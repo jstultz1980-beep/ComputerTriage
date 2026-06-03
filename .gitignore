@@ -1,0 +1,11 @@
+*.tmp
+*.bak
+*.old
+*.swp
+
+CSI-NetworkToolkit/Logs/*.log
+CSI-NetworkToolkit/Exports/*
+CSI-NetworkToolkit/Data/Fingerprints/*
+
+!CSI-NetworkToolkit/Exports/.gitkeep
+!CSI-NetworkToolkit/Data/Fingerprints/.gitkeep
