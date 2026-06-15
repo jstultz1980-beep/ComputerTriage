@@ -1,0 +1,147 @@
+﻿Network Toolkit Print Spooler Tool - Detailed Documentation Generated: 2026-03-27
+16:37:05
+
+============================================================ OVERVIEW
+============================================================ The Network Toolkit
+Print Spooler Tool is a PowerShell 5.1-based GUI utility designed to
+remotely manage Windows print servers.
+
+Primary capabilities include: - Remote printer enumeration (shared
+printers only) - Print job visibility per printer - Clearing individual
+printer queues - Clearing all queues (spool directory reset) -
+Restarting the print spooler service - Secure credential handling via
+Windows authentication - Persistent configuration storage (INI file)
+
+This tool is intended for use by system administrators managing network
+print servers.
+
+============================================================ CORE
+FUNCTIONAL COMPONENTS
+============================================================
+
+1. Authentication Model
+
+-   Uses Get-Credential for secure credential capture
+-   Supports retry (up to 3 attempts)
+-   Credentials are applied to all remote operations via Invoke-Command
+
+2. Remote Execution
+
+-   Uses Invoke-Command (WinRM)
+-   Executes all spooler and printer operations remotely
+-   Requires:
+    -   WinRM enabled
+    -   Administrative permissions on target server
+
+3. Printer Enumeration
+
+-   Uses Get-Printer
+-   Filters only shared printers
+-   Displays:
+    -   Share Name
+    -   Job Count
+
+4. Queue Management
+
+-   Clear Selected: Removes jobs only from selected printer
+-   Nuclear Reset: Stops spooler, clears spool directory, restarts
+    spooler
+
+5. Configuration Persistence
+
+Stored in PrintSpoolerTool.ini: - Last used server - Last used username
+
+6. Logging
+
+Log file: Logs.log
+
+Records: - Connection attempts - Username used - Execution events
+
+============================================================ USER
+INTERFACE ============================================================
+
+Fields: - Print Server: Target server name - Username: Credential
+username
+
+Buttons: - Connect: Establish session - Update Username: Save username -
+Refresh: Reload printer data - Clear Selected: Remove jobs from selected
+printer - Nuclear Reset: Full spooler reset
+
+Grid Behavior: - Full row selection enforced - Displays printer share
+names and job counts
+
+============================================================ SYSTEM
+REQUIREMENTS
+============================================================
+
+Client Machine: - Windows OS - PowerShell 5.1 - WinRM enabled (optional
+but recommended)
+
+Target Print Server: - Print Spooler service running - Remote management
+allowed - Firewall allows: - WinRM (5985/5986) - RPC (135 + dynamic
+ports)
+
+Permissions: - User must be local admin on print server
+
+============================================================ DEPLOYMENT
+INSTRUCTIONS
+============================================================
+
+1.  Place files in a single folder:
+
+    -   PrintSpoolerTool.ps1
+    -   PrintSpoolerTool.bat (optional launcher)
+    -   Logs (auto-created)
+    -   PrintSpoolerTool.ini (auto-created)
+
+2.  Enable script execution (once per machine): Set-ExecutionPolicy
+    RemoteSigned -Scope CurrentUser
+
+3.  Launch options:
+
+Option A - Direct: Right-click .ps1 â†’ Run with PowerShell
+
+Option B - Batch Launcher: Create .bat file:
+
+@echo off cd /d â€œ%~dp0â€ powershell.exe -NoProfile -ExecutionPolicy
+Bypass -STA -File â€œPrintSpoolerTool.ps1â€
+
+Double-click .bat to launch
+
+============================================================ USAGE
+INSTRUCTIONS
+============================================================
+
+1.  Enter print server name
+2.  Enter username (domain or local)
+3.  Click Connect
+4.  Enter password when prompted
+
+Once connected: - View printers and job counts - Select a printer row -
+Click â€œClear Selectedâ€ to remove jobs - Click â€œNuclear Resetâ€ for full
+reset
+
+============================================================
+TROUBLESHOOTING
+============================================================
+
+Authentication Issues: - Verify credentials - Ensure admin rights on
+target server
+
+Connection Failures: - Check DNS resolution - Ensure WinRM is enabled:
+Enable-PSRemoting -Force
+
+RPC Errors: - Check firewall rules - Verify spooler service is running
+
+No Printers Showing: - Ensure printers are shared - Verify permissions
+
+============================================================ NOTES
+============================================================
+
+-   Tool is designed to be portable
+-   No external dependencies required
+-   Uses native Windows PowerShell modules
+
+============================================================ END OF
+DOCUMENT ============================================================
+

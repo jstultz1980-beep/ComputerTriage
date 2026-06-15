@@ -91,10 +91,13 @@ function Global:Invoke-ConnectivityTriage {
 
 param(
     [string]$Target = "www.microsoft.com",
+    [switch]$NoClear,
     [switch]$PassThru
 )
 
-    Clear-Host
+    if(!$NoClear){
+        Clear-Host
+    }
 
     Write-Host ""
     Write-Host "CONNECTIVITY TRIAGE" -ForegroundColor Cyan
@@ -225,6 +228,126 @@ param(
     }
 
     $results | Format-Table -Wrap -AutoSize
+
+}
+
+function Global:Invoke-TestNetConnectionTool {
+
+param(
+    [string]$Target,
+    [int]$Port,
+    [switch]$TraceRoute,
+    [switch]$PassThru
+)
+
+    Clear-Host
+
+    Write-Host ""
+    Write-Host "TEST NETCONNECTION" -ForegroundColor Cyan
+    Write-Host "==================" -ForegroundColor DarkCyan
+    Write-Host ""
+
+    if(!(Get-Command Test-NetConnection -ErrorAction SilentlyContinue)){
+        Write-Host "Test-NetConnection is not available on this system." -ForegroundColor Yellow
+        return
+    }
+
+    if(!$Target){
+        $Target = Read-CSIInput "Target computer, IP, or hostname"
+    }
+
+    if(!$Port){
+        $portInput = Read-CSIInput "TCP port to test, blank for ping/routing only" -AllowEmpty
+
+        if($portInput){
+
+            if(-not ($portInput -as [int])){
+                Write-Host "Port must be a number." -ForegroundColor Red
+                return
+            }
+
+            $Port = [int]$portInput
+
+        }
+
+    }
+
+    $runTraceRoute = $TraceRoute.IsPresent
+
+    if(!$runTraceRoute){
+        $traceInput = Read-CSIInput "Run route diagnostics too? Type Y for yes" -AllowEmpty
+        if($traceInput){
+            $runTraceRoute = ($traceInput -match "^(y|yes)$")
+        }
+        else{
+            $runTraceRoute = $false
+        }
+    }
+
+    Write-Host ""
+    Write-Host "Testing:" $Target
+
+    if($Port){
+        Write-Host "Port:" $Port
+    }
+
+    Write-Host ""
+
+    $routeResult = $null
+
+    try {
+
+        if($Port){
+            $result = Test-NetConnection -ComputerName $Target -Port $Port -InformationLevel Detailed
+        }
+        else{
+            $result = Test-NetConnection -ComputerName $Target -InformationLevel Detailed
+        }
+
+        if($runTraceRoute){
+            Write-Host ""
+            Write-Host "Running route diagnostics..." -ForegroundColor Gray
+            $routeResult = Test-NetConnection -ComputerName $Target -InformationLevel Detailed -TraceRoute
+        }
+
+    }
+    catch {
+
+        Write-Host "Test-NetConnection failed." -ForegroundColor Red
+        Write-Host $_.Exception.Message
+        return
+
+    }
+
+    $summary = [pscustomobject]@{
+        Target           = $result.ComputerName
+        RemoteAddress    = $result.RemoteAddress
+        Resolved         = if($result.ResolvedAddresses){($result.ResolvedAddresses -join ",")}else{""}
+        InterfaceAlias   = $result.InterfaceAlias
+        SourceAddress    = $result.SourceAddress
+        PingSucceeded    = $result.PingSucceeded
+        TcpPort          = $result.RemotePort
+        TcpSucceeded     = $result.TcpTestSucceeded
+        RouteDiagnostics = $runTraceRoute
+    }
+
+    $summary | Format-List | Out-Host
+
+    if($runTraceRoute -and $routeResult -and $routeResult.TraceRoute){
+
+        Write-Host ""
+        Write-Host "Trace Route"
+        Write-Host "-----------"
+        $routeResult.TraceRoute | ForEach-Object { Write-Host $_ }
+
+    }
+
+    if($PassThru){
+        return [pscustomobject]@{
+            Test  = $result
+            Route = $routeResult
+        }
+    }
 
 }
 
@@ -692,23 +815,44 @@ param([switch]$PassThru)
 
     if(Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue){
 
-        $listeners = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
-                     Select-Object -First 60
+        $rawListeners = @(
+            Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+                Select-Object -First 250 |
+                ForEach-Object {
+
+                    $processName = ""
+
+                    try {
+                        $processName = (Get-Process -Id $_.OwningProcess -ErrorAction Stop).ProcessName
+                    }
+                    catch {}
+
+                    [pscustomobject]@{
+                        LocalAddress = $_.LocalAddress
+                        LocalPort    = $_.LocalPort
+                        ProcessId    = $_.OwningProcess
+                        ProcessName  = $processName
+                    }
+
+                }
+        )
+
+        if(Get-Command ConvertTo-CSIDedupedListeningPortRows -ErrorAction SilentlyContinue){
+            $listeners = @(ConvertTo-CSIDedupedListeningPortRows -ListeningPorts $rawListeners | Select-Object -First 60)
+        }
+        else{
+            $listeners = @($rawListeners | Sort-Object LocalPort,ProcessName,ProcessId -Unique | Select-Object -First 60)
+        }
 
         foreach($listener in $listeners){
 
-            $processName = ""
-
-            try {
-                $processName = (Get-Process -Id $listener.OwningProcess -ErrorAction Stop).ProcessName
-            }
-            catch {}
+            $addresses = if($listener.LocalAddresses){$listener.LocalAddresses}else{$listener.LocalAddress}
 
             $results += [pscustomobject]@{
                 Area   = "Listening TCP"
-                Name   = "$($listener.LocalAddress):$($listener.LocalPort)"
+                Name   = "$($addresses):$($listener.LocalPort)"
                 Status = "Listening"
-                Detail = "PID=$($listener.OwningProcess) Process=$processName"
+                Detail = "PID=$($listener.ProcessId) Process=$($listener.ProcessName)"
             }
 
         }
@@ -874,14 +1018,139 @@ param([switch]$PassThru)
 
 }
 
+function Global:Invoke-ResetDomainTimeSource {
+
+param([switch]$PassThru)
+
+    Clear-Host
+
+    Write-Host ""
+    Write-Host "RESET DOMAIN TIME SOURCE" -ForegroundColor Cyan
+    Write-Host "========================" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "This configures Windows Time to use the domain hierarchy, then verifies the active source."
+    Write-Host ""
+
+    $results = @()
+
+    try {
+        $service = Get-Service W32Time -ErrorAction SilentlyContinue
+        if(!$service){
+            throw "Windows Time service (W32Time) was not found."
+        }
+
+        Write-Host "Configuring domain hierarchy time source..."
+        $config = w32tm /config /syncfromflags:DOMHIER /update 2>&1
+        $configExit = $LASTEXITCODE
+
+        Write-Host "Restarting Windows Time service..."
+        Restart-Service W32Time -Force -ErrorAction Stop
+
+        Write-Host "Requesting resync..."
+        $resync = w32tm /resync /rediscover 2>&1
+        $resyncExit = $LASTEXITCODE
+
+        Write-Host "Verifying source..."
+        $source = w32tm /query /source 2>&1
+        $status = w32tm /query /status 2>&1
+
+        $results += [pscustomobject]@{
+            Step = "Configure"
+            Result = if($configExit -eq 0){"OK"}else{"Warning"}
+            Detail = (($config | Out-String).Trim())
+        }
+        $results += [pscustomobject]@{
+            Step = "Resync"
+            Result = if($resyncExit -eq 0){"OK"}else{"Warning"}
+            Detail = (($resync | Out-String).Trim())
+        }
+        $results += [pscustomobject]@{
+            Step = "Verify Source"
+            Result = "Info"
+            Detail = (($source | Out-String).Trim())
+        }
+        $results += [pscustomobject]@{
+            Step = "Verify Status"
+            Result = "Info"
+            Detail = (($status | Select-Object -First 6 | Out-String).Trim())
+        }
+    }
+    catch {
+        $results += [pscustomobject]@{
+            Step = "Reset Domain Time Source"
+            Result = "Failed"
+            Detail = $_.Exception.Message
+        }
+    }
+
+    if($PassThru){
+        return $results
+    }
+
+    $results | Format-Table -Wrap -AutoSize
+
+}
+
+function Global:Invoke-CSIRepairCommand {
+
+param(
+    [string]$Name,
+    [string]$FilePath,
+    [string[]]$Arguments
+)
+
+    Write-Host ""
+    Write-Host $Name -ForegroundColor Cyan
+    Write-Host ("-" * $Name.Length) -ForegroundColor DarkCyan
+    Write-Host "$FilePath $($Arguments -join ' ')"
+    Write-Host ""
+
+    $started = Get-Date
+    $output = @()
+
+    try {
+
+        & $FilePath @Arguments 2>&1 |
+            ForEach-Object {
+                $line = $_.ToString()
+                $output += $line
+                Write-Host $line
+            }
+
+        $exitCode = $LASTEXITCODE
+
+    }
+    catch {
+
+        $exitCode = -1
+        $output += $_.Exception.Message
+        Write-Host $_.Exception.Message -ForegroundColor Red
+
+    }
+
+    $elapsed = New-TimeSpan -Start $started -End (Get-Date)
+    $duration = $elapsed.ToString("hh\:mm\:ss")
+
+    return [pscustomobject]@{
+        Step       = $Name
+        ExitCode   = $exitCode
+        Duration   = $duration
+        LastOutput = (($output | Select-Object -Last 5) -join " ").Trim()
+    }
+
+}
+
 function Global:Invoke-UsualSuspectsTriage {
 
 param(
     [string]$Target = "www.microsoft.com",
+    [switch]$NoClear,
     [switch]$PassThru
 )
 
-    Clear-Host
+    if(!$NoClear){
+        Clear-Host
+    }
 
     Write-Host ""
     Write-Host "USUAL SUSPECTS TRIAGE" -ForegroundColor Cyan
@@ -1259,75 +1528,352 @@ param(
 
 }
 
-Register-CSICommand `
-    -Name "Usual Suspects Triage" `
-    -Command "Invoke-UsualSuspectsTriage" `
-    -Category "Troubleshooting" `
-    -Description "Run a broad live workstation/server issue triage" `
-    -Order 4
+function Global:Get-CSITriageSummary {
 
-Register-CSICommand `
-    -Name "Connectivity Triage" `
-    -Command "Invoke-ConnectivityTriage" `
-    -Category "Troubleshooting" `
-    -Description "Live gateway, DNS, internet, domain, HTTPS, and proxy checks" `
-    -Order 10
+param([object[]]$Health)
 
-Register-CSICommand `
-    -Name "DNS Path Test" `
-    -Command "Invoke-DNSPathTest" `
-    -Category "Troubleshooting" `
-    -Description "Check hosts file, DNS cache, DNS servers, and reverse lookup" `
-    -Order 31
+    $critical = @($Health | Where-Object {$_.Status -eq "Critical"}).Count
+    $warning = @($Health | Where-Object {$_.Status -eq "Warning"}).Count
+    $info = @($Health | Where-Object {$_.Status -eq "Info"}).Count
+    $ok = @($Health | Where-Object {$_.Status -eq "OK"}).Count
 
-Register-CSICommand `
-    -Name "Adapter Route Health" `
-    -Command "Invoke-AdapterRouteHealth" `
-    -Category "Troubleshooting" `
-    -Description "Expose adapter, DHCP, route, VPN, and Wi-Fi issues" `
-    -Order 11 `
-    -RequiresAdmin
+    return [pscustomobject]@{
+        Critical = $critical
+        Warning  = $warning
+        Info     = $info
+        OK       = $ok
+        Problems = $critical + $warning
+    }
 
-Register-CSICommand `
-    -Name "Port Reachability Matrix" `
-    -Command "Invoke-PortReachabilityMatrix" `
-    -Category "Troubleshooting" `
-    -Description "Test troubleshooting port profiles against a target" `
-    -Order 41
+}
 
-Register-CSICommand `
-    -Name "Packet Loss Monitor" `
-    -Command "Invoke-PacketLossMonitor" `
-    -Category "Troubleshooting" `
-    -Description "Live packet loss, latency, and jitter monitor" `
-    -Order 23
+function Global:Export-CSIFullTriageReport {
 
-Register-CSICommand `
-    -Name "Live Route Trace" `
-    -Command "Invoke-LiveRouteTrace" `
-    -Category "Troubleshooting" `
-    -Description "Show selected route, gateway health, ping, and hop trace to a target" `
-    -Order 24
+param(
+    [pscustomobject]$Report,
+    [string]$OutputRoot
+)
 
-Register-CSICommand `
-    -Name "Local Exposure Inspector" `
-    -Command "Invoke-LocalExposureInspector" `
-    -Category "Troubleshooting" `
-    -Description "Show firewall state, listening ports, allow rules, and RDP readiness" `
-    -Order 50 `
-    -RequiresAdmin
+    if(!$OutputRoot){
+        $OutputRoot = $CSIPaths.Exports
+    }
 
-Register-CSICommand `
-    -Name "TLS Certificate Check" `
-    -Command "Invoke-TLSCertificateCheck" `
-    -Category "Troubleshooting" `
-    -Description "Check TLS negotiation and certificate health" `
-    -Order 43
+    if(!(Test-Path $OutputRoot)){
+        New-Item -ItemType Directory -Path $OutputRoot -Force | Out-Null
+    }
 
-Register-CSICommand `
-    -Name "Time Sync Health" `
-    -Command "Invoke-TimeSyncHealth" `
-    -Category "Troubleshooting" `
-    -Description "Check Windows Time service and current time source" `
-    -Order 52 `
-    -RequiresAdmin
+    $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $basePath = Join-Path $OutputRoot "full-triage-$($Report.ComputerName)-$stamp"
+    $jsonPath = "$basePath.json"
+    $textPath = "$basePath.txt"
+
+    $Report | ConvertTo-Json -Depth 8 | Set-Content -Path $jsonPath -Encoding UTF8
+
+    $lines = @()
+    $lines += "CSI Full Computer Triage"
+    $lines += "========================"
+    $lines += "Computer: $($Report.ComputerName)"
+    $lines += "User: $($Report.UserName)"
+    $lines += "Collected: $($Report.CollectedAt)"
+    $lines += "Target: $($Report.Target)"
+    $lines += ""
+    $lines += "Summary"
+    $lines += "-------"
+    $lines += "Critical: $($Report.Summary.Critical)"
+    $lines += "Warning: $($Report.Summary.Warning)"
+    $lines += "Info: $($Report.Summary.Info)"
+    $lines += "OK: $($Report.Summary.OK)"
+    $lines += ""
+    $lines += "Problems"
+    $lines += "--------"
+
+    if($Report.Problems.Count -gt 0){
+        foreach($problem in $Report.Problems){
+            $lines += "$($problem.Status) [$($problem.Area)] $($problem.Check): $($problem.Detail)"
+        }
+    }
+    else{
+        $lines += "No critical or warning findings."
+    }
+
+    $lines += ""
+    $lines += "Repair Health"
+    $lines += "-------------"
+
+    if($Report.Repair.Count -gt 0){
+        foreach($repair in $Report.Repair){
+            $lines += "$($repair.Step): ExitCode=$($repair.ExitCode) Duration=$($repair.Duration) LastOutput=$($repair.LastOutput)"
+        }
+    }
+    else{
+        $lines += $Report.RepairDisposition
+    }
+
+    $lines += ""
+    $lines += "All Checks"
+    $lines += "----------"
+
+    foreach($check in $Report.Health){
+        $lines += "$($check.Status) [$($check.Area)] $($check.Check): $($check.Detail)"
+    }
+
+    $lines | Set-Content -Path $textPath -Encoding UTF8
+
+    return [pscustomobject]@{
+        Json = $jsonPath
+        Text = $textPath
+    }
+
+}
+
+function Global:Invoke-FullComputerTriage {
+
+param(
+    [string]$Target = "www.microsoft.com",
+    [switch]$SkipRepair,
+    [switch]$NoExport,
+    [switch]$PassThru
+)
+
+    Clear-Host
+
+    Write-Host ""
+    Write-Host "FULL COMPUTER TRIAGE" -ForegroundColor Cyan
+    Write-Host "====================" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "This tool checks local system health, network health, and common Windows service health."
+    Write-Host "Target for internet/DNS checks:" $Target
+    Write-Host ""
+
+    $fingerprint = $null
+    $health = @()
+    $repair = @()
+    $repairDisposition = "Repair checks were not run."
+    $exported = $null
+
+    try {
+
+        $fingerprint = Get-CSIComputerFingerprint
+
+    }
+    catch {
+
+        Write-Host "Unable to collect full computer fingerprint." -ForegroundColor Yellow
+        Write-Host $_.Exception.Message
+
+    }
+
+    if($fingerprint){
+
+        Write-Host "System Overview"
+        Write-Host "---------------"
+        Write-Host "Computer:" $fingerprint.ComputerName
+        Write-Host "User:" $fingerprint.UserName
+        Write-Host "Domain:" $fingerprint.Domain
+        Write-Host "Model:" $fingerprint.Manufacturer $fingerprint.Model
+        Write-Host "Serial:" $fingerprint.SerialNumber
+        Write-Host "OS:" $fingerprint.OS $fingerprint.OSVersion "Build" $fingerprint.OSBuild
+        Write-Host "Uptime Days:" $fingerprint.UptimeDays
+        Write-Host "CPU:" $fingerprint.CPU
+        Write-Host "Memory GB:" $fingerprint.MemoryGB
+        Write-Host "Pending Reboot:" $fingerprint.PendingReboot.Pending
+        Write-Host ""
+
+        Write-Host "Network Adapters"
+        Write-Host "----------------"
+        $fingerprint.NetworkAdapters | Format-Table -AutoSize | Out-Host
+
+        Write-Host ""
+        Write-Host "Disks"
+        Write-Host "-----"
+        $fingerprint.Disks | Format-Table -AutoSize | Out-Host
+
+        Write-Host ""
+    }
+
+    $health = Invoke-UsualSuspectsTriage -Target $Target -NoClear -PassThru
+    $summary = Get-CSITriageSummary -Health $health
+    $problems = @($health | Where-Object {$_.Status -in @("Critical","Warning")})
+
+    Write-Host ""
+    Write-Host "Triage Summary"
+    Write-Host "--------------"
+    Write-Host "Critical:" $summary.Critical
+    Write-Host "Warning:" $summary.Warning
+    Write-Host "Info:" $summary.Info
+    Write-Host "OK:" $summary.OK
+
+    Write-Host ""
+    Write-Host "Problems"
+    Write-Host "--------"
+
+    if($problems.Count -gt 0){
+        $problems | Format-Table Area,Check,Status,Detail -Wrap -AutoSize | Out-Host
+    }
+    else{
+        Write-Host "No critical or warning findings." -ForegroundColor Green
+    }
+
+    Write-Host ""
+    Write-Host "Repair Health Steps"
+    Write-Host "-------------------"
+    Write-Host "DISM ScanHealth, DISM RestoreHealth, and SFC are not run unless needed and confirmed."
+    Write-Host ""
+
+    if($SkipRepair){
+
+        $repairDisposition = "Repair steps skipped by parameter."
+        Write-Host $repairDisposition -ForegroundColor Yellow
+
+    }
+    elseif(!(Test-CSIAdministrator)){
+
+        $repairDisposition = "Repair steps require administrator rights."
+        Write-Host $repairDisposition -ForegroundColor Yellow
+
+    }
+    else{
+
+        $runCheckHealth = $false
+
+        try {
+            $answer = Read-CSIInput "Run quick DISM CheckHealth? Type Y to continue" -AllowEmpty
+            $runCheckHealth = ($answer -match "^(y|yes)$")
+        }
+        catch [System.OperationCanceledException] {
+            $runCheckHealth = $false
+        }
+
+        if(!$runCheckHealth){
+
+            $repairDisposition = "DISM CheckHealth was declined."
+            Write-Host $repairDisposition -ForegroundColor Yellow
+
+        }
+        else{
+
+            $repair += Invoke-CSIRepairCommand `
+                -Name "DISM CheckHealth" `
+                -FilePath "dism.exe" `
+                -Arguments @("/Online","/Cleanup-Image","/CheckHealth")
+
+            $checkHealthOutput = ($repair[-1].LastOutput)
+
+            if($repair[-1].ExitCode -eq 0 -and $checkHealthOutput -match "No component store corruption detected"){
+
+                $repairDisposition = "DISM CheckHealth found no component store corruption. ScanHealth, RestoreHealth, and SFC were not run."
+                Write-Host ""
+                Write-Host $repairDisposition -ForegroundColor Green
+
+            }
+            else{
+
+                Write-Host ""
+                Write-Host "DISM CheckHealth did not clearly report a clean component store." -ForegroundColor Yellow
+
+                $runDeepRepair = $false
+
+                try {
+                    $deepAnswer = Read-CSIInput "Run DISM ScanHealth, DISM RestoreHealth, and SFC? Type REPAIR to continue" -AllowEmpty
+                    $runDeepRepair = ($deepAnswer -eq "REPAIR")
+                }
+                catch [System.OperationCanceledException] {
+                    $runDeepRepair = $false
+                }
+
+                if($runDeepRepair){
+
+                    $repair += Invoke-CSIRepairCommand `
+                        -Name "DISM ScanHealth" `
+                        -FilePath "dism.exe" `
+                        -Arguments @("/Online","/Cleanup-Image","/ScanHealth")
+
+                    $scanOutput = ($repair[-1].LastOutput)
+
+                    if($repair[-1].ExitCode -eq 0 -and $scanOutput -match "No component store corruption detected"){
+
+                        $repairDisposition = "DISM ScanHealth found no component store corruption. RestoreHealth and SFC were not run."
+                        Write-Host ""
+                        Write-Host $repairDisposition -ForegroundColor Green
+
+                    }
+                    else{
+
+                        $repair += Invoke-CSIRepairCommand `
+                            -Name "DISM RestoreHealth" `
+                            -FilePath "dism.exe" `
+                            -Arguments @("/Online","/Cleanup-Image","/RestoreHealth")
+
+                        $repair += Invoke-CSIRepairCommand `
+                            -Name "System File Checker" `
+                            -FilePath "sfc.exe" `
+                            -Arguments @("/scannow")
+
+                        $repairDisposition = "Deep repair steps were run after confirmation."
+
+                    }
+
+                }
+                else{
+
+                    $repairDisposition = "Deep repair steps were not confirmed. ScanHealth, RestoreHealth, and SFC were not run."
+                    Write-Host $repairDisposition -ForegroundColor Yellow
+
+                }
+
+            }
+
+        }
+
+    }
+
+    if($repair.Count -gt 0){
+
+        Write-Host ""
+        Write-Host "Repair Summary"
+        Write-Host "--------------"
+        $repair | Format-Table -Wrap -AutoSize | Out-Host
+
+    }
+
+    $report = [pscustomobject]@{
+        ComputerName      = if($fingerprint){$fingerprint.ComputerName}else{$env:COMPUTERNAME}
+        UserName          = $env:USERNAME
+        CollectedAt       = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Target            = $Target
+        Summary           = $summary
+        Problems          = $problems
+        Fingerprint       = $fingerprint
+        Health            = $health
+        Repair            = $repair
+        RepairDisposition = $repairDisposition
+    }
+
+    if(!$NoExport){
+
+        try {
+            $exported = Export-CSIFullTriageReport -Report $report -OutputRoot $CSIPaths.Exports
+            $report | Add-Member -MemberType NoteProperty -Name Exported -Value $exported -Force
+            Write-Host ""
+            Write-Host "Report exported:" -ForegroundColor Green
+            Write-Host "Text:" $exported.Text
+            Write-Host "JSON:" $exported.Json
+        }
+        catch {
+            Write-Host ""
+            Write-Host "Report export failed." -ForegroundColor Red
+            Write-Host $_.Exception.Message
+        }
+
+    }
+
+    Write-Host ""
+    Write-Host "Triage complete." -ForegroundColor Green
+
+    if($PassThru){
+
+        return $report
+
+    }
+
+}

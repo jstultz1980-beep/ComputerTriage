@@ -1,6 +1,6 @@
 # =====================================================================
 # Start-NetworkConsole.ps1
-# CSI Network Toolkit Console Interface
+# Network Toolkit Console Interface
 # =====================================================================
 
 function Global:Start-NetworkConsole {
@@ -10,8 +10,8 @@ function Global:Start-NetworkConsole {
         Clear-Host
 
         Write-Host ""
-        Write-Host "CSI NETWORK TOOLKIT" -ForegroundColor Cyan
-        Write-Host "===================" -ForegroundColor DarkCyan
+        Write-Host "NETWORK TOOLKIT" -ForegroundColor Cyan
+        Write-Host "===============" -ForegroundColor DarkCyan
         Write-Host ""
 
         $commands = Get-CSICommands
@@ -70,9 +70,12 @@ function Global:Start-NetworkConsole {
         Write-Host ("{0}. Exit" -f $exitNumber) -ForegroundColor Red
         Write-Host ""
 
-        $choice = Read-Host "Select option"
-
-        if(Test-CSIBackCommand $choice){ return }
+        try {
+            $choice = Read-CSIInput "Select option"
+        }
+        catch [System.OperationCanceledException] {
+            return
+        }
 
         if (-not ($choice -as [int])) { continue }
 

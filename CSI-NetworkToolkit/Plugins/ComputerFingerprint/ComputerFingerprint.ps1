@@ -1,9 +1,19 @@
 function Global:Get-CSIFingerprintPath {
 
-    $path = Join-Path $CSIPaths.Data "Fingerprints"
+    $path = Join-Path $CSIPaths.Data "ComputerProfiles"
 
     if(!(Test-Path $path)){
-        New-Item -ItemType Directory -Path $path | Out-Null
+        New-Item -ItemType Directory -Path $path -Force | Out-Null
+    }
+
+    $legacyPath = Join-Path $CSIPaths.Data "Fingerprints"
+
+    if((Test-Path $legacyPath) -and !(Get-ChildItem -Path $path -Filter "*.json" -File -ErrorAction SilentlyContinue | Select-Object -First 1)){
+        Get-ChildItem -Path $legacyPath -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.Extension -in ".json",".html" } |
+            ForEach-Object {
+                Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $path $_.Name) -Force -ErrorAction SilentlyContinue
+            }
     }
 
     return $path
@@ -68,6 +78,376 @@ function Global:Get-CSIPendingRebootState {
 
 }
 
+function Global:ConvertTo-CSIHtmlText {
+
+param([object]$Value)
+
+    if($null -eq $Value){
+        return ""
+    }
+
+    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+
+}
+
+function Global:ConvertTo-CSIHtmlTable {
+
+param(
+    [string]$Title,
+    [object[]]$Rows
+)
+
+    $items = @($Rows | Where-Object { $null -ne $_ })
+
+    if($items.Count -eq 0){
+        return "<section><h2>$(ConvertTo-CSIHtmlText $Title)</h2><p class='muted'>No data found.</p></section>"
+    }
+
+    $columns = @($items[0].PSObject.Properties.Name)
+    $html = "<section><h2>$(ConvertTo-CSIHtmlText $Title)</h2><table><thead><tr>"
+
+    foreach($column in $columns){
+        $html += "<th>$(ConvertTo-CSIHtmlText $column)</th>"
+    }
+
+    $html += "</tr></thead><tbody>"
+
+    foreach($item in $items){
+
+        $html += "<tr>"
+
+        foreach($column in $columns){
+            $value = $item.$column
+
+            if($value -is [array]){
+                $value = $value -join ", "
+            }
+
+            $html += "<td>$(ConvertTo-CSIHtmlText $value)</td>"
+        }
+
+        $html += "</tr>"
+
+    }
+
+    $html += "</tbody></table></section>"
+    return $html
+
+}
+
+function Global:ConvertTo-CSIDedupedListeningPortRows {
+
+param([object[]]$ListeningPorts)
+
+    return @(
+        $ListeningPorts |
+            Where-Object { $null -ne $_ } |
+            Group-Object LocalPort,ProcessId,ProcessName |
+            ForEach-Object {
+
+                $first = $_.Group | Select-Object -First 1
+                $addresses = @(
+                    $_.Group |
+                        ForEach-Object { $_.LocalAddress } |
+                        Where-Object { $_ } |
+                        Sort-Object -Unique
+                )
+
+                [pscustomobject]@{
+                    LocalPort      = $first.LocalPort
+                    ProcessName    = $first.ProcessName
+                    ProcessId      = $first.ProcessId
+                    LocalAddresses = ($addresses -join ", ")
+                }
+
+            } |
+            Sort-Object LocalPort,ProcessName,ProcessId
+    )
+
+}
+
+function Global:Get-CSIComputerFingerprintServicingHealth {
+
+    $result = [pscustomobject]@{
+        Status = "Info"
+        FollowUpDismSfc = $false
+        Detail = "DISM CheckHealth was not run."
+        Recommendation = "Run Quick Diagnosis or DISM/SFC Repair Path if Windows servicing health is suspect."
+    }
+
+    if(!(Get-Command dism.exe -ErrorAction SilentlyContinue)){
+        $result.Detail = "dism.exe was not found."
+        $result.Recommendation = "Verify Windows servicing tools are available."
+        return $result
+    }
+
+    try {
+        $output = @(dism.exe /Online /Cleanup-Image /CheckHealth 2>&1 | ForEach-Object {$_.ToString()})
+        $text = ($output -join " ").Trim()
+
+        if($LASTEXITCODE -eq 0 -and $text -match "No component store corruption detected"){
+            $result.Status = "OK"
+            $result.Detail = "No component store corruption detected."
+            $result.Recommendation = "No DISM/SFC follow-up needed based on CheckHealth."
+        }
+        else{
+            $result.Status = "Warning"
+            $result.FollowUpDismSfc = $true
+            $result.Detail = if($text){$text.Substring(0,[math]::Min(260,$text.Length))}else{"DISM CheckHealth exited with code $LASTEXITCODE."}
+            $result.Recommendation = "Run DISM/SFC Repair Path if repair is approved, reboot if repairs occur, then rerun Quick Diagnosis."
+        }
+    }
+    catch {
+        $result.Status = "Warning"
+        $result.FollowUpDismSfc = $true
+        $result.Detail = $_.Exception.Message
+        $result.Recommendation = "Rerun elevated. If this still fails, inspect Windows servicing health."
+    }
+
+    return $result
+
+}
+
+function Global:ConvertTo-CSIComputerFingerprintHtml {
+
+param([object]$Fingerprint)
+
+    $pendingReboot = if($Fingerprint.PendingReboot -and $Fingerprint.PendingReboot.Pending){ "Yes" } else { "No" }
+    $pendingClass = if($pendingReboot -eq "Yes"){ "warn" } else { "ok" }
+    $servicing = $Fingerprint.ServicingHealth
+    $servicingStatus = if($servicing -and $servicing.Status){ [string]$servicing.Status } else { "Info" }
+    $servicingClass = if($servicingStatus -eq "OK"){ "ok" } elseif($servicingStatus -eq "Warning"){ "warn" } else { "muted" }
+    $servicingFollowUp = if($servicing -and $servicing.FollowUpDismSfc){ "Yes" } else { "No" }
+    $servicingDetail = if($servicing){ $servicing.Detail } else { "DISM CheckHealth was not collected." }
+    $servicingRecommendation = if($servicing){ $servicing.Recommendation } else { "Run Quick Diagnosis if Windows servicing health is suspect." }
+
+    $diskRows = @(
+        $Fingerprint.Disks |
+            ForEach-Object {
+                $freePct = if($_.SizeGB -and $_.SizeGB -ne 0){ [math]::Round(($_.FreeGB / $_.SizeGB) * 100, 1) } else { 0 }
+
+                [pscustomobject]@{
+                    Drive = $_.DeviceID
+                    Volume = $_.VolumeName
+                    SizeGB = $_.SizeGB
+                    FreeGB = $_.FreeGB
+                    FreePercent = $freePct
+                }
+            }
+    )
+
+    $adminRows = @(
+        $Fingerprint.LocalAdmins |
+            ForEach-Object {
+                [pscustomobject]@{
+                    Name = $_.Name
+                    Type = $_.ObjectClass
+                    Source = $_.PrincipalSource
+                }
+            }
+    )
+
+    $listeningPortRows = ConvertTo-CSIDedupedListeningPortRows -ListeningPorts $Fingerprint.ListeningPorts
+
+    $pendingDetails = ""
+
+    if($Fingerprint.PendingReboot -and $Fingerprint.PendingReboot.Details){
+        $pendingDetails = ($Fingerprint.PendingReboot.Details -join ", ")
+    }
+
+    $css = @"
+body{margin:0;background:#f3f6f8;color:#18212b;font-family:Segoe UI,Arial,sans-serif}
+header{background:#0d3054;color:white;padding:26px 34px}
+h1{margin:0;font-size:30px}
+.sub{margin-top:6px;color:#cfe1f2}
+main{padding:24px 34px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.card{background:white;border:1px solid #d9e1ea;border-left:5px solid #1b6598;padding:14px}
+.label{font-size:12px;text-transform:uppercase;color:#607080}
+.value{font-size:20px;font-weight:700;margin-top:6px}
+.ok{color:#137346}.warn{color:#a45b00}
+section{background:white;border:1px solid #d9e1ea;margin:16px 0;padding:18px}
+h2{font-size:18px;margin:0 0 12px 0;color:#0d3054}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid #e5ebf0;padding:8px;text-align:left;vertical-align:top}
+th{background:#eef4f8;color:#25394d}
+.grid{display:grid;grid-template-columns:220px 1fr;gap:6px 14px}
+.key{font-weight:700;color:#364b5f}
+.muted{color:#6c7884}
+"@
+
+    $html = @"
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Computer Profile - $(ConvertTo-CSIHtmlText $Fingerprint.ComputerName)</title>
+<style>$css</style>
+</head>
+<body>
+<header>
+<h1>Computer Profile</h1>
+<div class="sub">$(ConvertTo-CSIHtmlText $Fingerprint.ComputerName) &bull; Captured $(ConvertTo-CSIHtmlText $Fingerprint.CapturedAt)</div>
+</header>
+<main>
+<div class="cards">
+<div class="card"><div class="label">Computer</div><div class="value">$(ConvertTo-CSIHtmlText $Fingerprint.ComputerName)</div></div>
+<div class="card"><div class="label">OS Build</div><div class="value">$(ConvertTo-CSIHtmlText $Fingerprint.OSBuild)</div></div>
+<div class="card"><div class="label">Memory</div><div class="value">$(ConvertTo-CSIHtmlText $Fingerprint.MemoryGB) GB</div></div>
+<div class="card"><div class="label">Uptime</div><div class="value">$(ConvertTo-CSIHtmlText $Fingerprint.UptimeDays) days</div></div>
+<div class="card"><div class="label">Pending Reboot</div><div class="value $pendingClass">$pendingReboot</div></div>
+<div class="card"><div class="label">DISM/SFC Follow-Up</div><div class="value $servicingClass">$servicingFollowUp</div></div>
+</div>
+
+<section>
+<h2>Servicing Health</h2>
+<div class="grid">
+<div class="key">DISM CheckHealth</div><div class="$servicingClass">$(ConvertTo-CSIHtmlText $servicingStatus)</div>
+<div class="key">Follow Up Needed</div><div class="$servicingClass">$(ConvertTo-CSIHtmlText $servicingFollowUp)</div>
+<div class="key">Detail</div><div>$(ConvertTo-CSIHtmlText $servicingDetail)</div>
+<div class="key">Recommendation</div><div>$(ConvertTo-CSIHtmlText $servicingRecommendation)</div>
+</div>
+</section>
+
+<section>
+<h2>System Summary</h2>
+<div class="grid">
+<div class="key">User</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.UserName)</div>
+<div class="key">Domain</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.Domain)</div>
+<div class="key">Manufacturer / Model</div><div>$(ConvertTo-CSIHtmlText "$($Fingerprint.Manufacturer) $($Fingerprint.Model)")</div>
+<div class="key">Serial Number</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.SerialNumber)</div>
+<div class="key">BIOS Version</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.BIOSVersion)</div>
+<div class="key">OS</div><div>$(ConvertTo-CSIHtmlText "$($Fingerprint.OS) $($Fingerprint.OSVersion)")</div>
+<div class="key">Last Boot</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.LastBoot)</div>
+<div class="key">CPU</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.CPU)</div>
+<div class="key">Cores / Logical Processors</div><div>$(ConvertTo-CSIHtmlText "$($Fingerprint.Cores) / $($Fingerprint.LogicalProcessors)")</div>
+<div class="key">PowerShell</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.PowerShell)</div>
+<div class="key">Time Source</div><div>$(ConvertTo-CSIHtmlText $Fingerprint.TimeSource)</div>
+<div class="key">Pending Reboot Details</div><div>$(ConvertTo-CSIHtmlText $pendingDetails)</div>
+</div>
+</section>
+"@
+
+    $html += ConvertTo-CSIHtmlTable "Disks" $diskRows
+    $html += ConvertTo-CSIHtmlTable "Network IP Configuration" $Fingerprint.NetworkAdapters
+    $html += ConvertTo-CSIHtmlTable "Network Adapters / MAC Addresses" $Fingerprint.MACAddresses
+    $html += ConvertTo-CSIHtmlTable "Firewall Profiles" $Fingerprint.FirewallProfiles
+    $html += ConvertTo-CSIHtmlTable "Security Products" $Fingerprint.SecurityProducts
+    $html += ConvertTo-CSIHtmlTable "Defender Status" @($Fingerprint.Defender)
+    $html += ConvertTo-CSIHtmlTable "BitLocker" $Fingerprint.BitLocker
+    $html += ConvertTo-CSIHtmlTable "Local Administrators" $adminRows
+    $html += ConvertTo-CSIHtmlTable "Listening TCP Ports" $listeningPortRows
+
+    $html += @"
+</main>
+</body>
+</html>
+"@
+
+    return $html
+
+}
+
+function Global:Export-CSIComputerFingerprintHtml {
+
+param(
+    [object]$Fingerprint,
+    [string]$JsonPath
+)
+
+    if($JsonPath){
+        $htmlPath = [IO.Path]::ChangeExtension($JsonPath, ".html")
+    }
+    else{
+        $root = Get-CSIFingerprintPath
+        $safeName = ConvertTo-CSISafeFileName $Fingerprint.ComputerName
+        $htmlPath = Join-Path $root "$safeName.html"
+    }
+
+    ConvertTo-CSIComputerFingerprintHtml -Fingerprint $Fingerprint |
+        Set-Content -Path $htmlPath -Encoding UTF8
+
+    return $htmlPath
+
+}
+
+function Global:Save-CSIComputerFingerprint {
+
+param(
+    [object]$Fingerprint,
+    [string]$OutputRoot,
+    [string]$Prefix = "",
+    [switch]$Timestamped
+)
+
+    if(!$Fingerprint){
+        return $null
+    }
+
+    if($OutputRoot){
+        $root = $OutputRoot
+
+        if(!(Test-Path $root)){
+            New-Item -ItemType Directory -Path $root -Force | Out-Null
+        }
+    }
+    else{
+        $root = Get-CSIFingerprintPath
+    }
+
+    $safeName = ConvertTo-CSISafeFileName $Fingerprint.ComputerName
+    $fileBase = $safeName
+
+    if($Prefix){
+        $fileBase = "{0}-{1}" -f (ConvertTo-CSISafeFileName $Prefix),$safeName
+    }
+
+    if($Timestamped){
+        $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+        $fileBase = "{0}-{1}" -f $safeName,$stamp
+
+        if($Prefix){
+            $fileBase = "{0}-{1}-{2}" -f (ConvertTo-CSISafeFileName $Prefix),$safeName,$stamp
+        }
+    }
+
+    $jsonPath = Join-Path $root "$fileBase.json"
+
+    $Fingerprint |
+        ConvertTo-Json -Depth 8 |
+        Set-Content -Path $jsonPath -Encoding UTF8
+
+    $htmlPath = Export-CSIComputerFingerprintHtml -Fingerprint $Fingerprint -JsonPath $jsonPath
+
+    return [pscustomobject]@{
+        Json = $jsonPath
+        Html = $htmlPath
+    }
+
+}
+
+function Global:Open-CSIComputerFingerprintReport {
+
+param([string]$Path)
+
+    if(!(Test-Path $Path)){
+        Write-Host "Computer profile file missing." -ForegroundColor Red
+        return
+    }
+
+    try {
+        $fingerprint = Get-Content -Raw -Path $Path | ConvertFrom-Json
+        $htmlPath = Export-CSIComputerFingerprintHtml -Fingerprint $fingerprint -JsonPath $Path
+        Write-Host "Opening:" $htmlPath -ForegroundColor Green
+        Start-CSIToolProcess -FilePath $htmlPath | Out-Null
+    }
+    catch {
+        Write-Host "Unable to open computer profile report." -ForegroundColor Red
+        Write-Host $_.Exception.Message
+    }
+
+}
+
 function Global:Get-CSIComputerFingerprint {
 
     $os = Get-CimInstance Win32_OperatingSystem
@@ -121,9 +501,9 @@ function Global:Get-CSIComputerFingerprint {
 
     if(Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue){
 
-        $listeningPorts = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
-                          Select-Object -First 100 |
-                          ForEach-Object {
+        $rawListeningPorts = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+                             Select-Object -First 250 |
+                             ForEach-Object {
 
                               $processName = ""
 
@@ -139,7 +519,9 @@ function Global:Get-CSIComputerFingerprint {
                                   ProcessName  = $processName
                               }
 
-                          }
+                             }
+
+        $listeningPorts = ConvertTo-CSIDedupedListeningPortRows -ListeningPorts $rawListeningPorts
 
     }
 
@@ -203,6 +585,7 @@ function Global:Get-CSIComputerFingerprint {
     }
 
     $pendingReboot = Get-CSIPendingRebootState
+    $servicingHealth = Get-CSIComputerFingerprintServicingHealth
 
     if($os.LastBootUpTime -is [datetime]){
         $lastBoot = $os.LastBootUpTime
@@ -233,6 +616,7 @@ function Global:Get-CSIComputerFingerprint {
         MemoryGB         = [math]::Round($system.TotalPhysicalMemory / 1GB,2)
         PowerShell       = $PSVersionTable.PSVersion.ToString()
         PendingReboot    = $pendingReboot
+        ServicingHealth  = $servicingHealth
         Disks            = $disks
         NetworkAdapters  = $adapters
         MACAddresses     = $macs
@@ -288,23 +672,18 @@ param([switch]$PassThru)
     Clear-Host
 
     Write-Host ""
-    Write-Host "TAKE COMPUTER FINGERPRINT" -ForegroundColor Cyan
-    Write-Host "=========================" -ForegroundColor DarkCyan
+    Write-Host "TAKE COMPUTER PROFILE" -ForegroundColor Cyan
+    Write-Host "=====================" -ForegroundColor DarkCyan
     Write-Host ""
 
     $fingerprint = Get-CSIComputerFingerprint
-    $root = Get-CSIFingerprintPath
-    $safeName = ConvertTo-CSISafeFileName $fingerprint.ComputerName
-    $file = Join-Path $root "$safeName.json"
-
-    $fingerprint |
-        ConvertTo-Json -Depth 8 |
-        Set-Content -Path $file -Encoding UTF8
+    $saved = Save-CSIComputerFingerprint -Fingerprint $fingerprint
 
     Show-CSIComputerFingerprintSummary $fingerprint
 
     Write-Host ""
-    Write-Host "Fingerprint saved:" $file -ForegroundColor Green
+    Write-Host "Computer profile saved:" $saved.Json -ForegroundColor Green
+    Write-Host "HTML report saved:" $saved.Html -ForegroundColor Green
 
     if($PassThru){
         return $fingerprint
@@ -354,16 +733,16 @@ function Global:Invoke-ComputerFingerprintSelector {
     Clear-Host
 
     Write-Host ""
-    Write-Host "COMPUTER FINGERPRINT SELECTOR" -ForegroundColor Cyan
-    Write-Host "=============================" -ForegroundColor DarkCyan
+    Write-Host "COMPUTER PROFILE SELECTOR" -ForegroundColor Cyan
+    Write-Host "=========================" -ForegroundColor DarkCyan
     Write-Host ""
 
     $fingerprints = @(Get-CSIStoredFingerprints)
 
     if($fingerprints.Count -eq 0){
 
-        Write-Host "No computer fingerprints found." -ForegroundColor Yellow
-        Write-Host "Use option 2 to take a computer fingerprint."
+        Write-Host "No computer profiles found." -ForegroundColor Yellow
+        Write-Host "Run Quick Diagnosis to create a computer profile."
         return
 
     }
@@ -378,7 +757,7 @@ function Global:Invoke-ComputerFingerprintSelector {
 
     Write-Host ""
 
-    $choice = Read-CSIInput "Select computer fingerprint"
+    $choice = Read-CSIInput "Select computer profile"
 
     if(-not ($choice -as [int])){
         Write-Host "Invalid selection." -ForegroundColor Red
@@ -404,12 +783,11 @@ function Global:Invoke-ComputerFingerprintSelector {
 
         if(Test-Path $selected.Path){
 
-            Write-Host "Opening:" $selected.Path -ForegroundColor Green
-            Start-Process notepad.exe -ArgumentList "`"$($selected.Path)`"" | Out-Null
+            Open-CSIComputerFingerprintReport -Path $selected.Path
 
         }
         else{
-            Write-Host "Fingerprint file missing." -ForegroundColor Red
+            Write-Host "Computer profile file missing." -ForegroundColor Red
         }
 
     }
@@ -422,7 +800,7 @@ function Global:Invoke-ComputerFingerprintSelector {
 
         }
         else{
-            Write-Host "Fingerprint file missing." -ForegroundColor Red
+            Write-Host "Computer profile file missing." -ForegroundColor Red
         }
 
     }
@@ -433,18 +811,3 @@ function Global:Invoke-ComputerFingerprintSelector {
     }
 
 }
-
-Register-CSICommand `
-    -Name "Take Computer Fingerprint" `
-    -Command "Invoke-TakeComputerFingerprint" `
-    -Category "Fingerprint" `
-    -Description "Capture this computer's live system and network fingerprint" `
-    -Order 2 `
-    -RequiresAdmin
-
-Register-CSICommand `
-    -Name "Computer Fingerprint Selector" `
-    -Command "Invoke-ComputerFingerprintSelector" `
-    -Category "Fingerprint" `
-    -Description "Open or delete saved computer fingerprints" `
-    -Order 3

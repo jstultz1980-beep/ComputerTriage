@@ -1,0 +1,44 @@
+﻿{
+    "tools":  [
+                  {
+                      "name":  "fastresolver.portable",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "1.26.0",
+                      "launchPath":  ".\\Custom\\fastresolver.portable\\FastResolver.exe",
+                      "installPath":  ".\\Custom\\fastresolver.portable",
+                      "arguments":  ""
+                  },
+                  {
+                      "name":  "Firefox Portable",
+                      "source":  "PortableApps.com",
+                      "version":  "151.0.4",
+                      "launchPath":  ".\\Custom\\FirefoxPortable\\FirefoxPortable.exe",
+                      "installPath":  ".\\Custom\\FirefoxPortable",
+                      "arguments":  ""
+                  },
+                  {
+                      "name":  "kitty",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "0.76.1.13",
+                      "launchPath":  ".\\Custom\\kitty\\kitty.exe",
+                      "installPath":  ".\\Custom\\kitty",
+                      "arguments":  ""
+                  },
+                  {
+                      "name":  "putty",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "0.84.0",
+                      "launchPath":  ".\\Custom\\putty\\PUTTY.EXE",
+                      "installPath":  ".\\Custom\\putty",
+                      "arguments":  ""
+                  },
+                  {
+                      "name":  "winscp.portable",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "6.5.6",
+                      "launchPath":  ".\\Custom\\winscp.portable\\WinSCP.exe",
+                      "installPath":  ".\\Custom\\winscp.portable",
+                      "arguments":  ""
+                  }
+              ]
+}

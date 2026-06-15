@@ -91,10 +91,3 @@ param([switch]$PassThru)
     }
 
 }
-
-Register-CSICommand `
-    -Name "Network Topology Snapshot" `
-    -Command "Get-NetworkTopology" `
-    -Category "Discovery" `
-    -Description "Display key network infrastructure" `
-    -Order 12

@@ -5,8 +5,80 @@ function Global:Get-CSIReportFiles {
     }
 
     return Get-ChildItem -Path $CSIPaths.Exports -File -ErrorAction SilentlyContinue |
-           Where-Object {$_.Extension -in ".json",".csv",".txt",".log"} |
+           Where-Object {$_.Extension -in ".html",".htm",".json",".csv",".txt",".log",".xml"} |
            Sort-Object LastWriteTime -Descending
+
+}
+
+function Global:Open-CSIPath {
+
+param([string]$Path)
+
+    if(!$Path -or !(Test-Path $Path)){
+        Write-Host "Path not found:" $Path -ForegroundColor Yellow
+        return
+    }
+
+    Start-CSIToolProcess -FilePath "explorer.exe" -ArgumentList @("`"$Path`"") | Out-Null
+
+}
+
+function Global:Open-CSIOutputFile {
+
+param([string]$Path)
+
+    if(!$Path -or !(Test-Path $Path)){
+        Write-Host "File not found:" $Path -ForegroundColor Yellow
+        return
+    }
+
+    $extension = [System.IO.Path]::GetExtension($Path).ToLowerInvariant()
+
+    if($extension -in ".html",".htm",".pdf"){
+        Start-CSIToolProcess -FilePath $Path | Out-Null
+    }
+    else{
+        Start-CSIToolProcess -FilePath "notepad.exe" -ArgumentList @("`"$Path`"") | Out-Null
+    }
+
+}
+
+function Global:Get-CSIOutputLocations {
+
+    $locations = @(
+        [pscustomobject]@{
+            Name = "Exports"
+            Path = $CSIPaths.Exports
+            Notes = "Quick Diagnosis, triage reports, network reports, CSV/JSON/TXT/HTML exports"
+        }
+        [pscustomobject]@{
+            Name = "Computer Profiles"
+            Path = (Join-Path $CSIPaths.Data "ComputerProfiles")
+            Notes = "Computer profile JSON and HTML files"
+        }
+        [pscustomobject]@{
+            Name = "Minidumps"
+            Path = (Join-Path $CSIPaths.Data "MiniDumps")
+            Notes = "Collected minidumps and crash-analysis output"
+        }
+        [pscustomobject]@{
+            Name = "Print Queue Data"
+            Path = (Join-Path $CSIPaths.Data "PrintQueues")
+            Notes = "Print tool config, logs, and local print utility data"
+        }
+        [pscustomobject]@{
+            Name = "Toolkit Logs"
+            Path = $CSIPaths.Logs
+            Notes = "Toolkit log files"
+        }
+        [pscustomobject]@{
+            Name = "All Toolkit Data"
+            Path = $CSIPaths.Data
+            Notes = "All data subfolders"
+        }
+    )
+
+    return $locations | Where-Object { $_.Path }
 
 }
 
@@ -64,7 +136,7 @@ function Global:Invoke-ReportSelector {
     if($action -match "^(o|open)$"){
 
         Write-Host "Opening:" $selected.FullName -ForegroundColor Green
-        Start-Process notepad.exe -ArgumentList "`"$($selected.FullName)`"" | Out-Null
+        Open-CSIOutputFile -Path $selected.FullName
 
     }
     elseif($action -match "^(d|delete)$"){
@@ -76,6 +148,76 @@ function Global:Invoke-ReportSelector {
     else{
 
         Write-Host "Action not recognized. Use Open or Delete." -ForegroundColor Red
+
+    }
+
+}
+
+function Global:Invoke-OpenToolkitOutputs {
+
+    while($true){
+
+        Clear-Host
+
+        Write-Host ""
+        Write-Host "TOOL OUTPUTS" -ForegroundColor Cyan
+        Write-Host "============" -ForegroundColor DarkCyan
+        Write-Host ""
+
+        $locations = @(Get-CSIOutputLocations)
+
+        Write-Host "0. Open All Output Folders"
+
+        for($i = 0; $i -lt $locations.Count; $i++){
+            $location = $locations[$i]
+            $state = if(Test-Path $location.Path){"Ready"}else{"Missing"}
+            Write-Host ("{0}. {1}  [{2}]" -f ($i + 1),$location.Name,$state)
+            Write-Host ("   {0}" -f $location.Path) -ForegroundColor DarkGray
+        }
+
+        Write-Host ""
+        Write-Host "R. Recent Export Files"
+        Write-Host ""
+
+        $choice = Read-CSIInput "Select output location"
+
+        if($choice -match "^(r|recent)$"){
+            Invoke-ReportSelector
+            continue
+        }
+
+        if($choice -eq "0"){
+
+            foreach($location in $locations | Where-Object { Test-Path $_.Path }){
+                Open-CSIPath -Path $location.Path
+            }
+
+            Write-Host "Opened all available output folders." -ForegroundColor Green
+            return
+
+        }
+
+        if(-not ($choice -as [int])){
+            Write-Host "Invalid selection." -ForegroundColor Red
+            continue
+        }
+
+        $index = [int]$choice
+
+        if($index -lt 1 -or $index -gt $locations.Count){
+            Write-Host "Invalid selection." -ForegroundColor Red
+            continue
+        }
+
+        $selected = $locations[$index - 1]
+
+        if(!(Test-Path $selected.Path)){
+            New-Item -ItemType Directory -Path $selected.Path -Force | Out-Null
+        }
+
+        Write-Host "Opening:" $selected.Path -ForegroundColor Green
+        Open-CSIPath -Path $selected.Path
+        return
 
     }
 
@@ -144,15 +286,8 @@ param(
 }
 
 Register-CSICommand `
-    -Name "Report Selector" `
-    -Command "Invoke-ReportSelector" `
-    -Category "Plugins" `
-    -Description "Open or delete saved reports" `
-    -Order 91
-
-Register-CSICommand `
-    -Name "Create Network Report" `
-    -Command "Invoke-NetworkReportExporter" `
-    -Category "Plugins" `
-    -Description "Scan a CIDR and export a new alive-host report" `
-    -Order 92
+    -Name "Open Tool Outputs" `
+    -Command "Invoke-OpenToolkitOutputs" `
+    -Category "Reports" `
+    -Description "Open exports, reports, computer profiles, minidumps, print data, and toolkit logs" `
+    -Order 900

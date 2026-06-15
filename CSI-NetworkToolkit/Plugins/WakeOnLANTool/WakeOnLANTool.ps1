@@ -57,10 +57,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "Wake-on-LAN Tool" `
-    -Command "Invoke-WakeOnLANTool" `
-    -Category "Plugins" `
-    -Description "Send a Wake-on-LAN magic packet" `
-    -Order 72

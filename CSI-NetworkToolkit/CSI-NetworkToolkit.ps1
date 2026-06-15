@@ -1,6 +1,6 @@
 # =====================================================================
 # CSI-NetworkToolkit.ps1
-# CSI Network Toolkit - Main Launcher
+# Network Toolkit - Main Launcher
 # =====================================================================
 # Version : 1.0
 # PowerShell : 5.1+
@@ -46,6 +46,10 @@ if(!(Test-Path $CSIFiles.Registry)){
 
 . "$($CSIFiles.Registry)"
 
+if($CSIFiles.ToolCatalog -and (Test-Path $CSIFiles.ToolCatalog)){
+    . "$($CSIFiles.ToolCatalog)"
+}
+
 # --------------------------------------------------
 # Ensure Required Directories
 # --------------------------------------------------
@@ -54,6 +58,9 @@ $requiredDirs = @(
     $CSIPaths.Logs
     $CSIPaths.Exports
     $CSIPaths.Data
+    $CSIPaths.TempOutputs
+    $CSIPaths.Custom
+    $CSIPaths.Manifests
 )
 
 foreach($dir in $requiredDirs){
@@ -292,7 +299,21 @@ if($RunCommand){
 
 }
 
-Start-NetworkConsole
+try {
+    Start-NetworkConsole
+}
+catch [System.OperationCanceledException] {
+    Write-Host ""
+    Write-Host $_.Exception.Message -ForegroundColor Yellow
+}
+catch {
+    Write-Host ""
+    Write-Host "Command failed." -ForegroundColor Red
+    Write-Host $_
+}
+
+Write-Host ""
+[void](Read-Host "Press ENTER to close")
 
 # --------------------------------------------------
 # Shutdown Logging

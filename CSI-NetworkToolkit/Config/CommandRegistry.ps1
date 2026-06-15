@@ -13,6 +13,7 @@ param(
     [string]$Category = "General",
     [string]$Description = "",
     [string]$Source = "",
+    [string]$Id = "",
     [int]$Order = 100,
     [switch]$RequiresAdmin
 )
@@ -28,8 +29,13 @@ if(!$Source){
 
 }
 
+if(!$Id){
+    $Id = ($Name -replace '[^A-Za-z0-9]+','-').Trim('-').ToLowerInvariant()
+}
+
 $entry = [pscustomobject]@{
 
+    Id          = $Id
     Name        = $Name
     Command     = $Command
     Category    = $Category
@@ -41,11 +47,11 @@ $entry = [pscustomobject]@{
 
 }
 
-$existing = $Global:CSIRegistry | Where-Object {$_.Name -eq $Name} | Select-Object -First 1
+$existing = $Global:CSIRegistry | Where-Object {$_.Id -eq $Id -or $_.Name -eq $Name} | Select-Object -First 1
 
 if($existing){
 
-    $Global:CSIRegistry = @($Global:CSIRegistry | Where-Object {$_.Name -ne $Name})
+    $Global:CSIRegistry = @($Global:CSIRegistry | Where-Object {$_.Id -ne $Id -and $_.Name -ne $Name})
 
 }
 
@@ -63,10 +69,16 @@ function Invoke-CSICommand {
 
 param(
     [string]$Name,
+    [string]$Id,
     [object[]]$Arguments = @()
 )
 
-$cmd = $CSIRegistry | Where-Object {$_.Name -eq $Name} | Select-Object -First 1
+if($Id){
+    $cmd = $CSIRegistry | Where-Object {$_.Id -eq $Id} | Select-Object -First 1
+}
+else{
+    $cmd = $CSIRegistry | Where-Object {$_.Name -eq $Name} | Select-Object -First 1
+}
 
 if(!$cmd){
 

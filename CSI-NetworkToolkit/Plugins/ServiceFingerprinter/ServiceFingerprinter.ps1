@@ -93,9 +93,42 @@ param(
 
 }
 
+function Global:Invoke-PortAndServiceTest {
+
+    while($true){
+
+        Clear-Host
+
+        Write-Host ""
+        Write-Host "PORT AND SERVICE TEST" -ForegroundColor Cyan
+        Write-Host "=====================" -ForegroundColor DarkCyan
+        Write-Host ""
+        Write-Host "1. Common Port Scan"
+        Write-Host "2. Port Reachability Matrix"
+        Write-Host "3. Service Banner Check"
+        Write-Host "4. TLS Certificate Check"
+        Write-Host ""
+
+        $choice = Read-CSIInput "Select port task"
+
+        switch($choice){
+            "1" { Invoke-PortScan }
+            "2" { Invoke-PortReachabilityMatrix }
+            "3" { Invoke-ServiceFingerprinter }
+            "4" { Invoke-TLSCertificateCheck }
+            default { Write-Host "Invalid selection." -ForegroundColor Red }
+        }
+
+        Write-Host ""
+        [void](Read-Host "Press ENTER to continue")
+
+    }
+
+}
+
 Register-CSICommand `
-    -Name "Service Fingerprinter" `
-    -Command "Invoke-ServiceFingerprinter" `
-    -Category "Plugins" `
-    -Description "Check open TCP ports and capture simple service banners" `
-    -Order 42
+    -Name "Port And Service Test" `
+    -Command "Invoke-PortAndServiceTest" `
+    -Category "Troubleshooting" `
+    -Description "Port scan, reachability profiles, service banners, and TLS certificate checks" `
+    -Order 40

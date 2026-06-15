@@ -52,11 +52,3 @@ param(
         Format-Table -AutoSize
 
 }
-
-Register-CSICommand `
-    -Name "DHCP Scope Inspector" `
-    -Command "Invoke-DHCPScopeInspector" `
-    -Category "Plugins" `
-    -Description "Inspect DHCP scopes when RSAT DHCP tools are available" `
-    -Order 51 `
-    -RequiresAdmin

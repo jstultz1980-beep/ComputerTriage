@@ -6,6 +6,22 @@
 CSI-NetworkToolkit/Logs/*.log
 CSI-NetworkToolkit/Exports/*
 CSI-NetworkToolkit/Data/Fingerprints/*
+CSI-NetworkToolkit/Data/PrintQueues/*
+CSI-NetworkToolkit/Data/PrintQueueTools/*
+CSI-NetworkToolkit/Data/MiniDumps/*
+CSI-NetworkToolkit/Data/Temp/*
+CSI-NetworkToolkit/Data/TempToolOutputs/*
+CSI-NetworkToolkit/Data/ComputerProfiles/*
+CSI-NetworkToolkit/ExternalTools/*
+CSI-NetworkToolkit/_Downloads/*
+Custom/*
+manifests/custom-tools.json.bak
+CSI-NetworkToolkit/Plugins/PrintQueues/Logs/*
+CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/Logs/*
+CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/PrintSpoolerTool.ini
 
 !CSI-NetworkToolkit/Exports/.gitkeep
 !CSI-NetworkToolkit/Data/Fingerprints/.gitkeep
+!CSI-NetworkToolkit/Data/ComputerProfiles/.gitkeep
+!CSI-NetworkToolkit/Data/TempToolOutputs/.gitkeep
+!Custom/.gitkeep

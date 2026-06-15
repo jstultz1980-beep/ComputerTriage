@@ -46,10 +46,3 @@ param([switch]$PassThru)
     }
 
 }
-
-Register-CSICommand `
-    -Name "Network Neighbors" `
-    -Command "Get-NetworkNeighbors" `
-    -Category "Discovery" `
-    -Description "Show reachable IPv4 neighbor table entries" `
-    -Order 13

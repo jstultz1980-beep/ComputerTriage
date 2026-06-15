@@ -27,6 +27,10 @@ param(
             Exit-CSITool
         }
 
+        if([Console]::IsInputRedirected -and !$value -and !$AllowEmpty){
+            Exit-CSITool
+        }
+
         if($AllowEmpty -or $value){
             return $value
         }
@@ -101,10 +105,10 @@ param([string]$CommandName)
 
     try {
 
-        Start-Process `
+        Start-CSIToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList $arguments `
-            -Verb RunAs `
+            -Elevated `
             -WindowStyle Normal | Out-Null
 
         return $true

@@ -112,10 +112,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "Subnet Calculator" `
-    -Command "Invoke-SubnetCalculator" `
-    -Category "Plugins" `
-    -Description "Break down CIDR ranges and check overlap" `
-    -Order 70

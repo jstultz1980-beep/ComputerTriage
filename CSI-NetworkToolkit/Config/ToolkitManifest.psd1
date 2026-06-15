@@ -1,10 +1,10 @@
 @{
 
-ToolkitName = "CSI Network Toolkit"
+ToolkitName = "Network Toolkit"
 
 Version = "1.0"
 
-Author = "CSI"
+Author = "Network Toolkit"
 
 Description = "Portable network discovery and administration toolkit"
 

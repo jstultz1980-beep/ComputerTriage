@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Network Toolkit Help</title>
+  <style>
+    body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#eef4f1;color:#1f363d}
+    header{background:#16525b;color:white;padding:28px 36px}
+    main{max-width:1180px;margin:0 auto;padding:28px 36px}
+    section{background:white;border:1px solid #c9d8d4;border-radius:8px;margin:0 0 18px;padding:18px 20px}
+    h1,h2{margin:0 0 10px}
+    h3{margin:18px 0 8px;color:#16525b}
+    code{background:#eef4f1;padding:2px 5px;border-radius:4px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{text-align:left;border-bottom:1px solid #dce7e3;padding:8px;vertical-align:top}
+    th{background:#e3efeb;color:#1f363d}
+    .note{border-left:4px solid #ee6f4c;padding-left:12px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Network Toolkit Help</h1>
+  <div>Portable technician toolkit for live workstation and network troubleshooting.</div>
+</header>
+<main>
+  <section>
+    <h2>Start Here</h2>
+    <p>Use <strong>Quick Diagnosis</strong> first. It creates a technician-friendly HTML report and a Computer Profile for the local machine. The repair tools should be used only after Quick Diagnosis indicates servicing or system file follow-up, unless you deliberately override the warning.</p>
+    <p class="note">The toolkit is designed for live troubleshooting. Reports, temp tool outputs, and profiles are retained in bounded folders so you can compare recent results without filling the USB drive indefinitely.</p>
+  </section>
+  <section>
+    <h2>Main Workflows</h2>
+    <table>
+      <tr><th>Area</th><th>Use It For</th></tr>
+      <tr><td>Quick Diagnosis</td><td>One-click local health report, DISM CheckHealth status, hardware flags, crashes, network basics, and Computer Profile output.</td></tr>
+      <tr><td>Windows</td><td>Event logs, services, startup, updates, Defender, domain/GPO checks, Process Explorer, Procmon, and DISM/SFC repair.</td></tr>
+      <tr><td>Hardware</td><td>Device Manager problems, disk health, resource pressure, RAMMap, HWiNFO, CrystalDiskInfo, and minidump collection.</td></tr>
+      <tr><td>Network</td><td>Connectivity triage, Test-NetConnection, route tracing, DNS path checks, TLS checks, TCPView, PsPing, WinMTR, Wireshark, SSH/SFTP tools.</td></tr>
+      <tr><td>Infrastructure</td><td>DHCP server/rogue locator, DHCP scope review, time sync, DNS diagnostics, and admin/service utilities.</td></tr>
+      <tr><td>Files</td><td>Everything, WizTree, WinDirStat, WinMerge, Handle, and file/process lock investigation.</td></tr>
+      <tr><td>Robocopy</td><td>Plain-language builder for copy, mirror, network copy, and permission-preserving migration commands.</td></tr>
+      <tr><td>Chocolatey</td><td>Install Chocolatey, search packages, scan installed packages, upgrade, and uninstall.</td></tr>
+      <tr><td>Reports</td><td>Open Quick Diagnosis reports, Computer Profiles, temp tool outputs, logs, and minidump collections.</td></tr>
+    </table>
+  </section>
+  <section>
+    <h2>Quick Diagnosis and Repair</h2>
+    <p>Quick Diagnosis is the primary triage path. It runs diagnostic-only checks and saves a Computer Profile. DISM/SFC repair remains separate. If Quick Diagnosis does not indicate servicing follow-up, the GUI will ask for override confirmation before repair runs.</p>
+  </section>
+  <section>
+    <h2>Temp Tool Outputs</h2>
+    <p>Console-driven tools create timestamped output sessions under <code>Data\TempToolOutputs</code>. These sessions capture metadata and a transcript for troubleshooting tool usage without collecting every GUI log line. The toolkit keeps a limited recent history and removes older sessions automatically.</p>
+  </section>
+  <section>
+    <h2>Chocolatey</h2>
+    <p>Use Search Packages to find packages and Install Selected to install. Use Scan Installed to list local packages. Upgrade Selected and Uninstall Selected act on the selected installed package. If a package is already installed, the toolkit will show a message instead of launching a pointless install console.</p>
+  </section>
+  <section>
+    <h2>Minidumps and BSOD Review</h2>
+    <p>The Minidump Collector copies the selected dump into a temp output session. Point BlueScreenView or WinDbg at that copied folder so analysis does not depend on locked or protected Windows dump locations.</p>
+  </section>
+  <section>
+    <h2>Robocopy Builder Tips</h2>
+    <p>The current builder is intentionally balanced. Useful future enhancements would be saved presets, source/destination browse buttons, estimated action summary, and a dry-run diff view. Those would add power without making the builder much harder for junior technicians.</p>
+  </section>
+</main>
+</body>
+</html>

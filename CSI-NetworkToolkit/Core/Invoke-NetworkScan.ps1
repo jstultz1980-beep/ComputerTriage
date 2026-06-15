@@ -79,10 +79,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "Network Scan" `
-    -Command "Invoke-NetworkScan" `
-    -Category "Scanning" `
-    -Description "Auto-detect and scan the local IPv4 network" `
-    -Order 21

@@ -66,11 +66,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "ARP Inventory Exporter" `
-    -Command "Invoke-ARPInventoryExporter" `
-    -Category "Plugins" `
-    -Description "Export IPv4 neighbor inventory to CSV or JSON" `
-    -Order 90 `
-    -RequiresAdmin

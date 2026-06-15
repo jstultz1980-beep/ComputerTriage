@@ -32,6 +32,44 @@ if($CIDR -notmatch "^([^/]+)/(\d{1,2})$"){
     throw "Invalid CIDR format. Example: 192.168.1.0/24"
 }
 
+$baseIP = $matches[1]
+$prefix = [int]$matches[2]
+
+if($prefix -lt 0 -or $prefix -gt 32){
+    throw "Invalid CIDR prefix. Use a value from 0 through 32."
+}
+
+$baseNumber = Convert-IPToNumber $baseIP
+
+if($prefix -eq 0){
+    $mask = [uint32]0
+}
+else{
+    $mask = [uint32]([uint32]::MaxValue -shl (32 - $prefix))
+}
+
+$network = [uint32]($baseNumber -band $mask)
+$broadcast = [uint32]($network -bor (-bnot $mask))
+
+if($prefix -ge 31){
+    $start = [uint64]$network
+    $end = [uint64]$broadcast
+}
+else{
+    $start = [uint64]([uint32]($network + 1))
+    $end = [uint64]([uint32]($broadcast - 1))
+}
+
+if(($end - $start + 1) -gt 65536){
+    throw "CIDR range too large. Use /16 or smaller."
+}
+
+for($number = $start; $number -le $end; $number++){
+    Convert-NumberToIP ([uint32]$number)
+}
+
+}
+
 function Global:Invoke-CSIPingSweep {
 
 param(
@@ -90,43 +128,5 @@ if($batch.Count -gt 0){
 }
 
 return $alive
-
-}
-
-$baseIP = $matches[1]
-$prefix = [int]$matches[2]
-
-if($prefix -lt 0 -or $prefix -gt 32){
-    throw "Invalid CIDR prefix. Use a value from 0 through 32."
-}
-
-$baseNumber = Convert-IPToNumber $baseIP
-
-if($prefix -eq 0){
-    $mask = [uint32]0
-}
-else{
-    $mask = [uint32]([uint32]::MaxValue -shl (32 - $prefix))
-}
-
-$network = [uint32]($baseNumber -band $mask)
-$broadcast = [uint32]($network -bor (-bnot $mask))
-
-if($prefix -ge 31){
-    $start = [uint64]$network
-    $end = [uint64]$broadcast
-}
-else{
-    $start = [uint64]([uint32]($network + 1))
-    $end = [uint64]([uint32]($broadcast - 1))
-}
-
-if(($end - $start + 1) -gt 65536){
-    throw "CIDR range too large. Use /16 or smaller."
-}
-
-for($number = $start; $number -le $end; $number++){
-    Convert-NumberToIP ([uint32]$number)
-}
 
 }

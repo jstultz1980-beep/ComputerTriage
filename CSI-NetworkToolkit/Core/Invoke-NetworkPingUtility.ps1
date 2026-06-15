@@ -53,10 +53,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "Network Ping Scan" `
-    -Command "Invoke-NetworkPingUtility" `
-    -Category "Scanning" `
-    -Description "Ping sweep a CIDR range" `
-    -Order 20

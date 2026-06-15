@@ -146,9 +146,38 @@ param(
 
 }
 
+function Global:Invoke-DNSDiagnostics {
+
+    while($true){
+
+        Clear-Host
+
+        Write-Host ""
+        Write-Host "DNS DIAGNOSTICS" -ForegroundColor Cyan
+        Write-Host "===============" -ForegroundColor DarkCyan
+        Write-Host ""
+        Write-Host "1. DNS Lookup And Server Compare"
+        Write-Host "2. DNS Path Test"
+        Write-Host ""
+
+        $choice = Read-CSIInput "Select DNS task"
+
+        switch($choice){
+            "1" { Invoke-DNSToolkit }
+            "2" { Invoke-DNSPathTest }
+            default { Write-Host "Invalid selection." -ForegroundColor Red }
+        }
+
+        Write-Host ""
+        [void](Read-Host "Press ENTER to continue")
+
+    }
+
+}
+
 Register-CSICommand `
-    -Name "DNS Toolkit" `
-    -Command "Invoke-DNSToolkit" `
-    -Category "Plugins" `
-    -Description "Resolve hostnames, reverse lookups, and compare DNS servers" `
+    -Name "DNS Diagnostics" `
+    -Command "Invoke-DNSDiagnostics" `
+    -Category "Troubleshooting" `
+    -Description "DNS lookup, resolver comparison, cache, hosts file, and reverse lookup checks" `
     -Order 30

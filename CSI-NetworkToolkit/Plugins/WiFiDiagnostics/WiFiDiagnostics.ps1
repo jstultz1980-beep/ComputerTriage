@@ -451,30 +451,42 @@ param([switch]$PassThru)
 
 }
 
+function Global:Invoke-WiFiDiagnostics {
+
+    while($true){
+
+        Clear-Host
+
+        Write-Host ""
+        Write-Host "WI-FI DIAGNOSTICS" -ForegroundColor Cyan
+        Write-Host "=================" -ForegroundColor DarkCyan
+        Write-Host ""
+        Write-Host "1. Wi-Fi Issue Scan"
+        Write-Host "2. Wi-Fi Status"
+        Write-Host "3. Visible Wi-Fi Networks"
+        Write-Host "4. Saved Wi-Fi Profiles"
+        Write-Host ""
+
+        $choice = Read-CSIInput "Select Wi-Fi task"
+
+        switch($choice){
+            "1" { Invoke-WiFiIssueScan }
+            "2" { Invoke-WiFiStatus }
+            "3" { Invoke-WiFiNetworks }
+            "4" { Invoke-WiFiProfiles }
+            default { Write-Host "Invalid selection." -ForegroundColor Red }
+        }
+
+        Write-Host ""
+        [void](Read-Host "Press ENTER to continue")
+
+    }
+
+}
+
 Register-CSICommand `
-    -Name "Wi-Fi Status" `
-    -Command "Invoke-WiFiStatus" `
+    -Name "Wi-Fi Diagnostics" `
+    -Command "Invoke-WiFiDiagnostics" `
     -Category "Wi-Fi" `
-    -Description "Show current Wi-Fi service and connection status" `
+    -Description "Signal, service, channel, visible network, and saved profile diagnostics" `
     -Order 60
-
-Register-CSICommand `
-    -Name "Wi-Fi Networks" `
-    -Command "Invoke-WiFiNetworks" `
-    -Category "Wi-Fi" `
-    -Description "Show visible Wi-Fi networks, channels, radios, and signal" `
-    -Order 62
-
-Register-CSICommand `
-    -Name "Wi-Fi Profiles" `
-    -Command "Invoke-WiFiProfiles" `
-    -Category "Wi-Fi" `
-    -Description "Show saved Wi-Fi profile security and connection settings" `
-    -Order 63
-
-Register-CSICommand `
-    -Name "Wi-Fi Issue Scan" `
-    -Command "Invoke-WiFiIssueScan" `
-    -Category "Wi-Fi" `
-    -Description "Expose live Wi-Fi service, signal, security, and channel issues" `
-    -Order 61

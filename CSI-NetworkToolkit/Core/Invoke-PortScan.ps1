@@ -69,10 +69,3 @@ param(
     }
 
 }
-
-Register-CSICommand `
-    -Name "Port Scan" `
-    -Command "Invoke-PortScan" `
-    -Category "Scanning" `
-    -Description "Scan common TCP ports on a target host" `
-    -Order 40

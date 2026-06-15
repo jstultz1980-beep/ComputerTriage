@@ -1,9 +1,9 @@
 @{
 
-Name        = "Computer Fingerprint"
+Name        = "Computer Profile"
 Version     = "1.0"
 Author      = "CSI"
-Description = "Capture and manage computer fingerprints"
+Description = "Capture and manage computer profiles"
 Script      = "ComputerFingerprint.ps1"
 Enabled     = $true
 
