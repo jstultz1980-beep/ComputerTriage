@@ -9469,7 +9469,7 @@ function Build-SettingsPage {
 
     $rightLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $rightLayout.Dock = "Fill"
-    $rightLayout.RowCount = 10
+    $rightLayout.RowCount = 11
     $rightLayout.ColumnCount = 2
     $rightLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
@@ -9480,7 +9480,8 @@ function Build-SettingsPage {
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,62))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
@@ -9568,12 +9569,29 @@ function Build-SettingsPage {
     $resetButton = New-GUIButton "Reset Defaults" { Reset-GUISettingsPageDefaults }
     $resetButton.Width = 140
     [void]$buttonPanel.Controls.Add($resetButton)
+
+    $dataRemovalPanel = New-Object System.Windows.Forms.TableLayoutPanel
+    $dataRemovalPanel.Dock = "Fill"
+    $dataRemovalPanel.ColumnCount = 2
+    $dataRemovalPanel.Padding = New-Object System.Windows.Forms.Padding(0,6,0,0)
+    $dataRemovalPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $dataRemovalPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,174))) | Out-Null
+    $rightLayout.Controls.Add($dataRemovalPanel,0,7)
+    $rightLayout.SetColumnSpan($dataRemovalPanel,2)
+
+    $dataRemovalHint = New-GUILabel "Client diagnostic data"
+    $dataRemovalHint.Dock = "Fill"
+    $dataRemovalHint.TextAlign = "MiddleLeft"
+    $dataRemovalHint.ForeColor = $script:GUITheme.MutedText
+    [void]$dataRemovalPanel.Controls.Add($dataRemovalHint,0,0)
+
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
-    $sanitizeButton.Width = 165
-    [void]$buttonPanel.Controls.Add($sanitizeButton)
+    $sanitizeButton.Dock = "Fill"
+    $sanitizeButton.Width = 0
+    [void]$dataRemovalPanel.Controls.Add($sanitizeButton,1,0)
 
     $foldersLabel = New-GUILabel "Toolkit folders"
-    $rightLayout.Controls.Add($foldersLabel,0,7)
+    $rightLayout.Controls.Add($foldersLabel,0,8)
     $rightLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -9585,7 +9603,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $rightLayout.Controls.Add($folderPanel,0,8)
+    $rightLayout.Controls.Add($folderPanel,0,9)
     $rightLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "Open Logs" { Open-GUIFolder $CSIPaths.Logs }
@@ -9636,6 +9654,7 @@ function Set-GUIFallbackButtonToolTips {
         "Install Selected" = "Install the selected Chocolatey package."
         "Apply Settings" = "Apply and save Settings tab choices to the portable toolkit drive."
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
+        "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
