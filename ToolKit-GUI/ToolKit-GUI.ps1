@@ -72,6 +72,10 @@ $script:LatestQuickDiagnosisReport = $null
 $script:QuickLastDiagnosisLabel = $null
 $script:QuickDiagnosisProcess = $null
 $script:QuickDiagnosisTimer = $null
+$script:ToolkitSizeLabel = $null
+$script:ToolkitSizeProcess = $null
+$script:ToolkitSizeTimer = $null
+$script:ToolkitSizeResultPath = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -9379,6 +9383,85 @@ function Invoke-GUIRemoveClientData {
     ) | Out-Null
 }
 
+function Start-GUIToolkitSizeRefresh {
+    if(!$script:ToolkitSizeLabel -or $script:ToolkitSizeLabel.IsDisposed){
+        return
+    }
+
+    if($script:ToolkitSizeProcess -and !$script:ToolkitSizeProcess.HasExited){
+        return
+    }
+
+    if($script:ToolkitSizeTimer){
+        try { $script:ToolkitSizeTimer.Stop(); $script:ToolkitSizeTimer.Dispose() } catch {}
+        $script:ToolkitSizeTimer = $null
+    }
+
+    $deploymentRoot = Split-Path -Parent $SharedToolkitRoot
+    $escapedRoot = $deploymentRoot.Replace("'","''")
+    $resultPath = Join-Path $env:TEMP ("NetworkToolkit-size-{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $escapedResult = $resultPath.Replace("'","''")
+    $script:ToolkitSizeLabel.Text = "Toolkit size: calculating..."
+
+    $command = @"
+`$root = '$escapedRoot'
+`$files = Get-ChildItem -LiteralPath `$root -Force -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
+    `$_.FullName -notlike (`$root + '\.git\*') -and
+    `$_.FullName -notlike (`$root + '\Release\*')
+}
+`$totalBytes = (`$files | Measure-Object -Property Length -Sum).Sum
+[pscustomobject]@{
+    TotalBytes = [int64]`$totalBytes
+    FileCount = @(`$files).Count
+} | ConvertTo-Json | Set-Content -LiteralPath '$escapedResult' -Encoding UTF8
+"@
+
+    try {
+        $script:ToolkitSizeResultPath = $resultPath
+        $script:ToolkitSizeProcess = Start-CSIToolProcess `
+            -FilePath "powershell.exe" `
+            -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-Command",$command) `
+            -WorkingDirectory $deploymentRoot `
+            -WindowStyle Hidden `
+            -PassThru
+
+        $timer = New-Object System.Windows.Forms.Timer
+        $timer.Interval = 500
+        $timer.Add_Tick({
+            if(!$script:ToolkitSizeProcess -or !$script:ToolkitSizeProcess.HasExited){
+                return
+            }
+
+            $script:ToolkitSizeTimer.Stop()
+            $script:ToolkitSizeTimer.Dispose()
+            $script:ToolkitSizeTimer = $null
+            $script:ToolkitSizeProcess = $null
+
+            try {
+                $result = Get-Content -LiteralPath $script:ToolkitSizeResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+                $sizeGB = [math]::Round(([double]$result.TotalBytes / 1GB),2)
+                $script:ToolkitSizeLabel.Text = "Toolkit size: $sizeGB GB ($($result.FileCount) files)"
+            }
+            catch {
+                $script:ToolkitSizeLabel.Text = "Toolkit size: unavailable"
+            }
+            finally {
+                if($script:ToolkitSizeResultPath -and (Test-Path $script:ToolkitSizeResultPath)){
+                    Remove-Item -LiteralPath $script:ToolkitSizeResultPath -Force -ErrorAction SilentlyContinue
+                }
+                $script:ToolkitSizeResultPath = $null
+            }
+        })
+        $script:ToolkitSizeTimer = $timer
+        $script:ToolkitSizeTimer.Start()
+    }
+    catch {
+        $script:ToolkitSizeProcess = $null
+        $script:ToolkitSizeLabel.Text = "Toolkit size: unavailable"
+        Add-GUILog "Toolkit size refresh failed: $($_.Exception.Message)"
+    }
+}
+
 function Build-SettingsPage {
     param([System.Windows.Forms.TabPage]$Page)
 
@@ -9590,9 +9673,29 @@ function Build-SettingsPage {
     $sanitizeButton.Width = 0
     [void]$dataRemovalPanel.Controls.Add($sanitizeButton,1,0)
 
+    $foldersHeader = New-Object System.Windows.Forms.TableLayoutPanel
+    $foldersHeader.Dock = "Fill"
+    $foldersHeader.ColumnCount = 3
+    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,108))) | Out-Null
+    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
+    $rightLayout.Controls.Add($foldersHeader,0,8)
+    $rightLayout.SetColumnSpan($foldersHeader,2)
+
     $foldersLabel = New-GUILabel "Toolkit folders"
-    $rightLayout.Controls.Add($foldersLabel,0,8)
-    $rightLayout.SetColumnSpan($foldersLabel,2)
+    $foldersLabel.Dock = "Fill"
+    $foldersHeader.Controls.Add($foldersLabel,0,0)
+
+    $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
+    $ToolkitSizeLabel.Dock = "Fill"
+    $ToolkitSizeLabel.TextAlign = "MiddleLeft"
+    $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
+    $foldersHeader.Controls.Add($ToolkitSizeLabel,1,0)
+
+    $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
+    $sizeRefreshButton.Dock = "Fill"
+    $sizeRefreshButton.Width = 0
+    $foldersHeader.Controls.Add($sizeRefreshButton,2,0)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $folderPanel.Dock = "Fill"
@@ -9625,6 +9728,8 @@ function Build-SettingsPage {
     $dataButton.Dock = "Fill"
     $dataButton.Width = 0
     $folderPanel.Controls.Add($dataButton,1,1)
+
+    Start-GUIToolkitSizeRefresh
 }
 
 function Set-GUIFallbackButtonToolTips {
@@ -9655,6 +9760,7 @@ function Set-GUIFallbackButtonToolTips {
         "Apply Settings" = "Apply and save Settings tab choices to the portable toolkit drive."
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
+        "Refresh Size" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
