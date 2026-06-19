@@ -9238,42 +9238,144 @@ function Save-GUISettingsFromPage {
     Add-GUILog "Settings applied and saved."
 }
 
-function Invoke-GUISanitizeToolkit {
-    $confirm = [System.Windows.Forms.MessageBox]::Show(
-        "Remove old reports, tool output sessions, logs, minidump collections, and cached public IP scripts from this portable toolkit?`r`n`r`nThis keeps the toolkit apps, settings, and support files.",
-        "Sanitize Toolkit",
+function Get-GUIClientDataTargets {
+    $targets = @($CSIPaths.Exports,$CSIPaths.Data)
+
+    # A few plugins maintain their own logs outside the central Logs folder.
+    $targets += @(
+        (Join-Path $CSIPaths.Root "Plugins\PrintQueues\Logs"),
+        (Join-Path $CSIPaths.Root "Plugins\PrintQueues\Print Queue Cleanup\Logs")
+    )
+
+    $targets += @(Get-ChildItem -Path $CSIPaths.Root -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    return @($targets | Where-Object { $_ -and (Test-Path $_) } | Sort-Object -Unique)
+}
+
+function Get-GUIClientDataSummary {
+    $files = @()
+    foreach($target in Get-GUIClientDataTargets){
+        $files += @(Get-ChildItem -LiteralPath $target -Force -Recurse -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne ".gitkeep" })
+    }
+
+    return [pscustomobject]@{
+        FileCount = @($files).Count
+        SizeMB = [math]::Round((@($files | Measure-Object -Property Length -Sum).Sum / 1MB),2)
+    }
+}
+
+function Confirm-GUIClientDataRemoval {
+    param([pscustomobject]$Summary)
+
+    $firstConfirmation = [System.Windows.Forms.MessageBox]::Show(
+        "This removes collected client diagnostic data from this toolkit.`r`n`r`nIncluded: reports, exports, saved computer profiles and state, minidump collections, temporary tool output, print data, and toolkit/plugin logs.`r`n`r`nDetected now: $($Summary.FileCount) file(s), $($Summary.SizeMB) MB.`r`n`r`nToolkit applications, custom tools, settings, package manifests, and help files are preserved.`r`n`r`nContinue to the final confirmation?",
+        "Remove Client Data - First Confirmation",
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Warning
     )
 
-    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){
-        Add-GUILog "Sanitize Toolkit cancelled."
+    if($firstConfirmation -ne [System.Windows.Forms.DialogResult]::Yes){
+        return $false
+    }
+
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Remove Client Data - Final Confirmation"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(590,245)
+    $form.MinimumSize = New-Object System.Drawing.Size(590,245)
+    $form.MaximizeBox = $false
+    $form.MinimizeBox = $false
+    $form.Font = New-Object System.Drawing.Font("Segoe UI",9.5)
+    $form.BackColor = $script:GUITheme.Page
+
+    $message = New-Object System.Windows.Forms.Label
+    $message.Location = New-Object System.Drawing.Point(20,18)
+    $message.Size = New-Object System.Drawing.Size(540,92)
+    $message.Text = "Final confirmation: this permanently removes all collected client diagnostic data from the toolkit.`r`n`r`nType REMOVE CLIENT DATA exactly to continue."
+    $message.ForeColor = $script:GUITheme.Text
+    $form.Controls.Add($message)
+
+    $entry = New-Object System.Windows.Forms.TextBox
+    $entry.Location = New-Object System.Drawing.Point(20,122)
+    $entry.Size = New-Object System.Drawing.Size(540,27)
+    $entry.CharacterCasing = "Upper"
+    $form.Controls.Add($entry)
+
+    $cancel = New-Object System.Windows.Forms.Button
+    $cancel.Text = "Cancel"
+    $cancel.Location = New-Object System.Drawing.Point(360,165)
+    $cancel.Size = New-Object System.Drawing.Size(95,34)
+    $cancel.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+    $form.Controls.Add($cancel)
+
+    $remove = New-Object System.Windows.Forms.Button
+    $remove.Text = "Remove Data"
+    $remove.Location = New-Object System.Drawing.Point(465,165)
+    $remove.Size = New-Object System.Drawing.Size(95,34)
+    $remove.Enabled = $false
+    $remove.DialogResult = [System.Windows.Forms.DialogResult]::OK
+    $form.Controls.Add($remove)
+
+    $entry.Add_TextChanged({ $remove.Enabled = $entry.Text.Trim() -eq "REMOVE CLIENT DATA" })
+    $form.AcceptButton = $remove
+    $form.CancelButton = $cancel
+    $result = $form.ShowDialog($script:Form)
+    $form.Dispose()
+    return $result -eq [System.Windows.Forms.DialogResult]::OK
+}
+
+function Clear-GUIClientDataTarget {
+    param([string]$Path)
+
+    $removed = 0
+    foreach($item in @(Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne ".gitkeep" })){
+        Remove-Item -LiteralPath $item.FullName -Recurse -Force -ErrorAction Stop
+        $removed++
+    }
+    return $removed
+}
+
+function Invoke-GUIRemoveClientData {
+    $summary = Get-GUIClientDataSummary
+    if(!(Confirm-GUIClientDataRemoval -Summary $summary)){
+        Add-GUILog "Client data removal cancelled."
         return
     }
 
-    $targets = @(
-        $CSIPaths.Exports,
-        $CSIPaths.Logs,
-        (Get-CSITempOutputRoot),
-        (Join-Path $CSIPaths.Data "MiniDumps")
-    ) | Where-Object { $_ -and (Test-Path $_) }
-
-    foreach($target in $targets){
+    $removedTargets = 0
+    $failures = @()
+    foreach($target in Get-GUIClientDataTargets){
         try {
-            Get-ChildItem -LiteralPath $target -Force -ErrorAction SilentlyContinue |
-                Remove-Item -Recurse -Force -ErrorAction Stop
+            $removedTargets += Clear-GUIClientDataTarget -Path $target
         }
         catch {
-            Add-GUILog "Sanitize failed for ${target}: $($_.Exception.Message)"
+            $failures += "${target}: $($_.Exception.Message)"
         }
     }
 
-    Add-GUILog "Toolkit sanitized."
+    $script:LatestComputerProfileCache = $null
+    $script:LatestComputerProfileCacheTime = [datetime]::MinValue
+    $script:LatestQuickDiagnosisReport = $null
+    $script:QuickDiagnosisRan = $false
+    $script:DismSfcRecommended = $false
+    $script:LogLines = New-Object System.Collections.ArrayList
+    Refresh-Fingerprints -Quiet
+    Refresh-GUILastQuickDiagnosisLabel
+    Refresh-GUIDismSfcState
+    Update-GUIComputerHealthLight
+    Refresh-GUIReports
+
+    $message = "Removed client data from $removedTargets top-level item(s). Toolkit apps, settings, package manifests, and custom tool definitions were preserved."
+    if($failures.Count -gt 0){
+        $message += "`r`n`r`nSome items could not be removed:`r`n" + ($failures -join "`r`n")
+    }
+
+    Add-GUILog "Client data removal completed."
+    $messageIcon = if($failures.Count -gt 0){[System.Windows.Forms.MessageBoxIcon]::Warning}else{[System.Windows.Forms.MessageBoxIcon]::Information}
     [System.Windows.Forms.MessageBox]::Show(
-        "Toolkit temporary outputs, legacy reports, and logs were removed.",
-        "Sanitize Toolkit",
+        $message,
+        "Client Data Removed",
         [System.Windows.Forms.MessageBoxButtons]::OK,
-        [System.Windows.Forms.MessageBoxIcon]::Information
+        $messageIcon
     ) | Out-Null
 }
 
@@ -9466,8 +9568,8 @@ function Build-SettingsPage {
     $resetButton = New-GUIButton "Reset Defaults" { Reset-GUISettingsPageDefaults }
     $resetButton.Width = 140
     [void]$buttonPanel.Controls.Add($resetButton)
-    $sanitizeButton = New-GUIButton "Sanitize Toolkit" { Invoke-GUISanitizeToolkit }
-    $sanitizeButton.Width = 150
+    $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
+    $sanitizeButton.Width = 165
     [void]$buttonPanel.Controls.Add($sanitizeButton)
 
     $foldersLabel = New-GUILabel "Toolkit folders"
