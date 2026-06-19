@@ -100,11 +100,11 @@ param(
     $items = @($Rows | Where-Object { $null -ne $_ })
 
     if($items.Count -eq 0){
-        return "<section><h2>$(ConvertTo-CSIHtmlText $Title)</h2><p class='muted'>No data found.</p></section>"
+        return "<details class='report-section'><summary>$(ConvertTo-CSIHtmlText $Title)</summary><p class='muted'>No data found.</p></details>"
     }
 
     $columns = @($items[0].PSObject.Properties.Name)
-    $html = "<section><h2>$(ConvertTo-CSIHtmlText $Title)</h2><table><thead><tr>"
+    $html = "<details class='report-section'><summary>$(ConvertTo-CSIHtmlText $Title)</summary><table><thead><tr>"
 
     foreach($column in $columns){
         $html += "<th>$(ConvertTo-CSIHtmlText $column)</th>"
@@ -130,7 +130,202 @@ param(
 
     }
 
-    $html += "</tbody></table></section>"
+    $html += "</tbody></table></details>"
+    return $html
+
+}
+
+function Global:ConvertTo-CSISupplementalEvidenceHtml {
+
+param([object]$Fingerprint)
+
+    if(!$Fingerprint -or !$Fingerprint.PSObject.Properties["SysinternalsEvidence"] -or !$Fingerprint.SysinternalsEvidence){
+        return @"
+<details class="report-section">
+<summary>Startup, CPU, and Session Evidence</summary>
+<p class="muted">No supplemental Sysinternals evidence is attached to this profile yet. Run Quick Diagnosis to populate bounded Autoruns, Coreinfo, and session context.</p>
+</details>
+"@
+    }
+
+    $evidence = $Fingerprint.SysinternalsEvidence
+    $html = @"
+<details class="report-section">
+<summary>Startup, CPU, and Session Evidence</summary>
+<div class="grid">
+<div class="key">Collected</div><div>$(ConvertTo-CSIHtmlText $evidence.CollectedAt)</div>
+"@
+
+    if($evidence.Autoruns){
+        $autoruns = $evidence.Autoruns
+        $html += @"
+<div class="key">Autoruns Entries Checked</div><div>$(ConvertTo-CSIHtmlText $autoruns.EntriesChecked)</div>
+<div class="key">Autoruns Missing Paths</div><div>$(ConvertTo-CSIHtmlText $autoruns.MissingFileCount)</div>
+<div class="key">Autoruns Unsigned/Unverified</div><div>$(ConvertTo-CSIHtmlText $autoruns.UnsignedOrUnverifiedCount)</div>
+"@
+    }
+
+    if($evidence.Coreinfo){
+        $coreinfo = $evidence.Coreinfo
+        $html += @"
+<div class="key">Coreinfo Hypervisor Context</div><div>$(ConvertTo-CSIHtmlText $coreinfo.HypervisorMentioned)</div>
+<div class="key">Coreinfo Notes</div><div>$(ConvertTo-CSIHtmlText ((@($coreinfo.VirtualizationLines) | Select-Object -First 8) -join "; "))</div>
+"@
+    }
+
+    if($evidence.LoggedOnUsers){
+        $loggedOn = $evidence.LoggedOnUsers
+        $html += @"
+<div class="key">Logged-on User Context</div><div>$(ConvertTo-CSIHtmlText ((@($loggedOn.Users) | Select-Object -First 12) -join "; "))</div>
+"@
+    }
+
+    $html += "</div>"
+
+    if($evidence.Autoruns -and $evidence.Autoruns.MissingFiles){
+        $rows = @($evidence.Autoruns.MissingFiles | Select-Object Entry,Category,ImagePath)
+        $html += ConvertTo-CSIHtmlTable "Autoruns Missing File Details" $rows
+    }
+
+    if($evidence.Autoruns -and $evidence.Autoruns.UnsignedOrUnverified){
+        $rows = @($evidence.Autoruns.UnsignedOrUnverified | Select-Object Entry,Category,Publisher,Verified,ImagePath)
+        $html += ConvertTo-CSIHtmlTable "Autoruns Signature Review Details" $rows
+    }
+
+    if($evidence.LogonSessions -and $evidence.LogonSessions.SessionSummary){
+        $rows = @($evidence.LogonSessions.SessionSummary | ForEach-Object { [pscustomobject]@{ Detail = $_ } })
+        $html += ConvertTo-CSIHtmlTable "Logon Session Summary" $rows
+    }
+
+    $html += "</details>"
+    return $html
+
+}
+
+function Global:Get-CSIComputerProfileState {
+
+param([string]$ComputerName)
+
+    if(Get-Command Read-CSIComputerState -ErrorAction SilentlyContinue){
+        try {
+            return Read-CSIComputerState -ComputerName $ComputerName
+        }
+        catch {}
+    }
+
+    return $null
+
+}
+
+function Global:ConvertTo-CSIComputerStateSummaryHtml {
+
+param(
+    [object]$State,
+    [string]$ComputerName
+)
+
+    if(!$State -or !$State.Sections){
+        return @"
+<section>
+<h2>Toolkit Current State</h2>
+<p class="muted">No additional toolkit state has been captured for $(ConvertTo-CSIHtmlText $ComputerName) yet. Run Quick Diagnosis or GUI tools to populate this section.</p>
+</section>
+"@
+    }
+
+    $sections = $State.Sections
+    $sectionNames = if($sections -is [System.Collections.IDictionary]){
+        @($sections.Keys)
+    }
+    else{
+        @($sections.PSObject.Properties.Name)
+    }
+
+    $html = @"
+<section>
+<h2>Toolkit Current State</h2>
+<div class="grid">
+<div class="key">State File Updated</div><div>$(ConvertTo-CSIHtmlText $State.UpdatedAt)</div>
+<div class="key">Stored Sections</div><div>$(ConvertTo-CSIHtmlText ($sectionNames -join ", "))</div>
+</div>
+</section>
+"@
+
+    $quickSection = if($sections -is [System.Collections.IDictionary] -and $sections.Contains("QuickDiagnosis")){
+        $sections["QuickDiagnosis"]
+    }
+    else{
+        $sections.QuickDiagnosis
+    }
+
+    if($quickSection -and $quickSection.Data){
+        $quick = $quickSection.Data
+        $summary = $quick.Summary
+        $reportPath = if($quick.ReportPath){$quick.ReportPath}else{""}
+
+        $html += @"
+<section>
+<h2>Latest Quick Diagnosis</h2>
+<div class="grid">
+<div class="key">Captured</div><div>$(ConvertTo-CSIHtmlText $quick.CapturedAt)</div>
+<div class="key">Target</div><div>$(ConvertTo-CSIHtmlText $quick.Target)</div>
+<div class="key">Report</div><div>$(ConvertTo-CSIHtmlText $reportPath)</div>
+<div class="key">Critical / Warning / Info / OK</div><div>$(ConvertTo-CSIHtmlText "$($summary.Critical) / $($summary.Warning) / $($summary.Info) / $($summary.OK)")</div>
+<div class="key">Repair Disposition</div><div>$(ConvertTo-CSIHtmlText $quick.RepairDisposition)</div>
+</div>
+</section>
+"@
+
+        $problemRows = @(
+            @($quick.Problems) |
+                ForEach-Object {
+                    [pscustomobject]@{
+                        Status = $_.Status
+                        Area = $_.Area
+                        Check = $_.Check
+                        Evidence = $_.Detail
+                        NextStep = $_.Tip
+                    }
+                }
+        )
+
+        $html += ConvertTo-CSIHtmlTable "Latest Quick Diagnosis Problems" $problemRows
+    }
+
+    $toolSection = if($sections -is [System.Collections.IDictionary] -and $sections.Contains("LatestToolOutputs")){
+        $sections["LatestToolOutputs"]
+    }
+    else{
+        $sections.LatestToolOutputs
+    }
+
+    if($toolSection -and $toolSection.Data){
+        $toolItems = if($toolSection.Data -is [System.Collections.IDictionary]){
+            $toolSection.Data.GetEnumerator() | ForEach-Object {
+                [pscustomobject]@{ Name = $_.Key; Value = $_.Value }
+            }
+        }
+        else{
+            $toolSection.Data.PSObject.Properties
+        }
+
+        $toolRows = @(
+            $toolItems |
+                Sort-Object Name |
+                ForEach-Object {
+                    $tool = $_.Value
+                    [pscustomobject]@{
+                        Tool = $tool.ToolName
+                        UpdatedAt = $tool.UpdatedAt
+                        SessionPath = $tool.SessionPath
+                        TranscriptPath = $tool.TranscriptPath
+                    }
+                }
+        )
+
+        $html += ConvertTo-CSIHtmlTable "Latest GUI Tool Outputs" $toolRows
+    }
+
     return $html
 
 }
@@ -255,6 +450,9 @@ param([object]$Fingerprint)
         $pendingDetails = ($Fingerprint.PendingReboot.Details -join ", ")
     }
 
+    $computerState = Get-CSIComputerProfileState -ComputerName $Fingerprint.ComputerName
+    $computerStateHtml = ConvertTo-CSIComputerStateSummaryHtml -State $computerState -ComputerName $Fingerprint.ComputerName
+
     $css = @"
 body{margin:0;background:#f3f6f8;color:#18212b;font-family:Segoe UI,Arial,sans-serif}
 header{background:#0d3054;color:white;padding:26px 34px}
@@ -266,8 +464,10 @@ main{padding:24px 34px}
 .label{font-size:12px;text-transform:uppercase;color:#607080}
 .value{font-size:20px;font-weight:700;margin-top:6px}
 .ok{color:#137346}.warn{color:#a45b00}
-section{background:white;border:1px solid #d9e1ea;margin:16px 0;padding:18px}
+section,.report-section{background:white;border:1px solid #d9e1ea;margin:16px 0;padding:18px}
 h2{font-size:18px;margin:0 0 12px 0;color:#0d3054}
+summary{cursor:pointer;font-size:18px;font-weight:700;color:#0d3054;margin:0 0 12px 0}
+details[open] summary{margin-bottom:12px}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{border-bottom:1px solid #e5ebf0;padding:8px;text-align:left;vertical-align:top}
 th{background:#eef4f8;color:#25394d}
@@ -326,6 +526,8 @@ th{background:#eef4f8;color:#25394d}
 <div class="key">Pending Reboot Details</div><div>$(ConvertTo-CSIHtmlText $pendingDetails)</div>
 </div>
 </section>
+
+$computerStateHtml
 "@
 
     $html += ConvertTo-CSIHtmlTable "Disks" $diskRows
@@ -335,8 +537,9 @@ th{background:#eef4f8;color:#25394d}
     $html += ConvertTo-CSIHtmlTable "Security Products" $Fingerprint.SecurityProducts
     $html += ConvertTo-CSIHtmlTable "Defender Status" @($Fingerprint.Defender)
     $html += ConvertTo-CSIHtmlTable "BitLocker" $Fingerprint.BitLocker
-    $html += ConvertTo-CSIHtmlTable "Local Administrators" $adminRows
-    $html += ConvertTo-CSIHtmlTable "Listening TCP Ports" $listeningPortRows
+$html += ConvertTo-CSIHtmlTable "Local Administrators" $adminRows
+$html += ConvertTo-CSIHtmlTable "Listening TCP Ports" $listeningPortRows
+$html += ConvertTo-CSISupplementalEvidenceHtml -Fingerprint $Fingerprint
 
     $html += @"
 </main>
@@ -416,6 +619,17 @@ param(
     $Fingerprint |
         ConvertTo-Json -Depth 8 |
         Set-Content -Path $jsonPath -Encoding UTF8
+
+    if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){
+        try {
+            [void](Set-CSIComputerStateSection `
+                -SectionName "ComputerProfile" `
+                -Data $Fingerprint `
+                -ComputerName $Fingerprint.ComputerName `
+                -Source "Save-CSIComputerFingerprint")
+        }
+        catch {}
+    }
 
     $htmlPath = Export-CSIComputerFingerprintHtml -Fingerprint $Fingerprint -JsonPath $jsonPath
 

@@ -33,6 +33,7 @@ $Script:Files = [pscustomobject]@{
     LogFile     = Join-Path $Paths.Logs "Toolkit.log"
     HelpFile    = Join-Path $Paths.Docs "NetworkToolkitHelp.html"
     CustomTools = Join-Path $Paths.Manifests "custom-tools.json"
+    GuiSettings = Join-Path $Paths.Manifests "gui-settings.json"
 }
 
 $Global:CSIPaths = $Paths

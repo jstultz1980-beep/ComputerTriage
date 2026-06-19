@@ -225,6 +225,15 @@ foreach($plugin in $plugins){
 # --------------------------------------------------
 
 Import-CSIModules $CSIPaths.Utilities
+
+if(Get-Command Clear-CSIOldTempOutputs -ErrorAction SilentlyContinue){
+    Clear-CSIOldTempOutputs -KeepCount 12 -MaxAgeDays 7
+}
+
+if(Get-Command Clear-CSIReportAndLogQuota -ErrorAction SilentlyContinue){
+    Clear-CSIReportAndLogQuota -ReportKeepCount 6 -LogKeepCount 10 -TempKeepCount 12 -MaxAgeDays 21
+}
+
 Import-CSIModules $CSIPaths.Core
 Import-CSIModules $CSIPaths.Discovery
 

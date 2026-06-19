@@ -8,6 +8,151 @@ function Global:Get-CSIExternalToolRoot {
 
 }
 
+function Global:Test-CSISysinternalsPath {
+
+param([string]$Path)
+
+    return ($Path -and $Path -match '(?i)[\\/]Sysinternals[\\/]')
+
+}
+
+function Global:Get-CSISysinternalsBaseName {
+
+param([string]$Path)
+
+    if(!$Path){
+        return ""
+    }
+
+    $base = [IO.Path]::GetFileNameWithoutExtension($Path)
+    $base = $base -replace '(?i)64a$',''
+    $base = $base -replace '(?i)64$',''
+    return $base
+
+}
+
+function Global:Get-CSISysinternalsEulaRegistryNames {
+
+param([string]$Path)
+
+    $base = Get-CSISysinternalsBaseName -Path $Path
+    if(!$base){
+        return @()
+    }
+
+    $key = $base.ToLowerInvariant()
+    $map = @{
+        "accesschk" = @("AccessChk")
+        "accessenum" = @("AccessEnum")
+        "adexplorer" = @("ADExplorer")
+        "adinsight" = @("ADInsight")
+        "adrestore" = @("AdRestore")
+        "autoruns" = @("Autoruns")
+        "autorunsc" = @("Autoruns")
+        "dbgview" = @("DbgView")
+        "disk2vhd" = @("Disk2vhd")
+        "diskmon" = @("DiskMon")
+        "diskview" = @("DiskView")
+        "handle" = @("Handle")
+        "listdlls" = @("ListDLLs")
+        "logonsessions" = @("LogonSessions")
+        "pendmoves" = @("PendMoves")
+        "procdump" = @("ProcDump")
+        "procexp" = @("Process Explorer")
+        "procmon" = @("Process Monitor")
+        "psexec" = @("PsExec")
+        "psfile" = @("PsFile")
+        "psgetsid" = @("PsGetSid")
+        "psinfo" = @("PsInfo")
+        "pskill" = @("PsKill")
+        "pslist" = @("PsList")
+        "psloggedon" = @("PsLoggedon")
+        "psloglist" = @("PsLogList")
+        "pspasswd" = @("PsPasswd")
+        "psping" = @("PsPing")
+        "psservice" = @("PsService")
+        "psshutdown" = @("PsShutdown")
+        "pssuspend" = @("PsSuspend")
+        "rammap" = @("RAMMap")
+        "regdelnull" = @("RegDelNull")
+        "shareenum" = @("ShareEnum")
+        "sigcheck" = @("Sigcheck")
+        "streams" = @("Streams")
+        "strings" = @("Strings")
+        "sysmon" = @("Sysmon")
+        "tcpview" = @("TCPView")
+        "tcpvcon" = @("TCPView")
+        "vmmap" = @("VMMap")
+        "whois" = @("Whois")
+        "winobj" = @("WinObj")
+        "zoomit" = @("ZoomIt")
+    }
+
+    $names = @($base)
+    if($map.ContainsKey($key)){
+        $names += @($map[$key])
+    }
+
+    try {
+        if(Test-Path $Path){
+            $versionInfo = (Get-Item -LiteralPath $Path -ErrorAction Stop).VersionInfo
+            if($versionInfo.ProductName){
+                $names += [string]$versionInfo.ProductName
+            }
+            if($versionInfo.FileDescription){
+                $names += [string]$versionInfo.FileDescription
+            }
+        }
+    }
+    catch {}
+
+    return @($names | Where-Object { $_ } | Select-Object -Unique)
+
+}
+
+function Global:Set-CSISysinternalsEulaAccepted {
+
+param([string]$Path)
+
+    if(!(Test-CSISysinternalsPath -Path $Path)){
+        return
+    }
+
+    foreach($name in Get-CSISysinternalsEulaRegistryNames -Path $Path){
+        try {
+            $keyPath = Join-Path "HKCU:\Software\Sysinternals" $name
+            if(!(Test-Path $keyPath)){
+                New-Item -Path $keyPath -Force | Out-Null
+            }
+            New-ItemProperty -Path $keyPath -Name "EulaAccepted" -Value 1 -PropertyType DWord -Force | Out-Null
+        }
+        catch {}
+    }
+
+}
+
+function Global:Add-CSISysinternalsEulaArgument {
+
+param(
+    [string]$Path,
+    [string[]]$Arguments = @()
+)
+
+    $arguments = @($Arguments | Where-Object { $null -ne $_ -and $_ -ne "" })
+    if(!(Test-CSISysinternalsPath -Path $Path)){
+        return $arguments
+    }
+
+    if(@($arguments | Where-Object { $_ -match '(?i)^[-/]accept(eula)?$|^[-/]accepteula$' }).Count -gt 0){
+        return $arguments
+    }
+
+    $base = (Get-CSISysinternalsBaseName -Path $Path).ToLowerInvariant()
+    $switch = if($base -eq "procmon"){ "/AcceptEula" } else { "-accepteula" }
+    return @($switch) + $arguments
+
+}
+
 function Global:Get-CSIExternalToolCatalog {
 
     if($script:CSIExternalToolCatalogCache){
@@ -89,7 +234,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "SystemInformer"
             Name = "System Informer"
             Group = "Windows Health"
-            Paths = @("_Downloads\systeminformer-3.2.25011-release-bin\amd64\SystemInformer.exe","_Downloads\systeminformer-3.2.25011-release-bin\i386\SystemInformer.exe")
+            Paths = @("SystemInformer\amd64\SystemInformer.exe","SystemInformer\i386\SystemInformer.exe")
             Arguments = @()
             RequiresAdmin = $true
             Console = $false
@@ -99,7 +244,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WindowsErrorLookup"
             Name = "Windows Error Lookup"
             Group = "Windows Health"
-            Paths = @("_Downloads\WindowsErrorLookupToolPortable\WindowsErrorLookupToolPortable.exe")
+            Paths = @("WindowsErrorLookup\WindowsErrorLookupToolPortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -109,7 +254,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "MicrosoftSafetyScanner"
             Name = "Microsoft Safety Scanner"
             Group = "Security"
-            Paths = @("_Downloads\MicrosoftSafetyScanner-MSERT-x64.exe")
+            Paths = @("MicrosoftSafetyScanner\MSERT.exe")
             Arguments = @()
             RequiresAdmin = $true
             Console = $false
@@ -119,7 +264,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "AdwCleaner"
             Name = "Malwarebytes AdwCleaner"
             Group = "Security"
-            Paths = @("_Downloads\adwcleaner.exe")
+            Paths = @("AdwCleaner\adwcleaner.exe")
             Arguments = @()
             RequiresAdmin = $true
             Console = $false
@@ -129,7 +274,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "ClamWin"
             Name = "ClamWin Portable"
             Group = "Security"
-            Paths = @("_Downloads\ClamWinPortable\ClamWinPortable.exe")
+            Paths = @("ClamWin\ClamWinPortable.exe")
             Arguments = @()
             RequiresAdmin = $true
             Console = $false
@@ -169,7 +314,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WinMTR"
             Name = "WinMTR Portable"
             Group = "Connectivity"
-            Paths = @("_Downloads\WinMTRPortable\WinMTRPortable.exe","_Downloads\WinMTRPortable\App\WinMTR64\WinMTR.exe","_Downloads\WinMTRPortable\App\WinMTR\WinMTR.exe")
+            Paths = @("..\..\Custom\winmtr-redux\WinMTR64.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -179,17 +324,37 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WinSCP"
             Name = "WinSCP Portable"
             Group = "Network Utilities"
-            Paths = @("_Downloads\WinSCP-6.5.6-Portable\WinSCP.exe")
+            Paths = @("..\..\Custom\winscp.portable\WinSCP.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
             Notes = "SFTP, SCP, FTP, and WebDAV file transfer client."
         }
         [pscustomobject]@{
+            Id = "mRemoteNG"
+            Name = "mRemoteNG Portable"
+            Group = "Remote Access"
+            Paths = @("..\..\Custom\mRemoteNGPortable\mRemoteNG.exe","mRemoteNG\mRemoteNG.exe")
+            Arguments = @()
+            RequiresAdmin = $false
+            Console = $false
+            Notes = "Tabbed RDP, VNC, SSH, Telnet, and multi-protocol remote connection manager."
+        }
+        [pscustomobject]@{
+            Id = "TigerVNC"
+            Name = "TigerVNC Viewer"
+            Group = "Remote Access"
+            Paths = @("TigerVNC\vncviewer.exe")
+            Arguments = @()
+            RequiresAdmin = $false
+            Console = $false
+            Notes = "VNC viewer for direct remote screen connections to systems running a VNC server."
+        }
+        [pscustomobject]@{
             Id = "KiTTY"
             Name = "KiTTY Portable"
             Group = "Network Utilities"
-            Paths = @("_Downloads\KiTTYPortable\KiTTYPortable.exe")
+            Paths = @("..\..\Custom\kitty\kitty.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -199,7 +364,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WhoDat"
             Name = "WhoDat Portable"
             Group = "Network Utilities"
-            Paths = @("_Downloads\WhoDatPortable\WhoDatPortable.exe")
+            Paths = @("WhoDat\WhoDatPortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -249,7 +414,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "Everything"
             Name = "Everything Portable"
             Group = "File Utilities"
-            Paths = @("_Downloads\Everything-1.4.1.1032.x64\Everything.exe","_Downloads\Everything-1.4.1.1032.x64\everything.exe")
+            Paths = @("Everything\Everything.exe","Everything\everything.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -259,7 +424,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WinDirStat"
             Name = "WinDirStat Portable"
             Group = "File Utilities"
-            Paths = @("_Downloads\WinDirStatPortable\WinDirStatPortable.exe")
+            Paths = @("WinDirStat\WinDirStatPortable.exe")
             Arguments = @()
             RequiresAdmin = $true
             Console = $false
@@ -269,7 +434,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "WinMerge"
             Name = "WinMerge Portable"
             Group = "File Utilities"
-            Paths = @("_Downloads\WinMergePortable\WinMergePortable.exe")
+            Paths = @("WinMerge\WinMergePortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -279,7 +444,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "Kudu"
             Name = "Kudu Portable"
             Group = "File Utilities"
-            Paths = @("_Downloads\KuduPortable\KuduPortable.exe")
+            Paths = @("Kudu\KuduPortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -289,7 +454,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "NotepadPlusPlus"
             Name = "Notepad++ Portable"
             Group = "Software Utilities"
-            Paths = @("_Downloads\Notepad++Portable\Notepad++Portable.exe")
+            Paths = @("NotepadPlusPlus\Notepad++Portable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -299,7 +464,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "Drawio"
             Name = "Draw.io Portable"
             Group = "Software Utilities"
-            Paths = @("_Downloads\DrawioPortable\DrawioPortable.exe")
+            Paths = @("Drawio\DrawioPortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -309,7 +474,7 @@ function Global:Get-CSIExternalToolCatalog {
             Id = "KompoZer"
             Name = "KompoZer Portable"
             Group = "Software Utilities"
-            Paths = @("_Downloads\KompoZerPortable\KompoZerPortable.exe")
+            Paths = @("KompoZer\KompoZerPortable.exe")
             Arguments = @()
             RequiresAdmin = $false
             Console = $false
@@ -467,6 +632,16 @@ param(
 
     }
 
+    if(Get-Command Set-CSISysinternalsEulaAccepted -ErrorAction SilentlyContinue){
+        Set-CSISysinternalsEulaAccepted -Path $Tool.Path
+    }
+
+    # GUI Sysinternals tools use the registry acceptance set above. Some, such as
+    # Autoruns, interpret -accepteula as an invalid input-file argument.
+    if($Tool.Console -and (Get-Command Add-CSISysinternalsEulaArgument -ErrorAction SilentlyContinue)){
+        $arguments = @(Add-CSISysinternalsEulaArgument -Path $Tool.Path -Arguments $arguments)
+    }
+
     return @($arguments | Where-Object {$null -ne $_ -and $_ -ne ""})
 
 }
@@ -482,6 +657,10 @@ param(
 
     if(!$workingDirectory){
         $workingDirectory = Get-Location
+    }
+
+    if(Get-Command Set-CSISysinternalsEulaAccepted -ErrorAction SilentlyContinue){
+        Set-CSISysinternalsEulaAccepted -Path $Tool.Path
     }
 
     Start-CSIToolProcess `

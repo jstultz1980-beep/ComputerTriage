@@ -848,6 +848,153 @@ function Global:Get-CSIDumpFiles {
 
 }
 
+function Global:Get-CSIMinidumpCollectionRoot {
+
+    $root = Join-Path $CSIPaths.Data "MiniDumps"
+
+    if(!(Test-Path $root)){
+        New-Item -ItemType Directory -Path $root -Force | Out-Null
+    }
+
+    return $root
+
+}
+
+function Global:Get-CSILatestMinidumpCollection {
+
+    $root = Get-CSIMinidumpCollectionRoot
+    $pointer = Join-Path $root "_LatestCollection.txt"
+
+    if(Test-Path $pointer){
+        try {
+            $latest = (Get-Content -Path $pointer -Raw -ErrorAction Stop).Trim()
+            if($latest -and (Test-Path $latest)){
+                return $latest
+            }
+        }
+        catch {}
+    }
+
+    $folders = @(Get-ChildItem -Path $root -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
+    if($folders.Count -gt 0){
+        return $folders[0].FullName
+    }
+
+    return $null
+
+}
+
+function Global:New-CSIMinidumpCollection {
+
+param(
+    [object[]]$DumpFiles,
+    [object[]]$CrashEvents = @()
+)
+
+    $collectionRoot = Get-CSIMinidumpCollectionRoot
+    $safeComputer = ($env:COMPUTERNAME -replace '[^A-Za-z0-9._-]+','_').Trim('_')
+    if(!$safeComputer){ $safeComputer = "Computer" }
+
+    $collectionName = "{0}-{1}" -f (Get-Date -Format "yyyyMMdd-HHmmss"),$safeComputer
+    $collectionPath = Join-Path $collectionRoot $collectionName
+    New-Item -ItemType Directory -Path $collectionPath -Force | Out-Null
+
+    $copied = @()
+    $failures = @()
+
+    foreach($dump in @($DumpFiles)){
+        if(!$dump -or !(Test-Path $dump.FullName)){
+            continue
+        }
+
+        $destinationName = $dump.Name
+        $destination = Join-Path $collectionPath $destinationName
+
+        if(Test-Path $destination){
+            $base = [IO.Path]::GetFileNameWithoutExtension($dump.Name)
+            $ext = [IO.Path]::GetExtension($dump.Name)
+            $destinationName = "{0}-{1}{2}" -f $base,($dump.LastWriteTime.ToString("yyyyMMddHHmmss")),$ext
+            $destination = Join-Path $collectionPath $destinationName
+        }
+
+        try {
+            Copy-Item -LiteralPath $dump.FullName -Destination $destination -Force -ErrorAction Stop
+            $copied += [pscustomobject]@{
+                Source = $dump.FullName
+                Copy = $destination
+                Name = $destinationName
+                SizeMB = [math]::Round($dump.Length / 1MB,2)
+                LastWriteTime = $dump.LastWriteTime
+            }
+        }
+        catch {
+            $failures += [pscustomobject]@{
+                Source = $dump.FullName
+                Error = $_.Exception.Message
+            }
+        }
+    }
+
+    $summaryPath = Join-Path $collectionPath "summary.txt"
+    $manifestPath = Join-Path $collectionPath "manifest.csv"
+    $eventsPath = Join-Path $collectionPath "crash-events.txt"
+    $pointerPath = Join-Path $collectionRoot "_LatestCollection.txt"
+
+    $summary = @(
+        "Network Toolkit Minidump Collection"
+        "==================================="
+        "Computer: $env:COMPUTERNAME"
+        "Collected: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        "Collection: $collectionPath"
+        "DumpCount: $($copied.Count)"
+        "FailedCount: $($failures.Count)"
+        "Analyzer: $(if(Get-CSIDumpAnalyzer){Get-CSIDumpAnalyzer}else{'Not found'})"
+        ""
+        "Open this folder with BlueScreenView:"
+        $collectionPath
+        ""
+        "Copied Dumps"
+        "------------"
+    )
+
+    foreach($item in $copied){
+        $summary += "{0} ({1} MB) <- {2}" -f $item.Name,$item.SizeMB,$item.Source
+    }
+
+    if($failures.Count -gt 0){
+        $summary += ""
+        $summary += "Copy Failures"
+        $summary += "-------------"
+        foreach($failure in $failures){
+            $summary += "{0}: {1}" -f $failure.Source,$failure.Error
+        }
+    }
+
+    $summary | Set-Content -Path $summaryPath -Encoding UTF8
+    $copied | Export-Csv -Path $manifestPath -NoTypeInformation -Encoding UTF8
+
+    if($CrashEvents -and $CrashEvents.Count -gt 0){
+        $CrashEvents |
+            Sort-Object TimeCreated -Descending |
+            Select-Object -First 20 TimeCreated,ProviderName,Id,Message |
+            Format-List |
+            Out-String |
+            Set-Content -Path $eventsPath -Encoding UTF8
+    }
+
+    Set-Content -Path $pointerPath -Value $collectionPath -Encoding UTF8
+
+    return [pscustomobject]@{
+        Path = $collectionPath
+        SummaryPath = $summaryPath
+        ManifestPath = $manifestPath
+        EventsPath = if(Test-Path $eventsPath){$eventsPath}else{$null}
+        Copied = $copied
+        Failures = $failures
+    }
+
+}
+
 function Global:Get-CSIDumpAnalyzer {
 
     $commands = "cdb.exe","dumpchk.exe","windbgx.exe"
@@ -924,6 +1071,10 @@ param(
 
 function Global:Invoke-MinidumpCollectorAnalyzer {
 
+param(
+    [switch]$CollectAll
+)
+
     Clear-Host
     Write-CSISection "MINIDUMP COLLECTOR AND ANALYZER"
 
@@ -948,7 +1099,9 @@ function Global:Invoke-MinidumpCollectorAnalyzer {
         Write-Host "No .dmp or .mdmp files found in common dump locations." -ForegroundColor Yellow
     }
     else{
-        for($i = 0; $i -lt [math]::Min($dumpFiles.Count,20); $i++){
+        $visibleDumpCount = [math]::Min($dumpFiles.Count,20)
+
+        for($i = 0; $i -lt $visibleDumpCount; $i++){
             $dump = $dumpFiles[$i]
             Write-Host ("{0}. {1}  {2} MB  {3}" -f ($i + 1),$dump.FullName,[math]::Round($dump.Length / 1MB,2),$dump.LastWriteTime)
         }
@@ -985,65 +1138,83 @@ function Global:Invoke-MinidumpCollectorAnalyzer {
     }
 
     if($dumpFiles.Count -eq 0){
-        return
+        Write-Host ""
+        Write-Host "No crash dump files are currently available to copy." -ForegroundColor Yellow
+        Write-Host "Creating an evidence-only collection with the crash events shown above." -ForegroundColor Cyan
+
+        $collection = New-CSIMinidumpCollection -DumpFiles @() -CrashEvents $crashEvents
+        $noDumpNote = Join-Path $collection.Path "no-dumps-found.txt"
+        @(
+            "Network Toolkit Minidump Collector"
+            ""
+            "No .dmp or .mdmp files were found in the configured Windows dump locations."
+            "The collection still includes crash-events.txt when Windows event evidence was available."
+            ""
+            "BlueScreenView cannot analyze this collection until Windows creates a minidump or memory dump."
+            "For application crashes, use Crash Event Summary or Reliability Monitor to identify the repeating application, module, or provider."
+            "For future BSOD troubleshooting, verify System Properties > Startup and Recovery > Write debugging information is configured to create a Small memory dump."
+        ) | Set-Content -Path $noDumpNote -Encoding UTF8
+
+        Write-Host "Evidence collection created:" $collection.Path -ForegroundColor Green
+        Write-Host "Open crash-events.txt for the event evidence. No dump file was available for BlueScreenView." -ForegroundColor Yellow
+        Start-CSIToolProcess -FilePath "explorer.exe" -ArgumentList @("`"$($collection.Path)`"") | Out-Null
+        return $collection
+    }
+
+    $selectedDumps = @()
+
+    if($CollectAll){
+        $selectedDumps = @($dumpFiles | Select-Object -First 20)
+    }
+    else{
+        Write-Host ""
+        Write-Host "Collection options:"
+        Write-Host "A. Collect all listed dumps"
+        Write-Host "1-$visibleDumpCount. Collect one selected dump"
+        Write-Host ""
+        $choice = Read-CSIInput "Select dump number or A for all"
+
+        if($choice -match "^(a|all)$"){
+            $selectedDumps = @($dumpFiles | Select-Object -First 20)
+        }
+        else{
+        if(-not ($choice -as [int])){
+            Write-Host "Invalid selection." -ForegroundColor Red
+            return
+        }
+
+        $index = [int]$choice
+
+        if($index -lt 1 -or $index -gt $visibleDumpCount){
+            Write-Host "Invalid selection." -ForegroundColor Red
+            return
+        }
+
+        $selectedDumps = @($dumpFiles[$index - 1])
+        }
     }
 
     Write-Host ""
-    $choice = Read-CSIInput "Select dump to collect/analyze"
+    Write-Host "Collecting $($selectedDumps.Count) dump file(s) into toolkit storage..."
 
-    if(-not ($choice -as [int])){
-        Write-Host "Invalid selection." -ForegroundColor Red
-        return
-    }
-
-    $index = [int]$choice
-
-    if($index -lt 1 -or $index -gt $dumpFiles.Count){
-        Write-Host "Invalid selection." -ForegroundColor Red
-        return
-    }
-
-    $selected = $dumpFiles[$index - 1]
-    $outputSession = New-CSITempOutputSession -ToolName "Minidump-Collection"
-    $session = $outputSession.Path
-
-    $copyPath = Join-Path $session $selected.Name
-    $analysisPath = Join-Path $session "analysis.txt"
-    $summaryPath = Join-Path $session "summary.txt"
+    $collection = New-CSIMinidumpCollection -DumpFiles $selectedDumps -CrashEvents $crashEvents
+    $session = $collection.Path
 
     Write-Host ""
-    Write-Host "Collecting:" $selected.FullName
-
-    try {
-        Copy-Item -Path $selected.FullName -Destination $copyPath -Force -ErrorAction Stop
-    }
-    catch {
-        Write-Host "Unable to copy dump file." -ForegroundColor Red
-        Write-Host $_.Exception.Message
-        return
-    }
-
-    $summary = @(
-        "Network Toolkit Minidump Collection"
-        "==================================="
-        "Computer: $env:COMPUTERNAME"
-        "Collected: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-        "Source: $($selected.FullName)"
-        "Copy: $copyPath"
-        "SizeMB: $([math]::Round($selected.Length / 1MB,2))"
-        "LastWriteTime: $($selected.LastWriteTime)"
-        "Analyzer: $(if(Get-CSIDumpAnalyzer){Get-CSIDumpAnalyzer}else{'Not found'})"
-        ""
-        "Recent crash events are shown in the console output."
-    )
-
-    $summary | Set-Content -Path $summaryPath -Encoding UTF8
-
-    Write-Host "Collected to temp output session:" $session -ForegroundColor Green
-    Write-Host "Point BlueScreenView at this folder if you want to review the copied dump there." -ForegroundColor Green
+    Write-Host "Collected to toolkit minidump folder:" $session -ForegroundColor Green
+    Write-Host "BlueScreenView will automatically use the latest collection when launched from the toolkit." -ForegroundColor Green
     Write-Host ""
 
-    Invoke-CSIDumpAnalyzer -DumpPath $copyPath -OutputPath $analysisPath
+    if($collection.Failures.Count -gt 0){
+        Write-Host "Some dumps could not be copied:" -ForegroundColor Yellow
+        $collection.Failures | Format-Table Source,Error -Wrap -AutoSize
+    }
+
+    if($collection.Copied.Count -gt 0){
+        $firstCopy = $collection.Copied[0].Copy
+        $analysisPath = Join-Path $session "analysis.txt"
+        Invoke-CSIDumpAnalyzer -DumpPath $firstCopy -OutputPath $analysisPath
+    }
 
     Write-Host ""
     Write-Host "Collected Files"
@@ -1051,15 +1222,138 @@ function Global:Invoke-MinidumpCollectorAnalyzer {
     Get-ChildItem -Path $session -File | Select-Object Name,Length,LastWriteTime | Format-Table -AutoSize
 
     Write-Host ""
-    $action = Read-CSIInput "Open folder, Delete collection, or Done" -AllowEmpty
+    $action = Read-CSIInput "Open folder, Open BlueScreenView, Delete collection, or Done" -AllowEmpty
 
     if($action -match "^(o|open)$"){
         Start-CSIToolProcess -FilePath "explorer.exe" -ArgumentList @("`"$session`"") | Out-Null
+    }
+    elseif($action -match "^(b|blue|bluescreenview)$"){
+        Invoke-CSIExternalTool -Id "BlueScreenView" -ExtraArguments @("/MiniDumpFolder",$session)
     }
     elseif($action -match "^(d|delete)$"){
         Remove-Item -Path $session -Recurse -Force
         Write-Host "Deleted collection:" $session -ForegroundColor Yellow
     }
+
+}
+
+function Global:Invoke-CrashEventSummary {
+
+    Write-Host ""
+    Write-Host "CRASH EVENT SUMMARY" -ForegroundColor Cyan
+    Write-Host "===================" -ForegroundColor DarkCyan
+    Write-Host ""
+
+    $start = (Get-Date).AddDays(-14)
+    $filter = @{
+        LogName   = "System","Application"
+        StartTime = $start
+    }
+
+    $eventIds = @(41,1001,1000,1002,6008)
+
+    try {
+        $events = Get-WinEvent -FilterHashtable $filter -ErrorAction Stop |
+            Where-Object { $eventIds -contains $_.Id -or $_.ProviderName -match "Windows Error Reporting|BugCheck|Application Error|Application Hang" } |
+            Sort-Object TimeCreated -Descending |
+            Select-Object -First 40
+    }
+    catch {
+        Write-Host "Unable to read crash events: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "Try running elevated or open Reliability Monitor from the Crash tab."
+        return
+    }
+
+    $reportPath = Export-CSICrashEventSummaryHtml -Events $events
+
+    if(!$events){
+        Write-Host "No recent bugcheck, unexpected shutdown, WER, application crash, or application hang events were found in the last 14 days." -ForegroundColor Green
+        Write-Host "Crash event report:" $reportPath -ForegroundColor Green
+        Start-CSIToolProcess -FilePath $reportPath | Out-Null
+        return $reportPath
+    }
+
+    Write-Host "Recent crash-related events from the last 14 days:" -ForegroundColor Yellow
+    Write-Host ""
+
+    $events |
+        Select-Object `
+            @{Name="Time";Expression={$_.TimeCreated}},
+            @{Name="Log";Expression={$_.LogName}},
+            @{Name="Id";Expression={$_.Id}},
+            @{Name="Provider";Expression={$_.ProviderName}},
+            @{Name="Summary";Expression={($_.Message -replace "`r|`n"," " -replace "\s+"," ").Trim()}} |
+        Format-Table -Wrap -AutoSize
+
+    Write-Host ""
+    Write-Host "Recommended next steps:" -ForegroundColor Cyan
+    Write-Host "- Open Reliability Monitor for the plain-language timeline."
+    Write-Host "- Run Minidump Collector, then open BlueScreenView against the collected dump folder."
+    Write-Host "- If the same driver or application repeats, update, roll back, or remove that component."
+    Write-Host ""
+    Write-Host "Crash event report:" $reportPath -ForegroundColor Green
+
+    if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){
+        try {
+            $stateEvents = @($events | Select-Object -First 40 | ForEach-Object {
+                [pscustomobject]@{
+                    Time = if($_.TimeCreated){$_.TimeCreated.ToString("s")}else{""}
+                    Log = $_.LogName
+                    Id = $_.Id
+                    Provider = $_.ProviderName
+                    Summary = (([string]$_.Message -replace "`r|`n"," " -replace "\s+"," ").Trim())
+                }
+            })
+            [void](Set-CSIComputerStateSection -SectionName "CrashEventSummary" -Data ([pscustomobject]@{
+                CapturedAt = (Get-Date).ToString("s")
+                ReportPath = $reportPath
+                EventCount = @($events).Count
+                Events = $stateEvents
+            }) -Source "Invoke-CrashEventSummary")
+        }
+        catch {}
+    }
+
+    Start-CSIToolProcess -FilePath $reportPath | Out-Null
+    return $reportPath
+
+}
+
+function Global:Export-CSICrashEventSummaryHtml {
+
+param([object[]]$Events = @())
+
+    $outputRoot = if($CSIPaths -and $CSIPaths.Exports){$CSIPaths.Exports}else{Join-Path $env:TEMP "NetworkToolkit\Exports"}
+    if(!(Test-Path $outputRoot)){
+        New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
+    }
+
+    $safeComputer = if($env:COMPUTERNAME){($env:COMPUTERNAME -replace '[^A-Za-z0-9._-]+','_')}else{"Computer"}
+    $reportPath = Join-Path $outputRoot ("crash-event-summary-{0}-{1}.html" -f $safeComputer,(Get-Date -Format "yyyyMMdd-HHmmss"))
+    $encode = { param($Value) [System.Net.WebUtility]::HtmlEncode([string]$Value) }
+
+    $rows = if(@($Events).Count -gt 0){
+        (@($Events | Select-Object -First 40 | ForEach-Object {
+            $time = if($_.TimeCreated){$_.TimeCreated.ToString("g")}else{""}
+            $summary = (([string]$_.Message -replace "`r|`n"," " -replace "\s+"," ").Trim())
+            if($summary.Length -gt 1200){ $summary = $summary.Substring(0,1200) + "..." }
+            "<tr><td>$(& $encode $time)</td><td>$(& $encode $_.LogName)</td><td>$(& $encode $_.Id)</td><td>$(& $encode $_.ProviderName)</td><td>$(& $encode $summary)</td></tr>"
+        }) -join "`n")
+    }
+    else{
+        "<tr><td colspan='5' class='empty'>No matching crash, WER, bugcheck, unexpected shutdown, application error, or application hang events were found in the last 14 days.</td></tr>"
+    }
+
+    $html = @"
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Network Toolkit Crash Event Summary</title>
+<style>
+body{margin:0;background:#eef2f6;color:#1f2933;font-family:"Segoe UI",Arial,sans-serif}.top{background:#0f2f4a;color:#fff;padding:28px 36px}.top h1{margin:0;font-size:28px}.top p{margin:7px 0 0;color:#c9d8e5}.wrap{max-width:1240px;margin:0 auto;padding:26px 28px 40px}.card{background:#fff;border:1px solid #d9e1e8;border-radius:9px;padding:18px;box-shadow:0 6px 18px rgba(15,47,74,.07)}.summary{font-size:16px;line-height:1.5}.note{margin-top:18px;background:#fff5d9;border-left:5px solid #b7791f;border-radius:7px;padding:14px 16px;line-height:1.5}table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:18px;background:#fff;border:1px solid #d9e1e8;border-radius:8px;overflow:hidden}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid #e6edf3;font-size:13px;overflow-wrap:anywhere}th{background:#f6f8fb;color:#425466}tr:last-child td{border-bottom:0}.empty{color:#66788a;font-style:italic}.footer{margin-top:22px;color:#66788a;font-size:12px}@media print{body{background:#fff}.card{box-shadow:none}}
+</style></head><body><div class="top"><h1>Network Toolkit Crash Event Summary</h1><p>$(& $encode $env:COMPUTERNAME) | Generated $(Get-Date -Format "g") | Last 14 days</p></div><main class="wrap"><section class="card"><div class="summary"><strong>$(@($Events).Count)</strong> crash-related Windows event(s) were found. This report records event evidence; it does not prove a BSOD or that a dump file exists.</div><div class="note"><strong>How to use this:</strong> Find repeated providers, applications, modules, or event IDs around the user-reported time. Use Reliability Monitor for the timeline. Use BlueScreenView only when a .dmp file is present; the Minidump Collector will create an evidence collection even when Windows retained events but no dump.</div><table><thead><tr><th style="width:130px">Time</th><th style="width:105px">Log</th><th style="width:58px">ID</th><th style="width:190px">Provider</th><th>Event Detail</th></tr></thead><tbody>$rows</tbody></table></section><div class="footer">Generated by Network Toolkit.</div></main></body></html>
+"@
+
+    $html | Set-Content -Path $reportPath -Encoding UTF8
+    return $reportPath
 
 }
 

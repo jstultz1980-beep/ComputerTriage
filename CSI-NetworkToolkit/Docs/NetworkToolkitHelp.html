@@ -4,64 +4,668 @@
   <meta charset="utf-8">
   <title>Network Toolkit Help</title>
   <style>
-    body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#eef4f1;color:#1f363d}
-    header{background:#16525b;color:white;padding:28px 36px}
-    main{max-width:1180px;margin:0 auto;padding:28px 36px}
-    section{background:white;border:1px solid #c9d8d4;border-radius:8px;margin:0 0 18px;padding:18px 20px}
-    h1,h2{margin:0 0 10px}
-    h3{margin:18px 0 8px;color:#16525b}
-    code{background:#eef4f1;padding:2px 5px;border-radius:4px}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{text-align:left;border-bottom:1px solid #dce7e3;padding:8px;vertical-align:top}
-    th{background:#e3efeb;color:#1f363d}
-    .note{border-left:4px solid #ee6f4c;padding-left:12px}
+    :root{
+      --blue:#1660a8;
+      --blue-dark:#0f3d6b;
+      --blue-soft:#e8f3fc;
+      --ink:#1f2f3d;
+      --muted:#607386;
+      --line:#d5e3ee;
+      --paper:#ffffff;
+      --shell:#f5f9fc;
+      --green:#137346;
+      --amber:#9a6400;
+      --red:#b42318;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:var(--shell);color:var(--ink);line-height:1.55}
+    header{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:white;padding:30px 38px}
+    header h1{margin:0;font-size:32px;font-weight:650}
+    header p{margin:7px 0 0;color:#dcefff;font-size:15px}
+    main{max-width:1220px;margin:0 auto;padding:28px 32px 48px}
+    nav{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:0 0 20px}
+    nav h2{margin-top:0}
+    nav .links{columns:3;column-gap:28px}
+    nav a{display:block;color:#145a9a;text-decoration:none;margin:0 0 7px}
+    nav a:hover{text-decoration:underline}
+    section{background:var(--paper);border:1px solid var(--line);border-radius:12px;margin:0 0 20px;padding:22px 26px}
+    h2{margin:0 0 12px;color:#145a9a;font-size:23px}
+    h3{margin:22px 0 8px;color:#24485f;font-size:18px}
+    h4{margin:16px 0 6px;color:#24485f;font-size:15px}
+    p{margin:8px 0}
+    ul,ol{margin-top:8px}
+    li{margin:4px 0}
+    table{width:100%;border-collapse:collapse;margin:12px 0 4px}
+    th,td{border-bottom:1px solid #e2edf4;padding:9px 10px;text-align:left;vertical-align:top}
+    th{background:#eef7fd;color:#24485f;font-weight:650}
+    code{background:#eef4f8;padding:2px 5px;border-radius:4px}
+    .note,.warn,.danger,.tip{border-left:5px solid var(--blue);background:#eef8ff;padding:12px 14px;margin:14px 0;border-radius:8px}
+    .warn{border-left-color:var(--amber);background:#fff8e6}
+    .danger{border-left-color:var(--red);background:#fff0ee}
+    .tip{border-left-color:var(--green);background:#edf9f1}
+    .badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700}
+    .ok{background:#e0f3e5;color:var(--green)}
+    .review{background:#fff1cc;color:var(--amber)}
+    .critical{background:#ffe1dc;color:var(--red)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fbfdff}
+    .small{font-size:13px;color:var(--muted)}
+    .toc-label{font-weight:700;color:#24485f;margin:10px 0 4px}
+    @media(max-width:900px){
+      nav .links{columns:1}
+      .grid{grid-template-columns:1fr}
+      main{padding:18px}
+    }
   </style>
 </head>
 <body>
 <header>
   <h1>Network Toolkit Help</h1>
-  <div>Portable technician toolkit for live workstation and network troubleshooting.</div>
+  <p>Detailed technician guide for the portable Network Toolkit GUI and command-line toolkit.</p>
 </header>
+
 <main>
-  <section>
-    <h2>Start Here</h2>
-    <p>Use <strong>Quick Diagnosis</strong> first. It creates a technician-friendly HTML report and a Computer Profile for the local machine. The repair tools should be used only after Quick Diagnosis indicates servicing or system file follow-up, unless you deliberately override the warning.</p>
-    <p class="note">The toolkit is designed for live troubleshooting. Reports, temp tool outputs, and profiles are retained in bounded folders so you can compare recent results without filling the USB drive indefinitely.</p>
+  <nav>
+    <h2>Contents</h2>
+    <div class="links">
+      <a href="#purpose">Purpose And Mindset</a>
+      <a href="#startup">Launching The Toolkit</a>
+      <a href="#header">Header Controls</a>
+      <a href="#quick">Quick Diagnosis</a>
+      <a href="#reports">Reports And Outputs</a>
+      <a href="#computerinfo">Computer Info</a>
+      <a href="#analyze">Analyze</a>
+      <a href="#windowsupdate">Windows Update</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#crash">Crash</a>
+      <a href="#processes">Processes</a>
+      <a href="#network">Network</a>
+      <a href="#remote">Remote</a>
+      <a href="#services">Services And Infrastructure</a>
+      <a href="#repair">Repair</a>
+      <a href="#directory">Directory</a>
+      <a href="#security">Security</a>
+      <a href="#wifi">Wi-Fi</a>
+      <a href="#print">Print</a>
+      <a href="#files">Files</a>
+      <a href="#discovery">Discovery</a>
+      <a href="#robocopy">Robocopy</a>
+      <a href="#software">Software</a>
+      <a href="#cleanup">Clean Up</a>
+      <a href="#apps">Apps</a>
+      <a href="#choco">Chocolatey</a>
+      <a href="#sysinternals">Sysinternals</a>
+      <a href="#settings">Settings</a>
+      <a href="#logs">Live Log And Troubleshooting</a>
+      <a href="#cli">Console Mode</a>
+      <a href="#workflow">Recommended Field Workflows</a>
+    </div>
+  </nav>
+
+  <section id="purpose">
+    <h2>Purpose And Mindset</h2>
+    <p>The Network Toolkit is intended to be a portable, technician-friendly troubleshooting console. The goal is not to replace good judgment. The goal is to make the first pass fast, consistent, and easy for a junior technician to run without memorizing dozens of command-line switches.</p>
+    <p>The toolkit is built around live troubleshooting. It should expose what is broken right now, collect evidence that helps the next technician, and avoid unnecessary historical clutter. The current design uses a limited latest-state model: the toolkit can keep the newest useful discovery data per computer, while older temporary outputs can be removed with the sanitize option.</p>
+    <div class="tip">
+      <strong>Best first move:</strong> run Quick Diagnosis, review the report, then use the recommended tab or tool for deeper investigation. Do not start repair tools before you understand what the report is pointing at.
+    </div>
+    <div class="warn">
+      <strong>Portable toolkit rule:</strong> this toolkit may be running from a flash drive. Avoid writing unnecessary long-term data to the toolkit. Use Reports, Computer Info, and TempToolOutputs for active troubleshooting evidence, then sanitize when done.
+    </div>
   </section>
-  <section>
-    <h2>Main Workflows</h2>
+
+  <section id="startup">
+    <h2>Launching The Toolkit</h2>
+    <h3>Normal GUI launch</h3>
+    <p>Use the main launcher in the portable root. The GUI is the primary experience for technicians. It hides console noise where possible, organizes tools by purpose, and opens external utilities with the correct working paths.</p>
     <table>
-      <tr><th>Area</th><th>Use It For</th></tr>
-      <tr><td>Quick Diagnosis</td><td>One-click local health report, DISM CheckHealth status, hardware flags, crashes, network basics, and Computer Profile output.</td></tr>
-      <tr><td>Windows</td><td>Event logs, services, startup, updates, Defender, domain/GPO checks, Process Explorer, Procmon, and DISM/SFC repair.</td></tr>
-      <tr><td>Hardware</td><td>Device Manager problems, disk health, resource pressure, RAMMap, HWiNFO, CrystalDiskInfo, and minidump collection.</td></tr>
-      <tr><td>Network</td><td>Connectivity triage, Test-NetConnection, route tracing, DNS path checks, TLS checks, TCPView, PsPing, WinMTR, Wireshark, SSH/SFTP tools.</td></tr>
-      <tr><td>Infrastructure</td><td>DHCP server/rogue locator, DHCP scope review, time sync, DNS diagnostics, and admin/service utilities.</td></tr>
-      <tr><td>Files</td><td>Everything, WizTree, WinDirStat, WinMerge, Handle, and file/process lock investigation.</td></tr>
-      <tr><td>Robocopy</td><td>Plain-language builder for copy, mirror, network copy, and permission-preserving migration commands.</td></tr>
-      <tr><td>Chocolatey</td><td>Install Chocolatey, search packages, scan installed packages, upgrade, and uninstall.</td></tr>
-      <tr><td>Reports</td><td>Open Quick Diagnosis reports, Computer Profiles, temp tool outputs, logs, and minidump collections.</td></tr>
+      <tr><th>Launcher</th><th>Use</th></tr>
+      <tr><td><code>NetworkToolkit.ps1</code></td><td>Main PowerShell launcher. Opens the GUI by default. Use <code>-CLI</code> to open the console toolkit.</td></tr>
+      <tr><td><code>NetworkToolkit-Elevated.bat</code></td><td>Batch launcher intended to start the toolkit elevated from the portable root.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\CSI-NetworkToolkit.ps1</code></td><td>Console toolkit backend. Preserved for command-line use and for GUI button actions that still run console-driven tools.</td></tr>
+    </table>
+    <h3>Elevation</h3>
+    <p>Some tools work fine as a standard user. Others need local administrator rights. The header shows whether the toolkit is running elevated. If the task involves system repair, Windows Update repair, service manipulation, driver inspection, packet capture, security scanners, stale printer cleanup, or some Sysinternals tools, elevation may be required.</p>
+    <div class="warn">
+      If a tool fails with access denied, restart the toolkit elevated before assuming the computer itself is broken.
+    </div>
+  </section>
+
+  <section id="header">
+    <h2>Header Controls</h2>
+    <table>
+      <tr><th>Header item</th><th>What it does</th><th>How to use it</th></tr>
+      <tr><td>Network Toolkit logo and title</td><td>Identifies the portable toolkit instance.</td><td>No action needed. The toolkit branding is intentionally generic and no longer CSI-branded.</td></tr>
+      <tr><td>Computer</td><td>Shows the local computer name.</td><td>Use this to verify you are troubleshooting the intended device before collecting reports.</td></tr>
+      <tr><td>Domain</td><td>Shows the current domain/workgroup context.</td><td>Helpful for logon, GPO, DNS, time sync, and domain controller troubleshooting.</td></tr>
+      <tr><td>Private IP</td><td>Shows the active private IP and adapter name when detected.</td><td>Use as the first sanity check for VLAN, DHCP, static IP, and wrong-adapter issues.</td></tr>
+      <tr><td>Public IP</td><td>Shows the detected external IP when lookup succeeds.</td><td>Click the Public IP label/value to retry the lookup. Useful for NAT, VPN, firewall egress, and ISP path checks.</td></tr>
+      <tr><td>Elevation status</td><td>Shows <code>Running elevated</code> or not elevated.</td><td>Repair and deep inspection work should generally be done elevated.</td></tr>
+      <tr><td>Gear icon</td><td>Opens Settings.</td><td>Use for tab order, startup tab, themes, custom themes, report behavior, and sanitizing the toolkit.</td></tr>
+      <tr><td>Help</td><td>Opens this help document.</td><td>Use it when handing the toolkit to another technician or when you need a reminder of what a tool is supposed to do.</td></tr>
     </table>
   </section>
-  <section>
-    <h2>Quick Diagnosis and Repair</h2>
-    <p>Quick Diagnosis is the primary triage path. It runs diagnostic-only checks and saves a Computer Profile. DISM/SFC repair remains separate. If Quick Diagnosis does not indicate servicing follow-up, the GUI will ask for override confirmation before repair runs.</p>
+
+  <section id="quick">
+    <h2>Quick Diagnosis</h2>
+    <p>Quick Diagnosis is the main walk-up workflow. The idea is simple: plug in the toolkit, launch it, run one task, and get a professional status report that tells the technician what is healthy, what needs review, and what to do next.</p>
+    <h3>Main buttons</h3>
+    <table>
+      <tr><th>Button</th><th>Purpose</th><th>Expected output</th></tr>
+      <tr><td>Run Quick Diagnosis</td><td>Runs the one-click triage workflow. It collects a computer profile, runs common health checks, performs live target checks, runs DISM CheckHealth, checks drivers and hardware signals, and exports an HTML report.</td><td>An HTML Quick Diagnosis report in <code>CSI-NetworkToolkit\Exports</code>, plus a Computer Profile JSON/HTML. The report is not automatically opened unless Settings says to do so.</td></tr>
+      <tr><td>Open Latest Report</td><td>Opens the most recent Quick Diagnosis HTML report.</td><td>The latest report opens in the default browser.</td></tr>
+      <tr><td>Run DISM/SFC Repair Path</td><td>Runs the repair path after Quick Diagnosis indicates it may be needed. If the button is disabled, pressing it should require confirmation to override.</td><td>Repair output and logs. This is a remediation step, not a discovery-only step.</td></tr>
+    </table>
+    <h3>Quick target checks</h3>
+    <p>The Quick Diagnosis page also includes quick target fields for common network checks. These are for immediate troubleshooting while you are standing at the machine.</p>
+    <table>
+      <tr><th>Check</th><th>Use it when</th><th>What to look for</th></tr>
+      <tr><td>Ping</td><td>You need a fast reachability check to a gateway, DNS server, file server, website, printer, or another endpoint.</td><td>Packet loss, high latency, or name resolution failures.</td></tr>
+      <tr><td>TCPing/Test port</td><td>Ping is blocked or not enough. You need to know whether a specific TCP service is reachable.</td><td>Whether the TCP port connects. Common examples: 443, 445, 3389, 53, 25, 587.</td></tr>
+      <tr><td>Tracert</td><td>The target is not reachable or is slow and you need to see the route path.</td><td>Where traffic stops, where latency jumps, or whether a route is unexpected.</td></tr>
+      <tr><td>WHOIS</td><td>You need to identify ownership of a public IP or domain.</td><td>Registrar, network owner, ASN, and contact information.</td></tr>
+      <tr><td>NSLookup</td><td>You need basic DNS resolution output.</td><td>Which DNS server answered and what address/name came back.</td></tr>
+      <tr><td>DNS record lookup</td><td>You need a specific DNS record type.</td><td>A, AAAA, MX, TXT, CNAME, SRV, or other selected record responses.</td></tr>
+    </table>
+    <h3>How to read the Quick Diagnosis report</h3>
+    <p>The report is intentionally split into summary, system snapshot, disks, network adapters, problems found, all checks, and driver inventory. The important design choice is that passing checks should stay compact. If a check passes, the report should show the task name and an <span class="badge ok">Error free</span> style indicator. Supporting evidence is only expanded for warnings or critical issues.</p>
+    <table>
+      <tr><th>Status</th><th>Meaning</th><th>Action</th></tr>
+      <tr><td><span class="badge ok">OK</span></td><td>The check did not find an obvious issue.</td><td>No immediate follow-up unless the user's symptom points directly at that area.</td></tr>
+      <tr><td><span class="badge review">Info</span></td><td>The toolkit collected useful context or could not confirm a signal. This is not necessarily a problem.</td><td>Review only if related to the symptom. Virtual machines often produce Info findings for hardware checks.</td></tr>
+      <tr><td><span class="badge review">Warning</span></td><td>The toolkit found something that may be broken, misconfigured, blocked by permission, or worth checking.</td><td>Read the supporting evidence and recommended next step. Use the suggested tab/tool to investigate.</td></tr>
+      <tr><td><span class="badge critical">Critical</span></td><td>The toolkit found a high-risk condition.</td><td>Stop and investigate before making changes. Back up data first if storage failure is suspected.</td></tr>
+    </table>
+    <div class="note">
+      Virtual machine note: hardware tools such as SMART, CrystalDiskInfo, GPU inspection, and some sensor checks may be limited in VMs. If the toolkit says storage visibility is limited, check the hypervisor host or storage platform as well as the guest.
+    </div>
   </section>
-  <section>
-    <h2>Temp Tool Outputs</h2>
-    <p>Console-driven tools create timestamped output sessions under <code>Data\TempToolOutputs</code>. These sessions capture metadata and a transcript for troubleshooting tool usage without collecting every GUI log line. The toolkit keeps a limited recent history and removes older sessions automatically.</p>
+
+  <section id="reports">
+    <h2>Reports And Outputs</h2>
+    <p>The Reports tab is for useful technician-facing output, not raw log spam. Logs live in the Live Log tab and ToolUsage log folder. Reports should help answer questions like: what computer did I check, what did Quick Diagnosis find, what profile was captured, what network discovery output exists, and where are the repair records?</p>
+    <h3>Reports tab buttons</h3>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Search</td><td>Filters report entries using the search/filter field.</td></tr>
+      <tr><td>Refresh Reports</td><td>Reloads the report list from the toolkit output locations.</td></tr>
+      <tr><td>Open Selected</td><td>Opens the selected report file.</td></tr>
+      <tr><td>Open Location</td><td>Opens the folder containing the selected report.</td></tr>
+      <tr><td>Delete Selected</td><td>Removes the selected report after confirmation.</td></tr>
+      <tr><td>Open Help</td><td>Opens this guide.</td></tr>
+    </table>
+    <h3>Important output locations</h3>
+    <table>
+      <tr><th>Folder</th><th>Contains</th></tr>
+      <tr><td><code>CSI-NetworkToolkit\Exports</code></td><td>Quick Diagnosis reports, full triage reports, exported computer profiles, network reports, repair outputs, and other intentional reports.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\Data\ComputerProfiles</code></td><td>Latest saved computer profiles used by the Computer Info selector.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\Data\ComputerState</code></td><td>Latest known state per computer in JSON form. This is intended to support richer Computer Profile reports without keeping unlimited history.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\Data\TempToolOutputs</code></td><td>Per-tool temp output sessions for console-backed GUI tools.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\Data\MiniDumps</code></td><td>Collected minidumps copied from the local machine for crash review.</td></tr>
+      <tr><td><code>CSI-NetworkToolkit\Logs\ToolUsage</code></td><td>Small per-tool usage logs for troubleshooting toolkit behavior.</td></tr>
+    </table>
   </section>
-  <section>
-    <h2>Chocolatey</h2>
-    <p>Use Search Packages to find packages and Install Selected to install. Use Scan Installed to list local packages. Upgrade Selected and Uninstall Selected act on the selected installed package. If a package is already installed, the toolkit will show a message instead of launching a pointless install console.</p>
+
+  <section id="computerinfo">
+    <h2>Computer Info</h2>
+    <p>The Computer Info tab is the technician-facing view for saved computer profiles. A computer profile is the evolved version of the original computer fingerprint. It captures identity, OS, hardware, network configuration, local administrators, listening ports, security products, Defender, BitLocker, servicing health, pending reboot state, and toolkit latest-state data.</p>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Open HTML Report</td><td>Opens the selected computer profile as a readable HTML report.</td></tr>
+      <tr><td>Take Fingerprint / Take Profile</td><td>Captures the current computer profile and saves it for later selection.</td></tr>
+      <tr><td>Delete</td><td>Deletes the selected saved computer profile after confirmation.</td></tr>
+      <tr><td>Refresh</td><td>Reloads the saved profile list.</td></tr>
+    </table>
+    <p>The Computer Profile report should become more useful over time because it can include latest Quick Diagnosis data and latest GUI tool outputs from the per-computer state file.</p>
   </section>
-  <section>
-    <h2>Minidumps and BSOD Review</h2>
-    <p>The Minidump Collector copies the selected dump into a temp output session. Point BlueScreenView or WinDbg at that copied folder so analysis does not depend on locked or protected Windows dump locations.</p>
+
+  <section id="analyze">
+    <h2>Analyze Tab</h2>
+    <p>The Analyze tab is for evidence collection and issue discovery. Use it when Quick Diagnosis points to Windows, hardware, disk, event log, service, update, or policy issues.</p>
+    <table>
+      <tr><th>Tool</th><th>What it checks</th><th>When to use it</th></tr>
+      <tr><td>Event Log Triage</td><td>Recent critical and error events from important Windows logs.</td><td>Use when Quick Diagnosis reports event log warnings, application crashes, service failures, update failures, driver errors, or unexplained user symptoms.</td></tr>
+      <tr><td>Service Health</td><td>Automatic services that are unexpectedly stopped.</td><td>Use when services appear unhealthy, apps fail to start, networking behaves oddly, printing is broken, or Quick Diagnosis flags stopped services.</td></tr>
+      <tr><td>Startup Impact</td><td>Startup commands and scheduled task problems.</td><td>Use when boot/logon is slow, unwanted apps launch, or a user reports startup popups/errors.</td></tr>
+      <tr><td>Windows Update Health</td><td>Update services, update health, and pending reboot markers.</td><td>Use when updates are stuck, pending reboot is suspected, servicing is unhealthy, or the Windows Update tab needs context.</td></tr>
+      <tr><td>Group Policy HTML Report</td><td>Runs <code>gpresult /h</code> and opens the HTML report.</td><td>Use for GPO application problems, mapped drives, printers, security policy, scripts, folder redirection, software deployment, and user/computer policy troubleshooting.</td></tr>
+      <tr><td>Hardware Health</td><td>Device Manager problem devices, storage, battery, memory, and hardware events.</td><td>Use when devices are missing, drivers are wrong, the computer is unstable, or Quick Diagnosis flags hardware.</td></tr>
+      <tr><td>Disk Health</td><td>Free space, physical disk health, and recent disk events.</td><td>Use for slowness, freezing, update failures, profile issues, file corruption, or low disk space.</td></tr>
+      <tr><td>Resource Hotspots</td><td>Top CPU and memory consumers.</td><td>Use when a machine is slow right now.</td></tr>
+    </table>
   </section>
-  <section>
-    <h2>Robocopy Builder Tips</h2>
-    <p>The current builder is intentionally balanced. Useful future enhancements would be saved presets, source/destination browse buttons, estimated action summary, and a dry-run diff view. Those would add power without making the builder much harder for junior technicians.</p>
+
+  <section id="windowsupdate">
+    <h2>Windows Update Tab</h2>
+    <p>The Windows Update tab is a GUI wrapper for update discovery, history review, selected download, selected install, selected uninstall, and Windows Update repair. It is designed to avoid the normal pain of digging through Settings, Control Panel, Event Viewer, and command-line update tooling.</p>
+    <h3>Top buttons</h3>
+    <table>
+      <tr><th>Button</th><th>What it does</th><th>Notes</th></tr>
+      <tr><td>Refresh Updates</td><td>Scans for pending updates, removable installed updates, and recent update history.</td><td>Run this first. The grids are only as current as the last refresh.</td></tr>
+      <tr><td>Download Selected</td><td>Downloads the selected pending update without installing it.</td><td>Useful before a maintenance window or when internet access is temporary. It accepts the update EULA if required, downloads, then refreshes the list.</td></tr>
+      <tr><td>Install Selected</td><td>Downloads and installs the selected pending update.</td><td>Use only after confirming the selected update is appropriate. The result popup shows whether reboot is required.</td></tr>
+      <tr><td>Uninstall Selected</td><td>Uninstalls the selected installed update if Windows reports it as removable.</td><td>Not all updates are uninstallable. Use carefully, especially on servers.</td></tr>
+      <tr><td>Repair Windows Update</td><td>Stops update services, renames update caches, resets WinHTTP/Winsock and service descriptors, restarts services, writes a repair log, then rescans.</td><td>Requires elevation. It does not install updates. A reboot may be needed after repair.</td></tr>
+    </table>
+    <h3>Grids</h3>
+    <table>
+      <tr><th>Grid</th><th>Purpose</th></tr>
+      <tr><td>Pending Updates</td><td>Shows available updates, KBs, severity, estimated download size, downloaded state, and reboot requirement.</td></tr>
+      <tr><td>Installed Updates Windows Reports As Removable</td><td>Shows installed updates that can potentially be removed through the Windows Update Agent.</td></tr>
+      <tr><td>Recent Windows Update History</td><td>Shows recent install/uninstall attempts, result code, title, date, and support URL.</td></tr>
+    </table>
+    <div class="danger">
+      Do not use Repair Windows Update as the first move on every machine. Use it when updates are stuck, the Windows Update Agent is broken, scans fail repeatedly, or Quick Diagnosis/Windows Update Health points at update component trouble.
+    </div>
+  </section>
+
+  <section id="hardware">
+    <h2>Hardware Tab</h2>
+    <p>The Hardware tab holds deeper external tools and hardware-focused diagnostics. Quick Diagnosis and Analyze can identify suspicious areas; Hardware is where you open vendor-style tools for more detail.</p>
+    <table>
+      <tr><th>Tool</th><th>Use</th><th>VM note</th></tr>
+      <tr><td>CrystalDiskInfo</td><td>SMART health, temperature, firmware, and drive details.</td><td>May not work or may show limited data inside VMs, RAID controllers, USB bridges, or abstracted storage.</td></tr>
+      <tr><td>HWiNFO</td><td>Detailed inventory and sensors for CPU, board, memory, drives, thermals, and devices.</td><td>VMs may show virtualized hardware only.</td></tr>
+      <tr><td>CPU-Z</td><td>CPU, memory, motherboard, chipset, and platform details.</td><td>Good for quick identity and platform checks.</td></tr>
+      <tr><td>GPU-Z</td><td>Graphics adapter, driver, BIOS, sensors, and GPU details.</td><td>On VMs, use hypervisor tools/video driver guidance instead of expecting physical GPU detail.</td></tr>
+      <tr><td>HWMonitor</td><td>Temperatures, voltages, and fan readings.</td><td>Sensor visibility depends heavily on hardware and VM abstraction.</td></tr>
+      <tr><td>PCI-Z</td><td>PCI device identification and driver/device clues.</td><td>Useful when Device Manager has unknown devices or chipset issues.</td></tr>
+      <tr><td>Speccy</td><td>Readable hardware and system overview.</td><td>Useful for quick screenshots or inventory sanity checks.</td></tr>
+      <tr><td>SSD-Z</td><td>SSD-specific information.</td><td>May be limited on virtual disks.</td></tr>
+      <tr><td>QuickMemoryTestOK</td><td>Quick memory stress/test utility.</td><td>Not a replacement for a full memory diagnostic, but useful for fast suspicion checks.</td></tr>
+    </table>
+  </section>
+
+  <section id="crash">
+    <h2>Crash Tab</h2>
+    <p>The Crash tab is for BSOD, application crash, unexpected reboot, hang, and reliability investigations.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th><th>Recommended workflow</th></tr>
+      <tr><td>Minidump Collector</td><td>Copies recent minidump files into the toolkit and collects crash evidence.</td><td>Run this first when BSODs are reported. Then open the collected dump folder with BlueScreenView or another dump reader.</td></tr>
+      <tr><td>BlueScreenView</td><td>Reads minidump files and shows probable bugcheck drivers/modules.</td><td>Use after collecting dumps. Treat "caused by driver" as a lead, not a final answer.</td></tr>
+      <tr><td>Reliability Monitor</td><td>Opens Windows Reliability Monitor for a timeline of crashes, failed updates, and hangs.</td><td>Use when the user says "it started last week" or when you need a fast visual failure timeline.</td></tr>
+      <tr><td>Crash Event Summary</td><td>Summarizes bugcheck, WER, application crash, and shutdown events.</td><td>Use when no dump is present or you need timestamps and repeated patterns.</td></tr>
+    </table>
+    <div class="tip">
+      Crash workflow: collect dumps, review Reliability Monitor, check crash event summary, compare timestamps to Windows Update history and driver events, then inspect named drivers or devices.
+    </div>
+  </section>
+
+  <section id="processes">
+    <h2>Processes Tab</h2>
+    <p>The Processes tab is for live process, startup, handle, DLL, resource, and system activity inspection.</p>
+    <table>
+      <tr><th>Tool</th><th>What it is good for</th></tr>
+      <tr><td>Process Explorer</td><td>Process tree, parent/child relationships, handles, DLLs, signatures, user context, CPU, memory, and suspicious process review.</td></tr>
+      <tr><td>Process Monitor</td><td>Live file, registry, process, thread, and network activity tracing. Use filters immediately or it will collect too much noise.</td></tr>
+      <tr><td>RAMMap</td><td>Physical memory usage, standby list, mapped files, file cache, and memory pressure inspection.</td></tr>
+      <tr><td>System Informer</td><td>Advanced process, service, handle, module, and system activity inspection.</td></tr>
+    </table>
+    <div class="warn">
+      Process Monitor can produce a huge amount of data very quickly. Start capture only when you are ready, apply filters, reproduce the issue, then stop capture.
+    </div>
+  </section>
+
+  <section id="network">
+    <h2>Network Tab</h2>
+    <p>The Network tab is for target connectivity, routing, DNS path, TLS certificate checks, packet loss, live network connections, and packet capture.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th><th>Use when</th></tr>
+      <tr><td>Connectivity Triage</td><td>Fast gateway, DNS, route, and target reachability checks.</td><td>The user says "internet is down" or "network is slow."</td></tr>
+      <tr><td>Adapter Route Health</td><td>Adapters, IP configuration, gateways, routes, and DNS.</td><td>There are multiple adapters, VPNs, static IPs, wrong gateways, or DNS confusion.</td></tr>
+      <tr><td>Packet Loss Monitor</td><td>Live packet loss to a target.</td><td>Connectivity works sometimes but not reliably.</td></tr>
+      <tr><td>Live Route Trace</td><td>Repeated route trace/latency path view.</td><td>You need to see where the route fails or slows down.</td></tr>
+      <tr><td>Test-NetConnection</td><td>Host reachability and optional TCP port test.</td><td>You need to test a service port such as HTTPS, SMB, RDP, SMTP, or database ports.</td></tr>
+      <tr><td>DNS Path Test</td><td>DNS resolver behavior and lookup path.</td><td>Name resolution is suspected.</td></tr>
+      <tr><td>Port Reachability Matrix</td><td>Tests multiple ports against a target.</td><td>You need to quickly test many service ports.</td></tr>
+      <tr><td>TLS Certificate Check</td><td>Remote TLS certificate and expiration details.</td><td>HTTPS, certificate, trust, expiration, or inspection/proxy issues are suspected.</td></tr>
+      <tr><td>TCPView</td><td>Live TCP/UDP endpoints and owning processes.</td><td>You need to know what process owns a connection or listener.</td></tr>
+      <tr><td>PsPing</td><td>ICMP/TCP latency and connectivity from Sysinternals.</td><td>You need better latency data than a simple ping.</td></tr>
+      <tr><td>WinMTR</td><td>Continuous traceroute and packet loss monitoring.</td><td>Intermittent packet loss or path quality problems.</td></tr>
+      <tr><td>Wireshark</td><td>Packet capture and protocol analysis.</td><td>DHCP, DNS, TLS, TCP resets, retransmits, authentication, or protocol-level problems require packet evidence.</td></tr>
+    </table>
+  </section>
+
+  <section id="remote">
+    <h2>Remote Tab</h2>
+    <p>The Remote tab is for connecting to other systems or transferring files as part of troubleshooting.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Launch RDP</td><td>Opens Windows Remote Desktop Connection.</td></tr>
+      <tr><td>WinSCP</td><td>SFTP, SCP, FTP, and WebDAV file transfer.</td></tr>
+      <tr><td>KiTTY</td><td>Portable SSH/Telnet terminal client.</td></tr>
+      <tr><td>PuTTY</td><td>Portable SSH, Telnet, and serial terminal client.</td></tr>
+      <tr><td>WhoDat</td><td>WHOIS lookup for domains and public IP addresses.</td></tr>
+      <tr><td>mRemoteNG</td><td>Multi-protocol remote connection manager when installed in Apps.</td></tr>
+      <tr><td>RustDesk</td><td>Remote support tool when installed in Apps.</td></tr>
+      <tr><td>TightVNC</td><td>VNC viewer when installed in Apps.</td></tr>
+    </table>
+  </section>
+
+  <section id="services">
+    <h2>Services And Infrastructure Tab</h2>
+    <p>The Services/Infrastructure tools focus on local exposure, DHCP, DNS, time, and infrastructure-facing checks.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Local Exposure Inspector</td><td>Reviews listening ports and local exposure risk.</td></tr>
+      <tr><td>DHCP Scope Inspector</td><td>Reviews DHCP scope and lease information where available.</td></tr>
+      <tr><td>Time Sync Health</td><td>Checks Windows time source and synchronization state.</td></tr>
+      <tr><td>Reset Domain Time</td><td>Configures Windows Time to use the domain hierarchy, restarts W32Time, resyncs, and verifies the source. Requires elevation.</td></tr>
+      <tr><td>DHCP Server / Rogue Locator</td><td>Checks current DHCP lease evidence and attempts to identify unexpected DHCP responders.</td></tr>
+      <tr><td>DNS Diagnostics</td><td>Runs DNS diagnostics against configured resolvers and target lookups.</td></tr>
+    </table>
+    <div class="warn">
+      Rogue DHCP investigation may require packet capture, switch/AP inspection, DHCP snooping data, or firewall logs. A workstation can provide evidence, but the network infrastructure usually proves the source.
+    </div>
+  </section>
+
+  <section id="repair">
+    <h2>Repair Tab</h2>
+    <p>The Repair tab is for remediation after evidence has been reviewed. The toolkit intentionally tries to separate discovery from repair.</p>
+    <table>
+      <tr><th>Tool</th><th>What it does</th><th>Use carefully because</th></tr>
+      <tr><td>DISM/SFC Repair Path</td><td>Runs DISM CheckHealth, ScanHealth, RestoreHealth, and SFC with exported output.</td><td>It changes system state and can take time. Quick Diagnosis should indicate whether this is needed.</td></tr>
+      <tr><td>Windows Error Lookup</td><td>Looks up Windows error codes, HRESULTs, and Win32 messages.</td><td>It helps interpret errors but does not fix them.</td></tr>
+      <tr><td>Profile Cleanup Toolkit</td><td>Coworker profile cleanup utility, when installed in Apps or placed on the appropriate tab.</td><td>User profile cleanup can remove local user data if used incorrectly. Confirm scope before removing anything.</td></tr>
+    </table>
+  </section>
+
+  <section id="directory">
+    <h2>Directory Tab</h2>
+    <p>The Directory tab is for domain membership, secure channel, domain controller discovery, and Group Policy checks.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Domain Logon Health</td><td>Checks domain membership, secure channel, and domain controller discovery.</td></tr>
+      <tr><td>GPO Health</td><td>Runs a computer-scope Group Policy result summary.</td></tr>
+      <tr><td>Group Policy HTML Report</td><td>For deeper policy detail, use the Analyze tab report button.</td></tr>
+    </table>
+    <p>Use Directory tools when users cannot log in, mapped drives/printers do not apply, policies are stale, time/Kerberos errors exist, or a workstation appears joined but cannot find a domain controller.</p>
+  </section>
+
+  <section id="security">
+    <h2>Security Tab</h2>
+    <p>The Security tab is for malware/adware scanners, startup persistence inspection, signature checks, password tools, and security posture review.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th><th>Notes</th></tr>
+      <tr><td>Defender Security Check</td><td>Checks Defender, real-time protection, signatures, and firewall profiles.</td><td>Use when protection status or firewall posture is unclear.</td></tr>
+      <tr><td>Microsoft Safety Scanner</td><td>Microsoft on-demand malware scanner.</td><td>Requires elevation for best results. Definitions are time-sensitive, so keep the tool current.</td></tr>
+      <tr><td>Malwarebytes AdwCleaner</td><td>Finds adware, browser hijackers, unwanted programs, and toolbars.</td><td>Review detections before cleaning.</td></tr>
+      <tr><td>ClamWin Portable</td><td>Portable antivirus scanner for selected files/folders.</td><td>Best as a supplemental scanner, not a full EDR replacement.</td></tr>
+      <tr><td>Sigcheck</td><td>Checks signatures, hashes, versions, and unsigned executables.</td><td>Useful for suspicious binaries and driver/file trust checks.</td></tr>
+      <tr><td>Autoruns</td><td>Shows startup locations, services, drivers, scheduled tasks, and persistence points.</td><td>Powerful. Do not disable entries without knowing owner and impact.</td></tr>
+      <tr><td>HijackThis</td><td>Legacy-style browser/startup inspection tool when installed.</td><td>Use as a clue collector, not an automatic cleaner.</td></tr>
+      <tr><td>PWGen</td><td>Password generation utility when installed.</td><td>Useful for temporary passwords or secure random strings.</td></tr>
+      <tr><td>xpy</td><td>Privacy/system tweak utility when installed.</td><td>Be careful. Tweaks can change Windows behavior in ways that complicate support.</td></tr>
+    </table>
+  </section>
+
+  <section id="wifi">
+    <h2>Wi-Fi Tab</h2>
+    <p>The Wi-Fi tab is for wireless adapter, profile, visible network, and Wi-Fi event checks.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Wi-Fi Issue Scan</td><td>Runs a quick scan for common Wi-Fi problems.</td></tr>
+      <tr><td>Wi-Fi Status</td><td>Shows wireless interface state and current connection details.</td></tr>
+      <tr><td>Wi-Fi Networks</td><td>Lists visible wireless networks.</td></tr>
+      <tr><td>Wi-Fi Profiles</td><td>Lists saved wireless profiles.</td></tr>
+      <tr><td>WiFi Diagnostics View</td><td>NirSoft-style Wi-Fi diagnostics event viewer when installed.</td></tr>
+      <tr><td>Ubiquiti/WiFiman</td><td>Wireless diagnostic or vendor utility if installed.</td></tr>
+    </table>
+    <p>Use these tools when Wi-Fi connects to the wrong SSID, drops, has weak signal, cannot authenticate, lacks DHCP, or behaves differently than wired Ethernet.</p>
+  </section>
+
+  <section id="print">
+    <h2>Print Tab</h2>
+    <p>The Print tab is for local and network print troubleshooting.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Print Queue Maintenance</td><td>Launches the custom print queue maintenance GUI for network print queue work.</td></tr>
+      <tr><td>Print Spooler Triage</td><td>Checks local spooler health, printers, queues, jobs, and common print issues.</td></tr>
+      <tr><td>Stale Printer Cleanup</td><td>Finds stale local printer artifacts, old user printer entries, and orphaned printer registry remnants. Requires elevation.</td></tr>
+    </table>
+    <div class="warn">
+      Printer cleanup can affect user printer mappings and local printer state. Review detections before removing artifacts.
+    </div>
+  </section>
+
+  <section id="files">
+    <h2>Files Tab</h2>
+    <p>The Files tab contains search, disk space, compare, and file management tools.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Everything</td><td>Instant filename search.</td></tr>
+      <tr><td>WizTree</td><td>Fast disk space analysis. Runs elevated so it can see more of the filesystem.</td></tr>
+      <tr><td>WinDirStat</td><td>Visual disk usage analysis.</td></tr>
+      <tr><td>WinMerge</td><td>Compare and merge files/folders.</td></tr>
+      <tr><td>Kudu</td><td>Portable file manager.</td></tr>
+      <tr><td>Handle</td><td>Finds which process has a file, folder, registry key, or object open.</td></tr>
+      <tr><td>PsExec</td><td>Runs commands locally or remotely. Requires care and elevation for many uses.</td></tr>
+      <tr><td>LockHunter</td><td>Find and release locked files when installed.</td></tr>
+      <tr><td>Recuva</td><td>File recovery utility when installed.</td></tr>
+    </table>
+  </section>
+
+  <section id="discovery">
+    <h2>Discovery Tab</h2>
+    <p>The Discovery tab is for finding devices, identifying services, exporting ARP neighbor data, calculating subnets, and sending Wake-on-LAN packets.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Network Discovery</td><td>Discovers local network neighbors and common network details.</td></tr>
+      <tr><td>Port and Service Test</td><td>Fingerprints common service ports on a target.</td></tr>
+      <tr><td>Service Fingerprinter</td><td>Runs deeper service fingerprinting against selected targets.</td></tr>
+      <tr><td>ARP Inventory Exporter</td><td>Exports local ARP neighbor inventory for quick review.</td></tr>
+      <tr><td>Subnet Calculator</td><td>Calculates subnet ranges, masks, and host counts.</td></tr>
+      <tr><td>Wake-on-LAN Tool</td><td>Sends a Wake-on-LAN magic packet.</td></tr>
+      <tr><td>FastResolver</td><td>Fast local network name/IP resolution utility when installed.</td></tr>
+    </table>
+  </section>
+
+  <section id="robocopy">
+    <h2>Robocopy Tab</h2>
+    <p>The Robocopy tab is one of the builder-style tools. It asks plain-language questions and builds the command line for you. This is safer than having a junior technician memorize switches.</p>
+    <h3>Common fields and controls</h3>
+    <table>
+      <tr><th>Control</th><th>Purpose</th></tr>
+      <tr><td>Source</td><td>Folder to copy from.</td></tr>
+      <tr><td>Destination</td><td>Folder to copy to.</td></tr>
+      <tr><td>File pattern</td><td>Defaults to <code>*.*</code>. Can be changed for specific file types.</td></tr>
+      <tr><td>Copy mode/options</td><td>Controls recursive copy behavior, retries, multithreading, logging, mirroring, and metadata options.</td></tr>
+      <tr><td>Build Command</td><td>Generates the robocopy command without running it.</td></tr>
+      <tr><td>Copy Command</td><td>Copies the generated command to clipboard.</td></tr>
+      <tr><td>Preview Only</td><td>Runs the copy as a dry run/list preview if configured.</td></tr>
+      <tr><td>Run Copy</td><td>Runs the generated robocopy command.</td></tr>
+    </table>
+    <div class="danger">
+      Be careful with mirror/delete behavior. A wrong source/destination with mirror options can remove files from the destination. Confirm both paths before running.
+    </div>
+  </section>
+
+  <section id="software">
+    <h2>Software Tab</h2>
+    <p>The Software tab is for everyday portable software that supports troubleshooting work but is not itself a repair or cleanup tool.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>Notepad++</td><td>Open logs, scripts, configs, CSVs, and text files.</td></tr>
+      <tr><td>Firefox Portable</td><td>Portable browser with profile, history, extensions, and bookmarks on the toolkit drive.</td></tr>
+      <tr><td>LibreOffice</td><td>Open documents, spreadsheets, and reports when installed.</td></tr>
+      <tr><td>Draw.io</td><td>Create or edit diagrams, network maps, and troubleshooting visuals.</td></tr>
+      <tr><td>KompoZer</td><td>Quick HTML/report editing.</td></tr>
+      <tr><td>Sumatra PDF</td><td>Lightweight PDF viewer when installed.</td></tr>
+    </table>
+  </section>
+
+  <section id="cleanup">
+    <h2>Clean Up Tab</h2>
+    <p>The Clean Up tab is for disk cleanup, application removal, registry cleanup, locked files, and leftovers.</p>
+    <table>
+      <tr><th>Tool</th><th>Purpose</th><th>Warning</th></tr>
+      <tr><td>BleachBit</td><td>Disk cleanup and privacy cleanup.</td><td>Review cleanup selections before running.</td></tr>
+      <tr><td>CCleaner</td><td>Disk/app cleanup and some maintenance tasks.</td><td>Avoid aggressive registry cleaning unless approved.</td></tr>
+      <tr><td>Wise Registry Cleaner</td><td>Registry cleanup utility.</td><td>Registry cleaning can create problems. Back up and use sparingly.</td></tr>
+      <tr><td>Bulk Uninstaller</td><td>Review/remove installed applications and leftovers.</td><td>Requires .NET Desktop Runtime. Do not remove shared components blindly.</td></tr>
+      <tr><td>Revo Uninstaller</td><td>Application removal and leftover cleanup.</td><td>Confirm target app and leftovers before deleting.</td></tr>
+      <tr><td>LockHunter</td><td>Find and release locked files.</td><td>Closing handles can crash apps or corrupt writes if used recklessly.</td></tr>
+    </table>
+  </section>
+
+  <section id="apps">
+    <h2>Apps Tab</h2>
+    <p>The Apps tab lists portable tools installed into the toolkit. These are toolkit-contained applications, not necessarily programs installed on the local computer.</p>
+    <h3>Buttons</h3>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Launch Toolkit Tool</td><td>Launches the selected portable app.</td></tr>
+      <tr><td>Rename</td><td>Changes the display name shown in the Apps grid and generated tabs.</td></tr>
+      <tr><td>Set Tab Placement</td><td>Overrides where the app should appear. Use this to put tools on the tab where they naturally belong.</td></tr>
+      <tr><td>Remove From Toolkit</td><td>Removes the selected toolkit app entry and its copied files after confirmation.</td></tr>
+      <tr><td>Open Location</td><td>Opens the app folder.</td></tr>
+      <tr><td>Refresh Toolkit Tools</td><td>Reloads the app manifest and refreshes generated tool buttons.</td></tr>
+    </table>
+    <h3>Installed portable apps currently recognized</h3>
+    <p>Examples include BleachBit, Bulk Uninstaller, CCleaner, CPU-Z, FastResolver, Firefox Portable, GPU-Z, HijackThis, HWMonitor, KiTTY, LibreOffice, LockHunter, mRemoteNG, PCI-Z, Profile Cleanup Toolkit, PuTTY, PWGen, QuickMemoryTestOK, Recuva, Revo Uninstaller, RustDesk, Speccy, SSD-Z, Sumatra PDF, TightVNC, WiFi Diagnostics View, WinMTR, WinSCP, Wise Registry Cleaner, and xpy.</p>
+    <div class="note">
+      If a tool appears in Apps and also as a button on a functional tab, the tab button should launch the same installed app. If the app is removed from Apps, the tab button should disappear or stop being generated.
+    </div>
+  </section>
+
+  <section id="choco">
+    <h2>Chocolatey Tab</h2>
+    <p>The Choco tab has two distinct jobs. First, it can manage Chocolatey packages installed on the local computer. Second, it can help add portable tools into this toolkit.</p>
+    <h3>Status and install controls</h3>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Refresh Status</td><td>Checks whether Chocolatey is available and updates status text.</td></tr>
+      <tr><td>Install Chocolatey</td><td>Installs Chocolatey on the local computer.</td></tr>
+      <tr><td>Scan Installed</td><td>Scans Chocolatey packages installed on the local computer.</td></tr>
+    </table>
+    <h3>Install Chocolatey Packages frame</h3>
+    <table>
+      <tr><th>Control</th><th>Purpose</th></tr>
+      <tr><td>Search term</td><td>Package search text.</td></tr>
+      <tr><td>Search Packages</td><td>Searches Chocolatey package names.</td></tr>
+      <tr><td>Install Selected</td><td>Installs the selected package onto the local computer.</td></tr>
+      <tr><td>Add to Toolbox</td><td>Attempts to download/extract/copy a portable version into the toolkit. If the package does not appear portable, the toolkit warns and may offer fallback options.</td></tr>
+    </table>
+    <h3>Computer Installed Chocolatey Packages frame</h3>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Refresh Computer List</td><td>Reloads packages installed on the local computer.</td></tr>
+      <tr><td>Upgrade All</td><td>Upgrades all computer-installed Chocolatey packages.</td></tr>
+      <tr><td>Upgrade Selected</td><td>Upgrades the selected installed package.</td></tr>
+      <tr><td>Uninstall From Computer</td><td>Uninstalls the selected package from the local computer.</td></tr>
+    </table>
+    <div class="warn">
+      Important distinction: Apps tab equals toolkit-installed portable apps. Installed Chocolatey Packages equals packages installed on the current computer.
+    </div>
+  </section>
+
+  <section id="sysinternals">
+    <h2>Sysinternals</h2>
+    <p>Sysinternals tools are powerful Microsoft troubleshooting utilities. Many have been moved to the tab where they fit best. Tools that do not clearly belong elsewhere remain on the Sysinternals tab.</p>
+    <table>
+      <tr><th>Tool family</th><th>Examples</th><th>Notes</th></tr>
+      <tr><td>Process and startup</td><td>Process Explorer, Process Monitor, Autoruns</td><td>Use for live activity, startup/persistence, process ownership, and file/registry traces.</td></tr>
+      <tr><td>Network</td><td>TCPView, PsPing, Whois</td><td>Use for endpoint visibility, latency, TCP tests, and public ownership lookups.</td></tr>
+      <tr><td>Disk and file</td><td>Handle, RAMMap, Disk tools</td><td>Use for locked files, memory pressure, and low-level inspection.</td></tr>
+      <tr><td>PsTools</td><td>PsExec and related tools</td><td>Use carefully. Remote execution and service creation are admin-sensitive actions.</td></tr>
+      <tr><td>Security and registry</td><td>Sigcheck, Autoruns, registry inspection tools</td><td>Useful for trust, signatures, persistence, and suspicious file review.</td></tr>
+    </table>
+    <div class="note">
+      The toolkit attempts to pass Sysinternals EULA acceptance automatically where needed. If a tool still prompts, accept only if allowed by your organization.
+    </div>
+  </section>
+
+  <section id="settings">
+    <h2>Settings</h2>
+    <p>Settings are opened from the gear icon in the header. Settings are intentionally not part of the normal technician workflow tabs.</p>
+    <table>
+      <tr><th>Setting/Button</th><th>Purpose</th></tr>
+      <tr><td>Tab Order</td><td>Reorder visible tabs. Move Up and Move Down adjust the selected tab.</td></tr>
+      <tr><td>Startup tab</td><td>Chooses which tab opens first.</td></tr>
+      <tr><td>Color theme</td><td>Chooses a built-in theme or Custom Theme.</td></tr>
+      <tr><td>Custom Theme</td><td>Prompts for header, accent/button, page background, text, and live log background colors. Click Apply Settings to save.</td></tr>
+      <tr><td>Open Quick Diagnosis report when finished</td><td>When enabled, the latest Quick Diagnosis report opens automatically after the run.</td></tr>
+      <tr><td>Refresh public IP when the toolkit opens</td><td>Controls startup public IP lookup behavior.</td></tr>
+      <tr><td>Apply Settings</td><td>Saves settings and refreshes the visible UI.</td></tr>
+      <tr><td>Reset Defaults</td><td>Restores default settings on the settings page. Click Apply Settings to save.</td></tr>
+      <tr><td>Sanitize Toolkit</td><td>Removes old reports, logs, temp tool outputs, minidump collections, and cache data while keeping apps and settings.</td></tr>
+      <tr><td>Open Logs</td><td>Opens the toolkit logs folder.</td></tr>
+      <tr><td>Open Reports</td><td>Opens the exports/reports folder.</td></tr>
+      <tr><td>Open Temp Outputs</td><td>Opens the temp tool output sessions folder.</td></tr>
+      <tr><td>Open Data</td><td>Opens the toolkit data folder.</td></tr>
+    </table>
+  </section>
+
+  <section id="logs">
+    <h2>Live Log And Troubleshooting Toolkit Problems</h2>
+    <p>The Live Log tab shows high-level GUI activity and errors. It is not meant to capture every line of every tool. Each tool also has a small usage log under <code>CSI-NetworkToolkit\Logs\ToolUsage</code>.</p>
+    <table>
+      <tr><th>Button</th><th>Purpose</th></tr>
+      <tr><td>Clear Log</td><td>Clears the visible live log box.</td></tr>
+      <tr><td>Copy Log</td><td>Copies the live log text to the clipboard.</td></tr>
+    </table>
+    <h3>When a button does nothing</h3>
+    <ol>
+      <li>Check the status bar for a short failure message.</li>
+      <li>Open Live Log and look for a recent error.</li>
+      <li>Open Settings, then Open Logs, and inspect the matching ToolUsage log.</li>
+      <li>Confirm the portable app still exists in <code>CSI-NetworkToolkit\Custom</code> or <code>ExternalTools</code>.</li>
+      <li>If the tool requires elevation, restart the toolkit elevated.</li>
+    </ol>
+  </section>
+
+  <section id="cli">
+    <h2>Console Mode</h2>
+    <p>The GUI is the primary technician interface, but the console toolkit remains available. This is useful for remote shells, automation, or when the GUI cannot load.</p>
+    <table>
+      <tr><th>Command</th><th>Purpose</th></tr>
+      <tr><td><code>.\NetworkToolkit.ps1</code></td><td>Launch GUI.</td></tr>
+      <tr><td><code>.\NetworkToolkit.ps1 -CLI</code></td><td>Launch console toolkit.</td></tr>
+      <tr><td><code>.\NetworkToolkit.ps1 -SmokeTest</code></td><td>Developer/test mode to verify GUI loads.</td></tr>
+      <tr><td><code>.\NetworkToolkit.ps1 -ButtonSmokeTest</code></td><td>Developer/test mode to build tabs and verify buttons exist.</td></tr>
+    </table>
+  </section>
+
+  <section id="workflow">
+    <h2>Recommended Field Workflows</h2>
+    <h3>Walk-up workstation triage</h3>
+    <ol>
+      <li>Launch the toolkit elevated if possible.</li>
+      <li>Verify computer name, domain, private IP, and elevation in the header.</li>
+      <li>Run Quick Diagnosis.</li>
+      <li>Open Latest Report.</li>
+      <li>Review Problems Found first. Ignore passing checks unless the symptom points to that area.</li>
+      <li>Use the recommended tab/tool for each warning.</li>
+      <li>If repairs are needed, run targeted repair tools only after reviewing evidence.</li>
+      <li>Save or export anything useful, then sanitize the toolkit when the engagement is complete.</li>
+    </ol>
+    <h3>Network issue workflow</h3>
+    <ol>
+      <li>Check private IP, adapter, gateway, and DNS in the header/report.</li>
+      <li>Use Quick target Ping/TCPing against gateway, DNS, domain controller, and internet target.</li>
+      <li>Run Connectivity Triage and Adapter Route Health.</li>
+      <li>Use DNS Path Test if names fail but IPs work.</li>
+      <li>Use Live Route Trace or WinMTR for intermittent latency/loss.</li>
+      <li>Use Wireshark when DHCP/DNS/TCP behavior needs packet proof.</li>
+    </ol>
+    <h3>BSOD or crash workflow</h3>
+    <ol>
+      <li>Run Quick Diagnosis and check crash, driver, hardware, and disk findings.</li>
+      <li>Run Minidump Collector.</li>
+      <li>Open BlueScreenView against the collected dumps.</li>
+      <li>Open Reliability Monitor for timeline context.</li>
+      <li>Compare crash time with driver events and Windows Update history.</li>
+      <li>Update or roll back drivers only when evidence points to them.</li>
+    </ol>
+    <h3>Windows Update broken workflow</h3>
+    <ol>
+      <li>Run Quick Diagnosis and Windows Update Health.</li>
+      <li>Open Windows Update tab and Refresh Updates.</li>
+      <li>Review pending updates and history result codes.</li>
+      <li>Use Download Selected if you want to stage an update without installing.</li>
+      <li>Use Repair Windows Update only when scan/install/update components are broken.</li>
+      <li>Reboot if repair or update status indicates it, then refresh again.</li>
+    </ol>
   </section>
 </main>
 </body>

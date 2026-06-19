@@ -4,6 +4,7 @@
 *.swp
 
 CSI-NetworkToolkit/Logs/*.log
+CSI-NetworkToolkit/Logs/ToolUsage/*.log
 CSI-NetworkToolkit/Exports/*
 CSI-NetworkToolkit/Data/Fingerprints/*
 CSI-NetworkToolkit/Data/PrintQueues/*
@@ -12,10 +13,12 @@ CSI-NetworkToolkit/Data/MiniDumps/*
 CSI-NetworkToolkit/Data/Temp/*
 CSI-NetworkToolkit/Data/TempToolOutputs/*
 CSI-NetworkToolkit/Data/ComputerProfiles/*
+CSI-NetworkToolkit/Data/ComputerState/*
 CSI-NetworkToolkit/ExternalTools/*
 CSI-NetworkToolkit/_Downloads/*
 Custom/*
 manifests/custom-tools.json.bak
+manifests/gui-settings.json
 CSI-NetworkToolkit/Plugins/PrintQueues/Logs/*
 CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/Logs/*
 CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/PrintSpoolerTool.ini

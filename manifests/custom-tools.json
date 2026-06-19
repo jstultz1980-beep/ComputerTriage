@@ -1,12 +1,49 @@
 ﻿{
     "tools":  [
                   {
-                      "name":  "fastresolver.portable",
+                      "name":  "BleachBit",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "6.0.0",
+                      "launchPath":  ".\\Custom\\bleachbit.portable\\bleachbit.exe",
+                      "installPath":  ".\\Custom\\bleachbit.portable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Bulk Uninstaller",
+                      "source":  "Toolkit Portable App",
+                      "version":  "6.1",
+                      "launchPath":  ".\\Custom\\BulkUninstaller\\BCUninstaller.exe",
+                      "installPath":  ".\\Custom\\BulkUninstaller",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "CCleaner",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "6.31.0.11415",
+                      "launchPath":  ".\\Custom\\ccleaner.portable\\CCleaner.exe",
+                      "installPath":  ".\\Custom\\ccleaner.portable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "CPU-Z",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "2.20.2.20260604",
+                      "launchPath":  ".\\Custom\\cpu-z.portable\\cpuz.exe",
+                      "installPath":  ".\\Custom\\cpu-z.portable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "FastResolver",
                       "source":  "Chocolatey Toolbox",
                       "version":  "1.26.0",
                       "launchPath":  ".\\Custom\\fastresolver.portable\\FastResolver.exe",
                       "installPath":  ".\\Custom\\fastresolver.portable",
-                      "arguments":  ""
+                      "arguments":  "",
+                      "tabOverride":  ""
                   },
                   {
                       "name":  "Firefox Portable",
@@ -14,31 +51,224 @@
                       "version":  "151.0.4",
                       "launchPath":  ".\\Custom\\FirefoxPortable\\FirefoxPortable.exe",
                       "installPath":  ".\\Custom\\FirefoxPortable",
-                      "arguments":  ""
+                      "arguments":  "",
+                      "tabOverride":  ""
                   },
                   {
-                      "name":  "kitty",
+                      "name":  "GPU-Z",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "2.69.0",
+                      "launchPath":  ".\\Custom\\gpu-z\\GPU-Z.2.69.0.exe",
+                      "installPath":  ".\\Custom\\gpu-z",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "HijackThis",
+                      "source":  "PortableApps.com",
+                      "version":  "2.10.0.10",
+                      "launchPath":  ".\\Custom\\HijackThisPortable\\HijackThisPortable.exe",
+                      "installPath":  ".\\Custom\\HijackThisPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "HWMonitor",
+                      "source":  "PortableApps.com",
+                      "version":  "1.63",
+                      "launchPath":  ".\\Custom\\HWMonitorPortable\\HWMonitorPortable.exe",
+                      "installPath":  ".\\Custom\\HWMonitorPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "KiTTY",
                       "source":  "Chocolatey Toolbox",
                       "version":  "0.76.1.13",
                       "launchPath":  ".\\Custom\\kitty\\kitty.exe",
                       "installPath":  ".\\Custom\\kitty",
-                      "arguments":  ""
+                      "arguments":  "",
+                      "tabOverride":  ""
                   },
                   {
-                      "name":  "putty",
+                      "name":  "LibreOffice",
+                      "source":  "PortableApps.com",
+                      "version":  "26.2.1",
+                      "launchPath":  ".\\Custom\\LibreOfficePortable\\LibreOfficePortable.exe",
+                      "installPath":  ".\\Custom\\LibreOfficePortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "LockHunter",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "3.4.3.20260616",
+                      "launchPath":  ".\\Custom\\lockhunter\\LockHunter.exe",
+                      "installPath":  ".\\Custom\\lockhunter",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "mRemoteNG",
+                      "source":  "mRemoteNG Portable ZIP",
+                      "version":  "1.76.20.24669",
+                      "launchPath":  ".\\Custom\\mRemoteNGPortable\\mRemoteNG.exe",
+                      "installPath":  ".\\Custom\\mRemoteNGPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Password Generator",
+                      "source":  "PortableApps.com",
+                      "version":  "3.5.10",
+                      "launchPath":  ".\\Custom\\PWGenPortable\\PWGenPortable.exe",
+                      "installPath":  ".\\Custom\\PWGenPortable",
+                      "arguments":  "",
+                      "tabOverride":  "Security"
+                  },
+                  {
+                      "name":  "PCI-Z",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "2.0.0",
+                      "launchPath":  ".\\Custom\\pci-z\\PCI-Z.exe",
+                      "installPath":  ".\\Custom\\pci-z",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Profile Cleanup Toolkit",
+                      "source":  "Coworker Tool",
+                      "version":  "5",
+                      "launchPath":  ".\\Custom\\ProfileCleanup\\Multi-ProfToolv5.ps1",
+                      "installPath":  ".\\Custom\\ProfileCleanup",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "PuTTY",
                       "source":  "Chocolatey Toolbox",
                       "version":  "0.84.0",
                       "launchPath":  ".\\Custom\\putty\\PUTTY.EXE",
                       "installPath":  ".\\Custom\\putty",
-                      "arguments":  ""
+                      "arguments":  "",
+                      "tabOverride":  ""
                   },
                   {
-                      "name":  "winscp.portable",
+                      "name":  "Quick Memory Test",
+                      "source":  "PortableApps.com",
+                      "version":  "5.55",
+                      "launchPath":  ".\\Custom\\QuickMemoryTestOKPortable\\QuickMemoryTestOKPortable.exe",
+                      "installPath":  ".\\Custom\\QuickMemoryTestOKPortable",
+                      "arguments":  "",
+                      "tabOverride":  "Hardware"
+                  },
+                  {
+                      "name":  "Recuva",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "1.53.1087.20191005",
+                      "launchPath":  ".\\Custom\\recuva.portable\\recuva.exe",
+                      "installPath":  ".\\Custom\\recuva.portable",
+                      "arguments":  "",
+                      "tabOverride":  "Repair"
+                  },
+                  {
+                      "name":  "Revo Uninstaller",
+                      "source":  "PortableApps.com",
+                      "version":  "2.6.8",
+                      "launchPath":  ".\\Custom\\RevoUninstallerPortable\\RevoUninstallerPortable.exe",
+                      "installPath":  ".\\Custom\\RevoUninstallerPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Rust Desk",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "1.4.7",
+                      "launchPath":  ".\\Custom\\rustdesk.portable\\rustdesk-qs.exe",
+                      "installPath":  ".\\Custom\\rustdesk.portable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Speccy",
+                      "source":  "Portable extraction",
+                      "version":  "1.33.0.75",
+                      "launchPath":  ".\\Custom\\SpeccyPortable\\Speccy64.exe",
+                      "installPath":  ".\\Custom\\SpeccyPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "SSD-Z",
+                      "source":  "PortableApps.com",
+                      "version":  "16.09.09b",
+                      "launchPath":  ".\\Custom\\SSD-ZPortable\\SSD-ZPortable.exe",
+                      "installPath":  ".\\Custom\\SSD-ZPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Sumatra PDF",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "3.6.1",
+                      "launchPath":  ".\\Custom\\sumatrapdf.portable\\SumatraPDF-64.exe",
+                      "installPath":  ".\\Custom\\sumatrapdf.portable",
+                      "arguments":  "",
+                      "tabOverride":  "Software"
+                  },
+                  {
+                      "name":  "TightVNC",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "2.8.87",
+                      "launchPath":  ".\\Custom\\tightvnc\\tvnviewer.exe",
+                      "installPath":  ".\\Custom\\tightvnc",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "WiFi Diagnostics View",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "1.8.0",
+                      "launchPath":  ".\\Custom\\wifidiagnosticsview\\WifiDiagnosticsView.exe",
+                      "installPath":  ".\\Custom\\wifidiagnosticsview",
+                      "arguments":  "",
+                      "tabOverride":  "Wi-Fi"
+                  },
+                  {
+                      "name":  "WinMTR",
+                      "source":  "Chocolatey Toolbox",
+                      "version":  "1.0.0",
+                      "launchPath":  ".\\Custom\\winmtr-redux\\WinMTR64.exe",
+                      "installPath":  ".\\Custom\\winmtr-redux",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "WinSCP",
                       "source":  "Chocolatey Toolbox",
                       "version":  "6.5.6",
                       "launchPath":  ".\\Custom\\winscp.portable\\WinSCP.exe",
                       "installPath":  ".\\Custom\\winscp.portable",
-                      "arguments":  ""
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "Wise Registry Cleaner",
+                      "source":  "PortableApps.com",
+                      "version":  "11.3.2",
+                      "launchPath":  ".\\Custom\\WiseRegistryCleanerPortable\\WiseRegistryCleanerPortable.exe",
+                      "installPath":  ".\\Custom\\WiseRegistryCleanerPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
+                  },
+                  {
+                      "name":  "xpy",
+                      "source":  "PortableApps.com",
+                      "version":  "1.3.8",
+                      "launchPath":  ".\\Custom\\xpyPortable\\xpyPortable.exe",
+                      "installPath":  ".\\Custom\\xpyPortable",
+                      "arguments":  "",
+                      "tabOverride":  ""
                   }
               ]
 }
