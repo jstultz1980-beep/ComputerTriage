@@ -8658,7 +8658,9 @@ function Build-PsExecPage {
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    foreach($height in @(34,34,34,34,34,34,40,44,76)){
+    # Keep the command preview compact and reserve the remaining vertical space
+    # for live/captured output where technicians need to read diagnostics.
+    foreach($height in @(34,34,34,34,34,34,40,0,44)){
         $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,$height))) | Out-Null
     }
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
