@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$DestinationRoot = "",
+    [string]$PackageName = "NetworkToolkit-Portable",
     [switch]$Zip,
     [switch]$Force
 )
@@ -8,7 +9,10 @@ param(
 $ErrorActionPreference = "Stop"
 $sourceRoot = $PSScriptRoot
 $DestinationRoot = if($DestinationRoot){$DestinationRoot}else{Join-Path $sourceRoot "Release"}
-$packageRoot = Join-Path $DestinationRoot "NetworkToolkit-Portable"
+if([string]::IsNullOrWhiteSpace($PackageName) -or $PackageName -match '[\\/:*?"<>|]'){
+    throw "PackageName must be a valid folder name."
+}
+$packageRoot = Join-Path $DestinationRoot $PackageName
 
 if(!(Test-Path (Join-Path $sourceRoot "NetworkToolkit-Elevated.bat"))){
     throw "NetworkToolkit-Elevated.bat was not found. Run this builder from the toolkit root."
@@ -139,7 +143,7 @@ $readmePath = Join-Path $packageRoot "DEPLOYMENT-README.txt"
 ) | Set-Content -LiteralPath $readmePath -Encoding UTF8
 
 if($Zip){
-    $zipPath = Join-Path $DestinationRoot "NetworkToolkit-Portable.zip"
+    $zipPath = Join-Path $DestinationRoot ("{0}.zip" -f $PackageName)
     Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
     Write-Host "Creating zip archive..." -ForegroundColor Cyan
     Compress-Archive -LiteralPath $packageRoot -DestinationPath $zipPath -CompressionLevel Optimal -Force

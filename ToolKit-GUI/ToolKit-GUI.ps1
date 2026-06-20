@@ -6811,6 +6811,7 @@ function Get-GUIDefaultTabOrder {
         "Discovery",
         "Robocopy",
         "Software",
+        "Software Keys",
         "Clean Up",
         "Apps",
         "Choco",
@@ -8265,7 +8266,7 @@ function Build-ReportsPage {
     $script:ReportTypeBox = New-Object System.Windows.Forms.ComboBox
     $ReportTypeBox.DropDownStyle = "DropDownList"
     $ReportTypeBox.Width = 190
-    Add-GUIComboItems -ComboBox $ReportTypeBox -Items @("All","Quick Diagnosis","Computer Profiles","Crash Events","Discovery Exports","Repair And Triage","Minidumps")
+    Add-GUIComboItems -ComboBox $ReportTypeBox -Items @("All","Quick Diagnosis","Computer Profiles","Software Keys","Crash Events","Discovery Exports","Repair And Triage","Minidumps")
     $ReportTypeBox.Add_SelectedIndexChanged({ Refresh-GUIReports })
     [void]$filterPanel.Controls.Add($ReportTypeBox)
 
@@ -8312,6 +8313,7 @@ function Get-GUIReportItems {
     $items = @()
     $roots = @(
         @{ Type="Quick Diagnosis"; Path=$CSIPaths.Exports; Pattern="quick-diagnosis*.html" },
+        @{ Type="Software Keys"; Path=$CSIPaths.Exports; Pattern="software-key-report*.html" },
         @{ Type="Crash Events"; Path=$CSIPaths.Exports; Pattern="crash-event-summary*.html" },
         @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.html" },
         @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.json" },
@@ -9028,6 +9030,151 @@ function Build-SoftwareToolsPage {
         -Title "Software Tools" `
         -SectionMap $sectionMap `
         -SectionOrder @("Everyday Tools")
+}
+
+function Refresh-GUISoftwareKeyFinderResults {
+    param(
+        [object[]]$Keys = @(),
+        [object[]]$Activation = @()
+    )
+
+    if($script:SoftwareKeyGrid){
+        $SoftwareKeyGrid.Rows.Clear()
+        foreach($key in @($Keys)){
+            $row = $SoftwareKeyGrid.Rows.Add($key.Product,$key.Key,$key.Source,$key.Note)
+            $SoftwareKeyGrid.Rows[$row].Tag = $key
+        }
+    }
+
+    if($script:SoftwareActivationGrid){
+        $SoftwareActivationGrid.Rows.Clear()
+        foreach($item in @($Activation)){
+            [void]$SoftwareActivationGrid.Rows.Add($item.Name,$item.LicenseStatus,$item.PartialProductKey,$item.Description)
+        }
+    }
+}
+
+function Start-GUISoftwareKeyFinderScan {
+    try {
+        if(!(Get-Command Get-CSIWindowsLicenseKeys -ErrorAction SilentlyContinue)){
+            throw "Software Key Finder did not load. Restart the toolkit and try again."
+        }
+
+        $keys = @(Get-CSIWindowsLicenseKeys) + @(Get-CSIOfficeLicenseKeys)
+        $activation = @(Get-CSIMicrosoftActivationInventory)
+        $script:SoftwareKeyReportPath = Export-CSISoftwareKeyReport -RecoveredKeys $keys -ActivationInventory $activation
+        Refresh-GUISoftwareKeyFinderResults -Keys $keys -Activation $activation
+        Add-GUILog "Software Key Finder completed. Confidential report: $script:SoftwareKeyReportPath"
+        Write-GUIToolUsageLog -Tool "Software Key Finder" -Action "Completed" -Detail ("Recovered={0}; ActivationRecords={1}" -f $keys.Count,$activation.Count)
+    }
+    catch {
+        Add-GUILog "Software Key Finder failed: $($_.Exception.Message)"
+        Write-GUIToolUsageLog -Tool "Software Key Finder" -Action "Failed" -Detail $_.Exception.Message -Level "ERROR"
+        [System.Windows.Forms.MessageBox]::Show(
+            "Software Key Finder could not complete.`r`n`r`n$($_.Exception.Message)",
+            "Software Key Finder",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        ) | Out-Null
+    }
+}
+
+function Copy-GUISelectedSoftwareKey {
+    if(!$script:SoftwareKeyGrid -or $SoftwareKeyGrid.SelectedRows.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("Select a recovered product key first.","Software Key Finder",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $key = [string]$SoftwareKeyGrid.SelectedRows[0].Cells["Key"].Value
+    if(!$key){
+        return
+    }
+
+    [System.Windows.Forms.Clipboard]::SetText($key)
+    Add-GUILog "Copied a software key to the clipboard."
+}
+
+function Open-GUISoftwareKeyReport {
+    if(!$script:SoftwareKeyReportPath -or !(Test-Path $script:SoftwareKeyReportPath)){
+        $reports = @(Get-ChildItem -Path $CSIPaths.Exports -Filter "software-key-report*.html" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
+        if($reports.Count -gt 0){
+            $script:SoftwareKeyReportPath = $reports[0].FullName
+        }
+    }
+
+    if(!$script:SoftwareKeyReportPath -or !(Test-Path $script:SoftwareKeyReportPath)){
+        [System.Windows.Forms.MessageBox]::Show("Run Scan This Computer first.","Software Key Finder",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    Start-CSIToolProcess -FilePath $script:SoftwareKeyReportPath | Out-Null
+    Add-GUILog "Opened Software Key Finder report."
+}
+
+function Build-SoftwareKeyFinderPage {
+    param([System.Windows.Forms.TabPage]$Page)
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 1
+    $layout.RowCount = 3
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,56))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,54))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,46))) | Out-Null
+    $Page.Controls.Add($layout)
+
+    $toolbar = New-Object System.Windows.Forms.FlowLayoutPanel
+    $toolbar.Dock = "Fill"
+    $toolbar.Padding = New-Object System.Windows.Forms.Padding(4,8,4,4)
+    $layout.Controls.Add($toolbar,0,0)
+    [void]$toolbar.Controls.Add((New-GUIButton "Scan This Computer" { Start-GUISoftwareKeyFinderScan }))
+    [void]$toolbar.Controls.Add((New-GUIButton "Copy Selected Key" { Copy-GUISelectedSoftwareKey }))
+    [void]$toolbar.Controls.Add((New-GUIButton "Open Latest Report" { Open-GUISoftwareKeyReport }))
+
+    $keysGroup = New-Object System.Windows.Forms.GroupBox
+    $keysGroup.Text = "Recovered Product Keys"
+    $keysGroup.Dock = "Fill"
+    $keysGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $layout.Controls.Add($keysGroup,0,1)
+
+    $script:SoftwareKeyGrid = New-Object System.Windows.Forms.DataGridView
+    $SoftwareKeyGrid.Dock = "Fill"
+    $SoftwareKeyGrid.ReadOnly = $true
+    $SoftwareKeyGrid.AllowUserToAddRows = $false
+    $SoftwareKeyGrid.AllowUserToDeleteRows = $false
+    $SoftwareKeyGrid.RowHeadersVisible = $false
+    $SoftwareKeyGrid.SelectionMode = "FullRowSelect"
+    $SoftwareKeyGrid.MultiSelect = $false
+    $SoftwareKeyGrid.AutoSizeColumnsMode = "Fill"
+    $SoftwareKeyGrid.BackgroundColor = [System.Drawing.Color]::White
+    [void]$SoftwareKeyGrid.Columns.Add("Product","Product")
+    [void]$SoftwareKeyGrid.Columns.Add("Key","Product Key")
+    [void]$SoftwareKeyGrid.Columns.Add("Source","Source")
+    [void]$SoftwareKeyGrid.Columns.Add("Note","Notes")
+    $keysGroup.Controls.Add($SoftwareKeyGrid)
+
+    $activationGroup = New-Object System.Windows.Forms.GroupBox
+    $activationGroup.Text = "Windows And Office Activation Inventory"
+    $activationGroup.Dock = "Fill"
+    $activationGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $layout.Controls.Add($activationGroup,0,2)
+
+    $script:SoftwareActivationGrid = New-Object System.Windows.Forms.DataGridView
+    $SoftwareActivationGrid.Dock = "Fill"
+    $SoftwareActivationGrid.ReadOnly = $true
+    $SoftwareActivationGrid.AllowUserToAddRows = $false
+    $SoftwareActivationGrid.AllowUserToDeleteRows = $false
+    $SoftwareActivationGrid.RowHeadersVisible = $false
+    $SoftwareActivationGrid.SelectionMode = "FullRowSelect"
+    $SoftwareActivationGrid.MultiSelect = $false
+    $SoftwareActivationGrid.AutoSizeColumnsMode = "Fill"
+    $SoftwareActivationGrid.BackgroundColor = [System.Drawing.Color]::White
+    [void]$SoftwareActivationGrid.Columns.Add("Name","Product")
+    [void]$SoftwareActivationGrid.Columns.Add("Status","Status")
+    [void]$SoftwareActivationGrid.Columns.Add("LastFive","Last Five")
+    [void]$SoftwareActivationGrid.Columns.Add("Description","Description")
+    $activationGroup.Controls.Add($SoftwareActivationGrid)
 }
 
 function Build-CleanupToolsPage {
@@ -10011,6 +10158,10 @@ function Build-Form {
     $softwarePage.Text = "Software"
     $tabs.TabPages.Add($softwarePage) | Out-Null
 
+    $softwareKeysPage = New-Object System.Windows.Forms.TabPage
+    $softwareKeysPage.Text = "Software Keys"
+    $tabs.TabPages.Add($softwareKeysPage) | Out-Null
+
     $cleanupPage = New-Object System.Windows.Forms.TabPage
     $cleanupPage.Text = "Clean Up"
     $tabs.TabPages.Add($cleanupPage) | Out-Null
@@ -10102,6 +10253,7 @@ function Build-Form {
     Register-GUITabBuilder -Page $filesPage -Builder { param($Page) Build-FileToolsPage -Page $Page }
     Register-GUITabBuilder -Page $robocopyPage -Builder { param($Page) Build-RobocopyPage -Page $Page }
     Register-GUITabBuilder -Page $softwarePage -Builder { param($Page) Build-SoftwareToolsPage -Page $Page }
+    Register-GUITabBuilder -Page $softwareKeysPage -Builder { param($Page) Build-SoftwareKeyFinderPage -Page $Page }
     Register-GUITabBuilder -Page $cleanupPage -Builder { param($Page) Build-CleanupToolsPage -Page $Page }
     Register-GUITabBuilder -Page $customPage -Builder { param($Page) Build-CustomToolsPage -Page $Page }
     Register-GUITabBuilder -Page $chocolateyPage -Builder { param($Page) Build-ChocolateyPage -Page $Page }
@@ -10187,7 +10339,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings","Live Log")){
+    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings","Live Log")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){
