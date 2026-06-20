@@ -76,6 +76,9 @@ $script:ToolkitSizeLabel = $null
 $script:ToolkitSizeProcess = $null
 $script:ToolkitSizeTimer = $null
 $script:ToolkitSizeResultPath = $null
+$script:ToolkitUpdateProcess = $null
+$script:ToolkitUpdateTimer = $null
+$script:ToolkitUpdateResultPath = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -9623,6 +9626,178 @@ function Start-GUIToolkitSizeRefresh {
     }
 }
 
+function Start-GUIToolkitUpdate {
+    param(
+        [string]$SourceRoot,
+        [string]$DestinationRoot
+    )
+
+    $updaterPath = Join-Path (Split-Path -Parent $SharedToolkitRoot) "Update-NetworkToolkit.ps1"
+    if(!(Test-Path $updaterPath)){
+        [System.Windows.Forms.MessageBox]::Show("Update-NetworkToolkit.ps1 was not found beside the toolkit launcher.","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        return
+    }
+
+    if($script:ToolkitUpdateProcess -and !$script:ToolkitUpdateProcess.HasExited){
+        [System.Windows.Forms.MessageBox]::Show("A toolkit update is already running.","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $resultPath = Join-Path $env:TEMP ("NetworkToolkit-update-{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $arguments = @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$updaterPath`"","-SourceRoot","`"$SourceRoot`"","-DestinationRoot","`"$DestinationRoot`"","-ResultPath","`"$resultPath`"")
+    try {
+        $script:ToolkitUpdateResultPath = $resultPath
+        $script:ToolkitUpdateProcess = Start-CSIToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
+        Add-GUILog "Toolkit update started: $SourceRoot -> $DestinationRoot"
+        Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Started" -Detail ("Source={0}; Destination={1}" -f $SourceRoot,$DestinationRoot)
+
+        if($script:ToolkitUpdateTimer){
+            try { $script:ToolkitUpdateTimer.Stop(); $script:ToolkitUpdateTimer.Dispose() } catch {}
+        }
+
+        $timer = New-Object System.Windows.Forms.Timer
+        $timer.Interval = 1500
+        $timer.Add_Tick({
+            if(!$script:ToolkitUpdateProcess -or !$script:ToolkitUpdateProcess.HasExited){
+                return
+            }
+
+            $script:ToolkitUpdateTimer.Stop()
+            $script:ToolkitUpdateTimer.Dispose()
+            $script:ToolkitUpdateTimer = $null
+            $script:ToolkitUpdateProcess = $null
+
+            try {
+                $result = Get-Content -LiteralPath $script:ToolkitUpdateResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+                $logPath = "$($script:ToolkitUpdateResultPath).log"
+                if($result.Status -eq "Completed"){
+                    Add-GUILog "Toolkit update completed: $($result.DestinationRoot)"
+                    Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Completed" -Detail ("Destination={0}; ExitCode={1}" -f $result.DestinationRoot,$result.ExitCode)
+                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nMode: $($result.Mode)`r`nRobocopy exit code: $($result.ExitCode)","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                }
+                else{
+                    Add-GUILog "Toolkit update failed: $($result.Error)"
+                    Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Failed" -Detail $result.Error -Level "ERROR"
+                    [System.Windows.Forms.MessageBox]::Show("Toolkit update failed.`r`n`r`n$($result.Error)`r`n`r
+Log: $logPath","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+                }
+            }
+            catch {
+                Add-GUILog "Toolkit update ended but its result could not be read: $($_.Exception.Message)"
+            }
+            finally {
+                if($script:ToolkitUpdateResultPath -and (Test-Path $script:ToolkitUpdateResultPath)){
+                    Remove-Item -LiteralPath $script:ToolkitUpdateResultPath -Force -ErrorAction SilentlyContinue
+                }
+                $script:ToolkitUpdateResultPath = $null
+            }
+        })
+        $script:ToolkitUpdateTimer = $timer
+        $script:ToolkitUpdateTimer.Start()
+    }
+    catch {
+        Add-GUILog "Toolkit update could not start: $($_.Exception.Message)"
+        [System.Windows.Forms.MessageBox]::Show("Toolkit update could not start.`r`n`r`n$($_.Exception.Message)","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    }
+}
+
+function Show-GUIToolkitUpdater {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Update Network Toolkit"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(720,315)
+    $form.MinimumSize = New-Object System.Drawing.Size(720,315)
+    $form.MaximizeBox = $false
+    $form.Font = New-Object System.Drawing.Font("Segoe UI",9.5)
+    $form.BackColor = $script:GUITheme.Page
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 3
+    $layout.RowCount = 5
+    $layout.Padding = New-Object System.Windows.Forms.Padding(16)
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
+    $form.Controls.Add($layout)
+
+    $sourceBox = New-GUITextBox (Split-Path -Parent $SharedToolkitRoot)
+    $destinationBox = New-GUITextBox
+    $layout.Controls.Add((New-GUILabel "Current version"),0,0)
+    $layout.Controls.Add($sourceBox,1,0)
+    $layout.Controls.Add((New-GUILabel "Destination"),0,1)
+    $layout.Controls.Add($destinationBox,1,1)
+
+    $sourceBrowse = New-GUIButton "Browse" {
+        $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dialog.Description = "Select the current working Network Toolkit folder"
+        if($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){ $sourceBox.Text = $dialog.SelectedPath }
+    }
+    $sourceBrowse.Dock = "Fill"
+    $layout.Controls.Add($sourceBrowse,2,0)
+
+    $destinationBrowse = New-GUIButton "Browse" {
+        $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dialog.Description = "Select the Network Toolkit folder on the destination drive"
+        if($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){ $destinationBox.Text = $dialog.SelectedPath }
+    }
+    $destinationBrowse.Dock = "Fill"
+    $layout.Controls.Add($destinationBrowse,2,1)
+
+    $options = New-Object System.Windows.Forms.FlowLayoutPanel
+    $options.Dock = "Fill"
+    $options.FlowDirection = "TopDown"
+    $options.WrapContents = $false
+    $layout.SetColumnSpan($options,3)
+    $layout.Controls.Add($options,0,2)
+
+    $preserve = New-GUILabel "Updates existing/new toolkit files only. Reports, profiles, diagnostics, logs, GUI settings, and the Firefox profile are preserved on the destination."
+    $preserve.AutoSize = $true
+    $preserve.ForeColor = $script:GUITheme.MutedText
+    $options.Controls.Add($preserve)
+
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons.Dock = "Fill"
+    $buttons.FlowDirection = "RightToLeft"
+    $layout.SetColumnSpan($buttons,3)
+    $layout.Controls.Add($buttons,0,4)
+
+    $result = [pscustomobject]@{ Confirmed = $false; Source = ""; Destination = "" }
+    $cancel = New-GUIButton "Cancel" { $form.Close() }
+    $update = New-GUIButton "Update Destination" {
+        $source = $sourceBox.Text.Trim()
+        $destination = $destinationBox.Text.Trim()
+        if(!$source -or !$destination){
+            [System.Windows.Forms.MessageBox]::Show("Select both the current working toolkit and destination folders.","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            return
+        }
+
+        $confirm = [System.Windows.Forms.MessageBox]::Show("Update existing/new toolkit files?`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r
+Destination client data and settings will be preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
+        if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
+            $script:ToolkitUpdateDialogResult = [pscustomobject]@{ Confirmed = $true; Source = $source; Destination = $destination }
+            $form.Close()
+        }
+    }
+    $buttons.Controls.Add($update)
+    $buttons.Controls.Add($cancel)
+
+    $script:ToolkitUpdateDialogResult = $result
+    [void]$form.ShowDialog($script:Form)
+    $result = $script:ToolkitUpdateDialogResult
+    Remove-Variable -Name ToolkitUpdateDialogResult -Scope Script -ErrorAction SilentlyContinue
+    $form.Dispose()
+
+    if($result.Confirmed){
+        Start-GUIToolkitUpdate -SourceRoot $result.Source -DestinationRoot $result.Destination
+    }
+}
+
 function Build-SettingsPage {
     param([System.Windows.Forms.TabPage]$Page)
 
@@ -9808,11 +9983,14 @@ function Build-SettingsPage {
     $rightLayout.Controls.Add($buttonPanel,0,6)
     $rightLayout.SetColumnSpan($buttonPanel,2)
     $applyButton = New-GUIButton "Apply Settings" { Save-GUISettingsFromPage }
-    $applyButton.Width = 150
+    $applyButton.Width = 130
     [void]$buttonPanel.Controls.Add($applyButton)
     $resetButton = New-GUIButton "Reset Defaults" { Reset-GUISettingsPageDefaults }
-    $resetButton.Width = 140
+    $resetButton.Width = 120
     [void]$buttonPanel.Controls.Add($resetButton)
+    $updateButton = New-GUIButton "Update Toolkit" { Show-GUIToolkitUpdater }
+    $updateButton.Width = 135
+    [void]$buttonPanel.Controls.Add($updateButton)
 
     $dataRemovalPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $dataRemovalPanel.Dock = "Fill"
@@ -9925,6 +10103,7 @@ function Set-GUIFallbackButtonToolTips {
         "Scan This Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
         "Copy Selected Key" = "Copy the selected license or registration value to the clipboard."
         "Open Latest Report" = "Open the latest confidential Software Key Finder HTML report."
+        "Update Toolkit" = "Select a current working toolkit and destination folder, then update the destination while preserving its client data by default."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
