@@ -116,6 +116,7 @@ $script:GUIBusyLabel = $null
 $script:GUIBusyProgress = $null
 $script:GUIBusyTimer = $null
 $script:GUIBusyFrame = 0
+$script:GUIBusyFrames = @("Working |","Working /","Working -","Working \\")
 $script:RootLayout = $null
 $script:HeaderPanel = $null
 $script:HeaderSummaryPanel = $null
@@ -1138,7 +1139,6 @@ function Start-GUIBusyIndicator {
         return
     }
 
-    $frames = @("Working |","Working /","Working -","Working \\")
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 160
     $timer.Add_Tick({
@@ -1146,8 +1146,8 @@ function Start-GUIBusyIndicator {
             return
         }
 
-        $script:GUIBusyFrame = ($script:GUIBusyFrame + 1) % $frames.Count
-        $script:GUIBusyLabel.Text = $frames[$script:GUIBusyFrame]
+        $script:GUIBusyFrame = ($script:GUIBusyFrame + 1) % $script:GUIBusyFrames.Count
+        $script:GUIBusyLabel.Text = $script:GUIBusyFrames[$script:GUIBusyFrame]
     })
     $script:GUIBusyTimer = $timer
     $timer.Start()
@@ -5864,6 +5864,7 @@ function Start-GUIPsExecCaptured {
         }
 
         Stop-GUIPsExecCommand
+        Stop-GUIBusyIndicator
     }
 
     if($script:PsExecTimer){
@@ -5878,12 +5879,19 @@ function Start-GUIPsExecCaptured {
     $session = New-CSITempOutputSession -ToolName "PsExec Helper"
     $stdout = Join-Path $session.Path "psexec-output.txt"
     $stderr = Join-Path $session.Path "psexec-error.txt"
+    $connectionTimeoutSeconds = 10
+    if($script:PsExecTimeoutBox){
+        [void][int]::TryParse($script:PsExecTimeoutBox.Text.Trim(),[ref]$connectionTimeoutSeconds)
+    }
+    $maxRuntimeSeconds = [Math]::Max(60,$connectionTimeoutSeconds * 4)
     $metadata = [pscustomobject]@{
         CapturedAt = (Get-Date).ToString("s")
         Tool = "PsExec"
         Path = $tool.Path
         Arguments = $arguments
         CommandLine = Get-GUIPsExecCommandLine
+        ConnectionTimeoutSeconds = $connectionTimeoutSeconds
+        MaxRuntimeSeconds = $maxRuntimeSeconds
     }
     $metadata | ConvertTo-Json -Depth 6 | Set-Content -Path $session.Metadata -Encoding UTF8
 
@@ -5901,19 +5909,42 @@ function Start-GUIPsExecCaptured {
             -PassThru
 
         $script:PsExecProcess = $process
+        Start-GUIBusyIndicator -Message "PsExec"
         $script:PsExecFiles = @{
             Session = $session
             StdOut = $stdout
             StdErr = $stderr
+            StartedAt = Get-Date
+            ConnectionTimeoutSeconds = $connectionTimeoutSeconds
+            MaxRuntimeSeconds = $maxRuntimeSeconds
+            TimedOut = $false
         }
 
         $timer = New-Object System.Windows.Forms.Timer
-        $timer.Interval = 500
+        $timer.Interval = 1000
         $timer.Add_Tick({
             if(!$script:PsExecProcess){
                 $script:PsExecTimer.Stop()
                 $script:PsExecTimer.Dispose()
                 $script:PsExecTimer = $null
+                Stop-GUIBusyIndicator
+                return
+            }
+
+            $elapsedSeconds = [int][math]::Floor(((Get-Date) - $script:PsExecFiles.StartedAt).TotalSeconds)
+            if(!$script:PsExecProcess.HasExited){
+                $liveOut = if(Test-Path $script:PsExecFiles.StdOut){ Get-Content -Path $script:PsExecFiles.StdOut -Tail 20 -ErrorAction SilentlyContinue }else{ @() }
+                $liveErr = if(Test-Path $script:PsExecFiles.StdErr){ Get-Content -Path $script:PsExecFiles.StdErr -Tail 20 -ErrorAction SilentlyContinue }else{ @() }
+                $progressText = "Running for $elapsedSeconds second(s). Connection timeout: $($script:PsExecFiles.ConnectionTimeoutSeconds) second(s). Auto-stop: $($script:PsExecFiles.MaxRuntimeSeconds) second(s)."
+                if($liveOut){ $progressText += "`r`n`r`nOUTPUT:`r`n" + ($liveOut -join "`r`n") }
+                if($liveErr){ $progressText += "`r`n`r`nERROR OUTPUT:`r`n" + ($liveErr -join "`r`n") }
+                Set-GUIPsExecOutput -Title "PsExec Running" -Text $progressText
+
+                if($elapsedSeconds -ge $script:PsExecFiles.MaxRuntimeSeconds -and !$script:PsExecFiles.TimedOut){
+                    $script:PsExecFiles.TimedOut = $true
+                    try { $script:PsExecProcess.Kill() } catch {}
+                    Add-GUILog "PsExec exceeded its $($script:PsExecFiles.MaxRuntimeSeconds)-second watchdog and was stopped."
+                }
                 return
             }
 
@@ -5921,6 +5952,7 @@ function Start-GUIPsExecCaptured {
                 $script:PsExecTimer.Stop()
                 $script:PsExecTimer.Dispose()
                 $script:PsExecTimer = $null
+                Stop-GUIBusyIndicator
 
                 $outText = if(Test-Path $script:PsExecFiles.StdOut){ Get-Content -Raw -Path $script:PsExecFiles.StdOut -ErrorAction SilentlyContinue }else{ "" }
                 $errText = if(Test-Path $script:PsExecFiles.StdErr){ Get-Content -Raw -Path $script:PsExecFiles.StdErr -ErrorAction SilentlyContinue }else{ "" }
@@ -5944,6 +5976,7 @@ function Start-GUIPsExecCaptured {
         $timer.Start()
     }
     catch {
+        Stop-GUIBusyIndicator
         Set-GUIPsExecOutput -Title "PsExec Failed" -Text $_.Exception.Message
         Add-GUILog "Failed to start PsExec: $($_.Exception.Message)"
         Write-GUIToolUsageLog -Tool "PsExec Helper" -Action "Failed" -Detail $_.Exception.Message -Level "ERROR"
@@ -6922,6 +6955,8 @@ function Get-GUIDefaultSettings {
         customTheme = ConvertTo-GUICustomThemeSettings $defaultTheme
         autoOpenQuickDiagnosisReport = $false
         refreshPublicIPOnLaunch = $true
+        toolkitUpdateSource = (Split-Path -Parent $SharedToolkitRoot)
+        toolkitUpdateDestination = ""
     }
 }
 
@@ -6949,6 +6984,12 @@ function Get-GUISettings {
             }
             if($settings.PSObject.Properties.Name -notcontains "refreshPublicIPOnLaunch"){
                 $settings | Add-Member -MemberType NoteProperty -Name refreshPublicIPOnLaunch -Value $default.refreshPublicIPOnLaunch -Force
+            }
+            if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateSource" -or !$settings.toolkitUpdateSource){
+                $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateSource -Value $default.toolkitUpdateSource -Force
+            }
+            if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateDestination"){
+                $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateDestination -Value $default.toolkitUpdateDestination -Force
             }
             return $settings
         }
@@ -9837,8 +9878,10 @@ function Show-GUIToolkitUpdater {
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
     $form.Controls.Add($layout)
 
-    $sourceBox = New-GUITextBox (Split-Path -Parent $SharedToolkitRoot)
-    $destinationBox = New-GUITextBox
+    $settings = if($script:GuiSettings){$script:GuiSettings}else{Get-GUISettings}
+    $defaultSource = Split-Path -Parent $SharedToolkitRoot
+    $sourceBox = New-GUITextBox $(if($settings.toolkitUpdateSource){[string]$settings.toolkitUpdateSource}else{$defaultSource})
+    $destinationBox = New-GUITextBox $(if($settings.toolkitUpdateDestination){[string]$settings.toolkitUpdateDestination}else{""})
     $layout.Controls.Add((New-GUILabel "Current version"),0,0)
     $layout.Controls.Add($sourceBox,1,0)
     $layout.Controls.Add((New-GUILabel "Destination"),0,1)
@@ -9891,6 +9934,9 @@ function Show-GUIToolkitUpdater {
         $confirm = [System.Windows.Forms.MessageBox]::Show("Update existing/new toolkit files?`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r
 Destination client data and settings will be preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
         if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
+            $settings.toolkitUpdateSource = $source
+            $settings.toolkitUpdateDestination = $destination
+            Save-GUISettings -Settings $settings
             $script:ToolkitUpdateDialogResult = [pscustomobject]@{ Confirmed = $true; Source = $source; Destination = $destination }
             $form.Close()
         }
