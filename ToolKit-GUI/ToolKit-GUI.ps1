@@ -9060,7 +9060,7 @@ function Start-GUISoftwareKeyFinderScan {
             throw "Software Key Finder did not load. Restart the toolkit and try again."
         }
 
-        $keys = @(Get-CSIWindowsLicenseKeys) + @(Get-CSIOfficeLicenseKeys)
+        $keys = @(Get-CSIWindowsLicenseKeys) + @(Get-CSIOfficeLicenseKeys) + @(Get-CSIApplicationLicenseEntries)
         $activation = @(Get-CSIMicrosoftActivationInventory)
         $script:SoftwareKeyReportPath = Export-CSISoftwareKeyReport -RecoveredKeys $keys -ActivationInventory $activation
         Refresh-GUISoftwareKeyFinderResults -Keys $keys -Activation $activation
@@ -9133,7 +9133,7 @@ function Build-SoftwareKeyFinderPage {
     [void]$toolbar.Controls.Add((New-GUIButton "Open Latest Report" { Open-GUISoftwareKeyReport }))
 
     $keysGroup = New-Object System.Windows.Forms.GroupBox
-    $keysGroup.Text = "Recovered Product Keys"
+    $keysGroup.Text = "Recovered License And Registration Entries"
     $keysGroup.Dock = "Fill"
     $keysGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($keysGroup,0,1)
@@ -9478,7 +9478,19 @@ function Clear-GUIClientDataTarget {
     param([string]$Path)
 
     $removed = 0
-    foreach($item in @(Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne ".gitkeep" })){
+    $items = @(Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction SilentlyContinue | Sort-Object { $_.FullName.Length } -Descending)
+    foreach($item in $items){
+        if($item.Name -eq ".gitkeep"){
+            continue
+        }
+
+        if($item.PSIsContainer){
+            $hasMarker = @(Get-ChildItem -LiteralPath $item.FullName -Filter ".gitkeep" -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0
+            if($hasMarker){
+                continue
+            }
+        }
+
         Remove-Item -LiteralPath $item.FullName -Recurse -Force -ErrorAction Stop
         $removed++
     }
@@ -9908,6 +9920,9 @@ function Set-GUIFallbackButtonToolTips {
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
         "Refresh Size" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
+        "Scan This Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
+        "Copy Selected Key" = "Copy the selected license or registration value to the clipboard."
+        "Open Latest Report" = "Open the latest confidential Software Key Finder HTML report."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
