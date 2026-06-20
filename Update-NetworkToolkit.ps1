@@ -63,9 +63,12 @@ try {
         throw "The selected source is not a Network Toolkit folder. It must contain NetworkToolkit.ps1, CSI-NetworkToolkit, and ToolKit-GUI."
     }
 
+    # A source checkout can contain production packages under Release. Never
+    # recurse into those packages while updating another toolkit location.
+    $sourceReleaseDirectory = Join-Path $SourceRoot "Release"
     $excludeDirectories = @(
         (Join-Path $SourceRoot ".git"),
-        (Join-Path $SourceRoot "Release"),
+        $sourceReleaseDirectory,
         (Join-Path $SourceRoot "CSI-NetworkToolkit\Data"),
         (Join-Path $SourceRoot "CSI-NetworkToolkit\Exports"),
         (Join-Path $SourceRoot "CSI-NetworkToolkit\Logs"),

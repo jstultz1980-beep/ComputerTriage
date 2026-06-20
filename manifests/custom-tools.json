@@ -145,15 +145,6 @@
                       "tabOverride":  ""
                   },
                   {
-                      "name":  "PuTTY",
-                      "source":  "Chocolatey Toolbox",
-                      "version":  "0.84.0",
-                      "launchPath":  ".\\Custom\\putty\\PUTTY.EXE",
-                      "installPath":  ".\\Custom\\putty",
-                      "arguments":  "",
-                      "tabOverride":  ""
-                  },
-                  {
                       "name":  "Quick Memory Test",
                       "source":  "PortableApps.com",
                       "version":  "5.55",
