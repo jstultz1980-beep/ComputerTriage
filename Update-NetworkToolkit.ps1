@@ -20,6 +20,17 @@ function Test-NetworkToolkitRoot {
            (Test-Path (Join-Path $Path "ToolKit-GUI"))
 }
 
+function Resolve-NetworkToolkitFileSystemPath {
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+    if($item.PSProvider.Name -ne "FileSystem"){
+        throw "Path is not a filesystem location: $Path"
+    }
+
+    return $item.FullName.TrimEnd('\\')
+}
+
 $result = [ordered]@{
     SourceRoot = $SourceRoot
     DestinationRoot = $DestinationRoot
@@ -32,13 +43,13 @@ $result = [ordered]@{
 }
 
 try {
-    $SourceRoot = (Resolve-Path -LiteralPath $SourceRoot).Path.TrimEnd('\')
+    $SourceRoot = Resolve-NetworkToolkitFileSystemPath -Path $SourceRoot
     if(Test-Path $DestinationRoot){
-        $DestinationRoot = (Resolve-Path -LiteralPath $DestinationRoot).Path.TrimEnd('\')
+        $DestinationRoot = Resolve-NetworkToolkitFileSystemPath -Path $DestinationRoot
     }
     else{
         New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
-        $DestinationRoot = (Resolve-Path -LiteralPath $DestinationRoot).Path.TrimEnd('\')
+        $DestinationRoot = Resolve-NetworkToolkitFileSystemPath -Path $DestinationRoot
     }
 
     $result.SourceRoot = $SourceRoot

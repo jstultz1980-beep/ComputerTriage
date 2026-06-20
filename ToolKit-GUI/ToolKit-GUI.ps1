@@ -9818,13 +9818,12 @@ function Build-SettingsPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.ColumnCount = 4
+    $layout.ColumnCount = 3
     $layout.RowCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(16)
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,400))) | Out-Null
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,500))) | Out-Null
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
     $Page.Controls.Add($layout)
 
     $orderGroup = New-Object System.Windows.Forms.GroupBox
@@ -9881,14 +9880,14 @@ function Build-SettingsPage {
     $orderLayout.Controls.Add($orderHint,0,1)
 
     $rightPanel = New-Object System.Windows.Forms.GroupBox
-    $rightPanel.Text = "Startup And Layout"
+    $rightPanel.Text = "Startup And Appearance"
     $rightPanel.Dock = "Fill"
     $rightPanel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $layout.Controls.Add($rightPanel,2,0)
+    $layout.Controls.Add($rightPanel,1,0)
 
     $rightLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $rightLayout.Dock = "Fill"
-    $rightLayout.RowCount = 11
+    $rightLayout.RowCount = 7
     $rightLayout.ColumnCount = 2
     $rightLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
@@ -9900,10 +9899,6 @@ function Build-SettingsPage {
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,62))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $rightPanel.Controls.Add($rightLayout)
 
     $rightLayout.Controls.Add((New-GUILabel "Startup tab"),0,0)
@@ -9988,53 +9983,54 @@ function Build-SettingsPage {
     $resetButton = New-GUIButton "Reset Defaults" { Reset-GUISettingsPageDefaults }
     $resetButton.Width = 120
     [void]$buttonPanel.Controls.Add($resetButton)
+    $maintenanceGroup = New-Object System.Windows.Forms.GroupBox
+    $maintenanceGroup.Text = "Toolkit Maintenance"
+    $maintenanceGroup.Dock = "Fill"
+    $maintenanceGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $layout.Controls.Add($maintenanceGroup,2,0)
+
+    $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $maintenanceLayout.Dock = "Fill"
+    $maintenanceLayout.RowCount = 5
+    $maintenanceLayout.ColumnCount = 2
+    $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $maintenanceGroup.Controls.Add($maintenanceLayout)
+
     $updateButton = New-GUIButton "Update Toolkit" { Show-GUIToolkitUpdater }
-    $updateButton.Width = 135
-    [void]$buttonPanel.Controls.Add($updateButton)
-
-    $dataRemovalPanel = New-Object System.Windows.Forms.TableLayoutPanel
-    $dataRemovalPanel.Dock = "Fill"
-    $dataRemovalPanel.ColumnCount = 2
-    $dataRemovalPanel.Padding = New-Object System.Windows.Forms.Padding(0,6,0,0)
-    $dataRemovalPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $dataRemovalPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,174))) | Out-Null
-    $rightLayout.Controls.Add($dataRemovalPanel,0,7)
-    $rightLayout.SetColumnSpan($dataRemovalPanel,2)
-
-    $dataRemovalHint = New-GUILabel "Client diagnostic data"
-    $dataRemovalHint.Dock = "Fill"
-    $dataRemovalHint.TextAlign = "MiddleLeft"
-    $dataRemovalHint.ForeColor = $script:GUITheme.MutedText
-    [void]$dataRemovalPanel.Controls.Add($dataRemovalHint,0,0)
+    $updateButton.Dock = "Fill"
+    $updateButton.Width = 0
+    $maintenanceLayout.Controls.Add($updateButton,0,0)
+    $maintenanceLayout.SetColumnSpan($updateButton,2)
 
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
     $sanitizeButton.Dock = "Fill"
     $sanitizeButton.Width = 0
-    [void]$dataRemovalPanel.Controls.Add($sanitizeButton,1,0)
-
-    $foldersHeader = New-Object System.Windows.Forms.TableLayoutPanel
-    $foldersHeader.Dock = "Fill"
-    $foldersHeader.ColumnCount = 3
-    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,108))) | Out-Null
-    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $foldersHeader.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
-    $rightLayout.Controls.Add($foldersHeader,0,8)
-    $rightLayout.SetColumnSpan($foldersHeader,2)
-
-    $foldersLabel = New-GUILabel "Toolkit folders"
-    $foldersLabel.Dock = "Fill"
-    $foldersHeader.Controls.Add($foldersLabel,0,0)
+    $maintenanceLayout.Controls.Add($sanitizeButton,0,1)
+    $maintenanceLayout.SetColumnSpan($sanitizeButton,2)
 
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
-    $foldersHeader.Controls.Add($ToolkitSizeLabel,1,0)
+    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,2)
 
     $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
     $sizeRefreshButton.Dock = "Fill"
     $sizeRefreshButton.Width = 0
-    $foldersHeader.Controls.Add($sizeRefreshButton,2,0)
+    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,2)
+
+    $foldersLabel = New-GUILabel "Toolkit folders"
+    $foldersLabel.Dock = "Fill"
+    $foldersLabel.TextAlign = "MiddleLeft"
+    $maintenanceLayout.Controls.Add($foldersLabel,0,3)
+    $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $folderPanel.Dock = "Fill"
@@ -10045,8 +10041,8 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $rightLayout.Controls.Add($folderPanel,0,9)
-    $rightLayout.SetColumnSpan($folderPanel,2)
+    $maintenanceLayout.Controls.Add($folderPanel,0,4)
+    $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "Open Logs" { Open-GUIFolder $CSIPaths.Logs }
     $logsButton.Dock = "Fill"
