@@ -110,6 +110,11 @@ $script:WUActionSession = $null
 $script:PsExecProcess = $null
 $script:PsExecTimer = $null
 $script:PsExecFiles = $null
+$script:GUIBusyCount = 0
+$script:GUIBusyLabel = $null
+$script:GUIBusyProgress = $null
+$script:GUIBusyTimer = $null
+$script:GUIBusyFrame = 0
 $script:RootLayout = $null
 $script:HeaderPanel = $null
 $script:HeaderSummaryPanel = $null
@@ -1027,6 +1032,10 @@ function Apply-GUIThemeRuntime {
         $script:StaticTabStrip.BackColor = $script:GUITheme.Strip
     }
 
+    if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
+        $script:GUIBusyLabel.ForeColor = $script:GUITheme.AccentDark
+    }
+
     if($script:LogBox -and !$script:LogBox.IsDisposed){
         $script:LogBox.BackColor = $script:GUITheme.LogBack
         $script:LogBox.ForeColor = $script:GUITheme.LogFore
@@ -1109,6 +1118,62 @@ function Add-GUILog {
     }
 }
 
+function Start-GUIBusyIndicator {
+    param([string]$Message = "Working")
+
+    $script:GUIBusyCount++
+    if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
+        $script:GUIBusyLabel.Text = "$Message..."
+        $script:GUIBusyLabel.Visible = $true
+    }
+    if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
+        $script:GUIBusyProgress.Visible = $true
+        $script:GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
+        $script:GUIBusyProgress.MarqueeAnimationSpeed = 28
+    }
+    try { [System.Windows.Forms.Application]::DoEvents() } catch {}
+
+    if($script:GUIBusyTimer -or !$script:GUIBusyLabel -or $script:GUIBusyLabel.IsDisposed){
+        return
+    }
+
+    $frames = @("Working |","Working /","Working -","Working \\")
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 160
+    $timer.Add_Tick({
+        if($script:GUIBusyCount -le 0 -or !$script:GUIBusyLabel -or $script:GUIBusyLabel.IsDisposed){
+            return
+        }
+
+        $script:GUIBusyFrame = ($script:GUIBusyFrame + 1) % $frames.Count
+        $script:GUIBusyLabel.Text = $frames[$script:GUIBusyFrame]
+    })
+    $script:GUIBusyTimer = $timer
+    $timer.Start()
+}
+
+function Stop-GUIBusyIndicator {
+    if($script:GUIBusyCount -gt 0){
+        $script:GUIBusyCount--
+    }
+
+    if($script:GUIBusyCount -gt 0){
+        return
+    }
+
+    $script:GUIBusyCount = 0
+    if($script:GUIBusyTimer){
+        try { $script:GUIBusyTimer.Stop(); $script:GUIBusyTimer.Dispose() } catch {}
+        $script:GUIBusyTimer = $null
+    }
+    if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
+        $script:GUIBusyProgress.Visible = $false
+    }
+    if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
+        $script:GUIBusyLabel.Visible = $false
+    }
+}
+
 function Write-GUIToolUsageLog {
     param(
         [string]$Tool,
@@ -1144,6 +1209,7 @@ function Invoke-GUISafely {
         [scriptblock]$Action
     )
 
+    Start-GUIBusyIndicator -Message $Tool
     try {
         Write-GUIToolUsageLog -Tool $Tool -Action "Start"
         & $Action
@@ -1158,6 +1224,9 @@ function Invoke-GUISafely {
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Warning
         ) | Out-Null
+    }
+    finally {
+        Stop-GUIBusyIndicator
     }
 }
 
@@ -1877,6 +1946,7 @@ function Start-GUIQuickEmbeddedCommand {
             -PassThru
 
         $script:QuickOutputProcess = $process
+        Start-GUIBusyIndicator -Message $Title
         $script:QuickOutputFiles = @{
             Title = $Title
             StdOut = $stdout
@@ -1890,6 +1960,7 @@ function Start-GUIQuickEmbeddedCommand {
                 $script:QuickOutputTimer.Stop()
                 $script:QuickOutputTimer.Dispose()
                 $script:QuickOutputTimer = $null
+                Stop-GUIBusyIndicator
                 return
             }
 
@@ -1911,6 +1982,7 @@ function Start-GUIQuickEmbeddedCommand {
                 Add-GUILog "Quick check completed: $($script:QuickOutputFiles.Title)"
                 $script:QuickOutputProcess = $null
                 $script:QuickOutputFiles = $null
+                Stop-GUIBusyIndicator
             }
         })
 
@@ -3051,6 +3123,7 @@ function Start-GUIQuickDiagnosis {
             -WorkingDirectory $SharedToolkitRoot `
             -WindowStyle Hidden `
             -PassThru
+        Start-GUIBusyIndicator -Message "Quick Diagnosis"
 
         Add-GUILog "Quick Diagnosis started for target: $target"
         Write-GUIToolUsageLog -Tool "Quick Diagnosis" -Action "Started" -Detail "Target=$target"
@@ -3063,6 +3136,7 @@ function Start-GUIQuickDiagnosis {
                 $script:QuickDiagnosisTimer.Dispose()
                 $script:QuickDiagnosisTimer = $null
                 Refresh-GUILastQuickDiagnosisLabel
+                Stop-GUIBusyIndicator
                 return
             }
 
@@ -3072,6 +3146,7 @@ function Start-GUIQuickDiagnosis {
                 $script:QuickDiagnosisTimer.Dispose()
                 $script:QuickDiagnosisTimer = $null
                 $script:QuickDiagnosisProcess = $null
+                Stop-GUIBusyIndicator
                 $script:LatestComputerProfileCache = $null
                 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
                 Refresh-Fingerprints -Quiet
@@ -4443,6 +4518,7 @@ function Start-GUIChocoAction {
                 Session = $SessionPath
             }
         }
+        Start-GUIBusyIndicator -Message "Chocolatey $Action"
 
         $script:ChocoActionTimer = New-Object System.Windows.Forms.Timer
         $script:ChocoActionTimer.Interval = 1000
@@ -4466,6 +4542,7 @@ function Start-GUIChocoAction {
                 }
                 catch {}
                 $script:ChocoActionJob = $null
+                Stop-GUIBusyIndicator
 
                 if($script:ChocoActionTimer){
                     $script:ChocoActionTimer.Stop()
@@ -4489,6 +4566,7 @@ function Start-GUIChocoAction {
             }
             catch {
                 Add-GUILog "Chocolatey action monitor failed: $($_.Exception.Message)"
+                Stop-GUIBusyIndicator
                 try {
                     if($script:ChocoActionTimer){
                         $script:ChocoActionTimer.Stop()
@@ -7688,6 +7766,7 @@ finally {
             -PassThru
 
         $script:WUActionProcess = $process
+        Start-GUIBusyIndicator -Message "Windows Update $Action"
         $script:WUActionSession = [pscustomobject]@{
             Action = $Action
             ResultPath = $resultPath
@@ -7713,6 +7792,7 @@ finally {
                 $sessionInfo = $script:WUActionSession
                 $script:WUActionProcess = $null
                 $script:WUActionSession = $null
+                Stop-GUIBusyIndicator
 
                 try {
                     $result = Get-Content -Raw -Path $sessionInfo.ResultPath -ErrorAction Stop | ConvertFrom-Json
@@ -7735,6 +7815,7 @@ finally {
         $timer.Start()
     }
     catch {
+        Stop-GUIBusyIndicator
         Set-GUIWUStatus "Could not start Windows Update background action: $($_.Exception.Message)"
     }
 }
@@ -9648,6 +9729,7 @@ function Start-GUIToolkitUpdate {
     try {
         $script:ToolkitUpdateResultPath = $resultPath
         $script:ToolkitUpdateProcess = Start-CSIToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
+        Start-GUIBusyIndicator -Message "Updating Toolkit"
         Add-GUILog "Toolkit update started: $SourceRoot -> $DestinationRoot"
         Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Started" -Detail ("Source={0}; Destination={1}" -f $SourceRoot,$DestinationRoot)
 
@@ -9666,6 +9748,7 @@ function Start-GUIToolkitUpdate {
             $script:ToolkitUpdateTimer.Dispose()
             $script:ToolkitUpdateTimer = $null
             $script:ToolkitUpdateProcess = $null
+            Stop-GUIBusyIndicator
 
             try {
                 $result = Get-Content -LiteralPath $script:ToolkitUpdateResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
@@ -9696,6 +9779,7 @@ Log: $logPath","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[S
         $script:ToolkitUpdateTimer.Start()
     }
     catch {
+        Stop-GUIBusyIndicator
         Add-GUILog "Toolkit update could not start: $($_.Exception.Message)"
         [System.Windows.Forms.MessageBox]::Show("Toolkit update could not start.`r`n`r`n$($_.Exception.Message)","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
     }
@@ -10415,7 +10499,19 @@ function Build-Form {
     $status = New-Object System.Windows.Forms.StatusStrip
     $script:StatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
     $StatusLabel.Text = "Ready"
+    $StatusLabel.Spring = $true
+    $script:GUIBusyLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
+    $GUIBusyLabel.Text = "Working"
+    $GUIBusyLabel.Visible = $false
+    $GUIBusyLabel.ForeColor = $script:GUITheme.AccentDark
+    $script:GUIBusyProgress = New-Object System.Windows.Forms.ToolStripProgressBar
+    $GUIBusyProgress.Width = 96
+    $GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
+    $GUIBusyProgress.MarqueeAnimationSpeed = 28
+    $GUIBusyProgress.Visible = $false
     $status.Items.Add($StatusLabel) | Out-Null
+    $status.Items.Add($GUIBusyLabel) | Out-Null
+    $status.Items.Add($GUIBusyProgress) | Out-Null
     $root.Controls.Add($status,0,3)
 
     if(!$script:ToolTip){
