@@ -73,6 +73,7 @@ $script:QuickLastDiagnosisLabel = $null
 $script:QuickDiagnosisProcess = $null
 $script:QuickDiagnosisTimer = $null
 $script:ToolkitSizeLabel = $null
+$script:ToolkitLastUpdatedLabel = $null
 $script:ToolkitSizeProcess = $null
 $script:ToolkitSizeTimer = $null
 $script:ToolkitSizeResultPath = $null
@@ -9628,6 +9629,31 @@ function Invoke-GUIRemoveClientData {
     ) | Out-Null
 }
 
+function Update-GUIToolkitLastUpdatedLabel {
+    if(!$script:ToolkitLastUpdatedLabel -or $script:ToolkitLastUpdatedLabel.IsDisposed){
+        return
+    }
+
+    $deploymentRoot = Split-Path -Parent $SharedToolkitRoot
+    $historyPath = Join-Path $deploymentRoot "manifests\toolkit-update-history.json"
+    $text = "Toolkit last updated: not recorded"
+
+    if(Test-Path -LiteralPath $historyPath){
+        try {
+            $latest = @(Get-Content -LiteralPath $historyPath -Raw -ErrorAction Stop | ConvertFrom-Json | Sort-Object UpdatedAt -Descending | Select-Object -First 1)[0]
+            if($latest -and $latest.UpdatedAt){
+                $updatedAt = [datetime]::Parse([string]$latest.UpdatedAt)
+                $text = "Toolkit last updated: " + $updatedAt.ToString("MM/dd/yyyy h:mm tt")
+            }
+        }
+        catch {
+            $text = "Toolkit last updated: unavailable"
+        }
+    }
+
+    $script:ToolkitLastUpdatedLabel.Text = $text
+}
+
 function Start-GUIToolkitSizeRefresh {
     if(!$script:ToolkitSizeLabel -or $script:ToolkitSizeLabel.IsDisposed){
         return
@@ -9754,6 +9780,7 @@ function Start-GUIToolkitUpdate {
                 $result = Get-Content -LiteralPath $script:ToolkitUpdateResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
                 $logPath = "$($script:ToolkitUpdateResultPath).log"
                 if($result.Status -eq "Completed"){
+                    Update-GUIToolkitLastUpdatedLabel
                     Add-GUILog "Toolkit update completed: $($result.DestinationRoot)"
                     Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Completed" -Detail ("Destination={0}; ExitCode={1}" -f $result.DestinationRoot,$result.ExitCode)
                     [System.Windows.Forms.MessageBox]::Show("Toolkit update completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nMode: $($result.Mode)`r`nRobocopy exit code: $($result.ExitCode)","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -10075,12 +10102,13 @@ function Build-SettingsPage {
 
     $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $maintenanceLayout.Dock = "Fill"
-    $maintenanceLayout.RowCount = 5
+    $maintenanceLayout.RowCount = 6
     $maintenanceLayout.ColumnCount = 2
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
@@ -10093,27 +10121,35 @@ function Build-SettingsPage {
     $maintenanceLayout.Controls.Add($updateButton,0,0)
     $maintenanceLayout.SetColumnSpan($updateButton,2)
 
+    $script:ToolkitLastUpdatedLabel = New-GUILabel "Toolkit last updated: not recorded"
+    $ToolkitLastUpdatedLabel.Dock = "Fill"
+    $ToolkitLastUpdatedLabel.TextAlign = "MiddleLeft"
+    $ToolkitLastUpdatedLabel.ForeColor = $script:GUITheme.MutedText
+    $maintenanceLayout.Controls.Add($ToolkitLastUpdatedLabel,0,1)
+    $maintenanceLayout.SetColumnSpan($ToolkitLastUpdatedLabel,2)
+    Update-GUIToolkitLastUpdatedLabel
+
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
     $sanitizeButton.Dock = "Fill"
     $sanitizeButton.Width = 0
-    $maintenanceLayout.Controls.Add($sanitizeButton,0,1)
+    $maintenanceLayout.Controls.Add($sanitizeButton,0,2)
     $maintenanceLayout.SetColumnSpan($sanitizeButton,2)
 
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,2)
+    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,3)
 
     $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
     $sizeRefreshButton.Dock = "Fill"
     $sizeRefreshButton.Width = 0
-    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,2)
+    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,3)
 
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
     $foldersLabel.TextAlign = "MiddleLeft"
-    $maintenanceLayout.Controls.Add($foldersLabel,0,3)
+    $maintenanceLayout.Controls.Add($foldersLabel,0,4)
     $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -10125,7 +10161,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.Controls.Add($folderPanel,0,4)
+    $maintenanceLayout.Controls.Add($folderPanel,0,5)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "Open Logs" { Open-GUIFolder $CSIPaths.Logs }

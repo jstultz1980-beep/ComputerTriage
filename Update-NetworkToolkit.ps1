@@ -31,6 +31,37 @@ function Resolve-NetworkToolkitFileSystemPath {
     return $item.FullName.TrimEnd('\\')
 }
 
+function Write-NetworkToolkitUpdateRecord {
+    param(
+        [Parameter(Mandatory=$true)][string]$DestinationRoot,
+        [Parameter(Mandatory=$true)][string]$SourceRoot,
+        [int]$ExitCode
+    )
+
+    $manifestRoot = Join-Path $DestinationRoot "manifests"
+    $historyPath = Join-Path $manifestRoot "toolkit-update-history.json"
+    New-Item -ItemType Directory -Path $manifestRoot -Force | Out-Null
+
+    $history = @()
+    if(Test-Path -LiteralPath $historyPath){
+        try {
+            $history = @(Get-Content -LiteralPath $historyPath -Raw -ErrorAction Stop | ConvertFrom-Json)
+        }
+        catch {
+            $history = @()
+        }
+    }
+
+    $history += [pscustomobject]@{
+        UpdatedAt = (Get-Date).ToString("s")
+        Source = $SourceRoot
+        ExitCode = $ExitCode
+    }
+    $history = @($history | Select-Object -Last 25)
+    $history | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $historyPath -Encoding UTF8
+    return $historyPath
+}
+
 $result = [ordered]@{
     SourceRoot = $SourceRoot
     DestinationRoot = $DestinationRoot
@@ -39,6 +70,7 @@ $result = [ordered]@{
     Status = "Running"
     Mode = "Update"
     ExitCode = $null
+    UpdateRecordPath = ""
     Error = ""
 }
 
@@ -97,6 +129,7 @@ try {
         throw "Robocopy failed with exit code $LASTEXITCODE. Review $($ResultPath).log for details."
     }
 
+    $result.UpdateRecordPath = Write-NetworkToolkitUpdateRecord -DestinationRoot $DestinationRoot -SourceRoot $SourceRoot -ExitCode $result.ExitCode
     $result.Status = "Completed"
 }
 catch {
