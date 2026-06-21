@@ -18,7 +18,7 @@ function Test-PackagePath {
 }
 
 foreach($requiredPath in @(
-    "NetworkToolkit-Elevated.bat",
+    "NetworkToolkit.vbs",
     "App\NetworkToolkit.ps1",
     "App\ToolKit-GUI\ToolKit-GUI.ps1",
     "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1",

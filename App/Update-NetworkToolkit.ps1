@@ -54,7 +54,7 @@ function Move-NetworkToolkitLegacyLayout {
 function Remove-NetworkToolkitRootArtifacts {
     param([Parameter(Mandatory=$true)][string]$DeploymentRoot)
     foreach($item in @(Get-ChildItem -LiteralPath $DeploymentRoot -Force -ErrorAction SilentlyContinue)){
-        if($item.Name -in @("App",".git","NetworkToolkit-Elevated.bat")){ continue }
+        if($item.Name -in @("App",".git","NetworkToolkit.vbs")){ continue }
         Remove-Item -LiteralPath $item.FullName -Recurse -Force -ErrorAction Stop
     }
 }
@@ -146,7 +146,7 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
     $managedRootFiles = @(
         ".gitignore",
         "NetworkToolkit.ps1",
-        "NetworkToolkit-Elevated.bat",
+        "NetworkToolkit.vbs",
         "Update-NetworkToolkit.ps1",
         "Update-ToolkitVersion.ps1",
         "Build-ProductionPackage.ps1",
@@ -285,7 +285,7 @@ try {
     $result.PrunedFiles = $pruneResult.Removed
     $result.PruneSkippedFiles = $pruneResult.Skipped
     $result.VerifiedFiles = @(Test-NetworkToolkitCopy -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot)
-    Copy-Item -LiteralPath (Join-Path $sourceLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Destination (Join-Path $destinationLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Force
+    Copy-Item -LiteralPath (Join-Path $sourceLayout.DeploymentRoot "NetworkToolkit.vbs") -Destination (Join-Path $destinationLayout.DeploymentRoot "NetworkToolkit.vbs") -Force
     Remove-NetworkToolkitRootArtifacts -DeploymentRoot $destinationLayout.DeploymentRoot
     $result.Status = "Completed"
 }

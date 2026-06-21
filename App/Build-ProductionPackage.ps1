@@ -15,8 +15,8 @@ if([string]::IsNullOrWhiteSpace($PackageName) -or $PackageName -match '[\\/:*?"<
 }
 $packageRoot = Join-Path $DestinationRoot $PackageName
 
-if(!(Test-Path (Join-Path $launcherRoot "NetworkToolkit-Elevated.bat"))){
-    throw "NetworkToolkit-Elevated.bat was not found beside the App folder."
+if(!(Test-Path (Join-Path $launcherRoot "NetworkToolkit.vbs"))){
+    throw "NetworkToolkit.vbs was not found beside the App folder."
 }
 
 # A package is a source release. Refresh its build manifest before copying so
@@ -70,7 +70,7 @@ if($LASTEXITCODE -gt 7){
     throw "Robocopy failed with exit code $LASTEXITCODE."
 }
 
-Copy-Item -LiteralPath (Join-Path $launcherRoot "NetworkToolkit-Elevated.bat") -Destination (Join-Path $packageRoot "NetworkToolkit-Elevated.bat") -Force
+Copy-Item -LiteralPath (Join-Path $launcherRoot "NetworkToolkit.vbs") -Destination (Join-Path $packageRoot "NetworkToolkit.vbs") -Force
 
 # Recreate clean runtime folders expected by the toolkit; no client records are copied.
 $runtimeFolders = @(
@@ -102,7 +102,7 @@ Remove-Item -LiteralPath (Join-Path $packageAppRoot "manifests\gui-settings.json
 $packageFiles = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue)
 $totalBytes = [int64](($packageFiles | Measure-Object -Property Length -Sum).Sum)
 $launchers = @(
-    "NetworkToolkit-Elevated.bat",
+    "NetworkToolkit.vbs",
     "App\NetworkToolkit.ps1",
     "App\ToolKit-GUI\ToolKit-GUI.ps1",
     "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1"
@@ -144,11 +144,11 @@ $readmePath = Join-Path $packageAppRoot "DEPLOYMENT-README.txt"
 @(
     "Network Toolkit Portable - Production Test Package"
     ""
-    "Launch: right-click NetworkToolkit-Elevated.bat and choose Run as administrator."
+    "Launch: double-click NetworkToolkit.vbs and approve the elevation prompt."
     ""
     "This package is intentionally clean: collected reports, profiles, computer state, minidumps, temporary output, logs, GUI settings, and the previous Firefox Portable profile were excluded."
     ""
-    "Before handing the drive to a technician, copy the NetworkToolkit-Portable folder to the thumb drive and run NetworkToolkit-Elevated.bat from that folder."
+    "Before handing the drive to a technician, copy the NetworkToolkit-Portable folder to the thumb drive and run NetworkToolkit.vbs from that folder."
     ""
     "ProductionManifest.json records build size, file count, and SHA256 hashes for the primary launch files."
     ""
