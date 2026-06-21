@@ -8625,6 +8625,7 @@ function Build-ReportsPage {
 
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Location" { Open-SelectedGUIReportLocation }))
+    [void]$buttons.Controls.Add((New-GUIButton "Bundle To Send" { New-GUIChatGPTBundle }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Help" { Open-GUIHelpFile }))
 
@@ -8754,6 +8755,85 @@ function Delete-SelectedGUIReport {
     if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
         Remove-Item -LiteralPath $report.Path -Recurse:$report.IsDirectory -Force -ErrorAction SilentlyContinue
         Refresh-GUIReports
+    }
+}
+
+function New-GUIChatGPTBundle {
+    $reports = @($script:Reports | Where-Object { !$_.IsDirectory -and $_.Type -ne "Minidumps" -and (Test-Path -LiteralPath $_.Path) })
+    if($reports.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("There are no report files in the current view to bundle.","Bundle To Send",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $totalBytes = [int64](($reports | ForEach-Object { (Get-Item -LiteralPath $_.Path -ErrorAction SilentlyContinue).Length } | Measure-Object -Sum).Sum)
+    $preview = @($reports | Select-Object -First 8 | ForEach-Object { "- $($_.Type): $($_.Name)" }) -join "`r`n"
+    if($reports.Count -gt 8){ $preview += "`r`n- Plus $($reports.Count - 8) more visible report file(s)." }
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Create a ZIP for manual upload to ChatGPT?`r`n`r`nThis bundle contains the report files currently visible in Reports. It does not include minidumps, portable apps, browser data, or toolkit logs.`r`n`r`nFiles: $($reports.Count)`r`nSize: $([math]::Round($totalBytes / 1MB,2)) MB`r`n`r`n$preview`r`n`r`nReview the ZIP before uploading it. Continue?",
+        "Bundle To Send",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    try {
+        $bundleRoot = Join-Path $CSIPaths.Exports "AI-Bundles"
+        New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
+        $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+        $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp)
+        New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
+        foreach($report in $reports){
+            Copy-Item -LiteralPath $report.Path -Destination (Join-Path $bundleFolder $report.Name) -Force
+        }
+        @(
+            "Network Toolkit - ChatGPT Analysis Bundle"
+            "Created: $((Get-Date).ToString('s'))"
+            ""
+            "This ZIP was prepared for manual upload. Review its contents before sharing."
+            "Minidumps, portable applications, browser data, and toolkit logs are excluded."
+            ""
+            "Included files:"
+            $reports | ForEach-Object { "$($_.Type): $($_.Name)" }
+        ) | Set-Content -LiteralPath (Join-Path $bundleFolder "README.txt") -Encoding UTF8
+        @(
+            "# Network Toolkit Diagnostic Analysis Request"
+            ""
+            "You are assisting a Windows support technician. Analyze the diagnostic files in this ZIP as evidence, not as a substitute for direct access to the computer. The goal is to identify likely issues, explain their practical impact, and give a safe, prioritized troubleshooting plan."
+            ""
+            "## Required Output"
+            ""
+            "1. Start with an executive summary in plain language: overall health, the most important problems, and what is working normally."
+            "2. Create a prioritized findings table with: severity (Critical, High, Medium, Low, Informational), finding, exact supporting evidence (file name plus quoted value or event), likely impact, confidence level, and recommended next action."
+            "3. Separate confirmed problems from observations, correlations, and items that require verification. Do not state an inference as fact."
+            "4. For each actionable finding, provide safe first steps, deeper investigation steps, and remediation only when it is appropriate. Include prerequisites, likely user impact, reboot requirements, and rollback considerations."
+            "5. Call out conflicts between reports. If one report says a check passed while another suggests a problem, explain the discrepancy and identify the next check that would resolve it."
+            "6. Identify missing evidence that would materially change the diagnosis, such as an exact event log, driver version, update KB, service configuration, or network test result."
+            "7. End with a technician checklist ordered from lowest-risk/highest-value actions to more disruptive actions."
+            ""
+            "## Analysis Rules"
+            ""
+            "- Use only evidence in this ZIP. Clearly label anything based on general knowledge rather than an included report."
+            "- Do not recommend registry edits, service disabling, driver removal, security exclusions, or repair commands without explaining why, the risk, and how to validate the change."
+            "- Do not treat normal VM limitations, such as unavailable SMART disk data, as hardware failure."
+            "- Treat crash signatures, missing startup entries, pending reboots, DISM/SFC results, driver warnings, Windows Update state, and event-log patterns as leads that need corroboration unless the evidence is conclusive."
+            "- Preserve security posture: do not suggest bypassing endpoint protection, weakening firewall rules, or exposing remote management broadly."
+            "- Keep recommendations specific to the reported computer and cite the relevant file for every significant finding."
+            ""
+            "## Desired Tone"
+            ""
+            "Be direct and practical. Explain what the technician should do next and why. Avoid generic statements such as 'review the logs' when the report contains enough detail to name the relevant log, event, service, device, update, or startup entry."
+        ) | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-PROMPT.md") -Encoding UTF8
+        $zipPath = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp + ".zip")
+        Compress-Archive -Path (Join-Path $bundleFolder "*") -DestinationPath $zipPath -CompressionLevel Optimal -Force
+        Remove-Item -LiteralPath $bundleFolder -Recurse -Force -ErrorAction SilentlyContinue
+        [System.Windows.Forms.Clipboard]::SetText($zipPath)
+        Add-GUILog "Created ChatGPT analysis bundle: $zipPath"
+        Start-Process "https://chatgpt.com/auth/login"
+        [System.Windows.Forms.MessageBox]::Show("Your bundle is ready and its path has been copied to the clipboard.`r`n`r`n$zipPath`r`n`r`nChatGPT sign-in was opened. After signing in, upload the ZIP manually and ask for a plain-language analysis of the findings.","Bundle Ready",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+    }
+    catch {
+        Add-GUILog "ChatGPT bundle failed: $($_.Exception.Message)"
+        [System.Windows.Forms.MessageBox]::Show("Could not create the bundle.`r`n`r`n$($_.Exception.Message)","Bundle To Send",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
     }
 }
 
