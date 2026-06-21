@@ -8830,6 +8830,7 @@ function New-GUIChatGPTBundle {
             "5. Call out conflicts between reports. If one report says a check passed while another suggests a problem, explain the discrepancy and identify the next check that would resolve it."
             "6. Identify missing evidence that would materially change the diagnosis, such as an exact event log, driver version, update KB, service configuration, or network test result."
             "7. End with a technician checklist ordered from lowest-risk/highest-value actions to more disruptive actions."
+            "8. Create the complete response as a downloadable plain-text file named NetworkToolkit-AI-Analysis-$computerName.txt. Attach or provide the downloadable file in addition to showing the summary in chat. The text file must include the executive summary, findings table, evidence citations, remediation plan, missing evidence, and technician checklist."
             ""
             "## Analysis Rules"
             ""
