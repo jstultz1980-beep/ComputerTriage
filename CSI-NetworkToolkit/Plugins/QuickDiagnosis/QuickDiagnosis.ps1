@@ -62,6 +62,7 @@ param(
             }
 
             $deepDiveHtml = ""
+            $recommendedAction = [string]$problem.Tip
             if($deepDive){
                 $candidateDriverHtml = if($deepDive.CandidateDriver){
                     "<div class='wide'><span>Candidate Driver</span><p>$(Convert-CSIHtml $deepDive.CandidateDriver)</p></div>"
@@ -71,10 +72,13 @@ param(
                 }
 
                 $deepDiveHtml = "<div class='finding-detail'><div class='finding-subhead'>Deeper Investigation</div><div class='finding-body investigation-grid'><div><span>Confidence</span><p>$(Convert-CSIHtml $deepDive.Confidence)</p></div><div><span>Evidence</span><p>$(Convert-CSIHtml $deepDive.Evidence)</p></div><div><span>Impact</span><p>$(Convert-CSIHtml $deepDive.WhyItMatters)</p></div><div><span>Best Next Action</span><p>$(Convert-CSIHtml $deepDive.RecommendedAction)</p></div>$candidateDriverHtml</div></div>"
+                if($deepDive.RecommendedAction){
+                    $recommendedAction = [string]$deepDive.RecommendedAction
+                }
             }
 
             $supportingEvidence = @($problem.Detail,$problem.Explanation) | Where-Object { $_ } | Select-Object -Unique
-            "<div class='finding-card'><div class='finding-head'><span class='badge $($problem.Status.ToLower())'>$(Convert-CSIHtml $problem.Status)</span><strong>$(Convert-CSIHtml $problem.Area) - $(Convert-CSIHtml $problem.Check)</strong></div><div class='finding-body problem-grid'><div><span>Supporting Evidence</span><p>$(Convert-CSIHtml ($supportingEvidence -join "`n`n"))</p></div><div><span>Recommended Next Step</span><p>$(Convert-CSIHtml $problem.Tip)</p></div></div>$deepDiveHtml</div>"
+            "<div class='finding-card'><div class='finding-head'><span class='badge $($problem.Status.ToLower())'>$(Convert-CSIHtml $problem.Status)</span><strong>$(Convert-CSIHtml $problem.Area) - $(Convert-CSIHtml $problem.Check)</strong></div><div class='finding-body problem-grid'><div><span>Supporting Evidence</span><p>$(Convert-CSIHtml ($supportingEvidence -join "`n`n"))</p></div><div><span>Recommended Next Step</span><p>$(Convert-CSIHtml $recommendedAction)</p></div></div>$deepDiveHtml</div>"
         }) -join "`n"
     }
     else{
@@ -391,11 +395,26 @@ param([pscustomobject]$Finding)
     }
 
     if($area -eq "Startup"){
+        if($check -eq "Autoruns Missing Files"){
+            return @(
+                "In Autoruns, use the exact Entry Location, Entry, Autoruns target, and Launch fields shown in the supporting evidence to locate the record. Do not search only by the broad Logon category.",
+                "Compare the full launch command with the installed application or approved login script. If the command points to a truly absent executable, record the current entry before changing it.",
+                "Disable the one entry first, sign out/sign in or reproduce the affected application behavior, and restore it immediately if it was required.",
+                "Delete the entry only after the disabled test succeeds. Rerun Quick Diagnosis and confirm that the exact location/entry no longer appears."
+            )
+        }
+        if($check -eq "Autoruns Command Syntax Review"){
+            return @(
+                "Open Autoruns and locate the exact Entry Location and Entry shown in the evidence.",
+                "Read the entire Launch command. If Autoruns labels a built-in cmd.exe command such as cd, start, set, or call as missing, verify the command before treating it as a broken file path.",
+                "Keep the entry when the command is expected for the computer's alternate shell, login automation, or management software. Disable it only when its owner or purpose cannot be confirmed."
+            )
+        }
         return @(
-            "Open Autoruns and locate the exact entry or image path named in the supporting evidence.",
-            "Confirm the application is no longer installed or the file is truly missing. Do not remove startup entries solely because they look unfamiliar.",
+            "Open Autoruns and locate the exact entry, registry/task location, and launch command named in the supporting evidence.",
+            "Confirm whether the command belongs to an installed application, approved login script, or known management component before treating it as stale.",
             "Disable the entry first, test sign-in and the affected application, then delete it only when the owner and impact are understood.",
-            "Rerun Quick Diagnosis or Autoruns to confirm the stale entry no longer appears."
+            "Rerun Quick Diagnosis or Autoruns to confirm the same exact entry no longer appears."
         )
     }
 
@@ -565,7 +584,15 @@ function Global:Get-CSIQuickSysinternalsEvidence {
             $imagePath = [string]($_.'Image Path')
             $imagePath -match '(?i)file not found|not found|missing'
         })
-        $missing = @($missingAll | Select-Object -First 20)
+        $commandSyntaxRows = @($missingAll | Where-Object {
+            $imagePath = [string]($_.'Image Path')
+            $launchString = [string]($_.'Launch String')
+            $imagePath -match '(?i)^file not found:\s*(cd|dir|echo|set|start|call|if|for)\b' -and
+            $launchString -match '(?i)\bcmd(?:\.exe)?\b'
+        })
+        $missingDefinite = @($missingAll | Where-Object { $commandSyntaxRows -notcontains $_ })
+        $missing = @($missingDefinite | Select-Object -First 20)
+        $commandSyntax = @($commandSyntaxRows | Select-Object -First 20)
 
         $evidence.Autoruns = [pscustomobject]@{
             ToolPath = $autorunsc
@@ -573,7 +600,8 @@ function Global:Get-CSIQuickSysinternalsEvidence {
             ExitCode = $capture.ExitCode
             EntriesChecked = $rows.Count
             UnsignedOrUnverifiedCount = $unsignedAll.Count
-            MissingFileCount = $missingAll.Count
+            MissingFileCount = $missingDefinite.Count
+            CommandSyntaxReviewCount = $commandSyntaxRows.Count
             UnsignedOrUnverified = @($unsigned | ForEach-Object {
                 [pscustomobject]@{
                     Entry = $_.Entry
@@ -586,8 +614,19 @@ function Global:Get-CSIQuickSysinternalsEvidence {
             MissingFiles = @($missing | ForEach-Object {
                 [pscustomobject]@{
                     Entry = $_.Entry
+                    EntryLocation = $_.'Entry Location'
                     Category = $_.Category
                     ImagePath = $_.'Image Path'
+                    LaunchString = $_.'Launch String'
+                }
+            })
+            CommandSyntaxReviews = @($commandSyntax | ForEach-Object {
+                [pscustomobject]@{
+                    Entry = $_.Entry
+                    EntryLocation = $_.'Entry Location'
+                    Category = $_.Category
+                    ImagePath = $_.'Image Path'
+                    LaunchString = $_.'Launch String'
                 }
             })
             Error = $capture.Error
@@ -656,14 +695,19 @@ param(
 
         $category = [string]$Row.Category
         $entry = [string]$Row.Entry
+        $location = [string]$Row.EntryLocation
         $path = [string]$Row.ImagePath
+        $launch = [string]$Row.LaunchString
         $publisher = [string]$Row.Publisher
 
         $parts = @()
-        if($category){ $parts += $category }
+        if($category){ $parts += "Category=$category" }
+        if($location){ $parts += "Location=$location" }
         if($entry -and $entry -notmatch '^\d+$'){ $parts += $entry }
-        if($publisher){ $parts += $publisher }
-        if($path){ $parts += $path }
+        elseif($entry){ $parts += "Entry=$entry" }
+        if($publisher){ $parts += "Publisher=$publisher" }
+        if($path){ $parts += "Autoruns target=$path" }
+        if($launch){ $parts += "Launch=$launch" }
 
         return ($parts -join ": ")
     }
@@ -682,7 +726,11 @@ param(
         }
         elseif($autoruns.MissingFileCount -gt 0){
             $detail = (($autoruns.MissingFiles | Select-Object -First 5 | ForEach-Object { Format-CSIQuickAutorunsRow $_ }) -join "; ")
-            Add-CSIQuickFinding $Findings "Startup" "Autoruns Missing Files" "Warning" "$($autoruns.MissingFileCount) startup/persistence entry path(s) appear missing. $detail" "Open Autoruns and remove or repair stale startup entries only after confirming they are not expected remnants from a legitimate uninstall."
+            Add-CSIQuickFinding $Findings "Startup" "Autoruns Missing Files" "Warning" "$($autoruns.MissingFileCount) definite startup/persistence file path(s) are missing. Exact affected entries: $detail" "In Autoruns, locate each exact entry/location listed above. Confirm its application was intentionally removed or the path is truly absent, then disable the entry first and test before deleting it."
+        }
+        elseif($autoruns.CommandSyntaxReviewCount -gt 0){
+            $detail = (($autoruns.CommandSyntaxReviews | Select-Object -First 5 | ForEach-Object { Format-CSIQuickAutorunsRow $_ }) -join "; ")
+            Add-CSIQuickFinding $Findings "Startup" "Autoruns Command Syntax Review" "Info" "Autoruns could not resolve $($autoruns.CommandSyntaxReviewCount) command-style startup target(s), but it did not find a definite missing executable. Exact entry: $detail" "Review the exact location and launch command in Autoruns. The reported target may be a built-in cmd.exe command rather than a missing file. Keep it unless the alternate-shell or startup command is unexpected for this computer."
         }
         elseif($autoruns.UnsignedOrUnverifiedCount -gt 0){
             $detail = (($autoruns.UnsignedOrUnverified | Select-Object -First 5 | ForEach-Object { Format-CSIQuickAutorunsRow $_ }) -join "; ")
@@ -790,7 +838,10 @@ param([pscustomobject]$Finding)
 
     if($area -eq "Startup"){
         if($check -eq "Autoruns Missing Files"){
-            return "Open Autoruns and review the missing-path entries. Remove stale entries only after confirming the associated application was intentionally removed."
+            return "In Autoruns, locate the exact registry/task location, entry name, reported target, and launch command shown in Supporting Evidence. Disable the entry first; delete it only if the command truly points to an intentionally removed application."
+        }
+        if($check -eq "Autoruns Command Syntax Review"){
+            return "Review the exact Autoruns location and full launch command. A cmd.exe built-in such as cd /d can look like a missing file to Autoruns even though no executable is absent."
         }
         if($check -eq "Autoruns Verification"){
             return "Open Autoruns and Sigcheck. Confirm publisher, path, and business need before disabling startup entries."
@@ -896,6 +947,9 @@ param([pscustomobject]$Finding)
             return "Secure Boot could not be confirmed. This can be normal on VMs, legacy boot systems, or when the check lacks required permissions."
         }
         if($area -eq "Startup"){
+            if($check -eq "Autoruns Command Syntax Review"){
+                return "Autoruns could not resolve part of a startup command as a file. The evidence shows the exact registry location, entry, and full launch command so the technician can verify whether it is legitimate cmd.exe syntax or an unexpected startup modification."
+            }
             return "Startup evidence was partially collected or the helper tool was unavailable. This is not automatically a problem, but it limits the quick startup review."
         }
         if($area -eq "User Sessions"){
