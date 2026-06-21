@@ -18,6 +18,14 @@ if(!(Test-Path (Join-Path $sourceRoot "NetworkToolkit-Elevated.bat"))){
     throw "NetworkToolkit-Elevated.bat was not found. Run this builder from the toolkit root."
 }
 
+# A package is a source release. Refresh its build manifest before copying so
+# the updater can compare releases without relying on destination timestamps.
+$versionUpdater = Join-Path $sourceRoot "Update-ToolkitVersion.ps1"
+if(!(Test-Path -LiteralPath $versionUpdater)){
+    throw "Update-ToolkitVersion.ps1 was not found. Cannot create a versioned package."
+}
+& $versionUpdater
+
 if(Test-Path $packageRoot){
     if(!$Force){
         throw "Package folder already exists: $packageRoot. Use -Force to replace it."
@@ -85,8 +93,6 @@ Get-ChildItem -LiteralPath $packageRoot -Directory -Recurse -Filter "Logs" -Erro
     }
 
 Remove-Item -LiteralPath (Join-Path $packageRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue
-Remove-Item -LiteralPath (Join-Path $packageRoot "manifests\toolkit-update-history.json") -Force -ErrorAction SilentlyContinue
-Remove-Item -LiteralPath (Join-Path $packageRoot "LAST-UPDATED.txt") -Force -ErrorAction SilentlyContinue
 
 $packageFiles = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue)
 $totalBytes = [int64](($packageFiles | Measure-Object -Property Length -Sum).Sum)
@@ -121,9 +127,7 @@ $manifest = [ordered]@{
         "CSI-NetworkToolkit\\Logs",
         "Custom\\FirefoxPortable\\Data",
         "Plugin Logs",
-        "manifests\\gui-settings.json",
-        "manifests\\toolkit-update-history.json",
-        "LAST-UPDATED.txt"
+        "manifests\\gui-settings.json"
     )
     Launchers = $launchers
 }

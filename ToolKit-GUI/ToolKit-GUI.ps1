@@ -17,6 +17,23 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 try { Add-Type -AssemblyName Microsoft.VisualBasic -ErrorAction SilentlyContinue } catch {}
 
+$script:OwnsGuiInstanceMutex = $false
+if(!$global:NetworkToolkitInstanceMutex){
+    $mutexName = "NetworkToolkit-$([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)"
+    $createdNew = $false
+    $global:NetworkToolkitInstanceMutex = New-Object System.Threading.Mutex($true,$mutexName,[ref]$createdNew)
+    if(!$createdNew){
+        [System.Windows.Forms.MessageBox]::Show(
+            "Network Toolkit is already running. Use the existing window instead of launching another copy.",
+            "Network Toolkit",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Information
+        ) | Out-Null
+        exit 0
+    }
+    $script:OwnsGuiInstanceMutex = $true
+}
+
 $GuiRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SharedToolkitRoot = Join-Path (Split-Path -Parent $GuiRoot) "CSI-NetworkToolkit"
 $ToolkitLauncher = Join-Path $SharedToolkitRoot "CSI-NetworkToolkit.ps1"
@@ -73,7 +90,7 @@ $script:QuickLastDiagnosisLabel = $null
 $script:QuickDiagnosisProcess = $null
 $script:QuickDiagnosisTimer = $null
 $script:ToolkitSizeLabel = $null
-$script:ToolkitLastUpdatedLabel = $null
+$script:ToolkitVersionLabel = $null
 $script:ToolkitSizeProcess = $null
 $script:ToolkitSizeTimer = $null
 $script:ToolkitSizeResultPath = $null
@@ -9850,29 +9867,27 @@ function Invoke-GUIRemoveClientData {
     ) | Out-Null
 }
 
-function Update-GUIToolkitLastUpdatedLabel {
-    if(!$script:ToolkitLastUpdatedLabel -or $script:ToolkitLastUpdatedLabel.IsDisposed){
+function Update-GUIToolkitVersionLabel {
+    if(!$script:ToolkitVersionLabel -or $script:ToolkitVersionLabel.IsDisposed){
         return
     }
 
     $deploymentRoot = Split-Path -Parent $SharedToolkitRoot
-    $historyPath = Join-Path $deploymentRoot "manifests\toolkit-update-history.json"
-    $text = "Toolkit last updated: not recorded"
+    $manifestPath = Join-Path $deploymentRoot "manifests\toolkit-version.json"
+    $text = "Toolkit version: unavailable"
 
-    if(Test-Path -LiteralPath $historyPath){
+    if(Test-Path -LiteralPath $manifestPath){
         try {
-            $latest = @((Get-Content -LiteralPath $historyPath -Raw -ErrorAction Stop | ConvertFrom-Json) | ForEach-Object { $_ } | Sort-Object UpdatedAt -Descending | Select-Object -First 1)[0]
-            if($latest -and $latest.UpdatedAt){
-                $updatedAt = [datetime]::Parse([string]$latest.UpdatedAt)
-                $text = "Toolkit last updated: " + $updatedAt.ToString("MM/dd/yyyy h:mm tt")
-            }
+            $manifest = Get-Content -LiteralPath $manifestPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+            $published = if($manifest.SourceUpdatedAt){ ([datetime]$manifest.SourceUpdatedAt).ToString("MM/dd/yyyy h:mm tt") } else { "date unavailable" }
+            $text = "Toolkit version: $($manifest.Version)  |  Build $($manifest.Build)  |  Source updated $published"
         }
         catch {
-            $text = "Toolkit last updated: unavailable"
+            $text = "Toolkit version: unavailable"
         }
     }
 
-    $script:ToolkitLastUpdatedLabel.Text = $text
+    $script:ToolkitVersionLabel.Text = $text
 }
 
 function Start-GUIToolkitSizeRefresh {
@@ -10001,14 +10016,16 @@ function Start-GUIToolkitUpdate {
                 $result = Get-Content -LiteralPath $script:ToolkitUpdateResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
                 $logPath = "$($script:ToolkitUpdateResultPath).log"
                 if($result.Status -eq "Completed"){
-                    Update-GUIToolkitLastUpdatedLabel
+                    Update-GUIToolkitVersionLabel
                     Add-GUILog "Toolkit update completed: $($result.DestinationRoot)"
                     Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Completed" -Detail ("Destination={0}; ExitCode={1}" -f $result.DestinationRoot,$result.ExitCode)
                     $verified = if(@($result.VerifiedFiles).Count -gt 0){@($result.VerifiedFiles) -join ", "}else{"Launcher verification was not returned."}
                     if(@($result.VerificationSkippedFiles).Count -gt 0){ $verified += "`r`nVerification deferred because file was locked: " + (@($result.VerificationSkippedFiles) -join ", ") }
-                    $timestampSummary = "Program file timestamps refreshed: $($result.TimestampTouchedFiles)"
-                    if([int]$result.TimestampSkippedFiles -gt 0){ $timestampSummary += " (skipped because locked: $($result.TimestampSkippedFiles))" }
-                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed and the core launch files were verified.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nResult:`r`n$($result.CopySummary)`r`n`r`n$timestampSummary`r`n`r`nVerified:`r`n$verified`r`n`r`nUpdate marker:`r`n$($result.UpdateMarkerPath)", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed and the core launch files were verified.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nInstalled version:`r`n$($result.SourceVersion) build $($result.SourceBuild)`r`n`r`nResult:`r`n$($result.CopySummary)`r`n`r`nVerified:`r`n$verified", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                }
+                elseif($result.Status -eq "Current"){
+                    Add-GUILog "Toolkit update skipped: destination already has version $($result.SourceVersion) build $($result.SourceBuild)."
+                    [System.Windows.Forms.MessageBox]::Show($result.CopySummary, "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
                 }
                 else{
                     Add-GUILog "Toolkit update failed: $($result.Error)"
@@ -10067,7 +10084,7 @@ function Show-GUIToolkitUpdater {
     $runningToolkitRoot = $defaultSource
     $sourceBox = New-GUITextBox $(if($settings.toolkitUpdateSource){[string]$settings.toolkitUpdateSource}else{$defaultSource})
     $destinationBox = New-GUITextBox $(if($settings.toolkitUpdateDestination){[string]$settings.toolkitUpdateDestination}else{""})
-    $layout.Controls.Add((New-GUILabel "Current version"),0,0)
+    $layout.Controls.Add((New-GUILabel "Source toolkit"),0,0)
     $layout.Controls.Add($sourceBox,1,0)
     $layout.Controls.Add((New-GUILabel "Destination"),0,1)
     $layout.Controls.Add($destinationBox,1,1)
@@ -10095,7 +10112,7 @@ function Show-GUIToolkitUpdater {
     $layout.SetColumnSpan($options,3)
     $layout.Controls.Add($options,0,2)
 
-    $preserve = New-GUILabel "Updates toolkit scripts, configuration, and GUI assets only. Portable apps, ExternalTools, Custom apps, reports, profiles, diagnostics, logs, and GUI settings are preserved on the destination."
+    $preserve = New-GUILabel "Updates only when the selected source has a newer toolkit version/build. Scripts, configuration, and GUI assets update; portable apps, ExternalTools, Custom apps, reports, profiles, diagnostics, logs, and GUI settings stay on the destination."
     $preserve.AutoSize = $true
     $preserve.ForeColor = $script:GUITheme.MutedText
     $options.Controls.Add($preserve)
@@ -10125,7 +10142,7 @@ function Show-GUIToolkitUpdater {
 
         $modeText = if($mode -eq "Pull"){"Update the toolkit you launched from the selected source."}else{"Update the selected destination from the selected source."}
         $confirm = [System.Windows.Forms.MessageBox]::Show("$modeText`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r
-Portable apps and client data are preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
+Only a newer source version/build will update. Portable apps and client data are preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
         if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
             $settings.toolkitUpdateSource = $source
             $settings.toolkitUpdateDestination = $destination
@@ -10384,13 +10401,13 @@ function Build-SettingsPage {
     $maintenanceLayout.Controls.Add($updateButton,0,0)
     $maintenanceLayout.SetColumnSpan($updateButton,2)
 
-    $script:ToolkitLastUpdatedLabel = New-GUILabel "Toolkit last updated: not recorded"
-    $ToolkitLastUpdatedLabel.Dock = "Fill"
-    $ToolkitLastUpdatedLabel.TextAlign = "MiddleLeft"
-    $ToolkitLastUpdatedLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitLastUpdatedLabel,0,1)
-    $maintenanceLayout.SetColumnSpan($ToolkitLastUpdatedLabel,2)
-    Update-GUIToolkitLastUpdatedLabel
+    $script:ToolkitVersionLabel = New-GUILabel "Toolkit version: unavailable"
+    $ToolkitVersionLabel.Dock = "Fill"
+    $ToolkitVersionLabel.TextAlign = "MiddleLeft"
+    $ToolkitVersionLabel.ForeColor = $script:GUITheme.MutedText
+    $maintenanceLayout.Controls.Add($ToolkitVersionLabel,0,1)
+    $maintenanceLayout.SetColumnSpan($ToolkitVersionLabel,2)
+    Update-GUIToolkitVersionLabel
 
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
     $sanitizeButton.Dock = "Fill"
@@ -10974,4 +10991,13 @@ if($ButtonSmokeTest){
     return
 }
 
-[void]$Form.ShowDialog()
+try {
+    [void]$Form.ShowDialog()
+}
+finally {
+    if($script:OwnsGuiInstanceMutex -and $global:NetworkToolkitInstanceMutex){
+        try { $global:NetworkToolkitInstanceMutex.ReleaseMutex() } catch {}
+        $global:NetworkToolkitInstanceMutex.Dispose()
+        $global:NetworkToolkitInstanceMutex = $null
+    }
+}
