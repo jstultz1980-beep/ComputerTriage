@@ -6982,6 +6982,7 @@ function Get-GUIDefaultSettings {
         refreshPublicIPOnLaunch = $true
         toolkitUpdateSource = (Split-Path -Parent $SharedToolkitRoot)
         toolkitUpdateDestination = ""
+        toolkitUpdateMode = "Push"
     }
 }
 
@@ -7015,6 +7016,9 @@ function Get-GUISettings {
             }
             if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateDestination"){
                 $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateDestination -Value $default.toolkitUpdateDestination -Force
+            }
+            if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateMode" -or $settings.toolkitUpdateMode -notin @("Push","Pull")){
+                $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateMode -Value $default.toolkitUpdateMode -Force
             }
             return $settings
         }
@@ -9857,7 +9861,7 @@ function Update-GUIToolkitLastUpdatedLabel {
 
     if(Test-Path -LiteralPath $historyPath){
         try {
-            $latest = @(Get-Content -LiteralPath $historyPath -Raw -ErrorAction Stop | ConvertFrom-Json | Sort-Object UpdatedAt -Descending | Select-Object -First 1)[0]
+            $latest = @((Get-Content -LiteralPath $historyPath -Raw -ErrorAction Stop | ConvertFrom-Json) | ForEach-Object { $_ } | Sort-Object UpdatedAt -Descending | Select-Object -First 1)[0]
             if($latest -and $latest.UpdatedAt){
                 $updatedAt = [datetime]::Parse([string]$latest.UpdatedAt)
                 $text = "Toolkit last updated: " + $updatedAt.ToString("MM/dd/yyyy h:mm tt")
@@ -10000,7 +10004,11 @@ function Start-GUIToolkitUpdate {
                     Update-GUIToolkitLastUpdatedLabel
                     Add-GUILog "Toolkit update completed: $($result.DestinationRoot)"
                     Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Completed" -Detail ("Destination={0}; ExitCode={1}" -f $result.DestinationRoot,$result.ExitCode)
-                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nMode: $($result.Mode)`r`nRobocopy exit code: $($result.ExitCode)","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                    $verified = if(@($result.VerifiedFiles).Count -gt 0){@($result.VerifiedFiles) -join ", "}else{"Launcher verification was not returned."}
+                    if(@($result.VerificationSkippedFiles).Count -gt 0){ $verified += "`r`nVerification deferred because file was locked: " + (@($result.VerificationSkippedFiles) -join ", ") }
+                    $timestampSummary = "Program file timestamps refreshed: $($result.TimestampTouchedFiles)"
+                    if([int]$result.TimestampSkippedFiles -gt 0){ $timestampSummary += " (skipped because locked: $($result.TimestampSkippedFiles))" }
+                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed and the core launch files were verified.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nResult:`r`n$($result.CopySummary)`r`n`r`n$timestampSummary`r`n`r`nVerified:`r`n$verified`r`n`r`nUpdate marker:`r`n$($result.UpdateMarkerPath)", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
                 }
                 else{
                     Add-GUILog "Toolkit update failed: $($result.Error)"
@@ -10056,6 +10064,7 @@ function Show-GUIToolkitUpdater {
 
     $settings = if($script:GuiSettings){$script:GuiSettings}else{Get-GUISettings}
     $defaultSource = Split-Path -Parent $SharedToolkitRoot
+    $runningToolkitRoot = $defaultSource
     $sourceBox = New-GUITextBox $(if($settings.toolkitUpdateSource){[string]$settings.toolkitUpdateSource}else{$defaultSource})
     $destinationBox = New-GUITextBox $(if($settings.toolkitUpdateDestination){[string]$settings.toolkitUpdateDestination}else{""})
     $layout.Controls.Add((New-GUILabel "Current version"),0,0)
@@ -10086,10 +10095,16 @@ function Show-GUIToolkitUpdater {
     $layout.SetColumnSpan($options,3)
     $layout.Controls.Add($options,0,2)
 
-    $preserve = New-GUILabel "Updates existing/new toolkit files only. Reports, profiles, diagnostics, logs, GUI settings, and the Firefox profile are preserved on the destination."
+    $preserve = New-GUILabel "Updates toolkit scripts, configuration, and GUI assets only. Portable apps, ExternalTools, Custom apps, reports, profiles, diagnostics, logs, and GUI settings are preserved on the destination."
     $preserve.AutoSize = $true
     $preserve.ForeColor = $script:GUITheme.MutedText
     $options.Controls.Add($preserve)
+
+    $pullCheck = New-Object System.Windows.Forms.CheckBox
+    $pullCheck.Text = "Update this toolkit from the selected source (pull)"
+    $pullCheck.AutoSize = $true
+    $pullCheck.Checked = $settings.toolkitUpdateMode -eq "Pull"
+    $options.Controls.Add($pullCheck)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttons.Dock = "Fill"
@@ -10102,20 +10117,46 @@ function Show-GUIToolkitUpdater {
     $update = New-GUIButton "Update Destination" {
         $source = $sourceBox.Text.Trim()
         $destination = $destinationBox.Text.Trim()
+        $mode = if($pullCheck.Checked){"Pull"}else{"Push"}
         if(!$source -or !$destination){
             [System.Windows.Forms.MessageBox]::Show("Select both the current working toolkit and destination folders.","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
             return
         }
 
-        $confirm = [System.Windows.Forms.MessageBox]::Show("Update existing/new toolkit files?`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r
-Destination client data and settings will be preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
+        $modeText = if($mode -eq "Pull"){"Update the toolkit you launched from the selected source."}else{"Update the selected destination from the selected source."}
+        $confirm = [System.Windows.Forms.MessageBox]::Show("$modeText`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r
+Portable apps and client data are preserved.","Confirm Toolkit Update",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Question)
         if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
             $settings.toolkitUpdateSource = $source
             $settings.toolkitUpdateDestination = $destination
+            $settings.toolkitUpdateMode = $mode
             Save-GUISettings -Settings $settings
             $script:ToolkitUpdateDialogResult = [pscustomobject]@{ Confirmed = $true; Source = $source; Destination = $destination }
             $form.Close()
         }
+    }
+    $pullCheck.Add_CheckedChanged({
+        if($pullCheck.Checked){
+            $update.Text = "Update This Toolkit"
+            $destinationBox.Tag = $destinationBox.Text
+            $destinationBox.Text = $runningToolkitRoot
+            $destinationBox.ReadOnly = $true
+            $destinationBrowse.Enabled = $false
+        }
+        else{
+            $update.Text = "Update Destination"
+            $destinationBox.ReadOnly = $false
+            $destinationBrowse.Enabled = $true
+            $previousDestination = if($destinationBox.Tag){[string]$destinationBox.Tag}else{[string]$settings.toolkitUpdateDestination}
+            if($previousDestination -and $previousDestination -ne $runningToolkitRoot){ $destinationBox.Text = $previousDestination }
+        }
+    })
+    if($pullCheck.Checked){
+        $update.Text = "Update This Toolkit"
+        $destinationBox.Tag = $destinationBox.Text
+        $destinationBox.Text = $runningToolkitRoot
+        $destinationBox.ReadOnly = $true
+        $destinationBrowse.Enabled = $false
     }
     $buttons.Controls.Add($update)
     $buttons.Controls.Add($cancel)

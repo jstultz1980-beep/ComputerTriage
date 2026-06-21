@@ -85,6 +85,8 @@ Get-ChildItem -LiteralPath $packageRoot -Directory -Recurse -Filter "Logs" -Erro
     }
 
 Remove-Item -LiteralPath (Join-Path $packageRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath (Join-Path $packageRoot "manifests\toolkit-update-history.json") -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath (Join-Path $packageRoot "LAST-UPDATED.txt") -Force -ErrorAction SilentlyContinue
 
 $packageFiles = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue)
 $totalBytes = [int64](($packageFiles | Measure-Object -Property Length -Sum).Sum)
@@ -119,7 +121,9 @@ $manifest = [ordered]@{
         "CSI-NetworkToolkit\\Logs",
         "Custom\\FirefoxPortable\\Data",
         "Plugin Logs",
-        "manifests\\gui-settings.json"
+        "manifests\\gui-settings.json",
+        "manifests\\toolkit-update-history.json",
+        "LAST-UPDATED.txt"
     )
     Launchers = $launchers
 }

@@ -20,6 +20,8 @@ CSI-NetworkToolkit/_Downloads/*
 Custom/*
 manifests/custom-tools.json.bak
 manifests/gui-settings.json
+manifests/toolkit-update-history.json
+LAST-UPDATED.txt
 CSI-NetworkToolkit/Plugins/PrintQueues/Logs/*
 CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/Logs/*
 CSI-NetworkToolkit/Plugins/PrintQueues/Print Queue Cleanup/PrintSpoolerTool.ini
