@@ -106,8 +106,31 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
         "manifests\custom-tools.json",
         "manifests\custom-tools.json.bak"
     )
+    $managedRootFiles = @(
+        ".gitignore",
+        "NetworkToolkit.ps1",
+        "NetworkToolkit-Elevated.bat",
+        "Update-NetworkToolkit.ps1",
+        "Update-ToolkitVersion.ps1",
+        "Build-ProductionPackage.ps1",
+        "Test-ProductionPackage.ps1"
+    )
     $removed = 0
     $skipped = 0
+
+    # The root is owned by the toolkit launcher. Restrict it to known program
+    # files so stale production-package documents and accidental loose files
+    # do not persist from one deployment to the next.
+    foreach($destinationFile in @(Get-ChildItem -LiteralPath $DestinationRoot -File -Force -ErrorAction SilentlyContinue)){
+        if($managedRootFiles -contains $destinationFile.Name){ continue }
+        try {
+            Remove-Item -LiteralPath $destinationFile.FullName -Force -ErrorAction Stop
+            $removed++
+        }
+        catch {
+            $skipped++
+        }
+    }
 
     foreach($relativeRoot in $managedRoots){
         $destinationManagedRoot = Join-Path $DestinationRoot $relativeRoot
@@ -196,9 +219,12 @@ try {
             throw "Source version $($sourceManifest.VersionText) build $($sourceManifest.Build) is older than destination version $($destinationManifest.VersionText) build $($destinationManifest.Build)."
         }
         if($sourceManifest.Version -eq $destinationManifest.Version -and $sourceManifest.Build -eq $destinationManifest.Build){
+            $pruneResult = Remove-NetworkToolkitObsoleteProgramFiles -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot
+            $result.PrunedFiles = $pruneResult.Removed
+            $result.PruneSkippedFiles = $pruneResult.Skipped
             $result.Status = "Current"
             $result.ExitCode = 0
-            $result.CopySummary = "Destination already has Network Toolkit $($sourceManifest.VersionText) build $($sourceManifest.Build)."
+            $result.CopySummary = "Destination already has Network Toolkit $($sourceManifest.VersionText) build $($sourceManifest.Build); cleanup was still completed."
             return
         }
     }

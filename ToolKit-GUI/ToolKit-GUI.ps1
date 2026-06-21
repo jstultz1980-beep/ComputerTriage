@@ -10027,7 +10027,9 @@ function Start-GUIToolkitUpdate {
                 }
                 elseif($result.Status -eq "Current"){
                     Add-GUILog "Toolkit update skipped: destination already has version $($result.SourceVersion) build $($result.SourceBuild)."
-                    [System.Windows.Forms.MessageBox]::Show($result.CopySummary, "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                    $cleanup = "Obsolete toolkit files removed: $($result.PrunedFiles)"
+                    if([int]$result.PruneSkippedFiles -gt 0){ $cleanup += " (could not remove: $($result.PruneSkippedFiles))" }
+                    [System.Windows.Forms.MessageBox]::Show("$($result.CopySummary)`r`n`r`n$cleanup", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
                 }
                 else{
                     Add-GUILog "Toolkit update failed: $($result.Error)"
