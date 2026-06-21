@@ -10594,7 +10594,7 @@ function Build-Form {
     $logo.Location = New-Object System.Drawing.Point(12,13)
     $logo.Size = New-Object System.Drawing.Size(52,52)
     $logo.SizeMode = "Zoom"
-    $logoPath = Join-Path $GuiRoot "NetworkToolkit.png"
+    $logoPath = Join-Path $GuiRoot "J4S_logo.png"
     if(Test-Path $logoPath){
         $logo.Image = [System.Drawing.Image]::FromFile($logoPath)
     }

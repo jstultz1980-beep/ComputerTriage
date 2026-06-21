@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621163444,
-    "SourceUpdatedAt":  "2026-06-21T16:34:44.3555331-05:00",
-    "ReleaseNotes":  "Reorganized toolkit runtime beneath App with legacy update migration."
+    "Build":  20260621170421,
+    "SourceUpdatedAt":  "2026-06-21T17:04:21.4769858-05:00",
+    "ReleaseNotes":  "Use the J4S logo in the Network Toolkit header."
 }
