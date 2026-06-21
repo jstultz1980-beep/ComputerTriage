@@ -111,6 +111,8 @@ $script:WUActionSession = $null
 $script:PsExecProcess = $null
 $script:PsExecTimer = $null
 $script:PsExecFiles = $null
+$script:DriverUpdateGrid = $null
+$script:DriverUpdateStatusLabel = $null
 $script:GUIBusyCount = 0
 $script:GUIBusyLabel = $null
 $script:GUIBusyProgress = $null
@@ -2367,6 +2369,7 @@ function Invoke-GUINamedAction {
         "Start-GUIGPResultReport" { Start-GUIGPResultReport; break }
         "Start-GUIReliabilityMonitor" { Start-GUIReliabilityMonitor; break }
         "Start-GUIPsExecHelper" { Start-GUIPsExecHelper; break }
+        "Start-GUIDriverUpdateFinder" { Start-GUIDriverUpdateFinder; break }
         "Open-GUIOutputsFolder" { Open-GUIFolder $CSIPaths.Exports; break }
         "Open-GUITempOutputsFolder" { Open-GUIFolder (Get-CSITempOutputRoot); break }
         "Open-GUIDataFolder" { Open-GUIFolder $CSIPaths.Data; break }
@@ -5849,6 +5852,28 @@ function Start-GUIPsExecCaptured {
     $plan = Get-GUIPsExecArgumentList
     $tool = $plan.Tool
     $arguments = @($plan.Arguments)
+    $target = if($script:PsExecTargetBox){$script:PsExecTargetBox.Text.Trim()}else{""}
+    $remoteUser = if($script:PsExecUserBox){$script:PsExecUserBox.Text.Trim()}else{""}
+    $remotePassword = if($script:PsExecPasswordBox){$script:PsExecPasswordBox.Text}else{""}
+
+    if($remoteUser -and !$remotePassword){
+        [System.Windows.Forms.MessageBox]::Show(
+            "Captured PsExec runs cannot show an interactive password prompt.`r`n`r`nEnter the remote account password, or use Open Console if you need PsExec to prompt for it.",
+            "PsExec Credentials Required",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Information
+        ) | Out-Null
+        return
+    }
+
+    if($target -and !$remoteUser -and !(Test-GUIAdministrator)){
+        [System.Windows.Forms.MessageBox]::Show(
+            "PsExec is using the current non-elevated local session for remote access.`r`n`r`nFor a domain-admin connection, enter DOMAIN\\username and its password, or restart the toolkit elevated with an account that has administrative rights on the target.",
+            "PsExec Remote Access",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
+    }
 
     if($script:PsExecProcess -and !$script:PsExecProcess.HasExited){
         $choice = [System.Windows.Forms.MessageBox]::Show(
@@ -8272,12 +8297,163 @@ function Build-DirectoryToolsPage {
     Build-GUICatalogToolsPage -Page $Page -Tab "Directory" -Title "Directory Tools"
 }
 
+function Get-GUIDriverUpdateInventory {
+    $problemCodes = @{}
+    foreach($device in @(Get-CimInstance -ClassName Win32_PnPEntity -ErrorAction SilentlyContinue | Where-Object { $_.PNPDeviceID -and $_.ConfigManagerErrorCode -ne 0 })){
+        $problemCodes[[string]$device.PNPDeviceID] = [int]$device.ConfigManagerErrorCode
+    }
+
+    $records = @()
+    $seen = @{}
+    foreach($driver in @(Get-CimInstance -ClassName Win32_PnPSignedDriver -ErrorAction SilentlyContinue | Where-Object { $_.DeviceID -and $_.DeviceName })){
+        $deviceId = [string]$driver.DeviceID
+        $errorCode = if($problemCodes.ContainsKey($deviceId)){$problemCodes[$deviceId]}else{0}
+        $status = if($errorCode -ne 0){"Problem (Device Manager code $errorCode)"}else{"Installed"}
+        $driverDate = if($driver.DriverDate){
+            try { ([datetime]$driver.DriverDate).ToString("yyyy-MM-dd") } catch { [string]$driver.DriverDate }
+        }else{"Unknown"}
+        $records += [pscustomobject]@{
+            Status = $status
+            DeviceName = [string]$driver.DeviceName
+            DeviceClass = [string]$driver.DeviceClass
+            Provider = [string]$driver.DriverProviderName
+            Version = [string]$driver.DriverVersion
+            DriverDate = $driverDate
+            InfName = [string]$driver.InfName
+            HardwareId = $deviceId
+            ErrorCode = $errorCode
+        }
+        $seen[$deviceId] = $true
+    }
+
+    foreach($deviceId in $problemCodes.Keys | Where-Object { !$seen.ContainsKey($_) }){
+        $records += [pscustomobject]@{
+            Status = "Problem (Device Manager code $($problemCodes[$deviceId]))"
+            DeviceName = "Unresolved Plug and Play device"
+            DeviceClass = "Unknown"
+            Provider = ""
+            Version = ""
+            DriverDate = ""
+            InfName = ""
+            HardwareId = $deviceId
+            ErrorCode = $problemCodes[$deviceId]
+        }
+    }
+
+    return @($records | Sort-Object @{Expression={if($_.ErrorCode -ne 0){0}else{1}}},DeviceClass,DeviceName)
+}
+
+function Refresh-GUIDriverUpdateFinder {
+    if(!$script:DriverUpdateGrid -or $script:DriverUpdateGrid.IsDisposed){
+        return
+    }
+
+    try {
+        if($script:DriverUpdateStatusLabel){ $script:DriverUpdateStatusLabel.Text = "Scanning installed drivers and Device Manager status..." }
+        $script:DriverUpdateGrid.Rows.Clear()
+        $records = @(Get-GUIDriverUpdateInventory)
+        foreach($record in $records){
+            $index = $script:DriverUpdateGrid.Rows.Add($record.Status,$record.DeviceName,$record.DeviceClass,$record.Provider,$record.Version,$record.DriverDate,$record.InfName)
+            $script:DriverUpdateGrid.Rows[$index].Tag = $record
+            if($record.ErrorCode -ne 0){
+                $script:DriverUpdateGrid.Rows[$index].DefaultCellStyle.BackColor = [System.Drawing.Color]::MistyRose
+            }
+        }
+        $problems = @($records | Where-Object { $_.ErrorCode -ne 0 }).Count
+        if($script:DriverUpdateStatusLabel){ $script:DriverUpdateStatusLabel.Text = "Drivers found: $($records.Count). Device Manager problems: $problems. Select a device, then search for its official driver." }
+        Add-GUILog "Driver Update Finder scanned $($records.Count) driver records; problems: $problems."
+    }
+    catch {
+        if($script:DriverUpdateStatusLabel){ $script:DriverUpdateStatusLabel.Text = "Driver scan failed: $($_.Exception.Message)" }
+        Add-GUILog "Driver Update Finder failed: $($_.Exception.Message)"
+    }
+}
+
+function Search-GUISelectedDriverUpdate {
+    if(!$script:DriverUpdateGrid -or $script:DriverUpdateGrid.SelectedRows.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("Select a device first.","Driver Update Finder",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $driver = $script:DriverUpdateGrid.SelectedRows[0].Tag
+    if(!$driver){ return }
+    $query = '"{0}" "{1}" official driver download' -f $driver.DeviceName,$driver.HardwareId
+    $url = "https://www.bing.com/search?q=" + [uri]::EscapeDataString($query)
+    Start-Process $url
+    Add-GUILog "Opened official driver search for: $($driver.DeviceName)"
+}
+
+function Start-GUIDriverUpdateFinder {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Driver Update Finder"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(1180,680)
+    $form.MinimumSize = New-Object System.Drawing.Size(900,520)
+    $form.Font = New-Object System.Drawing.Font("Segoe UI",9.5)
+    $form.BackColor = $script:GUITheme.Page
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.RowCount = 3
+    $layout.ColumnCount = 1
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $form.Controls.Add($layout)
+
+    $script:DriverUpdateStatusLabel = New-GUILabel "Scan drivers to identify Device Manager problems and locate official updates."
+    $DriverUpdateStatusLabel.Dock = "Fill"
+    $DriverUpdateStatusLabel.TextAlign = "MiddleLeft"
+    $DriverUpdateStatusLabel.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($DriverUpdateStatusLabel,0,0)
+
+    $script:DriverUpdateGrid = New-Object System.Windows.Forms.DataGridView
+    $DriverUpdateGrid.Dock = "Fill"
+    $DriverUpdateGrid.ReadOnly = $true
+    $DriverUpdateGrid.AllowUserToAddRows = $false
+    $DriverUpdateGrid.AllowUserToDeleteRows = $false
+    $DriverUpdateGrid.SelectionMode = "FullRowSelect"
+    $DriverUpdateGrid.MultiSelect = $false
+    $DriverUpdateGrid.AutoSizeColumnsMode = "Fill"
+    $DriverUpdateGrid.BackgroundColor = [System.Drawing.Color]::White
+    [void]$DriverUpdateGrid.Columns.Add("Status","Status")
+    [void]$DriverUpdateGrid.Columns.Add("DeviceName","Device")
+    [void]$DriverUpdateGrid.Columns.Add("DeviceClass","Class")
+    [void]$DriverUpdateGrid.Columns.Add("Provider","Provider")
+    [void]$DriverUpdateGrid.Columns.Add("Version","Version")
+    [void]$DriverUpdateGrid.Columns.Add("DriverDate","Driver Date")
+    [void]$DriverUpdateGrid.Columns.Add("InfName","INF")
+    $DriverUpdateGrid.Columns["DeviceName"].FillWeight = 28
+    $DriverUpdateGrid.Columns["Provider"].FillWeight = 18
+    $layout.Controls.Add($DriverUpdateGrid,0,1)
+
+    $actions = New-Object System.Windows.Forms.FlowLayoutPanel
+    $actions.Dock = "Fill"
+    $actions.FlowDirection = "LeftToRight"
+    [void]$actions.Controls.Add((New-GUIButton "Refresh Drivers" { Refresh-GUIDriverUpdateFinder }))
+    [void]$actions.Controls.Add((New-GUIButton "Search Official Driver" { Search-GUISelectedDriverUpdate }))
+    [void]$actions.Controls.Add((New-GUIButton "Open Device Manager" { Start-CSIToolProcess -FilePath "devmgmt.msc" | Out-Null }))
+    [void]$actions.Controls.Add((New-GUIButton "Open Windows Update" {
+        $page = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Windows Update" } | Select-Object -First 1
+        if($page){ $script:MainTabs.SelectedTab = $page; Build-GUITabIfNeeded -Page $page; Update-GUIStaticTabStripSelection }
+    }))
+    $layout.Controls.Add($actions,0,2)
+
+    $form.Add_Shown({ Refresh-GUIDriverUpdateFinder })
+    [void]$form.ShowDialog($script:Form)
+    $form.Dispose()
+    $script:DriverUpdateGrid = $null
+    $script:DriverUpdateStatusLabel = $null
+}
+
 function Build-HardwareToolsPage {
     param([System.Windows.Forms.TabPage]$Page)
     $sectionMap = @{
         "hardwarehealth" = "Health And Diagnostics"
         "diskhealth" = "Health And Diagnostics"
         "resourcehotspots" = "Health And Diagnostics"
+        "driverupdatefinder" = "Driver Updates"
         "minidumpcollector" = "Crash And Dumps"
         "bluescreenview" = "Crash And Dumps"
         "crystaldiskinfo" = "Storage And Disk"
@@ -8295,7 +8471,7 @@ function Build-HardwareToolsPage {
         -Tab "Hardware" `
         -Title "Hardware Tools" `
         -SectionMap $sectionMap `
-        -SectionOrder @("Health And Diagnostics","Storage And Disk","Crash And Dumps","Inspection Utilities","Sysinternals")
+        -SectionOrder @("Health And Diagnostics","Driver Updates","Storage And Disk","Crash And Dumps","Inspection Utilities","Sysinternals")
 }
 
 function Build-DiskToolsPage {
@@ -8844,9 +9020,9 @@ function Build-PsExecPage {
     $builder.Controls.Add((New-GUILabel "Command"),2,2)
     $builder.Controls.Add($PsExecCommandBox,3,2)
 
-    $builder.Controls.Add((New-GUILabel "Username"),0,3)
+    $builder.Controls.Add((New-GUILabel "Remote username"),0,3)
     $builder.Controls.Add($PsExecUserBox,1,3)
-    $builder.Controls.Add((New-GUILabel "Password"),2,3)
+    $builder.Controls.Add((New-GUILabel "Remote password"),2,3)
     $builder.Controls.Add($PsExecPasswordBox,3,3)
 
     $builder.Controls.Add((New-GUILabel "Working dir"),0,4)
@@ -8940,8 +9116,8 @@ function Build-PsExecPage {
     if($script:ToolTip){
         $script:ToolTip.SetToolTip($PsExecTargetBox,"Enter one or more remote computers. Blank runs against the local computer.")
         $script:ToolTip.SetToolTip($PsExecCommandBox,"Enter the full command PsExec should run, such as cmd.exe /c ipconfig /all.")
-        $script:ToolTip.SetToolTip($PsExecUserBox,"Optional DOMAIN\user or local account for remote execution.")
-        $script:ToolTip.SetToolTip($PsExecPasswordBox,"Optional password. Leave blank to be prompted by PsExec or use current credentials.")
+        $script:ToolTip.SetToolTip($PsExecUserBox,"Optional DOMAIN\user or local administrator account for the target. Captured runs need a password when this is supplied.")
+        $script:ToolTip.SetToolTip($PsExecPasswordBox,"Password for the remote username. It is used only for this launch and is not saved. Leave both credential fields blank to use the current elevated session.")
         $script:ToolTip.SetToolTip($PsExecElevatedCheck,"Adds -h so the remote process uses an elevated token when available.")
         $script:ToolTip.SetToolTip($PsExecSystemCheck,"Adds -s to run as LocalSystem on the target.")
         $script:ToolTip.SetToolTip($PsExecInteractiveCheck,"Adds -i to interact with a target session. Usually only for visible GUI testing.")
@@ -10691,6 +10867,7 @@ if($ButtonSmokeTest){
         "Start-GUIGPResultReport",
         "Start-GUIReliabilityMonitor",
         "Start-GUIPsExecHelper",
+        "Start-GUIDriverUpdateFinder",
         "Open-GUIOutputsFolder",
         "Open-GUITempOutputsFolder",
         "Open-GUIDataFolder",
