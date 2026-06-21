@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621160943,
-    "SourceUpdatedAt":  "2026-06-21T16:09:43.9845652-05:00",
-    "ReleaseNotes":  "Single-instance launcher and version-controlled update checks."
+    "Build":  20260621161448,
+    "SourceUpdatedAt":  "2026-06-21T16:14:48.8292167-05:00",
+    "ReleaseNotes":  "Single-instance launcher, version-controlled updates, and safe stale-file cleanup."
 }

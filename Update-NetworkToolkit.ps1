@@ -83,6 +83,72 @@ function Test-NetworkToolkitCopy {
     $verified
 }
 
+function Remove-NetworkToolkitObsoleteProgramFiles {
+    param(
+        [Parameter(Mandatory=$true)][string]$SourceRoot,
+        [Parameter(Mandatory=$true)][string]$DestinationRoot
+    )
+
+    # Only prune code locations owned by the updater. Runtime data, portable
+    # apps, and technician settings are intentionally never part of this pass.
+    $managedRoots = @(
+        "ToolKit-GUI",
+        "CSI-NetworkToolkit\Config",
+        "CSI-NetworkToolkit\Core",
+        "CSI-NetworkToolkit\Discovery",
+        "CSI-NetworkToolkit\Plugins",
+        "CSI-NetworkToolkit\UI",
+        "CSI-NetworkToolkit\Utilities",
+        "manifests"
+    )
+    $preservedPaths = @(
+        "manifests\gui-settings.json",
+        "manifests\custom-tools.json",
+        "manifests\custom-tools.json.bak"
+    )
+    $removed = 0
+    $skipped = 0
+
+    foreach($relativeRoot in $managedRoots){
+        $destinationManagedRoot = Join-Path $DestinationRoot $relativeRoot
+        if(!(Test-Path -LiteralPath $destinationManagedRoot)){ continue }
+
+        foreach($destinationFile in @(Get-ChildItem -LiteralPath $destinationManagedRoot -Recurse -File -Force -ErrorAction SilentlyContinue)){
+            $relativePath = $destinationFile.FullName.Substring($DestinationRoot.Length).TrimStart('\\')
+            if($preservedPaths -contains $relativePath -or $relativePath -match '(?i)(^|\\)(Data|Logs|ExternalTools|Exports)(\\|$)'){
+                continue
+            }
+
+            if(Test-Path -LiteralPath (Join-Path $SourceRoot $relativePath)){ continue }
+            try {
+                Remove-Item -LiteralPath $destinationFile.FullName -Force -ErrorAction Stop
+                $removed++
+            }
+            catch {
+                $skipped++
+            }
+        }
+    }
+
+    foreach($legacyRelativePath in @(
+        "LAST-UPDATED.txt",
+        "manifests\toolkit-update-history.json"
+    )){
+        $legacyPath = Join-Path $DestinationRoot $legacyRelativePath
+        if(Test-Path -LiteralPath $legacyPath){
+            try {
+                Remove-Item -LiteralPath $legacyPath -Force -ErrorAction Stop
+                $removed++
+            }
+            catch {
+                $skipped++
+            }
+        }
+    }
+
+    [pscustomobject]@{ Removed = $removed; Skipped = $skipped }
+}
+
 $result = [ordered]@{
     SourceRoot = $SourceRoot
     DestinationRoot = $DestinationRoot
@@ -96,6 +162,8 @@ $result = [ordered]@{
     DestinationVersion = ""
     DestinationBuild = 0
     VerifiedFiles = @()
+    PrunedFiles = 0
+    PruneSkippedFiles = 0
     Error = ""
 }
 
@@ -151,6 +219,9 @@ try {
         throw "Robocopy failed with exit code $($result.ExitCode). Review $($ResultPath).log for details."
     }
     $result.CopySummary = Get-NetworkToolkitRobocopySummary -ExitCode $result.ExitCode
+    $pruneResult = Remove-NetworkToolkitObsoleteProgramFiles -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot
+    $result.PrunedFiles = $pruneResult.Removed
+    $result.PruneSkippedFiles = $pruneResult.Skipped
     $result.VerifiedFiles = @(Test-NetworkToolkitCopy -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot)
     $result.Status = "Completed"
 }

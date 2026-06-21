@@ -10021,7 +10021,9 @@ function Start-GUIToolkitUpdate {
                     Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Completed" -Detail ("Destination={0}; ExitCode={1}" -f $result.DestinationRoot,$result.ExitCode)
                     $verified = if(@($result.VerifiedFiles).Count -gt 0){@($result.VerifiedFiles) -join ", "}else{"Launcher verification was not returned."}
                     if(@($result.VerificationSkippedFiles).Count -gt 0){ $verified += "`r`nVerification deferred because file was locked: " + (@($result.VerificationSkippedFiles) -join ", ") }
-                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed and the core launch files were verified.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nInstalled version:`r`n$($result.SourceVersion) build $($result.SourceBuild)`r`n`r`nResult:`r`n$($result.CopySummary)`r`n`r`nVerified:`r`n$verified", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                    $cleanup = "Obsolete toolkit files removed: $($result.PrunedFiles)"
+                    if([int]$result.PruneSkippedFiles -gt 0){ $cleanup += " (could not remove: $($result.PruneSkippedFiles))" }
+                    [System.Windows.Forms.MessageBox]::Show("Toolkit update completed and the core launch files were verified.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nInstalled version:`r`n$($result.SourceVersion) build $($result.SourceBuild)`r`n`r`nResult:`r`n$($result.CopySummary)`r`n$cleanup`r`n`r`nVerified:`r`n$verified", "Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
                 }
                 elseif($result.Status -eq "Current"){
                     Add-GUILog "Toolkit update skipped: destination already has version $($result.SourceVersion) build $($result.SourceBuild)."
@@ -10040,6 +10042,9 @@ Log: $logPath","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[S
             finally {
                 if($script:ToolkitUpdateResultPath -and (Test-Path $script:ToolkitUpdateResultPath)){
                     Remove-Item -LiteralPath $script:ToolkitUpdateResultPath -Force -ErrorAction SilentlyContinue
+                }
+                if($result -and $result.Status -in @("Completed","Current") -and (Test-Path $logPath)){
+                    Remove-Item -LiteralPath $logPath -Force -ErrorAction SilentlyContinue
                 }
                 $script:ToolkitUpdateResultPath = $null
             }
