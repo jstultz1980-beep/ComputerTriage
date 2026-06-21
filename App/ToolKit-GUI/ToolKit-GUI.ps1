@@ -8625,7 +8625,7 @@ function Build-ReportsPage {
 
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Location" { Open-SelectedGUIReportLocation }))
-    [void]$buttons.Controls.Add((New-GUIButton "Bundle To Send" { New-GUIChatGPTBundle }))
+    [void]$buttons.Controls.Add((New-GUIButton "Bundle Latest To Send" { New-GUIChatGPTBundle }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Help" { Open-GUIHelpFile }))
 
@@ -8759,9 +8759,29 @@ function Delete-SelectedGUIReport {
 }
 
 function New-GUIChatGPTBundle {
-    $reports = @($script:Reports | Where-Object { !$_.IsDirectory -and $_.Type -ne "Minidumps" -and (Test-Path -LiteralPath $_.Path) })
+    $computerName = [Environment]::MachineName
+    $allReports = @(Get-GUIReportItems | Where-Object { !$_.IsDirectory -and $_.Type -ne "Minidumps" -and (Test-Path -LiteralPath $_.Path) })
+    $reports = @()
+    foreach($typeGroup in @($allReports | Group-Object Type)){
+        $typeReports = @($typeGroup.Group | Sort-Object Modified -Descending)
+        $computerReports = @($typeReports | Where-Object { $_.Name -match [regex]::Escape($computerName) -or $_.Path -match [regex]::Escape($computerName) })
+        if($typeGroup.Name -eq "Computer Profiles" -and $computerReports.Count -eq 0){
+            continue
+        }
+        $candidates = if($computerReports.Count -gt 0){ $computerReports }else{ $typeReports }
+
+        # A profile's HTML report is more useful to a reviewing technician than
+        # its backing JSON, while the other report categories use their newest file.
+        if($typeGroup.Name -eq "Computer Profiles"){
+            $htmlProfile = @($candidates | Where-Object { $_.Name -match '\.html?$' } | Select-Object -First 1)
+            $reports += if($htmlProfile.Count -gt 0){$htmlProfile}else{@($candidates | Select-Object -First 1)}
+        }
+        else {
+            $reports += @($candidates | Select-Object -First 1)
+        }
+    }
     if($reports.Count -eq 0){
-        [System.Windows.Forms.MessageBox]::Show("There are no report files in the current view to bundle.","Bundle To Send",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        [System.Windows.Forms.MessageBox]::Show("There are no report files available to bundle for this computer.","Bundle Latest To Send",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
         return
     }
 
@@ -8769,8 +8789,8 @@ function New-GUIChatGPTBundle {
     $preview = @($reports | Select-Object -First 8 | ForEach-Object { "- $($_.Type): $($_.Name)" }) -join "`r`n"
     if($reports.Count -gt 8){ $preview += "`r`n- Plus $($reports.Count - 8) more visible report file(s)." }
     $confirm = [System.Windows.Forms.MessageBox]::Show(
-        "Create a ZIP for manual upload to ChatGPT?`r`n`r`nThis bundle contains the report files currently visible in Reports. It does not include minidumps, portable apps, browser data, or toolkit logs.`r`n`r`nFiles: $($reports.Count)`r`nSize: $([math]::Round($totalBytes / 1MB,2)) MB`r`n`r`n$preview`r`n`r`nReview the ZIP before uploading it. Continue?",
-        "Bundle To Send",
+        "Create a ZIP for manual upload to ChatGPT?`r`n`r`nThis bundle automatically uses the latest available report from each category for $computerName. It does not include minidumps, portable apps, browser data, or toolkit logs.`r`n`r`nFiles: $($reports.Count)`r`nSize: $([math]::Round($totalBytes / 1MB,2)) MB`r`n`r`n$preview`r`n`r`nReview the ZIP before uploading it. Continue?",
+        "Bundle Latest To Send",
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Warning
     )
@@ -8783,7 +8803,8 @@ function New-GUIChatGPTBundle {
         $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp)
         New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
         foreach($report in $reports){
-            Copy-Item -LiteralPath $report.Path -Destination (Join-Path $bundleFolder $report.Name) -Force
+            $safeType = ($report.Type -replace '[^A-Za-z0-9]+','-').Trim('-')
+            Copy-Item -LiteralPath $report.Path -Destination (Join-Path $bundleFolder ("$safeType-$($report.Name)")) -Force
         }
         @(
             "Network Toolkit - ChatGPT Analysis Bundle"

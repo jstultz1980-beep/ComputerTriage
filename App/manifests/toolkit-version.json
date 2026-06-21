@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621180518,
-    "SourceUpdatedAt":  "2026-06-21T18:05:18.2024468-05:00",
-    "ReleaseNotes":  "Add a reviewed ChatGPT report bundle with a detailed analysis prompt."
+    "Build":  20260621180914,
+    "SourceUpdatedAt":  "2026-06-21T18:09:14.5911790-05:00",
+    "ReleaseNotes":  "Bundle the latest report from each category for the current computer."
 }
