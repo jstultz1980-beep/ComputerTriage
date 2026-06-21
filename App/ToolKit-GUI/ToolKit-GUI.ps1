@@ -8830,7 +8830,8 @@ function New-GUIChatGPTBundle {
             "5. Call out conflicts between reports. If one report says a check passed while another suggests a problem, explain the discrepancy and identify the next check that would resolve it."
             "6. Identify missing evidence that would materially change the diagnosis, such as an exact event log, driver version, update KB, service configuration, or network test result."
             "7. End with a technician checklist ordered from lowest-risk/highest-value actions to more disruptive actions."
-            "8. Create the complete response as a downloadable plain-text file named NetworkToolkit-AI-Analysis-$computerName.txt. Attach or provide the downloadable file in addition to showing the summary in chat. The text file must include the executive summary, findings table, evidence citations, remediation plan, missing evidence, and technician checklist."
+            "8. Use ANALYSIS-REPORT-TEMPLATE.html in this ZIP as the required layout. Replace its placeholder content with your analysis and return a downloadable self-contained HTML file named NetworkToolkit-AI-Analysis-$computerName.html. Preserve the included CSS and do not rely on external fonts, scripts, images, or stylesheets."
+            "9. The downloadable HTML must include the executive summary, findings table, evidence citations, remediation plan, missing evidence, and technician checklist. Also show a concise summary in chat."
             ""
             "## Analysis Rules"
             ""
@@ -8845,6 +8846,34 @@ function New-GUIChatGPTBundle {
             ""
             "Be direct and practical. Explain what the technician should do next and why. Avoid generic statements such as 'review the logs' when the report contains enough detail to name the relevant log, event, service, device, update, or startup entry."
         ) | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-PROMPT.md") -Encoding UTF8
+        @'
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network Toolkit AI Analysis</title>
+<style>
+  :root { --ink:#18324b; --muted:#5e7082; --line:#cbd8e4; --page:#edf4f9; --panel:#ffffff; --accent:#1679c5; --critical:#a82b2b; --high:#ca631f; --medium:#b28b16; --low:#287a61; }
+  * { box-sizing:border-box; } body { margin:0; background:var(--page); color:var(--ink); font:15px/1.5 "Segoe UI",Arial,sans-serif; }
+  main { max-width:1100px; margin:28px auto; padding:0 20px 36px; } header { background:var(--ink); color:#fff; padding:26px 30px; border-radius:12px 12px 4px 4px; }
+  h1 { margin:0; font-size:27px; } h2 { margin:0 0 10px; font-size:19px; } h3 { margin:0 0 6px; font-size:16px; } .meta { margin-top:8px; color:#d9e9f7; }
+  section { margin-top:16px; padding:22px 24px; background:var(--panel); border:1px solid var(--line); border-radius:8px; } .summary { font-size:16px; }
+  table { width:100%; border-collapse:collapse; } th { text-align:left; background:#e8f2fb; } th,td { padding:11px 10px; border:1px solid var(--line); vertical-align:top; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:12px; } .critical { background:#f8dcdc; color:var(--critical); } .high { background:#fbe5d7; color:var(--high); } .medium { background:#f8f0cf; color:var(--medium); } .low { background:#dcefe7; color:var(--low); }
+  .finding { border-left:5px solid var(--accent); padding:14px 16px; margin:12px 0; background:#f7fbff; } .label { color:var(--muted); font-weight:700; } ol,ul { margin:8px 0 0 22px; } code { background:#edf2f6; padding:1px 4px; }
+  @media print { body { background:#fff; } main { max-width:none; margin:0; padding:0; } section { break-inside:avoid; } }
+</style>
+</head>
+<body><main>
+<header><h1>Network Toolkit AI Analysis</h1><div class="meta">Computer: {{COMPUTER_NAME}} | Analysis date: {{DATE}}</div></header>
+<section><h2>Executive Summary</h2><p class="summary">{{PLAIN_LANGUAGE_HEALTH_SUMMARY}}</p></section>
+<section><h2>Prioritized Findings</h2><table><thead><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Impact</th><th>Confidence</th><th>Next Action</th></tr></thead><tbody>{{FINDING_ROWS}}</tbody></table></section>
+<section><h2>Finding Details And Remediation</h2>{{FINDING_DETAIL_CARDS}}</section>
+<section><h2>Missing Evidence Or Follow-Up Checks</h2><ul>{{MISSING_EVIDENCE_ITEMS}}</ul></section>
+<section><h2>Technician Checklist</h2><ol>{{TECHNICIAN_CHECKLIST_ITEMS}}</ol></section>
+</main></body></html>
+'@ | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-REPORT-TEMPLATE.html") -Encoding UTF8
         $zipPath = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp + ".zip")
         Compress-Archive -Path (Join-Path $bundleFolder "*") -DestinationPath $zipPath -CompressionLevel Optimal -Force
         Remove-Item -LiteralPath $bundleFolder -Recurse -Force -ErrorAction SilentlyContinue

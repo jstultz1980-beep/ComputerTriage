@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621181305,
-    "SourceUpdatedAt":  "2026-06-21T18:13:05.9118397-05:00",
-    "ReleaseNotes":  "Request a downloadable technician analysis file from bundled AI reviews."
+    "Build":  20260621181608,
+    "SourceUpdatedAt":  "2026-06-21T18:16:08.3348298-05:00",
+    "ReleaseNotes":  "Provide an HTML and CSS template for downloadable AI diagnostic analysis."
 }
