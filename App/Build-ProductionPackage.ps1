@@ -8,14 +8,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 $sourceRoot = $PSScriptRoot
+$launcherRoot = Split-Path -Parent $sourceRoot
 $DestinationRoot = if($DestinationRoot){$DestinationRoot}else{Join-Path $sourceRoot "Release"}
 if([string]::IsNullOrWhiteSpace($PackageName) -or $PackageName -match '[\\/:*?"<>|]'){
     throw "PackageName must be a valid folder name."
 }
 $packageRoot = Join-Path $DestinationRoot $PackageName
 
-if(!(Test-Path (Join-Path $sourceRoot "NetworkToolkit-Elevated.bat"))){
-    throw "NetworkToolkit-Elevated.bat was not found. Run this builder from the toolkit root."
+if(!(Test-Path (Join-Path $launcherRoot "NetworkToolkit-Elevated.bat"))){
+    throw "NetworkToolkit-Elevated.bat was not found beside the App folder."
 }
 
 # A package is a source release. Refresh its build manifest before copying so
@@ -35,6 +36,8 @@ if(Test-Path $packageRoot){
 }
 
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+$packageAppRoot = Join-Path $packageRoot "App"
+New-Item -ItemType Directory -Path $packageAppRoot -Force | Out-Null
 
 $excludeDirectories = @(
     (Join-Path $sourceRoot ".git"),
@@ -48,7 +51,7 @@ $excludeDirectories = @(
 Write-Host "Building clean portable package..." -ForegroundColor Cyan
 $robocopyArguments = @(
     "`"$sourceRoot`"",
-    "`"$packageRoot`"",
+    "`"$packageAppRoot`"",
     "/E",
     "/COPY:DAT",
     "/DCOPY:DAT",
@@ -67,6 +70,8 @@ if($LASTEXITCODE -gt 7){
     throw "Robocopy failed with exit code $LASTEXITCODE."
 }
 
+Copy-Item -LiteralPath (Join-Path $launcherRoot "NetworkToolkit-Elevated.bat") -Destination (Join-Path $packageRoot "NetworkToolkit-Elevated.bat") -Force
+
 # Recreate clean runtime folders expected by the toolkit; no client records are copied.
 $runtimeFolders = @(
     "CSI-NetworkToolkit\Data",
@@ -82,25 +87,25 @@ $runtimeFolders = @(
 )
 
 foreach($relativePath in $runtimeFolders){
-    New-Item -ItemType Directory -Path (Join-Path $packageRoot $relativePath) -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $packageAppRoot $relativePath) -Force | Out-Null
 }
 
 # Portable tool logs may sit inside plugin folders rather than the central Logs folder.
-Get-ChildItem -LiteralPath $packageRoot -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue |
+Get-ChildItem -LiteralPath $packageAppRoot -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue |
     ForEach-Object {
         Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-Remove-Item -LiteralPath (Join-Path $packageRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath (Join-Path $packageAppRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue
 
 $packageFiles = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue)
 $totalBytes = [int64](($packageFiles | Measure-Object -Property Length -Sum).Sum)
 $launchers = @(
     "NetworkToolkit-Elevated.bat",
-    "NetworkToolkit.ps1",
-    "ToolKit-GUI\ToolKit-GUI.ps1",
-    "CSI-NetworkToolkit\CSI-NetworkToolkit.ps1"
+    "App\NetworkToolkit.ps1",
+    "App\ToolKit-GUI\ToolKit-GUI.ps1",
+    "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1"
 ) | ForEach-Object {
     $path = Join-Path $packageRoot $_
     if(Test-Path $path){
@@ -122,20 +127,20 @@ $manifest = [ordered]@{
     ClientDataExcluded = @(
         ".git",
         "Release",
-        "CSI-NetworkToolkit\\Data",
-        "CSI-NetworkToolkit\\Exports",
-        "CSI-NetworkToolkit\\Logs",
-        "Custom\\FirefoxPortable\\Data",
+        "App\\CSI-NetworkToolkit\\Data",
+        "App\\CSI-NetworkToolkit\\Exports",
+        "App\\CSI-NetworkToolkit\\Logs",
+        "App\\Custom\\FirefoxPortable\\Data",
         "Plugin Logs",
-        "manifests\\gui-settings.json"
+        "App\\manifests\\gui-settings.json"
     )
     Launchers = $launchers
 }
 
-$manifestPath = Join-Path $packageRoot "ProductionManifest.json"
+$manifestPath = Join-Path $packageAppRoot "manifests\ProductionManifest.json"
 $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
 
-$readmePath = Join-Path $packageRoot "DEPLOYMENT-README.txt"
+$readmePath = Join-Path $packageAppRoot "DEPLOYMENT-README.txt"
 @(
     "Network Toolkit Portable - Production Test Package"
     ""

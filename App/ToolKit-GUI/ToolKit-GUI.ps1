@@ -10087,7 +10087,7 @@ function Show-GUIToolkitUpdater {
     $form.Controls.Add($layout)
 
     $settings = if($script:GuiSettings){$script:GuiSettings}else{Get-GUISettings}
-    $defaultSource = Split-Path -Parent $SharedToolkitRoot
+    $defaultSource = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
     $runningToolkitRoot = $defaultSource
     $sourceBox = New-GUITextBox $(if($settings.toolkitUpdateSource){[string]$settings.toolkitUpdateSource}else{$defaultSource})
     $destinationBox = New-GUITextBox $(if($settings.toolkitUpdateDestination){[string]$settings.toolkitUpdateDestination}else{""})

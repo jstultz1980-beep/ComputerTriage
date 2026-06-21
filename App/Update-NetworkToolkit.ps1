@@ -22,6 +22,35 @@ function Resolve-NetworkToolkitFileSystemPath {
     $item.FullName.TrimEnd('\\')
 }
 
+function Resolve-NetworkToolkitLayout {
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    $deploymentRoot = Resolve-NetworkToolkitFileSystemPath -Path $Path
+    $appRoot = Join-Path $deploymentRoot "App"
+    if(Test-Path -LiteralPath (Join-Path $appRoot "manifests\toolkit-version.json")){
+        return [pscustomobject]@{ DeploymentRoot=$deploymentRoot; AppRoot=$appRoot; IsLegacy=$false }
+    }
+    if(Test-Path -LiteralPath (Join-Path $deploymentRoot "manifests\toolkit-version.json")){
+        return [pscustomobject]@{ DeploymentRoot=$deploymentRoot; AppRoot=$deploymentRoot; IsLegacy=$true }
+    }
+    throw "Network Toolkit version manifest was not found in $deploymentRoot or $deploymentRoot\App."
+}
+
+function Move-NetworkToolkitLegacyLayout {
+    param([Parameter(Mandatory=$true)]$Layout)
+    if(!$Layout.IsLegacy){ return $Layout }
+
+    $newAppRoot = Join-Path $Layout.DeploymentRoot "App"
+    New-Item -ItemType Directory -Path $newAppRoot -Force | Out-Null
+    foreach($name in @("CSI-NetworkToolkit","Custom","manifests","ToolKit-GUI")){
+        $legacyPath = Join-Path $Layout.DeploymentRoot $name
+        if(Test-Path -LiteralPath $legacyPath){
+            Move-Item -LiteralPath $legacyPath -Destination $newAppRoot -ErrorAction Stop
+        }
+    }
+    [pscustomobject]@{ DeploymentRoot=$Layout.DeploymentRoot; AppRoot=$newAppRoot; IsLegacy=$false }
+}
+
 function Get-NetworkToolkitVersionManifest {
     param([Parameter(Mandatory=$true)][string]$ToolkitRoot)
 
@@ -191,17 +220,16 @@ $result = [ordered]@{
 }
 
 try {
-    $SourceRoot = Resolve-NetworkToolkitFileSystemPath -Path $SourceRoot
-    if(Test-Path -LiteralPath $DestinationRoot){
-        $DestinationRoot = Resolve-NetworkToolkitFileSystemPath -Path $DestinationRoot
-    }
-    else {
-        New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
-        $DestinationRoot = Resolve-NetworkToolkitFileSystemPath -Path $DestinationRoot
-    }
-    if($SourceRoot.Equals($DestinationRoot,[System.StringComparison]::OrdinalIgnoreCase)){
+    $sourceLayout = Resolve-NetworkToolkitLayout -Path $SourceRoot
+    if(!(Test-Path -LiteralPath $DestinationRoot)){ New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null }
+    $destinationLayout = Resolve-NetworkToolkitLayout -Path $DestinationRoot
+    if($sourceLayout.DeploymentRoot.Equals($destinationLayout.DeploymentRoot,[System.StringComparison]::OrdinalIgnoreCase)){
         throw "Source and destination must be different folders."
     }
+
+    $destinationLayout = Move-NetworkToolkitLegacyLayout -Layout $destinationLayout
+    $SourceRoot = $sourceLayout.AppRoot
+    $DestinationRoot = $destinationLayout.AppRoot
 
     $sourceManifest = Get-NetworkToolkitVersionManifest -ToolkitRoot $SourceRoot
     $result.SourceRoot = $SourceRoot
@@ -249,6 +277,7 @@ try {
     $result.PrunedFiles = $pruneResult.Removed
     $result.PruneSkippedFiles = $pruneResult.Skipped
     $result.VerifiedFiles = @(Test-NetworkToolkitCopy -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot)
+    Copy-Item -LiteralPath (Join-Path $sourceLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Destination (Join-Path $destinationLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Force
     $result.Status = "Completed"
 }
 catch {

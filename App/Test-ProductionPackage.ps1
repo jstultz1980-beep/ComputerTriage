@@ -4,7 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$PackageRoot = if($PackageRoot){$PackageRoot}else{$PSScriptRoot}
+$PackageRoot = if($PackageRoot){$PackageRoot}else{(Split-Path -Parent $PSScriptRoot)}
 $PackageRoot = (Resolve-Path -LiteralPath $PackageRoot).Path
 $failures = New-Object System.Collections.ArrayList
 
@@ -19,17 +19,17 @@ function Test-PackagePath {
 
 foreach($requiredPath in @(
     "NetworkToolkit-Elevated.bat",
-    "NetworkToolkit.ps1",
-    "ToolKit-GUI\ToolKit-GUI.ps1",
-    "CSI-NetworkToolkit\CSI-NetworkToolkit.ps1",
-    "CSI-NetworkToolkit\ExternalTools\Sysinternals",
-    "ProductionManifest.json",
-    "DEPLOYMENT-README.txt"
+    "App\NetworkToolkit.ps1",
+    "App\ToolKit-GUI\ToolKit-GUI.ps1",
+    "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1",
+    "App\CSI-NetworkToolkit\ExternalTools\Sysinternals",
+    "App\manifests\ProductionManifest.json",
+    "App\DEPLOYMENT-README.txt"
 )){
     Test-PackagePath -RelativePath $requiredPath
 }
 
-$manifestPath = Join-Path $PackageRoot "ProductionManifest.json"
+$manifestPath = Join-Path $PackageRoot "App\manifests\ProductionManifest.json"
 if(Test-Path -LiteralPath $manifestPath){
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 
@@ -52,11 +52,11 @@ else{
 
 foreach($relativePath in @(
     ".git",
-    "CSI-NetworkToolkit\Exports",
-    "CSI-NetworkToolkit\Data\ComputerState",
-    "CSI-NetworkToolkit\Data\MiniDumps",
-    "Custom\FirefoxPortable\Data\profile",
-    "manifests\gui-settings.json"
+    "App\CSI-NetworkToolkit\Exports",
+    "App\CSI-NetworkToolkit\Data\ComputerState",
+    "App\CSI-NetworkToolkit\Data\MiniDumps",
+    "App\Custom\FirefoxPortable\Data\profile",
+    "App\manifests\gui-settings.json"
 )){
     $path = Join-Path $PackageRoot $relativePath
     if($relativePath -eq ".git"){

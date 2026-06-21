@@ -1,7 +1,0 @@
-﻿{
-    "Product":  "Network Toolkit",
-    "Version":  "1.0.0",
-    "Build":  20260621161853,
-    "SourceUpdatedAt":  "2026-06-21T16:18:53.6147170-05:00",
-    "ReleaseNotes":  "Version-controlled updates with safe stale-file cleanup, including current destinations."
-}

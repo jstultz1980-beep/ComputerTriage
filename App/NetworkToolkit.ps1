@@ -18,6 +18,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$deploymentRoot = Split-Path -Parent $PSScriptRoot
+$legacyGuiRoot = Join-Path $deploymentRoot "ToolKit-GUI"
+if(Test-Path -LiteralPath $legacyGuiRoot){
+    # A pre-App GUI can leave an image locked until its existing process exits.
+    # Clear the empty legacy folder on a later launch without disrupting it.
+    try { Remove-Item -LiteralPath $legacyGuiRoot -Recurse -Force -ErrorAction Stop } catch {}
+}
+
 $mutexName = "NetworkToolkit-$([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)"
 $createdNew = $false
 $toolkitMutex = New-Object System.Threading.Mutex($true,$mutexName,[ref]$createdNew)

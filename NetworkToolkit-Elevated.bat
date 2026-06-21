@@ -2,7 +2,8 @@
 setlocal
 
 set "TOOLKIT_ROOT=%~dp0"
-set "TOOLKIT_SCRIPT=%TOOLKIT_ROOT%NetworkToolkit.ps1"
+set "TOOLKIT_APP_ROOT=%TOOLKIT_ROOT%App"
+set "TOOLKIT_SCRIPT=%TOOLKIT_APP_ROOT%\NetworkToolkit.ps1"
 
 if not exist "%TOOLKIT_SCRIPT%" (
     echo NetworkToolkit.ps1 was not found.
