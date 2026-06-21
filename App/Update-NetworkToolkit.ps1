@@ -51,6 +51,14 @@ function Move-NetworkToolkitLegacyLayout {
     [pscustomobject]@{ DeploymentRoot=$Layout.DeploymentRoot; AppRoot=$newAppRoot; IsLegacy=$false }
 }
 
+function Remove-NetworkToolkitRootArtifacts {
+    param([Parameter(Mandatory=$true)][string]$DeploymentRoot)
+    foreach($item in @(Get-ChildItem -LiteralPath $DeploymentRoot -Force -ErrorAction SilentlyContinue)){
+        if($item.Name -in @("App",".git","NetworkToolkit-Elevated.bat")){ continue }
+        Remove-Item -LiteralPath $item.FullName -Recurse -Force -ErrorAction Stop
+    }
+}
+
 function Get-NetworkToolkitVersionManifest {
     param([Parameter(Mandatory=$true)][string]$ToolkitRoot)
 
@@ -278,6 +286,7 @@ try {
     $result.PruneSkippedFiles = $pruneResult.Skipped
     $result.VerifiedFiles = @(Test-NetworkToolkitCopy -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot)
     Copy-Item -LiteralPath (Join-Path $sourceLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Destination (Join-Path $destinationLayout.DeploymentRoot "NetworkToolkit-Elevated.bat") -Force
+    Remove-NetworkToolkitRootArtifacts -DeploymentRoot $destinationLayout.DeploymentRoot
     $result.Status = "Completed"
 }
 catch {

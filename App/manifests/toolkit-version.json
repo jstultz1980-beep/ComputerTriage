@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621163418,
-    "SourceUpdatedAt":  "2026-06-21T16:34:18.9274820-05:00",
+    "Build":  20260621163444,
+    "SourceUpdatedAt":  "2026-06-21T16:34:44.3555331-05:00",
     "ReleaseNotes":  "Reorganized toolkit runtime beneath App with legacy update migration."
 }
