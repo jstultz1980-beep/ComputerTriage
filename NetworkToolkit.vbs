@@ -12,7 +12,7 @@ If Not fileSystem.FileExists(toolkitScript) Then
     WScript.Quit 1
 End If
 
-arguments = "-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File """" & toolkitScript & """""
+arguments = "-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File " & Chr(34) & toolkitScript & Chr(34)
 For argumentIndex = 0 To WScript.Arguments.Count - 1
     arguments = arguments & " " & Chr(34) & WScript.Arguments(argumentIndex) & Chr(34)
 Next

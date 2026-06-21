@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621170709,
-    "SourceUpdatedAt":  "2026-06-21T17:07:09.7388787-05:00",
-    "ReleaseNotes":  "Replace the batch launcher with a hidden elevated VBS launcher."
+    "Build":  20260621170843,
+    "SourceUpdatedAt":  "2026-06-21T17:08:43.1892640-05:00",
+    "ReleaseNotes":  "Fix VBS launcher quoting for hidden GUI startup."
 }
