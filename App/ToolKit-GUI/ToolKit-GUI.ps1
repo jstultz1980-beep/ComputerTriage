@@ -97,6 +97,9 @@ $script:ToolkitSizeResultPath = $null
 $script:ToolkitUpdateProcess = $null
 $script:ToolkitUpdateTimer = $null
 $script:ToolkitUpdateResultPath = $null
+$script:ToolkitDeploymentProcess = $null
+$script:ToolkitDeploymentTimer = $null
+$script:ToolkitDeploymentResultPath = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -10574,6 +10577,57 @@ Log: $logPath","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[S
     }
 }
 
+function Start-GUIToolkitDeployment {
+    param([string]$SourceRoot,[string]$DestinationRoot)
+    $deployerPath = Join-Path (Split-Path -Parent $SharedToolkitRoot) 'Deploy-NetworkToolkit.ps1'
+    if(!(Test-Path -LiteralPath $deployerPath)){ throw "Deployment script was not found: $deployerPath" }
+    if($script:ToolkitDeploymentProcess -and !$script:ToolkitDeploymentProcess.HasExited){
+        [System.Windows.Forms.MessageBox]::Show('A fresh toolkit deployment is already running.','Network Toolkit Deployment') | Out-Null
+        return
+    }
+    $resultPath = Join-Path $env:TEMP ("NetworkToolkit-deployment-{0}.json" -f [guid]::NewGuid().ToString('N'))
+    $arguments = @('-NoProfile','-ExecutionPolicy','Bypass','-File',"`"$deployerPath`"",'-SourceRoot',"`"$SourceRoot`"",'-DestinationRoot',"`"$DestinationRoot`"",'-ResultPath',"`"$resultPath`"")
+    $script:ToolkitDeploymentResultPath = $resultPath
+    $script:ToolkitDeploymentProcess = Start-CSIToolProcess -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
+    Start-GUIBusyIndicator -Message 'Deploying Toolkit'
+    Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Started' -Detail "Source=$SourceRoot; Destination=$DestinationRoot"
+    $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 1200
+    $timer.Add_Tick({
+        if(!$script:ToolkitDeploymentProcess -or !$script:ToolkitDeploymentProcess.HasExited){ return }
+        $timer.Stop(); $timer.Dispose(); $script:ToolkitDeploymentTimer=$null; Stop-GUIBusyIndicator
+        try {
+            $result = Get-Content -LiteralPath $script:ToolkitDeploymentResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+            if($result.Status -eq 'Completed'){
+                Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Completed' -Detail "Destination=$($result.DestinationRoot); Files=$($result.FilesCopied)"
+                $message = "Fresh toolkit deployment completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nFiles deployed: $($result.FilesCopied)`r`n`r`nLaunch it from NetworkToolkit.vbs at the destination root."
+                [System.Windows.Forms.MessageBox]::Show($message,'Network Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            }
+            else {
+                Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Failed' -Detail $result.Error -Level 'ERROR'
+                [System.Windows.Forms.MessageBox]::Show("Fresh toolkit deployment failed.`r`n`r`n$($result.Error)`r`n`r`nLog: $($result.LogPath)",'Network Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+            }
+        }
+        catch { Add-GUILog "Toolkit deployment result could not be read: $($_.Exception.Message)" }
+        finally {
+            $script:ToolkitDeploymentProcess=$null
+            if($script:ToolkitDeploymentResultPath -and (Test-Path $script:ToolkitDeploymentResultPath)){ Remove-Item -LiteralPath $script:ToolkitDeploymentResultPath -Force -ErrorAction SilentlyContinue }
+            $script:ToolkitDeploymentResultPath=$null
+        }
+    })
+    $script:ToolkitDeploymentTimer=$timer; $timer.Start()
+}
+
+function Show-GUIToolkitDeployment {
+    $source = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
+    $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+    $dialog.Description = 'Choose the USB-drive folder for the fresh Network Toolkit deployment'
+    if($dialog.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){ return }
+    $destination = $dialog.SelectedPath
+    $message = "A fresh deployment will replace all content in this destination folder.`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r`nPortable apps and ExternalTools are included. Reports, logs, profiles, settings, and client data are not copied."
+    if([System.Windows.Forms.MessageBox]::Show($message,'Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+    if([System.Windows.Forms.MessageBox]::Show('Confirm fresh deployment. Existing destination contents will be deleted.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -eq [System.Windows.Forms.DialogResult]::Yes){ Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination }
+}
+
 function Show-GUIToolkitUpdater {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Update Network Toolkit"
@@ -10919,7 +10973,10 @@ function Build-SettingsPage {
     $updateButton.Dock = "Fill"
     $updateButton.Width = 0
     $maintenanceLayout.Controls.Add($updateButton,0,0)
-    $maintenanceLayout.SetColumnSpan($updateButton,2)
+    $deployButton = New-GUIButton "Deploy Fresh Toolkit" { Show-GUIToolkitDeployment }
+    $deployButton.Dock = "Fill"
+    $deployButton.Width = 0
+    $maintenanceLayout.Controls.Add($deployButton,1,0)
 
     $script:ToolkitVersionLabel = New-GUILabel "Toolkit version: unavailable"
     $ToolkitVersionLabel.Dock = "Fill"
@@ -11020,6 +11077,7 @@ function Set-GUIFallbackButtonToolTips {
         "Copy Selected Key" = "Copy the selected license or registration value to the clipboard."
         "Open Latest Report" = "Open the latest confidential Software Key Finder HTML report."
         "Update Toolkit" = "Select a current working toolkit and destination folder, then update the destination while preserving its client data by default."
+        "Deploy Fresh Toolkit" = "Create a clean portable deployment on a USB drive or new folder, including toolkit apps but excluding client data and logs."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
