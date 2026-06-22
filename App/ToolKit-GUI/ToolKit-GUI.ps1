@@ -9575,13 +9575,16 @@ function Build-SoftwareToolsPage {
         -SectionOrder @("Everyday Tools")
 
     $resources = New-Object System.Windows.Forms.FlowLayoutPanel
-    $resources.Dock = "Top"
-    $resources.Height = 42
+    $resources.Dock = "Bottom"
+    $resources.Height = 34
     $resources.Padding = New-Object System.Windows.Forms.Padding(12,5,12,5)
     [void]$resources.Controls.Add((New-GUILabel "Safe software resources:"))
-    [void]$resources.Controls.Add((New-GUIButton "PortableApps.com" { Start-Process "https://portableapps.com/apps" }))
-    [void]$resources.Controls.Add((New-GUIButton "Ninite" { Start-Process "https://ninite.com/" }))
-    [void]$resources.Controls.Add((New-GUIButton "Chocolatey Search" { Start-Process "https://community.chocolatey.org/packages" }))
+    foreach($resource in @(@{Text='PortableApps.com';Url='https://portableapps.com/apps'},@{Text='Ninite';Url='https://ninite.com/'},@{Text='Chocolatey Search';Url='https://community.chocolatey.org/packages'})){
+        $link = New-Object System.Windows.Forms.LinkLabel
+        $link.Text = $resource.Text; $link.AutoSize = $true; $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)
+        $link.Tag = $resource.Url; $link.Add_LinkClicked({ param($sender,$args) Start-Process $sender.Tag })
+        [void]$resources.Controls.Add($link)
+    }
     $Page.Controls.Add($resources)
     $resources.BringToFront()
 }
