@@ -9244,7 +9244,7 @@ function Build-PsExecPage {
     $presetBox.Add_SelectedIndexChanged({
         switch([string]$this.SelectedItem){
             "Remote command prompt" { $script:PsExecCommandBox.Text = "cmd.exe" }
-            "PowerShell prompt" { $script:PsExecCommandBox.Text = "powershell.exe -NoExit" }
+            "PowerShell prompt" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -NoExit"; $script:PsExecInteractiveCheck.Checked = $true }
             "Computer name and user" { $script:PsExecCommandBox.Text = "cmd.exe /c hostname && whoami" }
             "IP configuration" { $script:PsExecCommandBox.Text = "cmd.exe /c ipconfig /all" }
             "Group Policy update" { $script:PsExecCommandBox.Text = "cmd.exe /c gpupdate /force" }
@@ -9832,6 +9832,19 @@ function Build-LiveLogPage {
 
     [void]$buttons.Controls.Add((New-GUIButton "Clear Log" { if($script:LogLines){ $script:LogLines.Clear() }; if($script:LogBox -and !$script:LogBox.IsDisposed){ $script:LogBox.Clear() }; Add-GUILog "Live log cleared." }))
     [void]$buttons.Controls.Add((New-GUIButton "Copy Log" { if($script:LogBox){ [System.Windows.Forms.Clipboard]::SetText($script:LogBox.Text); Add-GUILog "Live log copied to clipboard." } }))
+}
+
+function Show-GUILiveLogWindow {
+    $window = New-Object System.Windows.Forms.Form
+    $window.Text = "Network Toolkit Live Log"
+    $window.StartPosition = "CenterParent"
+    $window.Size = New-Object System.Drawing.Size(900,560)
+    $box = New-Object System.Windows.Forms.RichTextBox
+    $box.Dock = "Fill"; $box.ReadOnly = $true; $box.Font = New-Object System.Drawing.Font("Consolas",10)
+    $box.Text = (@($script:LogLines) -join "`r`n")
+    $window.Controls.Add($box)
+    [void]$window.ShowDialog($script:Form)
+    $window.Dispose()
 }
 
 function Move-GUISettingsSelectedTab {
@@ -10679,7 +10692,7 @@ function Build-SettingsPage {
     $maintenanceLayout.Controls.Add($folderPanel,0,5)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
-    $logsButton = New-GUIButton "Open Logs" { Open-GUIFolder $CSIPaths.Logs }
+    $logsButton = New-GUIButton "View Live Log" { Show-GUILiveLogWindow }
     $logsButton.Dock = "Fill"
     $logsButton.Width = 0
     $folderPanel.Controls.Add($logsButton,0,0)
@@ -11019,7 +11032,6 @@ function Build-Form {
 
     $liveLogPage = New-Object System.Windows.Forms.TabPage
     $liveLogPage.Text = "Live Log"
-    $tabs.TabPages.Add($liveLogPage) | Out-Null
 
     $availableTabs = @()
     foreach($page in $tabs.TabPages){
@@ -11179,7 +11191,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings","Live Log")){
+    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){
