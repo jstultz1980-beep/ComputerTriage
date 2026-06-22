@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622164609,
-    "SourceUpdatedAt":  "2026-06-22T16:46:09.7983280-05:00",
-    "ReleaseNotes":  "Fix shared safe PowerShell runner state initialization for plugin launches."
+    "Build":  20260622164923,
+    "SourceUpdatedAt":  "2026-06-22T16:49:23.9019470-05:00",
+    "ReleaseNotes":  "Quote safe runner script paths so tools with spaced session names launch correctly."
 }

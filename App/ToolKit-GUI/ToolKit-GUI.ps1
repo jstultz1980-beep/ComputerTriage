@@ -2386,7 +2386,11 @@ finally {
         $overlay.Controls.Add($output); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
         $page.Controls.Add($overlay); $overlay.BringToFront()
 
-        $process = Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$runnerPath) -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
+        # Start-Process joins an argument array before launching powershell.exe.
+        # Quote the generated runner path explicitly because session folder names
+        # include spaces such as "Network Discovery - Auto Scan".
+        $childArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""
+        $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $childArguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
         $state = [pscustomobject]@{
             Process = $process
             Overlay = $overlay
