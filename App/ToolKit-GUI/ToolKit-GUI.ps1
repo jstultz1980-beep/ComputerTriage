@@ -2342,8 +2342,6 @@ function Global:Start-GUISafeScriptRunner {
     $activityId = [guid]::NewGuid().ToString('N')
     $session = New-CSITempOutputSession -ToolName $ToolName
     $runnerPath = Join-Path $session.Path 'run-tool.ps1'
-    $stdoutPath = Join-Path $session.Path 'stdout.txt'
-    $stderrPath = Join-Path $session.Path 'stderr.txt'
     $transcriptPath = $session.Transcript
 
     $runner = @"
@@ -2381,16 +2379,26 @@ finally {
         $title = New-GUILabel "Running: $ToolName"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 440
         $output = New-Object System.Windows.Forms.RichTextBox
         $output.Dock = 'Fill'; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
+        $inputPanel = New-Object System.Windows.Forms.Panel
+        $inputPanel.Dock = 'Bottom'; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
+        $input = New-GUITextBox; $input.Dock = 'Fill'
+        $send = New-Object System.Windows.Forms.Button
+        $send.Text = 'Send'; $send.Dock = 'Right'; $send.Width = 82; Set-GUIButtonChrome -Button $send
         $close = New-Object System.Windows.Forms.Button
         $close.Text = 'Stop And Close'; $close.Width = 130; Set-GUIButtonChrome -Button $close
-        $overlay.Controls.Add($output); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
+        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
+        $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
         $page.Controls.Add($overlay); $overlay.BringToFront()
 
         # Start-Process joins an argument array before launching powershell.exe.
         # Quote the generated runner path explicitly because session folder names
         # include spaces such as "Network Discovery - Auto Scan".
         $childArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""
-        $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $childArguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
+        $psi = New-Object System.Diagnostics.ProcessStartInfo
+        $psi.FileName = 'powershell.exe'; $psi.Arguments = $childArguments; $psi.WorkingDirectory = $SharedToolkitRoot
+        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput = $true
+        $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi
+        if(!$process.Start()){ throw 'Could not start the PowerShell tool process.' }
         $state = [pscustomobject]@{
             Process = $process
             Overlay = $overlay
@@ -2399,8 +2407,12 @@ finally {
             Session = $session.Path
             Timer = $null
             LastLengths = @{}
+            Input = $input
         }
         $close.Tag = $state
+        $input.Tag = $state; $send.Tag = $state
+        $send.Add_Click({ param($sender,$args) $current=$sender.Tag; if($current -and !$current.Process.HasExited -and $current.Input.Text){ try { $current.Process.StandardInput.WriteLine($current.Input.Text); $current.Input.Clear() } catch {} } })
+        $input.Add_KeyDown({ param($sender,$args) if($args.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($sender.Text); $sender.Clear() } catch {} }; $args.SuppressKeyPress=$true } })
         $close.Add_Click({
             param($sender,$args)
             $current = $sender.Tag
@@ -2415,9 +2427,11 @@ finally {
         $timer = New-Object System.Windows.Forms.Timer
         $timer.Interval = 300
         $state.Timer = $timer
-        $state.LastLengths = @{ $transcriptPath = 0; $stdoutPath = 0; $stderrPath = 0 }
+        # Start-Transcript is the single display source. Polling stdout too
+        # duplicated every Write-Host line in the embedded terminal.
+        $state.LastLengths = @{ $transcriptPath = 0 }
         $tick = {
-            foreach($path in @($transcriptPath,$stdoutPath,$stderrPath)){
+            foreach($path in @($transcriptPath)){
                 try {
                     if(!(Test-Path -LiteralPath $path)){ continue }
                     $stream = [System.IO.File]::Open($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Read,[System.IO.FileShare]::ReadWrite)
