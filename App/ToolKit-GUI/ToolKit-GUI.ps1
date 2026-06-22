@@ -2316,7 +2316,7 @@ function Start-GUICommandByName {
     }
 }
 
-function Start-GUISafeScriptRunner {
+function Global:Start-GUISafeScriptRunner {
     param(
         [Parameter(Mandatory)][string]$ToolName,
         [Parameter(Mandatory)][string]$Invocation
@@ -2423,7 +2423,7 @@ finally {
     }
 }
 
-function Start-GUINetworkDiscovery {
+function Global:Start-GUINetworkDiscovery {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Network Discovery'
     $form.StartPosition = 'CenterParent'; $form.Size = New-Object System.Drawing.Size(620,210)
@@ -2439,16 +2439,63 @@ function Start-GUINetworkDiscovery {
     $cidrLabel = New-GUILabel 'CIDR'; $cidrLabel.Width=44; $cidrLabel.TextAlign='MiddleLeft'
     $row.Controls.Add($cidrLabel); $row.Controls.Add($cidr); $layout.Controls.Add($row,0,1)
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel; $buttons.Dock='Fill'
-    $newButton = { param($text) $button=New-Object System.Windows.Forms.Button; $button.Text=$text; $button.Width=126; $button.Height=34; Set-GUIButtonChrome -Button $button; $button }
-    $auto=& $newButton 'Auto Scan'; $manual=& $newButton 'Scan CIDR'; $topology=& $newButton 'Topology'; $neighbors=& $newButton 'Neighbors'; $cancel=& $newButton 'Cancel'
+    $auto = New-GUIButton 'Auto Scan' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Auto Scan' -Invocation 'Invoke-NetworkScan -Timeout 500 -Throttle 128' }
+    $manualAction = {
+        $value=$cidr.Text.Trim()
+        if($value -notmatch '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'){
+            [System.Windows.Forms.MessageBox]::Show('Enter an IPv4 CIDR such as 10.10.10.0/24.','Network Toolkit') | Out-Null
+            return
+        }
+        Start-GUISafeScriptRunner -ToolName 'Network Discovery - CIDR Scan' -Invocation ("Invoke-NetworkPingUtility -CIDR '{0}' -Timeout 500 -Throttle 128" -f $value)
+    }.GetNewClosure()
+    $manual = New-GUIButton 'Scan CIDR' $manualAction
+    $topology = New-GUIButton 'Topology' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Topology' -Invocation 'Get-NetworkTopology' }
+    $neighbors = New-GUIButton 'Neighbors' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Neighbors' -Invocation 'Get-NetworkNeighbors' }
+    $cancel = New-GUIButton 'Cancel' { $form.Close() }
     foreach($button in @($auto,$manual,$topology,$neighbors,$cancel)){ $buttons.Controls.Add($button) }
     $layout.Controls.Add($buttons,0,2); $form.Controls.Add($layout)
-    $start = { param($invocation,$label) $form.Close(); Start-GUISafeScriptRunner -ToolName $label -Invocation $invocation }.GetNewClosure()
-    $auto.Add_Click({ & $start 'Invoke-NetworkScan -Timeout 500 -Throttle 128' 'Network Discovery - Auto Scan' })
-    $manual.Add_Click({ $value=$cidr.Text.Trim(); if($value -notmatch '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'){ [System.Windows.Forms.MessageBox]::Show('Enter an IPv4 CIDR such as 10.10.10.0/24.','Network Toolkit') | Out-Null; return }; & $start ("Invoke-NetworkPingUtility -CIDR '{0}' -Timeout 500 -Throttle 128" -f $value) 'Network Discovery - CIDR Scan' })
-    $topology.Add_Click({ & $start 'Get-NetworkTopology' 'Network Discovery - Topology' })
-    $neighbors.Add_Click({ & $start 'Get-NetworkNeighbors' 'Network Discovery - Neighbors' })
-    $cancel.Add_Click({ $form.Close() })
+    $auto.Add_Click({ $form.Close() })
+    $manual.Add_Click({ if(!$form.IsDisposed){$form.Close()} })
+    $topology.Add_Click({ $form.Close() })
+    $neighbors.Add_Click({ $form.Close() })
+    [void]$form.ShowDialog($script:Form)
+}
+
+function Global:Start-GUIPortServiceTest {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = 'Port And Service Test'
+    $form.StartPosition = 'CenterParent'; $form.Size = New-Object System.Drawing.Size(680,215)
+    $form.MinimizeBox = $false; $form.MaximizeBox = $false; $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock='Fill'; $layout.Padding=New-Object System.Windows.Forms.Padding(16); $layout.ColumnCount=2; $layout.RowCount=3
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,105))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.Controls.Add((New-GUILabel 'Target'),0,0)
+    $target = New-GUITextBox; $target.Text = if($script:QuickTargetBox){$script:QuickTargetBox.Text}else{''}; $layout.Controls.Add($target,1,0)
+    $layout.Controls.Add((New-GUILabel 'Port list'),0,1)
+    $ports = New-GUITextBox; $ports.Text='22,80,443,445,3389'; $layout.Controls.Add($ports,1,1)
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel; $buttons.Dock='Fill'; $layout.SetColumnSpan($buttons,2); $layout.Controls.Add($buttons,0,2)
+    $startPortAction = {
+        param([string]$Mode)
+        $hostName=$target.Text.Trim()
+        if(!$hostName){ [System.Windows.Forms.MessageBox]::Show('Enter a target hostname or IP address.','Network Toolkit') | Out-Null; return }
+        $portNumbers=@($ports.Text -split ',' | ForEach-Object { $number=0; if([int]::TryParse($_.Trim(),[ref]$number) -and $number -ge 1 -and $number -le 65535){$number} })
+        if($Mode -in @('Port Scan','Banner Check') -and $portNumbers.Count -eq 0){ [System.Windows.Forms.MessageBox]::Show('Enter one or more valid TCP ports.','Network Toolkit') | Out-Null; return }
+        switch($Mode){
+            'Port Scan' { Start-GUISafeScriptRunner -ToolName 'Port And Service Test - Port Scan' -Invocation ("Invoke-PortScan -Target '{0}' -Ports {1} -Timeout 1000" -f $hostName,($portNumbers -join ',')) }
+            'Windows Matrix' { Start-GUISafeScriptRunner -ToolName 'Port And Service Test - Windows Matrix' -Invocation ("Invoke-PortReachabilityMatrix -Target '{0}' -Profile Windows -Timeout 1000" -f $hostName) }
+            'Banner Check' { Start-GUISafeScriptRunner -ToolName 'Port And Service Test - Banner Check' -Invocation ("Invoke-ServiceFingerprinter -Target '{0}' -Ports {1} -Timeout 1000" -f $hostName,($portNumbers -join ',')) }
+            'TLS Check' { Start-GUISafeScriptRunner -ToolName 'Port And Service Test - TLS Check' -Invocation ("Invoke-TLSCertificateCheck -Target '{0}' -Port 443" -f $hostName) }
+        }
+    }.GetNewClosure()
+    $common=New-GUIButton 'Port Scan' { & $startPortAction 'Port Scan' }
+    $matrix=New-GUIButton 'Windows Matrix' { & $startPortAction 'Windows Matrix' }
+    $banner=New-GUIButton 'Banner Check' { & $startPortAction 'Banner Check' }
+    $tls=New-GUIButton 'TLS Check' { & $startPortAction 'TLS Check' }
+    $cancel=New-GUIButton 'Cancel' { $form.Close() }
+    foreach($button in @($common,$matrix,$banner,$tls,$cancel)){ $buttons.Controls.Add($button) }
+    $form.Controls.Add($layout)
+    foreach($button in @($common,$matrix,$banner,$tls)){ $button.Add_Click({ if(!$form.IsDisposed){$form.Close()} }) }
     [void]$form.ShowDialog($script:Form)
 }
 
@@ -7478,6 +7525,10 @@ function Get-GUIToolAction {
 
     if($Tool.Function -eq 'Invoke-NetworkDiscovery'){
         return { Start-GUINetworkDiscovery }
+    }
+
+    if($Tool.Function -eq 'Invoke-PortAndServiceTest'){
+        return { Start-GUIPortServiceTest }
     }
 
     if($Tool.External){
