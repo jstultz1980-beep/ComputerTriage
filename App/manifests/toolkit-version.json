@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622112840,
-    "SourceUpdatedAt":  "2026-06-22T11:28:40.9796900-05:00",
-    "ReleaseNotes":  "Generate computer Final Reports from validated AI analysis and local diagnosis."
+    "Build":  20260622161703,
+    "SourceUpdatedAt":  "2026-06-22T16:17:03.5290518-05:00",
+    "ReleaseNotes":  "Stabilize PowerShell tool execution, repair deployment layout handling, cache tab inventories, and add theme presets."
 }
