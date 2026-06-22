@@ -8626,6 +8626,7 @@ function Build-ReportsPage {
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Location" { Open-SelectedGUIReportLocation }))
     [void]$buttons.Controls.Add((New-GUIButton "Bundle Latest To Send" { New-GUIChatGPTBundle }))
+    [void]$buttons.Controls.Add((New-GUIButton "Import AI Analysis" { Import-GUIAIAnalysis }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Help" { Open-GUIHelpFile }))
 
@@ -8759,6 +8760,35 @@ function Delete-SelectedGUIReport {
     }
 }
 
+function Import-GUIAIAnalysis {
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "Import Network Toolkit AI Analysis"
+    $dialog.Filter = "AI analysis JSON (*.json)|*.json|All files (*.*)|*.*"
+    if($dialog.ShowDialog($script:Form) -ne [System.Windows.Forms.DialogResult]::OK){ return }
+    try {
+        $analysis = Get-Content -LiteralPath $dialog.FileName -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        foreach($property in @('computerName','riskLevel','executiveSummary','findings','rootCauseCandidates','missingEvidence','technicianChecklist')){
+            if(!$analysis.PSObject.Properties[$property]){ throw "The imported JSON is missing required field: $property" }
+        }
+        $encode = { param($value) [System.Net.WebUtility]::HtmlEncode([string]$value) }
+        $findings = @($analysis.findings | ForEach-Object {
+            $evidence = @($_.evidence) -join '<br>'
+            "<tr><td>$( & $encode $_.severity )</td><td>$( & $encode $_.title )</td><td>$( & $encode $evidence )</td><td>$( & $encode $_.impact )</td><td>$( & $encode $_.confidence )</td><td>$( & $encode $_.nextAction )</td></tr>"
+        }) -join "`n"
+        $timeline = @($analysis.eventTimeline | ForEach-Object { "<li><strong>$( & $encode $_.time )</strong> - $( & $encode $_.summary )<br><span>$( & $encode $_.evidence )</span></li>" }) -join "`n"
+        $causes = @($analysis.rootCauseCandidates | ForEach-Object { "<li><strong>$( & $encode $_.candidate )</strong> ($( & $encode $_.confidence ))<br>$( & $encode (@($_.evidence) -join '; ') )</li>" }) -join "`n"
+        $missing = @($analysis.missingEvidence | ForEach-Object { "<li>$( & $encode $_ )</li>" }) -join "`n"
+        $checklist = @($analysis.technicianChecklist | ForEach-Object { "<li>$( & $encode $_ )</li>" }) -join "`n"
+        $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+        $path = Join-Path $CSIPaths.Exports ("ai-analysis-{0}-{1}.html" -f $analysis.computerName,$stamp)
+        @"
+<!doctype html><html><head><meta charset="utf-8"><title>Network Toolkit AI Analysis</title><style>body{font:15px Segoe UI,Arial;background:#eef4f8;color:#18324b;margin:0}main{max-width:1200px;margin:28px auto;background:#fff;padding:30px;border:1px solid #cbd8e4;border-radius:8px}h1{margin:0;color:#124c7a}h2{margin-top:28px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #cbd8e4;vertical-align:top;text-align:left}th{background:#e7f1fa}li{margin:8px 0}span{color:#526070}</style></head><body><main><h1>Network Toolkit AI Analysis</h1><p><strong>Computer:</strong> $( & $encode $analysis.computerName ) &nbsp; <strong>Risk:</strong> $( & $encode $analysis.riskLevel ) &nbsp; <strong>Imported:</strong> $stamp</p><h2>Executive Summary</h2><p>$( & $encode $analysis.executiveSummary )</p><h2>Findings</h2><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Impact</th><th>Confidence</th><th>Next Action</th></tr>$findings</table><h2>Event Timeline</h2><ul>$timeline</ul><h2>Likely Root Cause Candidates</h2><ul>$causes</ul><h2>Missing Evidence</h2><ul>$missing</ul><h2>Technician Checklist</h2><ol>$checklist</ol></main></body></html>
+"@ | Set-Content -LiteralPath $path -Encoding UTF8
+        Add-GUILog "Imported AI analysis: $path"; Refresh-GUIReports; Open-CSIOutputFile -Path $path
+    }
+    catch { [System.Windows.Forms.MessageBox]::Show("Could not import AI analysis.`r`n`r`n$($_.Exception.Message)","Import AI Analysis",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
+}
+
 function New-GUIChatGPTBundle {
     $computerName = [Environment]::MachineName
     $allReports = @(Get-GUIReportItems | Where-Object { !$_.IsDirectory -and $_.Type -ne "Minidumps" -and (Test-Path -LiteralPath $_.Path) })
@@ -8870,8 +8900,8 @@ function New-GUIChatGPTBundle {
             "7. End with a technician checklist ordered from lowest-risk/highest-value actions to more disruptive actions."
             "8. Explicitly review Diagnostic-Collection for crash dump inventory, driver inventory, filter drivers, network bindings, process snapshots, the event timeline, domain/DC and DFSR evidence when present, gpresult, and security/VPN/backup product indicators."
             "9. Identify likely root-cause candidates only when supported by the evidence, and describe the relevant event timeline."
-            "10. Use ANALYSIS-REPORT-TEMPLATE.html in this ZIP as the required layout. Replace its placeholder content with your analysis and return a downloadable self-contained HTML file named NetworkToolkit-AI-Analysis-$computerName.html. Preserve the included CSS and do not rely on external fonts, scripts, images, or stylesheets."
-            "11. The downloadable HTML must include the executive summary, risk level, findings table, evidence citations, event timeline, root-cause candidates, remediation plan, missing evidence, and technician checklist. Also show a concise summary in chat."
+            "10. Return a downloadable JSON file named NetworkToolkit-AI-Analysis-$computerName.json that strictly conforms to AI-ANALYSIS-SCHEMA.json in this ZIP. Do not return HTML."
+            "11. The JSON must include the executive summary, risk level, findings, evidence citations, event timeline, root-cause candidates, remediation checklist, and missing evidence. Also show a concise summary in chat."
             ""
             "## Analysis Rules"
             ""
@@ -8887,6 +8917,21 @@ function New-GUIChatGPTBundle {
             ""
             "Be direct and practical. Explain what the technician should do next and why. Avoid generic statements such as 'review the logs' when the report contains enough detail to name the relevant log, event, service, device, update, or startup entry."
         ) | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-PROMPT.md") -Encoding UTF8
+        @'
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Network Toolkit AI Analysis",
+  "type": "object",
+  "required": ["computerName", "riskLevel", "executiveSummary", "findings", "rootCauseCandidates", "missingEvidence", "technicianChecklist"],
+  "properties": {
+    "computerName": {"type":"string"}, "analysisTimestamp": {"type":"string"}, "riskLevel": {"enum":["Critical","High","Medium","Low","Informational"]}, "executiveSummary":{"type":"string"},
+    "findings":{"type":"array","items":{"type":"object","required":["severity","title","evidence","nextAction"],"properties":{"severity":{"type":"string"},"title":{"type":"string"},"evidence":{"type":"array","items":{"type":"string"}},"impact":{"type":"string"},"confidence":{"type":"string"},"nextAction":{"type":"string"}}}},
+    "eventTimeline":{"type":"array","items":{"type":"object","properties":{"time":{"type":"string"},"summary":{"type":"string"},"evidence":{"type":"string"}}}},
+    "rootCauseCandidates":{"type":"array","items":{"type":"object","properties":{"candidate":{"type":"string"},"confidence":{"type":"string"},"evidence":{"type":"array","items":{"type":"string"}}}}},
+    "missingEvidence":{"type":"array","items":{"type":"string"}}, "technicianChecklist":{"type":"array","items":{"type":"string"}}
+  }
+}
+'@ | Set-Content -LiteralPath (Join-Path $bundleFolder "AI-ANALYSIS-SCHEMA.json") -Encoding UTF8
         @'
 <!doctype html>
 <html lang="en">

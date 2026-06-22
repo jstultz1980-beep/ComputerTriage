@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622084935,
-    "SourceUpdatedAt":  "2026-06-22T08:49:35.3043504-05:00",
-    "ReleaseNotes":  "Open File Explorer with completed AI bundles selected."
+    "Build":  20260622090724,
+    "SourceUpdatedAt":  "2026-06-22T09:07:24.2148191-05:00",
+    "ReleaseNotes":  "Import structured AI analysis JSON and render local HTML reports."
 }
