@@ -8804,7 +8804,17 @@ function New-GUIChatGPTBundle {
         $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp)
         New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
         $collectionRoot = $null
+        $collectFreshEvidence = $false
         if(Get-Command New-CSIAIDiagnosticCollection -ErrorAction SilentlyContinue){
+            $collectionChoice = [System.Windows.Forms.MessageBox]::Show(
+                "Run a fresh expanded evidence collection before creating the bundle?`r`n`r`nThis repeats some Quick Diagnosis read-only checks and additionally gathers targeted event, driver, service, network, process, policy, and role evidence. Choose No to bundle only the latest existing reports.",
+                "Fresh Evidence Collection",
+                [System.Windows.Forms.MessageBoxButtons]::YesNo,
+                [System.Windows.Forms.MessageBoxIcon]::Question
+            )
+            $collectFreshEvidence = $collectionChoice -eq [System.Windows.Forms.DialogResult]::Yes
+        }
+        if($collectFreshEvidence){
             Start-GUIBusyIndicator -Message "Collecting diagnostic evidence"
             try {
                 $collectionRoot = New-CSIAIDiagnosticCollection -ComputerName $computerName
@@ -8821,10 +8831,11 @@ function New-GUIChatGPTBundle {
         @(
             "Network Toolkit - ChatGPT Analysis Bundle"
             "Created: $((Get-Date).ToString('s'))"
+            "Fresh evidence collection: $collectFreshEvidence"
             ""
             "This ZIP was prepared for manual upload. Review its contents before sharing."
             "Minidumps, portable applications, browser data, and toolkit logs are excluded."
-            "A fresh Diagnostic-Collection folder contains read-only crash, driver, filter-driver, network, process, service, event, policy, domain, and security-product evidence where available."
+            "A Diagnostic-Collection folder is included only when fresh evidence collection was approved."
             ""
             "Included files:"
             $reports | ForEach-Object { "$($_.Type): $($_.Name)" }
