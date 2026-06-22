@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622090724,
-    "SourceUpdatedAt":  "2026-06-22T09:07:24.2148191-05:00",
-    "ReleaseNotes":  "Import structured AI analysis JSON and render local HTML reports."
+    "Build":  20260622110200,
+    "SourceUpdatedAt":  "2026-06-22T11:02:00.9795192-05:00",
+    "ReleaseNotes":  "Improve AI bundle workflow and report presentation."
 }

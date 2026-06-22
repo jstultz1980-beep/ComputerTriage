@@ -6447,7 +6447,7 @@ function Build-FingerprintPage {
     $layout.Controls.Add($buttons,0,2)
 
     foreach($buttonDef in @(
-        @{ Text = "Open HTML Report"; Action = { Open-SelectedFingerprintReport } },
+        @{ Text = "View"; Action = { Open-SelectedFingerprintReport } },
         @{ Text = "Create Profile"; Action = { Take-FingerprintFromGUI } },
         @{ Text = "Delete"; Action = { Delete-SelectedFingerprint } },
         @{ Text = "Refresh"; Action = { Refresh-Fingerprints } }
@@ -8624,7 +8624,6 @@ function Build-ReportsPage {
     $layout.Controls.Add($buttons,0,2)
 
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
-    [void]$buttons.Controls.Add((New-GUIButton "Open Location" { Open-SelectedGUIReportLocation }))
     [void]$buttons.Controls.Add((New-GUIButton "Bundle Latest To Send" { New-GUIChatGPTBundle }))
     [void]$buttons.Controls.Add((New-GUIButton "Import AI Analysis" { Import-GUIAIAnalysis }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
@@ -8641,17 +8640,14 @@ function Get-GUIReportItems {
         @{ Type="Software Keys"; Path=$CSIPaths.Exports; Pattern="software-key-report*.html" },
         @{ Type="Crash Events"; Path=$CSIPaths.Exports; Pattern="crash-event-summary*.html" },
         @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.html" },
-        @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.json" },
         @{ Type="Minidumps"; Path=(Join-Path $CSIPaths.Data "MiniDumps"); Pattern="*" },
         @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*inventory*.csv" },
         @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*network*.csv" },
-        @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*network*.json" },
         @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*discovery*.txt" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="full-triage*.txt" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="full-triage*.json" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="dism*.log" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="sfc*.log" }
-        @{ Type="Issue Evidence"; Path=$CSIPaths.Exports; Pattern="issue-evidence*.json" }
     )
 
     foreach($root in $roots){
@@ -8784,6 +8780,9 @@ function Import-GUIAIAnalysis {
         @"
 <!doctype html><html><head><meta charset="utf-8"><title>Network Toolkit AI Analysis</title><style>body{font:15px Segoe UI,Arial;background:#eef4f8;color:#18324b;margin:0}main{max-width:1200px;margin:28px auto;background:#fff;padding:30px;border:1px solid #cbd8e4;border-radius:8px}h1{margin:0;color:#124c7a}h2{margin-top:28px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #cbd8e4;vertical-align:top;text-align:left}th{background:#e7f1fa}li{margin:8px 0}span{color:#526070}</style></head><body><main><h1>Network Toolkit AI Analysis</h1><p><strong>Computer:</strong> $( & $encode $analysis.computerName ) &nbsp; <strong>Risk:</strong> $( & $encode $analysis.riskLevel ) &nbsp; <strong>Imported:</strong> $stamp</p><h2>Executive Summary</h2><p>$( & $encode $analysis.executiveSummary )</p><h2>Findings</h2><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Impact</th><th>Confidence</th><th>Next Action</th></tr>$findings</table><h2>Event Timeline</h2><ul>$timeline</ul><h2>Likely Root Cause Candidates</h2><ul>$causes</ul><h2>Missing Evidence</h2><ul>$missing</ul><h2>Technician Checklist</h2><ol>$checklist</ol></main></body></html>
 "@ | Set-Content -LiteralPath $path -Encoding UTF8
+        if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){
+            [void](Set-CSIComputerStateSection -SectionName "AIAnalysis" -Data $analysis -ComputerName $analysis.computerName -Source "Import-GUIAIAnalysis")
+        }
         Add-GUILog "Imported AI analysis: $path"; Refresh-GUIReports; Open-CSIOutputFile -Path $path
     }
     catch { [System.Windows.Forms.MessageBox]::Show("Could not import AI analysis.`r`n`r`n$($_.Exception.Message)","Import AI Analysis",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
@@ -8831,7 +8830,7 @@ function New-GUIChatGPTBundle {
         $bundleRoot = Join-Path $CSIPaths.Exports "AI-Bundles"
         New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
         $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-        $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp)
+        $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-{0}-{1}" -f $computerName,$stamp)
         New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
         $collectionRoot = $null
         $collectFreshEvidence = $false
@@ -8917,6 +8916,7 @@ function New-GUIChatGPTBundle {
             ""
             "Be direct and practical. Explain what the technician should do next and why. Avoid generic statements such as 'review the logs' when the report contains enough detail to name the relevant log, event, service, device, update, or startup entry."
         ) | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-PROMPT.md") -Encoding UTF8
+        $promptText = Get-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-PROMPT.md") -Raw
         @'
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -8960,14 +8960,14 @@ function New-GUIChatGPTBundle {
 <section><h2>Technician Checklist</h2><ol>{{TECHNICIAN_CHECKLIST_ITEMS}}</ol></section>
 </main></body></html>
 '@ | Set-Content -LiteralPath (Join-Path $bundleFolder "ANALYSIS-REPORT-TEMPLATE.html") -Encoding UTF8
-        $zipPath = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp + ".zip")
+        $zipPath = Join-Path $bundleRoot ("chatgpt-bundle-{0}-{1}.zip" -f $computerName,$stamp)
         Compress-Archive -Path (Join-Path $bundleFolder "*") -DestinationPath $zipPath -CompressionLevel Optimal -Force
         Remove-Item -LiteralPath $bundleFolder -Recurse -Force -ErrorAction SilentlyContinue
-        [System.Windows.Forms.Clipboard]::SetText($zipPath)
+        [System.Windows.Forms.Clipboard]::SetText($promptText)
         Add-GUILog "Created ChatGPT analysis bundle: $zipPath"
         Start-Process -FilePath "explorer.exe" -ArgumentList ("/select,`"{0}`"" -f $zipPath)
         Start-Process "https://chatgpt.com/auth/login"
-        [System.Windows.Forms.MessageBox]::Show("Your bundle is ready and its path has been copied to the clipboard.`r`n`r`n$zipPath`r`n`r`nChatGPT sign-in was opened. After signing in, upload the ZIP manually and ask for a plain-language analysis of the findings.","Bundle Ready",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        [System.Windows.Forms.MessageBox]::Show("Your bundle is ready.`r`n`r`n$zipPath`r`n`r`nThe analysis prompt has been copied to the clipboard. ChatGPT sign-in was opened; upload the ZIP, paste the prompt, and request the downloadable JSON analysis.","Bundle Ready",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
     }
     catch {
         Add-GUILog "ChatGPT bundle failed: $($_.Exception.Message)"
@@ -9573,6 +9573,17 @@ function Build-SoftwareToolsPage {
         -Title "Software Tools" `
         -SectionMap $sectionMap `
         -SectionOrder @("Everyday Tools")
+
+    $resources = New-Object System.Windows.Forms.FlowLayoutPanel
+    $resources.Dock = "Top"
+    $resources.Height = 42
+    $resources.Padding = New-Object System.Windows.Forms.Padding(12,5,12,5)
+    [void]$resources.Controls.Add((New-GUILabel "Safe software resources:"))
+    [void]$resources.Controls.Add((New-GUIButton "PortableApps.com" { Start-Process "https://portableapps.com/apps" }))
+    [void]$resources.Controls.Add((New-GUIButton "Ninite" { Start-Process "https://ninite.com/" }))
+    [void]$resources.Controls.Add((New-GUIButton "Chocolatey Search" { Start-Process "https://community.chocolatey.org/packages" }))
+    $Page.Controls.Add($resources)
+    $resources.BringToFront()
 }
 
 function Refresh-GUISoftwareKeyFinderResults {
@@ -9784,7 +9795,6 @@ function Build-CustomToolsPage {
     $removeToolkitButton = New-GUIButton "Remove From Toolkit" { Remove-SelectedGUICustomTool }
     $removeToolkitButton.Width = 180
     [void]$buttons.Controls.Add($removeToolkitButton)
-    [void]$buttons.Controls.Add((New-GUIButton "Open Location" { Open-SelectedGUICustomToolFolder }))
     [void]$buttons.Controls.Add((New-GUIButton "Refresh Toolkit Tools" { Refresh-GUICustomTools; Refresh-GUICustomToolTabs }))
 
     $CustomGrid.Add_CellDoubleClick({ Start-SelectedGUICustomTool })
