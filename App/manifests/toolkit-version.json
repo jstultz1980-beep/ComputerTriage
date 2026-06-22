@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622081141,
-    "SourceUpdatedAt":  "2026-06-22T08:11:41.0949385-05:00",
-    "ReleaseNotes":  "Add targeted issue evidence exports for AI-assisted Quick Diagnosis review."
+    "Build":  20260622083052,
+    "SourceUpdatedAt":  "2026-06-22T08:30:52.9472343-05:00",
+    "ReleaseNotes":  "Add modular diagnostic collection for AI analysis bundles."
 }

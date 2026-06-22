@@ -8803,6 +8803,17 @@ function New-GUIChatGPTBundle {
         $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
         $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-" + $stamp)
         New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
+        $collectionRoot = $null
+        if(Get-Command New-CSIAIDiagnosticCollection -ErrorAction SilentlyContinue){
+            Start-GUIBusyIndicator -Message "Collecting diagnostic evidence"
+            try {
+                $collectionRoot = New-CSIAIDiagnosticCollection -ComputerName $computerName
+                if($collectionRoot -and (Test-Path -LiteralPath $collectionRoot)){
+                    Copy-Item -LiteralPath $collectionRoot -Destination (Join-Path $bundleFolder "Diagnostic-Collection") -Recurse -Force
+                }
+            }
+            finally { Stop-GUIBusyIndicator }
+        }
         foreach($report in $reports){
             $safeType = ($report.Type -replace '[^A-Za-z0-9]+','-').Trim('-')
             Copy-Item -LiteralPath $report.Path -Destination (Join-Path $bundleFolder ("$safeType-$($report.Name)")) -Force
@@ -8813,6 +8824,7 @@ function New-GUIChatGPTBundle {
             ""
             "This ZIP was prepared for manual upload. Review its contents before sharing."
             "Minidumps, portable applications, browser data, and toolkit logs are excluded."
+            "A fresh Diagnostic-Collection folder contains read-only crash, driver, filter-driver, network, process, service, event, policy, domain, and security-product evidence where available."
             ""
             "Included files:"
             $reports | ForEach-Object { "$($_.Type): $($_.Name)" }
@@ -8831,8 +8843,10 @@ function New-GUIChatGPTBundle {
             "5. Call out conflicts between reports. If one report says a check passed while another suggests a problem, explain the discrepancy and identify the next check that would resolve it."
             "6. Identify missing evidence that would materially change the diagnosis, such as an exact event log, driver version, update KB, service configuration, or network test result."
             "7. End with a technician checklist ordered from lowest-risk/highest-value actions to more disruptive actions."
-            "8. Use ANALYSIS-REPORT-TEMPLATE.html in this ZIP as the required layout. Replace its placeholder content with your analysis and return a downloadable self-contained HTML file named NetworkToolkit-AI-Analysis-$computerName.html. Preserve the included CSS and do not rely on external fonts, scripts, images, or stylesheets."
-            "9. The downloadable HTML must include the executive summary, findings table, evidence citations, remediation plan, missing evidence, and technician checklist. Also show a concise summary in chat."
+            "8. Explicitly review Diagnostic-Collection for crash dump inventory, driver inventory, filter drivers, network bindings, process snapshots, the event timeline, domain/DC and DFSR evidence when present, gpresult, and security/VPN/backup product indicators."
+            "9. Identify likely root-cause candidates only when supported by the evidence, and describe the relevant event timeline."
+            "10. Use ANALYSIS-REPORT-TEMPLATE.html in this ZIP as the required layout. Replace its placeholder content with your analysis and return a downloadable self-contained HTML file named NetworkToolkit-AI-Analysis-$computerName.html. Preserve the included CSS and do not rely on external fonts, scripts, images, or stylesheets."
+            "11. The downloadable HTML must include the executive summary, risk level, findings table, evidence citations, event timeline, root-cause candidates, remediation plan, missing evidence, and technician checklist. Also show a concise summary in chat."
             ""
             "## Analysis Rules"
             ""
