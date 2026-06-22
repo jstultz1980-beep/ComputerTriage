@@ -8805,14 +8805,24 @@ function New-GUIChatGPTBundle {
         New-Item -ItemType Directory -Path $bundleFolder -Force | Out-Null
         $collectionRoot = $null
         $collectFreshEvidence = $false
+        $usedRecentEvidence = $false
         if(Get-Command New-CSIAIDiagnosticCollection -ErrorAction SilentlyContinue){
+            $latestCollection = @(Get-ChildItem -LiteralPath $CSIPaths.Exports -Directory -Filter ("AI-Collection-{0}-*" -f $computerName) -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1)[0]
+            $collectionIsRecent = $latestCollection -and ((Get-Date) - $latestCollection.LastWriteTime).TotalHours -lt 24
             $collectionChoice = [System.Windows.Forms.MessageBox]::Show(
-                "Run a fresh expanded evidence collection before creating the bundle?`r`n`r`nThis repeats some Quick Diagnosis read-only checks and additionally gathers targeted event, driver, service, network, process, policy, and role evidence. Choose No to bundle only the latest existing reports.",
+                "Run a fresh expanded evidence collection before creating the bundle?`r`n`r`nThis repeats some Quick Diagnosis read-only checks and additionally gathers targeted event, driver, service, network, process, policy, and role evidence. Choose No to reuse evidence collected within the last 24 hours; if no current collection exists, the expanded collector will run once.",
                 "Fresh Evidence Collection",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Question
             )
             $collectFreshEvidence = $collectionChoice -eq [System.Windows.Forms.DialogResult]::Yes
+            if(!$collectFreshEvidence -and $collectionIsRecent){
+                $collectionRoot = $latestCollection.FullName
+                $usedRecentEvidence = $true
+            }
+            elseif(!$collectFreshEvidence){
+                $collectFreshEvidence = $true
+            }
         }
         if($collectFreshEvidence){
             Start-GUIBusyIndicator -Message "Collecting diagnostic evidence"
@@ -8824,6 +8834,9 @@ function New-GUIChatGPTBundle {
             }
             finally { Stop-GUIBusyIndicator }
         }
+        if($collectionRoot -and (Test-Path -LiteralPath $collectionRoot) -and !$collectFreshEvidence){
+            Copy-Item -LiteralPath $collectionRoot -Destination (Join-Path $bundleFolder "Diagnostic-Collection") -Recurse -Force
+        }
         foreach($report in $reports){
             $safeType = ($report.Type -replace '[^A-Za-z0-9]+','-').Trim('-')
             Copy-Item -LiteralPath $report.Path -Destination (Join-Path $bundleFolder ("$safeType-$($report.Name)")) -Force
@@ -8832,10 +8845,11 @@ function New-GUIChatGPTBundle {
             "Network Toolkit - ChatGPT Analysis Bundle"
             "Created: $((Get-Date).ToString('s'))"
             "Fresh evidence collection: $collectFreshEvidence"
+            "Recent evidence reused: $usedRecentEvidence"
             ""
             "This ZIP was prepared for manual upload. Review its contents before sharing."
             "Minidumps, portable applications, browser data, and toolkit logs are excluded."
-            "A Diagnostic-Collection folder is included only when fresh evidence collection was approved."
+            "Diagnostic-Collection contains either fresh evidence or the latest collection less than 24 hours old."
             ""
             "Included files:"
             $reports | ForEach-Object { "$($_.Type): $($_.Name)" }
