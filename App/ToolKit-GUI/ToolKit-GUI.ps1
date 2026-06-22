@@ -2302,11 +2302,151 @@ function Start-GUICommandByName {
     }
 
     if($command.Command){
+        if($command.Command -eq 'Invoke-NetworkDiscovery'){
+            Start-GUINetworkDiscovery
+            return
+        }
         Start-GUIToolkitFunctionConsole -FunctionName $command.Command -DisplayName $command.Name -RequiresAdmin:([bool]$command.RequiresAdmin)
     }
     else{
         Add-GUILog "Command has no registered function: $Name"
     }
+}
+
+function Start-GUISafeScriptRunner {
+    param(
+        [Parameter(Mandatory)][string]$ToolName,
+        [Parameter(Mandatory)][string]$Invocation
+    )
+
+    $activityId = [guid]::NewGuid().ToString('N')
+    $session = New-CSITempOutputSession -ToolName $ToolName
+    $runnerPath = Join-Path $session.Path 'run-tool.ps1'
+    $stdoutPath = Join-Path $session.Path 'stdout.txt'
+    $stderrPath = Join-Path $session.Path 'stderr.txt'
+    $transcriptPath = $session.Transcript
+
+    $runner = @"
+`$ErrorActionPreference = 'Continue'
+`$metadata = [ordered]@{ Tool = '$($ToolName.Replace("'","''"))'; Invocation = '$($Invocation.Replace("'","''"))'; StartedAt = (Get-Date).ToString('s'); CompletedAt = ''; Status = 'Running'; ComputerName = `$env:COMPUTERNAME }
+`$metadata | ConvertTo-Json | Set-Content -LiteralPath '$($session.Metadata)' -Encoding UTF8
+try {
+    . '$($ToolkitLauncher)' -NoConsole
+    Start-Transcript -Path '$transcriptPath' -Force | Out-Null
+    Write-Host "Running: $($ToolName.Replace('"','\"'))"
+    & { $Invocation }
+    `$metadata.Status = 'Completed'
+}
+catch {
+    Write-Error (`$_ | Out-String)
+    `$metadata.Status = 'Error'
+    `$metadata.Error = `$_.Exception.Message
+}
+finally {
+    `$metadata.CompletedAt = (Get-Date).ToString('s')
+    try { Stop-Transcript | Out-Null } catch {}
+    `$metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath '$($session.Metadata)' -Encoding UTF8
+}
+"@
+
+    try {
+        $runner | Set-Content -LiteralPath $runnerPath -Encoding UTF8
+        $page = if($script:MainTabs){ $script:MainTabs.SelectedTab }else{ $null }
+        if(!$page){ throw 'No active tool tab is available.' }
+
+        $overlay = New-Object System.Windows.Forms.Panel
+        $overlay.Dock = 'Fill'; $overlay.BackColor = $script:GUITheme.LogBack
+        $toolbar = New-Object System.Windows.Forms.FlowLayoutPanel
+        $toolbar.Dock = 'Top'; $toolbar.Height = 42; $toolbar.Padding = New-Object System.Windows.Forms.Padding(10,6,10,4); $toolbar.BackColor = $script:GUITheme.Header
+        $title = New-GUILabel "Running: $ToolName"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 440
+        $output = New-Object System.Windows.Forms.RichTextBox
+        $output.Dock = 'Fill'; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
+        $close = New-Object System.Windows.Forms.Button
+        $close.Text = 'Stop And Close'; $close.Width = 130; Set-GUIButtonChrome -Button $close
+        $overlay.Controls.Add($output); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
+        $page.Controls.Add($overlay); $overlay.BringToFront()
+
+        $process = Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$runnerPath) -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
+        $state = [pscustomobject]@{ Process=$process; Overlay=$overlay; Tool=$ToolName; ActivityId=$activityId; Session=$session.Path }
+        $close.Tag = $state
+        $close.Add_Click({
+            param($sender,$args)
+            $current = $sender.Tag
+            if(!$current){ return }
+            try {
+                if(!$current.Process.HasExited){ $current.Process.Kill() }
+                Write-GUIDiagnosticLog -Event 'SafeRunnerStopRequested' -Tool $current.Tool -ActivityId $current.ActivityId -Detail "Session=$($current.Session)"
+            }
+            catch { Write-GUIDiagnosticLog -Event 'SafeRunnerStopFailed' -Tool $current.Tool -Level 'ERROR' -ActivityId $current.ActivityId -Detail $_.ScriptStackTrace -Exception $_.Exception }
+            if(!$current.Overlay.IsDisposed){ $current.Overlay.Dispose() }
+        })
+
+        $timer = New-Object System.Windows.Forms.Timer
+        $timer.Interval = 300
+        $state.Timer = $timer
+        $state.LastLengths = @{ $transcriptPath = 0; $stdoutPath = 0; $stderrPath = 0 }
+        $tick = {
+            foreach($path in @($transcriptPath,$stdoutPath,$stderrPath)){
+                try {
+                    if(!(Test-Path -LiteralPath $path)){ continue }
+                    $stream = [System.IO.File]::Open($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Read,[System.IO.FileShare]::ReadWrite)
+                    try {
+                        $length = $stream.Length; $offset = [int64]$state.LastLengths[$path]
+                        if($length -gt $offset){
+                            $stream.Position = $offset
+                            $reader = New-Object System.IO.StreamReader($stream)
+                            $text = $reader.ReadToEnd(); $reader.Dispose()
+                            if($text -and !$output.IsDisposed){ $output.AppendText($text); $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }
+                            $state.LastLengths[$path] = $length
+                        }
+                    }
+                    finally { $stream.Dispose() }
+                }
+                catch { Write-GUIDiagnosticLog -Event 'SafeRunnerReadFailed' -Tool $ToolName -Level 'WARN' -ActivityId $activityId -Detail $_.Exception.Message -Exception $_.Exception }
+            }
+            if($process.HasExited){
+                $timer.Stop(); $timer.Dispose()
+                $title.Text = "Completed: $ToolName (exit $($process.ExitCode))"
+                Write-GUIDiagnosticLog -Event 'SafeRunnerExited' -Tool $ToolName -ActivityId $activityId -Detail "ExitCode=$($process.ExitCode); Session=$($session.Path)"
+            }
+        }.GetNewClosure()
+        $timer.Add_Tick($tick); $timer.Start()
+        Write-GUIDiagnosticLog -Event 'SafeRunnerStarted' -Tool $ToolName -ActivityId $activityId -Detail "ChildProcessId=$($process.Id); Session=$($session.Path); Invocation=$Invocation"
+        Add-GUILog "Launched safe session: $ToolName"
+    }
+    catch {
+        Write-GUIDiagnosticLog -Event 'SafeRunnerLaunchFailed' -Tool $ToolName -Level 'ERROR' -ActivityId $activityId -Detail $_.ScriptStackTrace -Exception $_.Exception
+        throw
+    }
+}
+
+function Start-GUINetworkDiscovery {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = 'Network Discovery'
+    $form.StartPosition = 'CenterParent'; $form.Size = New-Object System.Drawing.Size(620,210)
+    $form.MinimizeBox = $false; $form.MaximizeBox = $false; $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = 'Fill'; $layout.Padding = New-Object System.Windows.Forms.Padding(16); $layout.RowCount = 3; $layout.ColumnCount = 1
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.Controls.Add((New-GUILabel 'Choose a scan. CIDR is only used by Scan CIDR.'),0,0)
+    $row = New-Object System.Windows.Forms.FlowLayoutPanel; $row.Dock='Fill'
+    $cidr = New-GUITextBox; $cidr.Width=180
+    $cidrLabel = New-GUILabel 'CIDR'; $cidrLabel.Width=44; $cidrLabel.TextAlign='MiddleLeft'
+    $row.Controls.Add($cidrLabel); $row.Controls.Add($cidr); $layout.Controls.Add($row,0,1)
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel; $buttons.Dock='Fill'
+    $newButton = { param($text) $button=New-Object System.Windows.Forms.Button; $button.Text=$text; $button.Width=126; $button.Height=34; Set-GUIButtonChrome -Button $button; $button }
+    $auto=& $newButton 'Auto Scan'; $manual=& $newButton 'Scan CIDR'; $topology=& $newButton 'Topology'; $neighbors=& $newButton 'Neighbors'; $cancel=& $newButton 'Cancel'
+    foreach($button in @($auto,$manual,$topology,$neighbors,$cancel)){ $buttons.Controls.Add($button) }
+    $layout.Controls.Add($buttons,0,2); $form.Controls.Add($layout)
+    $start = { param($invocation,$label) $form.Close(); Start-GUISafeScriptRunner -ToolName $label -Invocation $invocation }.GetNewClosure()
+    $auto.Add_Click({ & $start 'Invoke-NetworkScan -Timeout 500 -Throttle 128' 'Network Discovery - Auto Scan' })
+    $manual.Add_Click({ $value=$cidr.Text.Trim(); if($value -notmatch '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'){ [System.Windows.Forms.MessageBox]::Show('Enter an IPv4 CIDR such as 10.10.10.0/24.','Network Toolkit') | Out-Null; return }; & $start ("Invoke-NetworkPingUtility -CIDR '{0}' -Timeout 500 -Throttle 128" -f $value) 'Network Discovery - CIDR Scan' })
+    $topology.Add_Click({ & $start 'Get-NetworkTopology' 'Network Discovery - Topology' })
+    $neighbors.Add_Click({ & $start 'Get-NetworkNeighbors' 'Network Discovery - Neighbors' })
+    $cancel.Add_Click({ $form.Close() })
+    [void]$form.ShowDialog($script:Form)
 }
 
 function Start-GUIToolkitFunctionConsole {
@@ -7331,6 +7471,10 @@ function Get-GUIToolAction {
 
     if($Tool.Action){
         return $Tool.Action
+    }
+
+    if($Tool.Function -eq 'Invoke-NetworkDiscovery'){
+        return { Start-GUINetworkDiscovery }
     }
 
     if($Tool.External){
