@@ -1139,6 +1139,47 @@ function Add-GUILog {
     }
 }
 
+function Write-GUIDiagnosticLog {
+    param(
+        [string]$Event,
+        [string]$Tool = "GUI",
+        [string]$Level = "INFO",
+        [string]$Detail = "",
+        [System.Exception]$Exception = $null,
+        [string]$ActivityId = ""
+    )
+
+    try {
+        $logRoot = if($CSIPaths -and $CSIPaths.Logs){ $CSIPaths.Logs }else{ Join-Path $SharedToolkitRoot 'Logs' }
+        if(!(Test-Path -LiteralPath $logRoot)){
+            New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
+        }
+
+        $path = Join-Path $logRoot 'NetworkToolkit-GUI-Diagnostic.log'
+        $exceptionText = if($Exception){ $Exception.ToString() }else{ '' }
+        $record = [ordered]@{
+            Timestamp  = (Get-Date).ToString('o')
+            Level      = $Level
+            ActivityId = $ActivityId
+            Event      = $Event
+            Tool       = $Tool
+            ProcessId  = $PID
+            Detail     = ($Detail -replace "[\r\n]+",' | ')
+            Exception  = ($exceptionText -replace "[\r\n]+",' | ')
+        }
+        ($record | ConvertTo-Json -Compress) | Add-Content -LiteralPath $path -Encoding UTF8
+
+        $item = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
+        if($item -and $item.Length -gt 524288){
+            $recent = Get-Content -LiteralPath $path -Tail 1000 -ErrorAction SilentlyContinue
+            Set-Content -LiteralPath $path -Value $recent -Encoding UTF8
+        }
+    }
+    catch {
+        # Diagnostics must never make the technician-facing UI less stable.
+    }
+}
+
 function Start-GUIBusyIndicator {
     param([string]$Message = "Working")
 
@@ -1218,6 +1259,8 @@ function Write-GUIToolUsageLog {
             $recent = Get-Content -Path $logPath -Tail 200 -ErrorAction SilentlyContinue
             Set-Content -Path $logPath -Value $recent -Encoding UTF8
         }
+
+        Write-GUIDiagnosticLog -Event $Action -Tool $Tool -Level $Level -Detail $Detail
     }
     catch {
     }
@@ -1229,14 +1272,17 @@ function Invoke-GUISafely {
         [scriptblock]$Action
     )
 
+    $activityId = [guid]::NewGuid().ToString('N')
     Start-GUIBusyIndicator -Message $Tool
     try {
-        Write-GUIToolUsageLog -Tool $Tool -Action "Start"
+        Write-GUIToolUsageLog -Tool $Tool -Action "Start" -Detail "ActivityId=$activityId"
+        Write-GUIDiagnosticLog -Event 'ActionDispatch' -Tool $Tool -ActivityId $activityId -Detail ("Action={0}" -f $Action.ToString())
         & $Action
-        Write-GUIToolUsageLog -Tool $Tool -Action "Completed"
+        Write-GUIToolUsageLog -Tool $Tool -Action "Completed" -Detail "ActivityId=$activityId"
     }
     catch {
-        Write-GUIToolUsageLog -Tool $Tool -Action "Failed" -Detail $_.Exception.Message -Level "ERROR"
+        Write-GUIToolUsageLog -Tool $Tool -Action "Failed" -Detail ("ActivityId={0}; {1}" -f $activityId,$_.Exception.Message) -Level "ERROR"
+        Write-GUIDiagnosticLog -Event 'ActionException' -Tool $Tool -Level 'ERROR' -ActivityId $activityId -Detail $_.ScriptStackTrace -Exception $_.Exception
         Add-GUILog "$Tool failed: $($_.Exception.Message)"
         [System.Windows.Forms.MessageBox]::Show(
             "$Tool failed.`r`n`r`n$($_.Exception.Message)",
@@ -1258,12 +1304,19 @@ function Register-GUIExceptionHandlers {
             $message = if($eventArgs.Exception){$eventArgs.Exception.Message}else{"Unknown GUI exception"}
             Add-GUILog "GUI recovered from an unexpected error: $message"
             Write-GUIToolUsageLog -Tool "GUI" -Action "UnhandledThreadException" -Detail $message -Level "ERROR"
+            Write-GUIDiagnosticLog -Event 'UnhandledThreadException' -Tool 'GUI' -Level 'ERROR' -Detail $_.ScriptStackTrace -Exception $eventArgs.Exception
             [System.Windows.Forms.MessageBox]::Show(
                 "The toolkit caught an unexpected GUI error and kept running.`r`n`r`n$message",
                 "Network Toolkit",
                 [System.Windows.Forms.MessageBoxButtons]::OK,
                 [System.Windows.Forms.MessageBoxIcon]::Warning
             ) | Out-Null
+        })
+        [System.AppDomain]::CurrentDomain.add_UnhandledException({
+            param($sender,$eventArgs)
+            $exception = $eventArgs.ExceptionObject -as [System.Exception]
+            $detail = "IsTerminating=$($eventArgs.IsTerminating)"
+            Write-GUIDiagnosticLog -Event 'UnhandledAppDomainException' -Tool 'GUI' -Level 'FATAL' -Detail $detail -Exception $exception
         })
     }
     catch {
@@ -2264,6 +2317,7 @@ function Start-GUIToolkitFunctionConsole {
     )
 
     $toolLabel = if($DisplayName){$DisplayName}else{$FunctionName}
+    $activityId = [guid]::NewGuid().ToString('N')
     $session = New-CSITempOutputSession -ToolName $toolLabel
     $runnerPath = Join-Path $session.Path "run-tool.ps1"
 
@@ -2350,6 +2404,7 @@ finally {
 
     try {
         $commandText | Set-Content -Path $runnerPath -Encoding UTF8
+        Write-GUIDiagnosticLog -Event 'ConsoleRunnerPrepared' -Tool $toolLabel -ActivityId $activityId -Detail ("Function={0}; Runner={1}; Session={2}; RequiresAdmin={3}" -f $FunctionName,$runnerPath,$session.Path,$RequiresAdmin)
 
         if($RequiresAdmin -and !(Test-GUIAdministrator)){
             throw "This tool requires elevation. Restart Network Toolkit elevated, then run it again."
@@ -2380,7 +2435,8 @@ finally {
         $psi.FileName = 'powershell.exe'; $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""; $psi.WorkingDirectory = $SharedToolkitRoot
         $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
         $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
-        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay; Input=$input }
+        Write-GUIDiagnosticLog -Event 'ConsoleChildStarted' -Tool $toolLabel -ActivityId $activityId -Detail ("ChildProcessId={0}; FileName={1}; Arguments={2}" -f $process.Id,$psi.FileName,$psi.Arguments)
+        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay; Input=$input; Tool=$toolLabel; ActivityId=$activityId; SessionPath=$session.Path }
         $input.Tag = $terminalState; $send.Tag = $terminalState
         $appendLine = { param($line) if($null -ne $line){ $action=[System.Action]{ $output.AppendText($line + "`r`n"); Add-Content -LiteralPath $livePath -Value $line -Encoding UTF8; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }; if(!$output.IsDisposed){[void]$output.BeginInvoke($action)} } }
         $process.add_OutputDataReceived({ param($sender,$args) & $appendLine $args.Data })
@@ -2388,13 +2444,17 @@ finally {
         $process.BeginOutputReadLine(); $process.BeginErrorReadLine()
         $close = New-Object System.Windows.Forms.Button
         $close.Text = 'Stop And Close'; Set-GUIButtonChrome -Button $close
-        $close.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state){ if(!$state.Process.HasExited){try{$state.Process.Kill()}catch{}}; if($state.Overlay -and !$state.Overlay.IsDisposed){$state.Overlay.Dispose()} } })
+        $close.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state){ Write-GUIDiagnosticLog -Event 'ConsoleChildStopRequested' -Tool $state.Tool -ActivityId $state.ActivityId -Detail ("ChildProcessId={0}; Session={1}" -f $state.Process.Id,$state.SessionPath); if(!$state.Process.HasExited){try{$state.Process.Kill()}catch{ Write-GUIDiagnosticLog -Event 'ConsoleChildStopFailed' -Tool $state.Tool -Level 'ERROR' -ActivityId $state.ActivityId -Detail $_.ScriptStackTrace -Exception $_.Exception }}; if($state.Overlay -and !$state.Overlay.IsDisposed){$state.Overlay.Dispose()} } })
         $close.Tag = $terminalState
         [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
         Start-GUIBusyIndicator -Message $toolLabel
         $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
         $timer.Add_Tick({
-            if($process.HasExited){ $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator; $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))" }
+            if($process.HasExited){
+                $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator
+                $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))"
+                Write-GUIDiagnosticLog -Event 'ConsoleChildExited' -Tool $toolLabel -ActivityId $activityId -Detail ("ChildProcessId={0}; ExitCode={1}; Session={2}" -f $process.Id,$process.ExitCode,$session.Path)
+            }
         })
         $timer.Start()
 
@@ -2402,6 +2462,7 @@ finally {
         Add-GUILog "Temp output session: $($session.Path)"
     }
     catch {
+        Write-GUIDiagnosticLog -Event 'ConsoleLaunchFailed' -Tool $toolLabel -Level 'ERROR' -ActivityId $activityId -Detail $_.ScriptStackTrace -Exception $_.Exception
         Add-GUILog "Failed to launch ${toolLabel}: $($_.Exception.Message)"
     }
 }
@@ -10870,6 +10931,15 @@ function Build-Form {
     if(Test-Path $GuiIconPath){
         $Form.Icon = New-Object System.Drawing.Icon($GuiIconPath)
     }
+
+    $Form.Add_FormClosing({
+        param($sender,$eventArgs)
+        Write-GUIDiagnosticLog -Event 'FormClosing' -Tool 'GUI' -Detail ("CloseReason={0}; Cancel={1}" -f $eventArgs.CloseReason,$eventArgs.Cancel)
+    })
+    $Form.Add_FormClosed({
+        param($sender,$eventArgs)
+        Write-GUIDiagnosticLog -Event 'FormClosed' -Tool 'GUI' -Detail ("CloseReason={0}" -f $eventArgs.CloseReason)
+    })
 
     $root = New-Object System.Windows.Forms.TableLayoutPanel
     $root.Dock = "Fill"
