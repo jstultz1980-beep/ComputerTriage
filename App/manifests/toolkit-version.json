@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622110335,
-    "SourceUpdatedAt":  "2026-06-22T11:03:35.0480247-05:00",
-    "ReleaseNotes":  "Refine reports, bundle workflow, PsExec presets, software links, and live log access."
+    "Build":  20260622110412,
+    "SourceUpdatedAt":  "2026-06-22T11:04:12.0289649-05:00",
+    "ReleaseNotes":  "Refine toolkit UI controls and PsExec output layout."
 }
