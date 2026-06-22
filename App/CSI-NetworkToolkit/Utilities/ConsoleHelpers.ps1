@@ -21,18 +21,16 @@ param(
 
     while($true){
 
-        $value = Read-Host "$Prompt [B=Back]"
+        if([Console]::IsInputRedirected){
+            Write-Host "$Prompt [B=Back]"
+            $value = [Console]::In.ReadLine()
+        }
+        else{
+            $value = Read-Host "$Prompt [B=Back]"
+        }
 
         if(Test-CSIBackCommand $value){
             Exit-CSITool
-        }
-
-        if([Console]::IsInputRedirected -and !$value -and !$AllowEmpty){
-            # GUI terminal sessions use redirected stdin. Wait briefly for the
-            # technician to submit a line instead of treating no queued input
-            # as an automatic request to leave the tool.
-            Start-Sleep -Milliseconds 150
-            continue
         }
 
         if($AllowEmpty -or $value){
