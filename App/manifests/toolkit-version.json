@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622112036,
-    "SourceUpdatedAt":  "2026-06-22T11:20:36.4925183-05:00",
-    "ReleaseNotes":  "Fix embedded terminal control state handling."
+    "Build":  20260622112312,
+    "SourceUpdatedAt":  "2026-06-22T11:23:12.7846921-05:00",
+    "ReleaseNotes":  "Keep redirected GUI terminal sessions open for console prompts."
 }

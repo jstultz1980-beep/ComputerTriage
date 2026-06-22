@@ -28,7 +28,11 @@ param(
         }
 
         if([Console]::IsInputRedirected -and !$value -and !$AllowEmpty){
-            Exit-CSITool
+            # GUI terminal sessions use redirected stdin. Wait briefly for the
+            # technician to submit a line instead of treating no queued input
+            # as an automatic request to leave the tool.
+            Start-Sleep -Milliseconds 150
+            continue
         }
 
         if($AllowEmpty -or $value){
