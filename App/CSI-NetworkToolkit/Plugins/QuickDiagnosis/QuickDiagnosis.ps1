@@ -2261,6 +2261,71 @@ param([pscustomobject]$Report)
 
 }
 
+function Global:Export-CSIQuickIssueEvidence {
+param([pscustomobject]$Report)
+
+    $start = (Get-Date).AddDays(-14)
+    $eventRows = New-Object System.Collections.ArrayList
+    $addEvents = {
+        param([string]$LogName,[string[]]$Providers,[int[]]$Ids,[string]$Category)
+        foreach($provider in $Providers){
+            try {
+                $filter = @{ LogName=$LogName; ProviderName=$provider; StartTime=$start }
+                if($Ids){ $filter.Id = $Ids }
+                Get-WinEvent -FilterHashtable $filter -MaxEvents 30 -ErrorAction Stop | ForEach-Object {
+                    [void]$eventRows.Add([pscustomobject]@{
+                        Category=$Category; Time=$_.TimeCreated.ToString('s'); Log=$_.LogName; Provider=$_.ProviderName; Id=$_.Id; Level=$_.LevelDisplayName
+                        Message=([string]$_.Message).Trim()
+                    })
+                }
+            }
+            catch {}
+        }
+    }
+
+    & $addEvents 'System' @('Service Control Manager') @(7000,7001,7009,7031,7034) 'Service failures'
+    & $addEvents 'Application' @('Application Error','Windows Error Reporting') @(1000,1001) 'Application crashes and WER'
+    & $addEvents 'System' @('Microsoft-Windows-Kernel-PnP','Microsoft-Windows-DriverFrameworks-UserMode') @() 'Driver and device events'
+    & $addEvents 'Setup' @('Microsoft-Windows-WindowsUpdateClient') @() 'Windows Update events'
+
+    $stoppedAuto = @()
+    try {
+        $stoppedAuto = @(Get-CimInstance Win32_Service -ErrorAction Stop |
+            Where-Object { $_.StartMode -eq 'Auto' -and $_.State -ne 'Running' } |
+            Select-Object Name,DisplayName,State,StartMode,StartName,PathName)
+    }
+    catch {}
+
+    $deviceProblems = @()
+    try {
+        if(Get-Command Get-PnpDevice -ErrorAction SilentlyContinue){
+            $deviceProblems = @(Get-PnpDevice -PresentOnly -ErrorAction SilentlyContinue |
+                Where-Object { $_.Status -notin @('OK','Unknown') } |
+                Select-Object FriendlyName,Class,Status,Problem,InstanceId)
+        }
+    }
+    catch {}
+
+    $recentUpdates = @()
+    try { $recentUpdates = @(Get-HotFix -ErrorAction Stop | Sort-Object InstalledOn -Descending | Select-Object -First 12 HotFixID,Description,InstalledOn,InstalledBy) } catch {}
+
+    $computerName = if($Report.Fingerprint -and $Report.Fingerprint.ComputerName){$Report.Fingerprint.ComputerName}else{$env:COMPUTERNAME}
+    $evidence = [pscustomobject]@{
+        ComputerName=$computerName; CollectedAt=(Get-Date).ToString('s'); WindowStart=$start.ToString('s')
+        PendingReboot=if($Report.Fingerprint){$Report.Fingerprint.PendingReboot}else{$null}
+        TargetedEvents=@($eventRows | Sort-Object Time -Descending | Select-Object -First 100)
+        StoppedAutomaticServices=$stoppedAuto
+        DeviceManagerProblems=$deviceProblems
+        DriverInventory=if($Report.DriverInventory){@($Report.DriverInventory | Select-Object DeviceName,DeviceClass,Provider,Version,DriverDate,InfName)}else{@()}
+        RecentInstalledUpdates=$recentUpdates
+    }
+    $path = Join-Path $CSIPaths.Exports ("issue-evidence-{0}-{1}.json" -f $computerName,(Get-Date -Format 'yyyyMMdd-HHmmss'))
+    $evidence | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $path -Encoding UTF8
+    $Report | Add-Member -MemberType NoteProperty -Name IssueEvidencePath -Value $path -Force
+    $Report | Add-Member -MemberType NoteProperty -Name IssueEvidence -Value $evidence -Force
+    $path
+}
+
 function Global:Invoke-QuickDiagnosis {
 
 param(
@@ -2301,6 +2366,7 @@ param(
             }
 
             $report = Add-CSIQuickStatusChecksToReport -Report $report
+            $issueEvidencePath = Export-CSIQuickIssueEvidence -Report $report
 
             if($report.Fingerprint -and $report.FingerprintExports){
                 foreach($jsonPath in @($report.FingerprintExports.DataJson,$report.FingerprintExports.Json)){
@@ -2327,6 +2393,8 @@ param(
                         Problems = $report.Problems
                         Health = $report.Health
                         DeepDives = $report.DeepDives
+                        IssueEvidencePath = $issueEvidencePath
+                        IssueEvidence = $report.IssueEvidence
                         RepairDisposition = $report.RepairDisposition
                         FingerprintExports = $report.FingerprintExports
                     }

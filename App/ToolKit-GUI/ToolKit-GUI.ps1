@@ -8589,7 +8589,7 @@ function Build-ReportsPage {
     $script:ReportTypeBox = New-Object System.Windows.Forms.ComboBox
     $ReportTypeBox.DropDownStyle = "DropDownList"
     $ReportTypeBox.Width = 190
-    Add-GUIComboItems -ComboBox $ReportTypeBox -Items @("All","Quick Diagnosis","Computer Profiles","Software Keys","Crash Events","Discovery Exports","Repair And Triage","Minidumps")
+    Add-GUIComboItems -ComboBox $ReportTypeBox -Items @("All","Quick Diagnosis","Computer Profiles","Software Keys","Crash Events","Discovery Exports","Repair And Triage","Issue Evidence","Minidumps")
     $ReportTypeBox.Add_SelectedIndexChanged({ Refresh-GUIReports })
     [void]$filterPanel.Controls.Add($ReportTypeBox)
 
@@ -8650,6 +8650,7 @@ function Get-GUIReportItems {
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="full-triage*.json" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="dism*.log" },
         @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="sfc*.log" }
+        @{ Type="Issue Evidence"; Path=$CSIPaths.Exports; Pattern="issue-evidence*.json" }
     )
 
     foreach($root in $roots){
@@ -8836,6 +8837,7 @@ function New-GUIChatGPTBundle {
             "## Analysis Rules"
             ""
             "- Use only evidence in this ZIP. Clearly label anything based on general knowledge rather than an included report."
+            "- Do not name a specific application, driver, service, vendor, or product unless it is explicitly identified in the included evidence."
             "- Do not recommend registry edits, service disabling, driver removal, security exclusions, or repair commands without explaining why, the risk, and how to validate the change."
             "- Do not treat normal VM limitations, such as unavailable SMART disk data, as hardware failure."
             "- Treat crash signatures, missing startup entries, pending reboots, DISM/SFC results, driver warnings, Windows Update state, and event-log patterns as leads that need corroboration unless the evidence is conclusive."

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260621181608,
-    "SourceUpdatedAt":  "2026-06-21T18:16:08.3348298-05:00",
-    "ReleaseNotes":  "Provide an HTML and CSS template for downloadable AI diagnostic analysis."
+    "Build":  20260622081141,
+    "SourceUpdatedAt":  "2026-06-22T08:11:41.0949385-05:00",
+    "ReleaseNotes":  "Add targeted issue evidence exports for AI-assisted Quick Diagnosis review."
 }
