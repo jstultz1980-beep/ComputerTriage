@@ -5999,9 +5999,11 @@ function Start-GUIPsExecCaptured {
                 $outText = if(Test-Path $script:PsExecFiles.StdOut){ Get-Content -Raw -Path $script:PsExecFiles.StdOut -ErrorAction SilentlyContinue }else{ "" }
                 $errText = if(Test-Path $script:PsExecFiles.StdErr){ Get-Content -Raw -Path $script:PsExecFiles.StdErr -ErrorAction SilentlyContinue }else{ "" }
                 $exitCode = $script:PsExecProcess.ExitCode
+                $remoteInterrupted = ($outText + "`n" + $errText) -match '(?i)(-1073741510|0xC000013A|\^C)'
                 $combined = @(
                     if($outText){ $outText.TrimEnd() }
                     if($errText){ "ERROR OUTPUT:`r`n" + $errText.TrimEnd() }
+                    if($remoteInterrupted){ "Interpretation: The remote command was interrupted by Ctrl+C or a console-close event (Windows status 0xC000013A). This is not a normal command-completion result." }
                     "Exit code: $exitCode"
                     "Output folder: $($script:PsExecFiles.Session.Path)"
                 ) -join "`r`n`r`n"

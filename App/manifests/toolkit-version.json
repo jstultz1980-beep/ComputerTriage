@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622111057,
-    "SourceUpdatedAt":  "2026-06-22T11:10:57.2703189-05:00",
-    "ReleaseNotes":  "Refine software resource links."
+    "Build":  20260622111235,
+    "SourceUpdatedAt":  "2026-06-22T11:12:35.5198556-05:00",
+    "ReleaseNotes":  "Explain interrupted PsExec remote command results."
 }
