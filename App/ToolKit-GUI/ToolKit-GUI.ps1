@@ -2367,9 +2367,11 @@ finally {
         $inputPanel = New-Object System.Windows.Forms.Panel
         $inputPanel.Dock = "Bottom"; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
         $input = New-GUITextBox; $input.Dock = "Fill"
-        $send = New-GUIButton "Send" { if(!$process.HasExited -and $input.Text){ $process.StandardInput.WriteLine($input.Text); $input.Clear() } }
+        $send = New-Object System.Windows.Forms.Button
+        $send.Text = 'Send'; Set-GUIButtonChrome -Button $send
+        $send.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state -and !$state.Process.HasExited -and $state.Input.Text){ $state.Process.StandardInput.WriteLine($state.Input.Text); $state.Input.Clear() } })
         $send.Dock = "Right"; $send.Width = 82
-        $input.Add_KeyDown({ if($_.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ if(!$process.HasExited){$process.StandardInput.WriteLine($input.Text); $input.Clear()}; $_.SuppressKeyPress=$true } })
+        $input.Add_KeyDown({ if($_.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $state=$sender.Tag; if($state -and !$state.Process.HasExited){$state.Process.StandardInput.WriteLine($sender.Text); $sender.Clear()}; $_.SuppressKeyPress=$true } })
         $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
         $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
 
@@ -2378,11 +2380,16 @@ finally {
         $psi.FileName = 'powershell.exe'; $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""; $psi.WorkingDirectory = $SharedToolkitRoot
         $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
         $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
+        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay; Input=$input }
+        $input.Tag = $terminalState; $send.Tag = $terminalState
         $appendLine = { param($line) if($null -ne $line){ $action=[System.Action]{ $output.AppendText($line + "`r`n"); Add-Content -LiteralPath $livePath -Value $line -Encoding UTF8; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }; if(!$output.IsDisposed){[void]$output.BeginInvoke($action)} } }
         $process.add_OutputDataReceived({ param($sender,$args) & $appendLine $args.Data })
         $process.add_ErrorDataReceived({ param($sender,$args) & $appendLine ("ERROR: " + $args.Data) })
         $process.BeginOutputReadLine(); $process.BeginErrorReadLine()
-        $close = New-GUIButton "Stop And Close" { if(!$process.HasExited){try{$process.Kill()}catch{}}; $overlay.Dispose() }
+        $close = New-Object System.Windows.Forms.Button
+        $close.Text = 'Stop And Close'; Set-GUIButtonChrome -Button $close
+        $close.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state){ if(!$state.Process.HasExited){try{$state.Process.Kill()}catch{}}; if($state.Overlay -and !$state.Overlay.IsDisposed){$state.Overlay.Dispose()} } })
+        $close.Tag = $terminalState
         [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
         Start-GUIBusyIndicator -Message $toolLabel
         $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
