@@ -8667,6 +8667,7 @@ function Build-ReportsPage {
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Bundle Latest To Send" { New-GUIChatGPTBundle }))
     [void]$buttons.Controls.Add((New-GUIButton "Import AI Analysis" { Import-GUIAIAnalysis }))
+    [void]$buttons.Controls.Add((New-GUIButton "Generate Final Report" { Export-GUIFinalComputerReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Open Help" { Open-GUIHelpFile }))
 
@@ -8678,6 +8679,7 @@ function Get-GUIReportItems {
     $items = @()
     $roots = @(
         @{ Type="Quick Diagnosis"; Path=$CSIPaths.Exports; Pattern="quick-diagnosis*.html" },
+        @{ Type="Final Reports"; Path=$CSIPaths.Exports; Pattern="final-report*.html" },
         @{ Type="Software Keys"; Path=$CSIPaths.Exports; Pattern="software-key-report*.html" },
         @{ Type="Crash Events"; Path=$CSIPaths.Exports; Pattern="crash-event-summary*.html" },
         @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.html" },
@@ -8824,9 +8826,30 @@ function Import-GUIAIAnalysis {
         if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){
             [void](Set-CSIComputerStateSection -SectionName "AIAnalysis" -Data $analysis -ComputerName $analysis.computerName -Source "Import-GUIAIAnalysis")
         }
+        Export-GUIFinalComputerReport -ComputerName $analysis.computerName | Out-Null
         Add-GUILog "Imported AI analysis: $path"; Refresh-GUIReports; Open-CSIOutputFile -Path $path
     }
     catch { [System.Windows.Forms.MessageBox]::Show("Could not import AI analysis.`r`n`r`n$($_.Exception.Message)","Import AI Analysis",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
+}
+
+function Export-GUIFinalComputerReport {
+    param([string]$ComputerName=$env:COMPUTERNAME)
+    if(!(Get-Command Read-CSIComputerState -ErrorAction SilentlyContinue)){ throw "Computer state storage is unavailable." }
+    $state = Read-CSIComputerState -ComputerName $ComputerName
+    $sections = $state.Sections
+    if(!$sections -or !$sections.AIAnalysis -or !$sections.AIAnalysis.Data){ throw "Import an AI analysis JSON for $ComputerName first." }
+    $ai = $sections.AIAnalysis.Data
+    $quick = if($sections.QuickDiagnosis){$sections.QuickDiagnosis.Data}else{$null}
+    $enc = { param($v) [System.Net.WebUtility]::HtmlEncode([string]$v) }
+    $findings = @($ai.findings | ForEach-Object { "<tr><td>$( & $enc $_.severity )</td><td>$( & $enc $_.title )</td><td>$( & $enc (@($_.evidence) -join '<br>') )</td><td>$( & $enc $_.nextAction )</td></tr>" }) -join "`n"
+    $checklist = @($ai.technicianChecklist | ForEach-Object { "<li>$( & $enc $_ )</li>" }) -join "`n"
+    $problems = if($quick -and $quick.Problems){@($quick.Problems | ForEach-Object { "<li><strong>$( & $enc ("$($_.Area) - $($_.Check)") )</strong>: $( & $enc $_.Detail )</li>" }) -join "`n"}else{'<li>No saved Quick Diagnosis findings were available.</li>'}
+    $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'; $path=Join-Path $CSIPaths.Exports ("final-report-{0}-{1}.html" -f $ComputerName,$stamp)
+    @"
+<!doctype html><html><head><meta charset="utf-8"><title>Network Toolkit Final Report</title><style>body{font:15px Segoe UI,Arial;background:#edf4f8;color:#18324b;margin:0}main{max-width:1180px;margin:28px auto;background:white;padding:32px;border:1px solid #cbd8e4;border-radius:8px}h1{color:#125c96;margin:0}h2{margin-top:28px;color:#18324b}table{border-collapse:collapse;width:100%}th,td{border:1px solid #cbd8e4;padding:10px;text-align:left;vertical-align:top}th{background:#e7f1fa}.meta{color:#526070}</style></head><body><main><h1>Network Toolkit Final Report</h1><p class="meta">Computer: $( & $enc $ComputerName ) | Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | AI risk: $( & $enc $ai.riskLevel )</p><h2>Executive Summary</h2><p>$( & $enc $ai.executiveSummary )</p><h2>Local Quick Diagnosis Findings</h2><ul>$problems</ul><h2>AI Evidence-Backed Findings</h2><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Next Action</th></tr>$findings</table><h2>Technician Checklist</h2><ol>$checklist</ol><h2>Provenance</h2><p>Local Quick Diagnosis state: $( & $enc $state.LastQuickDiagnosisAt )<br>AI analysis imported: $( & $enc $sections.AIAnalysis.UpdatedAt )<br>AI content was imported from validated JSON and rendered by Network Toolkit.</p></main></body></html>
+"@ | Set-Content -LiteralPath $path -Encoding UTF8
+    if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){ [void](Set-CSIComputerStateSection -SectionName 'FinalReport' -Data ([pscustomobject]@{Path=$path;GeneratedAt=(Get-Date).ToString('s')}) -ComputerName $ComputerName -Source 'Export-GUIFinalComputerReport') }
+    Add-GUILog "Generated Final Report: $path"; return $path
 }
 
 function New-GUIChatGPTBundle {
