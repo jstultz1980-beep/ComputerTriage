@@ -2345,19 +2345,41 @@ finally {
     Write-Host "Output saved to:" -ForegroundColor Green
     Write-Host "$($session.Path)"
     Write-Host ""
-    [void](Read-Host "Press ENTER to close")
 }
 "@
 
     try {
         $commandText | Set-Content -Path $runnerPath -Encoding UTF8
 
-        Start-CSIToolProcess `
-            -FilePath "powershell.exe" `
-            -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$runnerPath`"") `
-            -WorkingDirectory $SharedToolkitRoot `
-            -WindowStyle Normal `
-            -Elevated:($RequiresAdmin -and !(Test-GUIAdministrator)) | Out-Null
+        if($RequiresAdmin -and !(Test-GUIAdministrator)){
+            throw "This tool requires elevation. Restart Network Toolkit elevated, then run it again."
+        }
+
+        $page = if($script:MainTabs){$script:MainTabs.SelectedTab}else{$null}
+        if(!$page){ throw "No active tool tab is available for console output." }
+        $overlay = New-Object System.Windows.Forms.Panel
+        $overlay.Dock = "Fill"; $overlay.BackColor = $script:GUITheme.LogBack; $overlay.BringToFront()
+        $toolbar = New-Object System.Windows.Forms.FlowLayoutPanel
+        $toolbar.Dock = "Top"; $toolbar.Height = 42; $toolbar.Padding = New-Object System.Windows.Forms.Padding(10,6,10,4); $toolbar.BackColor = $script:GUITheme.Header
+        $title = New-GUILabel "Running: $toolLabel"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 360
+        $output = New-Object System.Windows.Forms.RichTextBox
+        $output.Dock = "Fill"; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
+        $overlay.Controls.Add($output); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
+
+        $livePath = Join-Path $session.Path 'live-output.txt'
+        $psi = New-Object System.Diagnostics.ProcessStartInfo
+        $psi.FileName = 'cmd.exe'; $psi.Arguments = "/c powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`" > `"$livePath`" 2>&1"; $psi.WorkingDirectory = $SharedToolkitRoot
+        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
+        $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
+        $close = New-GUIButton "Stop And Close" { if(!$process.HasExited){try{$process.Kill()}catch{}}; $overlay.Dispose() }
+        [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
+        Start-GUIBusyIndicator -Message $toolLabel
+        $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
+        $timer.Add_Tick({
+            try { if(Test-Path $livePath){ $output.Text = Get-Content -LiteralPath $livePath -Raw -ErrorAction SilentlyContinue; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() } } catch {}
+            if($process.HasExited){ $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator; $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))" }
+        })
+        $timer.Start()
 
         Add-GUILog "Launched: $toolLabel"
         Add-GUILog "Temp output session: $($session.Path)"

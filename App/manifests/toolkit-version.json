@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622111235,
-    "SourceUpdatedAt":  "2026-06-22T11:12:35.5198556-05:00",
-    "ReleaseNotes":  "Explain interrupted PsExec remote command results."
+    "Build":  20260622111725,
+    "SourceUpdatedAt":  "2026-06-22T11:17:25.7214371-05:00",
+    "ReleaseNotes":  "Embed console-driven toolkit functions inside their active tabs."
 }
