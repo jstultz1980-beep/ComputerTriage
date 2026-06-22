@@ -24,11 +24,6 @@ param(
         if([Console]::IsInputRedirected){
             Write-Host "$Prompt [B=Back]"
             $value = [Console]::In.ReadLine()
-            # A protected GUI session has no interactive console stdin.  Do not
-            # spin forever when a legacy Read-Host menu is launched there.
-            if($null -eq $value){
-                throw [System.OperationCanceledException]::new('This legacy menu requires GUI controls and cannot accept console input.')
-            }
         }
         else{
             $value = Read-Host "$Prompt [B=Back]"
