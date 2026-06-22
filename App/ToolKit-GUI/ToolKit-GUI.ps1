@@ -2260,8 +2260,16 @@ function Start-GUIToolkitFunctionConsole {
     param(
         [string]$FunctionName,
         [string]$DisplayName = "",
-        [switch]$RequiresAdmin
+        [switch]$RequiresAdmin,
+        [string]$Invocation = ""
     )
+
+    # The legacy Network Discovery menu uses Read-Host.  It cannot safely run
+    # inside a redirected process, so present its individual actions in the GUI.
+    if($FunctionName -eq 'Invoke-NetworkDiscovery' -and !$Invocation){
+        Start-GUINetworkDiscovery
+        return
+    }
 
     $toolLabel = if($DisplayName){$DisplayName}else{$FunctionName}
     $session = New-CSITempOutputSession -ToolName $toolLabel
@@ -2290,7 +2298,7 @@ try {
     Write-Host "Running: $($toolLabel.Replace('"','\"'))" -ForegroundColor Cyan
     Write-Host "Output session: $($session.Path)" -ForegroundColor DarkCyan
     Write-Host ""
-    $FunctionName
+    $(if($Invocation){$Invocation}else{$FunctionName})
     `$metadata.CompletedAt = (Get-Date).ToString("s")
     `$metadata.Status = "Completed"
 }
@@ -2364,28 +2372,20 @@ finally {
         $title = New-GUILabel "Running: $toolLabel"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 360
         $output = New-Object System.Windows.Forms.RichTextBox
         $output.Dock = "Fill"; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
-        $inputPanel = New-Object System.Windows.Forms.Panel
-        $inputPanel.Dock = "Bottom"; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
-        $input = New-GUITextBox; $input.Dock = "Fill"
-        $send = New-Object System.Windows.Forms.Button
-        $send.Text = 'Send'; Set-GUIButtonChrome -Button $send
-        $send.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state -and !$state.Process.HasExited -and $state.Input.Text){ $state.Process.StandardInput.WriteLine($state.Input.Text); $state.Input.Clear() } })
-        $send.Dock = "Right"; $send.Width = 82
-        $input.Add_KeyDown({ if($_.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $state=$sender.Tag; if($state -and !$state.Process.HasExited){$state.Process.StandardInput.WriteLine($sender.Text); $sender.Clear()}; $_.SuppressKeyPress=$true } })
-        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
-        $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
+        $notice = New-GUILabel 'This legacy tool is running in a protected output session.'
+        $notice.Dock = 'Bottom'; $notice.Height = 28; $notice.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5)
+        $notice.BackColor = $script:GUITheme.HeaderPanel; $notice.ForeColor = $script:GUITheme.MutedText
+        $overlay.Controls.Add($output); $overlay.Controls.Add($notice); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
 
-        $livePath = Join-Path $session.Path 'live-output.txt'
+        $livePath = $session.Transcript
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = 'powershell.exe'; $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""; $psi.WorkingDirectory = $SharedToolkitRoot
-        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
+        # Do not use OutputDataReceived/ErrorDataReceived here. Those callbacks
+        # ran outside the WinForms message loop and could terminate the GUI.
+        # The child writes a transcript which the UI timer safely polls instead.
+        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
         $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
-        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay; Input=$input }
-        $input.Tag = $terminalState; $send.Tag = $terminalState
-        $appendLine = { param($line) if($null -ne $line){ $action=[System.Action]{ $output.AppendText($line + "`r`n"); Add-Content -LiteralPath $livePath -Value $line -Encoding UTF8; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }; if(!$output.IsDisposed){[void]$output.BeginInvoke($action)} } }
-        $process.add_OutputDataReceived({ param($sender,$args) & $appendLine $args.Data })
-        $process.add_ErrorDataReceived({ param($sender,$args) & $appendLine ("ERROR: " + $args.Data) })
-        $process.BeginOutputReadLine(); $process.BeginErrorReadLine()
+        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay }
         $close = New-Object System.Windows.Forms.Button
         $close.Text = 'Stop And Close'; Set-GUIButtonChrome -Button $close
         $close.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state){ if(!$state.Process.HasExited){try{$state.Process.Kill()}catch{}}; if($state.Overlay -and !$state.Overlay.IsDisposed){$state.Overlay.Dispose()} } })
@@ -2393,9 +2393,31 @@ finally {
         [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
         Start-GUIBusyIndicator -Message $toolLabel
         $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
+        $lastLength = 0
         $timer.Add_Tick({
-            if($process.HasExited){ $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator; $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))" }
-        })
+            try {
+                if((Test-Path -LiteralPath $livePath)){
+                    $stream = [System.IO.File]::Open($livePath,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Read,[System.IO.FileShare]::ReadWrite)
+                    try {
+                        if($stream.Length -gt $lastLength){
+                            $stream.Position = $lastLength
+                            $reader = New-Object System.IO.StreamReader($stream)
+                            $newText = $reader.ReadToEnd()
+                            $reader.Dispose()
+                            if($newText){ $output.AppendText($newText); $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }
+                            $lastLength = $stream.Length
+                        }
+                    }
+                    finally { $stream.Dispose() }
+                }
+            }
+            catch { }
+            if($process.HasExited){
+                $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator
+                $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))"
+                Add-GUILog "Completed: $toolLabel (exit $($process.ExitCode))"
+            }
+        }.GetNewClosure())
         $timer.Start()
 
         Add-GUILog "Launched: $toolLabel"
@@ -2404,6 +2426,68 @@ finally {
     catch {
         Add-GUILog "Failed to launch ${toolLabel}: $($_.Exception.Message)"
     }
+}
+
+function Start-GUINetworkDiscovery {
+    $page = if($script:MainTabs){$script:MainTabs.SelectedTab}else{$null}
+    if(!$page){ throw 'No active Discovery tab is available.' }
+
+    $overlay = New-Object System.Windows.Forms.Panel
+    $overlay.Dock = 'Fill'; $overlay.BackColor = $script:GUITheme.Panel; $overlay.Padding = New-Object System.Windows.Forms.Padding(18)
+    $page.Controls.Add($overlay); $overlay.BringToFront()
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = 'Fill'; $layout.ColumnCount = 1; $layout.RowCount = 3
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,74))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $overlay.Controls.Add($layout)
+
+    $heading = New-GUILabel 'Network Discovery'
+    $heading.Font = New-Object System.Drawing.Font('Segoe UI Semibold',15)
+    $heading.Dock = 'Fill'; $heading.TextAlign = 'MiddleLeft'
+    $layout.Controls.Add($heading,0,0)
+
+    $actions = New-Object System.Windows.Forms.FlowLayoutPanel
+    $actions.Dock = 'Fill'; $actions.WrapContents = $false
+    $cidrLabel = New-GUILabel 'CIDR (optional)'; $cidrLabel.Width = 105; $cidrLabel.TextAlign = 'MiddleLeft'
+    $cidr = New-GUITextBox; $cidr.Width = 170
+    $cidr.Text = ''
+    $makeActionButton = {
+        param([string]$Text)
+        $button = New-Object System.Windows.Forms.Button
+        $button.Text = $Text; $button.Width = 128; $button.Height = 32; $button.Margin = New-Object System.Windows.Forms.Padding(5)
+        Set-GUIButtonChrome -Button $button
+        return $button
+    }
+    $auto = & $makeActionButton 'Auto Scan'
+    $manual = & $makeActionButton 'Scan CIDR'
+    $topology = & $makeActionButton 'Topology'
+    $neighbors = & $makeActionButton 'Neighbors'
+    $close = & $makeActionButton 'Close'
+    foreach($control in @($cidrLabel,$cidr,$auto,$manual,$topology,$neighbors,$close)){ [void]$actions.Controls.Add($control) }
+    $layout.Controls.Add($actions,0,1)
+
+    $description = New-GUILabel "Choose a discovery action. Scans run in a protected child process and stream their transcript here without closing the toolkit."
+    $description.Dock = 'Top'; $description.Height = 28; $description.ForeColor = $script:GUITheme.MutedText
+    $output = New-Object System.Windows.Forms.RichTextBox
+    $output.Dock = 'Fill'; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
+    $outputHost = New-Object System.Windows.Forms.Panel; $outputHost.Dock = 'Fill'; $outputHost.Controls.Add($output); $outputHost.Controls.Add($description)
+    $layout.Controls.Add($outputHost,0,2)
+
+    $startAction = {
+        param([string]$Invocation,[string]$Label)
+        if($overlay.IsDisposed){ return }
+        $overlay.Dispose()
+        Start-GUIToolkitFunctionConsole -FunctionName 'Invoke-NetworkDiscovery' -DisplayName $Label -Invocation $Invocation
+    }.GetNewClosure()
+    $auto.Tag = [pscustomobject]@{ Action=$startAction; Invocation='Invoke-NetworkScan -Timeout 500 -Throttle 128'; Label='Network Discovery - Auto Scan' }
+    $auto.Add_Click({ param($sender,$args) $data=$sender.Tag; & ($data.Action) $data.Invocation $data.Label })
+    $manual.Tag = [pscustomobject]@{ Action=$startAction; Input=$cidr }
+    $manual.Add_Click({ param($sender,$args) $data=$sender.Tag; $value=$data.Input.Text.Trim(); if($value -notmatch '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'){ [System.Windows.Forms.MessageBox]::Show('Enter a valid IPv4 CIDR such as 10.10.10.0/24.','Network Toolkit','OK','Warning'); return }; & ($data.Action) ("Invoke-NetworkPingUtility -CIDR '{0}' -Timeout 500 -Throttle 128" -f $value) 'Network Discovery - CIDR Scan' })
+    $topology.Tag = [pscustomobject]@{ Action=$startAction }; $topology.Add_Click({ param($sender,$args) & ($sender.Tag.Action) 'Get-NetworkTopology' 'Network Discovery - Topology' })
+    $neighbors.Tag = [pscustomobject]@{ Action=$startAction }; $neighbors.Add_Click({ param($sender,$args) & ($sender.Tag.Action) 'Get-NetworkNeighbors' 'Network Discovery - Neighbors' })
+    $close.Tag=$overlay; $close.Add_Click({ param($sender,$args) if($sender.Tag -and !$sender.Tag.IsDisposed){$sender.Tag.Dispose()} })
 }
 
 function Start-GUIExternalToolById {
