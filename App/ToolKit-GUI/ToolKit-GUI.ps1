@@ -2387,7 +2387,15 @@ finally {
         $page.Controls.Add($overlay); $overlay.BringToFront()
 
         $process = Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$runnerPath) -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
-        $state = [pscustomobject]@{ Process=$process; Overlay=$overlay; Tool=$ToolName; ActivityId=$activityId; Session=$session.Path }
+        $state = [pscustomobject]@{
+            Process = $process
+            Overlay = $overlay
+            Tool = $ToolName
+            ActivityId = $activityId
+            Session = $session.Path
+            Timer = $null
+            LastLengths = @{}
+        }
         $close.Tag = $state
         $close.Add_Click({
             param($sender,$args)
