@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622084240,
-    "SourceUpdatedAt":  "2026-06-22T08:42:40.6684955-05:00",
-    "ReleaseNotes":  "Reuse AI evidence collections for 24 hours before refreshing them."
+    "Build":  20260622084935,
+    "SourceUpdatedAt":  "2026-06-22T08:49:35.3043504-05:00",
+    "ReleaseNotes":  "Open File Explorer with completed AI bundles selected."
 }

@@ -8920,6 +8920,7 @@ function New-GUIChatGPTBundle {
         Remove-Item -LiteralPath $bundleFolder -Recurse -Force -ErrorAction SilentlyContinue
         [System.Windows.Forms.Clipboard]::SetText($zipPath)
         Add-GUILog "Created ChatGPT analysis bundle: $zipPath"
+        Start-Process -FilePath "explorer.exe" -ArgumentList ("/select,`"{0}`"" -f $zipPath)
         Start-Process "https://chatgpt.com/auth/login"
         [System.Windows.Forms.MessageBox]::Show("Your bundle is ready and its path has been copied to the clipboard.`r`n`r`n$zipPath`r`n`r`nChatGPT sign-in was opened. After signing in, upload the ZIP manually and ask for a plain-language analysis of the findings.","Bundle Ready",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
     }
