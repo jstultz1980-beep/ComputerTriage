@@ -73,6 +73,8 @@ $script:DismSfcRecommended = $false
 $script:ToolTip = $null
 $script:DashboardLabels = @{}
 $script:ExternalToolCache = @{}
+$script:GuiSysinternalsToolsCache = $null
+$script:GuiCustomToolsCache = $null
 $script:TabButtons = @{}
 $script:TabBuilders = @{}
 $script:BuiltTabs = @{}
@@ -171,7 +173,7 @@ $script:GUITheme = @{
 }
 
 function Get-GUIColorThemeNames {
-    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Custom Theme")
+    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Custom Theme")
 }
 
 function ConvertTo-GUIColorHex {
@@ -674,6 +676,21 @@ function Get-GUIColorTheme {
     }
 
     switch($Name){
+        "Rosewood" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(130,55,73); HeaderPanel=[System.Drawing.Color]::FromArgb(155,68,90); HeaderMuted=[System.Drawing.Color]::FromArgb(255,238,242); Accent=[System.Drawing.Color]::FromArgb(218,92,120); AccentDark=[System.Drawing.Color]::FromArgb(112,43,61); AccentSoft=[System.Drawing.Color]::FromArgb(255,239,243); Page=[System.Drawing.Color]::FromArgb(255,252,253); Shell=[System.Drawing.Color]::FromArgb(252,243,246); Strip=[System.Drawing.Color]::FromArgb(250,231,237); Text=[System.Drawing.Color]::FromArgb(57,38,44); MutedText=[System.Drawing.Color]::FromArgb(103,79,87); Border=[System.Drawing.Color]::FromArgb(224,184,195); Success=[System.Drawing.Color]::FromArgb(44,149,104); Warning=[System.Drawing.Color]::FromArgb(218,151,41); Danger=[System.Drawing.Color]::FromArgb(195,65,72); Disabled=[System.Drawing.Color]::FromArgb(231,216,220); LogBack=[System.Drawing.Color]::FromArgb(39,25,30); LogFore=[System.Drawing.Color]::FromArgb(250,233,238)
+            }
+        }
+        "Midnight Cyan" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(19,67,89); HeaderPanel=[System.Drawing.Color]::FromArgb(26,88,113); HeaderMuted=[System.Drawing.Color]::FromArgb(225,247,255); Accent=[System.Drawing.Color]::FromArgb(42,170,194); AccentDark=[System.Drawing.Color]::FromArgb(16,57,76); AccentSoft=[System.Drawing.Color]::FromArgb(229,249,253); Page=[System.Drawing.Color]::FromArgb(251,254,255); Shell=[System.Drawing.Color]::FromArgb(239,248,251); Strip=[System.Drawing.Color]::FromArgb(222,241,247); Text=[System.Drawing.Color]::FromArgb(25,47,59); MutedText=[System.Drawing.Color]::FromArgb(75,100,111); Border=[System.Drawing.Color]::FromArgb(163,204,216); Success=[System.Drawing.Color]::FromArgb(42,151,102); Warning=[System.Drawing.Color]::FromArgb(221,157,38); Danger=[System.Drawing.Color]::FromArgb(204,70,70); Disabled=[System.Drawing.Color]::FromArgb(209,225,230); LogBack=[System.Drawing.Color]::FromArgb(13,30,38); LogFore=[System.Drawing.Color]::FromArgb(220,241,246)
+            }
+        }
+        "Spring Meadow" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(43,111,76); HeaderPanel=[System.Drawing.Color]::FromArgb(59,137,91); HeaderMuted=[System.Drawing.Color]::FromArgb(233,255,239); Accent=[System.Drawing.Color]::FromArgb(81,175,112); AccentDark=[System.Drawing.Color]::FromArgb(32,91,60); AccentSoft=[System.Drawing.Color]::FromArgb(232,250,237); Page=[System.Drawing.Color]::FromArgb(253,255,253); Shell=[System.Drawing.Color]::FromArgb(242,251,244); Strip=[System.Drawing.Color]::FromArgb(225,246,231); Text=[System.Drawing.Color]::FromArgb(32,53,41); MutedText=[System.Drawing.Color]::FromArgb(76,103,86); Border=[System.Drawing.Color]::FromArgb(174,216,187); Success=[System.Drawing.Color]::FromArgb(38,145,94); Warning=[System.Drawing.Color]::FromArgb(219,155,40); Danger=[System.Drawing.Color]::FromArgb(201,69,68); Disabled=[System.Drawing.Color]::FromArgb(216,231,220); LogBack=[System.Drawing.Color]::FromArgb(22,39,30); LogFore=[System.Drawing.Color]::FromArgb(228,246,234)
+            }
+        }
         "Ocean Teal" {
             return @{
                 Header      = [System.Drawing.Color]::FromArgb(14,111,122)
@@ -2378,9 +2395,8 @@ finally {
             if(!$current){ return }
             try {
                 if(!$current.Process.HasExited){ $current.Process.Kill() }
-                Write-GUIDiagnosticLog -Event 'SafeRunnerStopRequested' -Tool $current.Tool -ActivityId $current.ActivityId -Detail "Session=$($current.Session)"
             }
-            catch { Write-GUIDiagnosticLog -Event 'SafeRunnerStopFailed' -Tool $current.Tool -Level 'ERROR' -ActivityId $current.ActivityId -Detail $_.ScriptStackTrace -Exception $_.Exception }
+            catch { }
             if(!$current.Overlay.IsDisposed){ $current.Overlay.Dispose() }
         })
 
@@ -2405,12 +2421,11 @@ finally {
                     }
                     finally { $stream.Dispose() }
                 }
-                catch { Write-GUIDiagnosticLog -Event 'SafeRunnerReadFailed' -Tool $ToolName -Level 'WARN' -ActivityId $activityId -Detail $_.Exception.Message -Exception $_.Exception }
+                catch { }
             }
             if($process.HasExited){
                 $timer.Stop(); $timer.Dispose()
                 $title.Text = "Completed: $ToolName (exit $($process.ExitCode))"
-                Write-GUIDiagnosticLog -Event 'SafeRunnerExited' -Tool $ToolName -ActivityId $activityId -Detail "ExitCode=$($process.ExitCode); Session=$($session.Path)"
             }
         }.GetNewClosure()
         $timer.Add_Tick($tick); $timer.Start()
@@ -2507,6 +2522,16 @@ function Start-GUIToolkitFunctionConsole {
     )
 
     $toolLabel = if($DisplayName){$DisplayName}else{$FunctionName}
+    if($RequiresAdmin -and !(Test-GUIAdministrator)){
+        throw "This tool requires elevation. Restart Network Toolkit elevated, then run it again."
+    }
+
+    # All legacy PowerShell tools run through the file-polled child-process
+    # runner. The former OutputDataReceived callbacks could execute outside
+    # the WinForms runspace and close the toolkit without a recoverable error.
+    Start-GUISafeScriptRunner -ToolName $toolLabel -Invocation $FunctionName
+    return
+
     $activityId = [guid]::NewGuid().ToString('N')
     $session = New-CSITempOutputSession -ToolName $toolLabel
     $runnerPath = Join-Path $session.Path "run-tool.ps1"
@@ -3016,6 +3041,10 @@ function Get-GUISysinternalsDescription {
 }
 
 function Get-GUISysinternalsTools {
+    if($script:GuiSysinternalsToolsCache){
+        return @($script:GuiSysinternalsToolsCache)
+    }
+
     $root = Get-GUISysinternalsRoot
 
     if(!(Test-Path $root)){
@@ -3044,7 +3073,8 @@ function Get-GUISysinternalsTools {
         }
     }
 
-    return $tools | Sort-Object Category,DisplayName
+    $script:GuiSysinternalsToolsCache = @($tools | Sort-Object Category,DisplayName)
+    return @($script:GuiSysinternalsToolsCache)
 }
 
 function Read-GUISysinternalsInput {
@@ -3671,6 +3701,12 @@ function Test-GUIInstallerExecutable {
 }
 
 function Get-GUICustomTools {
+    param([switch]$Detailed)
+
+    if(!$Detailed -and $script:GuiCustomToolsCache){
+        return @($script:GuiCustomToolsCache)
+    }
+
     $tools = @()
 
     if($CSIFiles.CustomTools -and (Test-Path $CSIFiles.CustomTools)){
@@ -3680,7 +3716,7 @@ function Get-GUICustomTools {
             foreach($tool in @($manifest.tools)){
                 $launchPath = Resolve-GUIToolkitPath $tool.launchPath
                 $status = if(Test-Path $launchPath){
-                    if(Test-GUIInstallerExecutable -Path $launchPath){"Installer - not portable"}else{"Ready"}
+                    if($Detailed -and (Test-GUIInstallerExecutable -Path $launchPath)){"Installer - not portable"}else{"Ready"}
                 }
                 else{
                     "Missing"
@@ -3703,7 +3739,9 @@ function Get-GUICustomTools {
         }
     }
 
-    return @($tools | Sort-Object Name)
+    $tools = @($tools | Sort-Object Name)
+    $script:GuiCustomToolsCache = $tools
+    return $tools
 }
 
 function Refresh-GUICustomTools {
@@ -3711,7 +3749,8 @@ function Refresh-GUICustomTools {
         return
     }
 
-    $script:CustomTools = @(Get-GUICustomTools)
+    $script:GuiCustomToolsCache = $null
+    $script:CustomTools = @(Get-GUICustomTools -Detailed)
     $script:CustomGrid.Rows.Clear()
 
     foreach($tool in $script:CustomTools){
@@ -7139,12 +7178,15 @@ function Build-GUITabIfNeeded {
     }
 
     $entry = $script:TabBuilders[$Page.Text]
+    $buildTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $Page.SuspendLayout()
 
     try {
         & $entry.Builder $Page
         $script:BuiltTabs[$Page.Text] = $true
         Set-GUIFallbackButtonToolTips
+        $buildTimer.Stop()
+        Write-GUIDiagnosticLog -Event 'TabBuilt' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count)
     }
     catch {
         Add-GUILog "Failed to build $($Page.Text) tab: $($_.Exception.Message)"
@@ -7159,6 +7201,7 @@ function Build-GUITabIfNeeded {
         $script:BuiltTabs[$Page.Text] = $true
     }
     finally {
+        if($buildTimer.IsRunning){ $buildTimer.Stop() }
         $Page.ResumeLayout()
     }
 }
@@ -9899,9 +9942,12 @@ function Build-SoftwareToolsPage {
 
     $resources = New-Object System.Windows.Forms.FlowLayoutPanel
     $resources.Dock = "Bottom"
-    $resources.Height = 34
-    $resources.Padding = New-Object System.Windows.Forms.Padding(12,5,12,5)
-    [void]$resources.Controls.Add((New-GUILabel "Safe software resources:"))
+    $resources.Height = 42
+    $resources.WrapContents = $false
+    $resources.Padding = New-Object System.Windows.Forms.Padding(12,6,12,4)
+    $resourceLabel = New-GUILabel "Safe software resources:"
+    $resourceLabel.Width = 132; $resourceLabel.TextAlign = 'MiddleLeft'
+    [void]$resources.Controls.Add($resourceLabel)
     foreach($resource in @(@{Text='PortableApps.com';Url='https://portableapps.com/apps'},@{Text='Ninite';Url='https://ninite.com/'},@{Text='Chocolatey Search';Url='https://community.chocolatey.org/packages'})){
         $link = New-Object System.Windows.Forms.LinkLabel
         $link.Text = $resource.Text; $link.AutoSize = $true; $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)

@@ -24,6 +24,9 @@ param(
         if([Console]::IsInputRedirected){
             Write-Host "$Prompt [B=Back]"
             $value = [Console]::In.ReadLine()
+            if($null -eq $value){
+                throw [System.OperationCanceledException]::new('This legacy menu requires a GUI form and cannot accept console input.')
+            }
         }
         else{
             $value = Read-Host "$Prompt [B=Back]"

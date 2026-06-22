@@ -30,6 +30,14 @@ function Resolve-NetworkToolkitLayout {
     if(Test-Path -LiteralPath (Join-Path $appRoot "manifests\toolkit-version.json")){
         return [pscustomobject]@{ DeploymentRoot=$deploymentRoot; AppRoot=$appRoot; IsLegacy=$false }
     }
+    # The GUI previously remembered App as the source in some deployments.
+    # Accept that selection and resolve it back to its deployment root.
+    if(Test-Path -LiteralPath (Join-Path $deploymentRoot "manifests\toolkit-version.json")){
+        $parent = Split-Path -Parent $deploymentRoot
+        if((Split-Path -Leaf $deploymentRoot) -eq 'App' -and (Test-Path -LiteralPath (Join-Path $parent 'NetworkToolkit.vbs'))){
+            return [pscustomobject]@{ DeploymentRoot=$parent; AppRoot=$deploymentRoot; IsLegacy=$false }
+        }
+    }
     if(Test-Path -LiteralPath (Join-Path $deploymentRoot "manifests\toolkit-version.json")){
         return [pscustomobject]@{ DeploymentRoot=$deploymentRoot; AppRoot=$deploymentRoot; IsLegacy=$true }
     }
