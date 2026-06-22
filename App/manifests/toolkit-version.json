@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622111725,
-    "SourceUpdatedAt":  "2026-06-22T11:17:25.7214371-05:00",
-    "ReleaseNotes":  "Embed console-driven toolkit functions inside their active tabs."
+    "Build":  20260622111902,
+    "SourceUpdatedAt":  "2026-06-22T11:19:02.7099394-05:00",
+    "ReleaseNotes":  "Make embedded toolkit console overlays accept interactive input."
 }

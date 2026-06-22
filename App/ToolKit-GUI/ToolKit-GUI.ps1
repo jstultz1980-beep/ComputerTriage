@@ -2364,19 +2364,29 @@ finally {
         $title = New-GUILabel "Running: $toolLabel"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 360
         $output = New-Object System.Windows.Forms.RichTextBox
         $output.Dock = "Fill"; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
-        $overlay.Controls.Add($output); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
+        $inputPanel = New-Object System.Windows.Forms.Panel
+        $inputPanel.Dock = "Bottom"; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
+        $input = New-GUITextBox; $input.Dock = "Fill"
+        $send = New-GUIButton "Send" { if(!$process.HasExited -and $input.Text){ $process.StandardInput.WriteLine($input.Text); $input.Clear() } }
+        $send.Dock = "Right"; $send.Width = 82
+        $input.Add_KeyDown({ if($_.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ if(!$process.HasExited){$process.StandardInput.WriteLine($input.Text); $input.Clear()}; $_.SuppressKeyPress=$true } })
+        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
+        $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
 
         $livePath = Join-Path $session.Path 'live-output.txt'
         $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = 'cmd.exe'; $psi.Arguments = "/c powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`" > `"$livePath`" 2>&1"; $psi.WorkingDirectory = $SharedToolkitRoot
-        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
+        $psi.FileName = 'powershell.exe'; $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""; $psi.WorkingDirectory = $SharedToolkitRoot
+        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
         $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
+        $appendLine = { param($line) if($null -ne $line){ $action=[System.Action]{ $output.AppendText($line + "`r`n"); Add-Content -LiteralPath $livePath -Value $line -Encoding UTF8; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }; if(!$output.IsDisposed){[void]$output.BeginInvoke($action)} } }
+        $process.add_OutputDataReceived({ param($sender,$args) & $appendLine $args.Data })
+        $process.add_ErrorDataReceived({ param($sender,$args) & $appendLine ("ERROR: " + $args.Data) })
+        $process.BeginOutputReadLine(); $process.BeginErrorReadLine()
         $close = New-GUIButton "Stop And Close" { if(!$process.HasExited){try{$process.Kill()}catch{}}; $overlay.Dispose() }
         [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
         Start-GUIBusyIndicator -Message $toolLabel
         $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
         $timer.Add_Tick({
-            try { if(Test-Path $livePath){ $output.Text = Get-Content -LiteralPath $livePath -Raw -ErrorAction SilentlyContinue; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() } } catch {}
             if($process.HasExited){ $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator; $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))" }
         })
         $timer.Start()
