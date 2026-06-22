@@ -2467,19 +2467,31 @@ finally {
 function Global:Start-GUINetworkDiscovery {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Network Discovery'
-    $form.StartPosition = 'CenterParent'; $form.Size = New-Object System.Drawing.Size(620,210)
-    $form.MinimizeBox = $false; $form.MaximizeBox = $false; $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
+    $form.StartPosition = 'CenterParent'; $form.ClientSize = New-Object System.Drawing.Size(560,290)
+    $form.MinimumSize = New-Object System.Drawing.Size(576,329)
+    $form.MaximizeBox = $false; $form.MinimizeBox = $false; $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
-    $layout.Dock = 'Fill'; $layout.Padding = New-Object System.Windows.Forms.Padding(16); $layout.RowCount = 3; $layout.ColumnCount = 1
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
+    $layout.Dock = 'Fill'; $layout.Padding = New-Object System.Windows.Forms.Padding(18); $layout.RowCount = 4; $layout.ColumnCount = 1
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.Controls.Add((New-GUILabel 'Choose a scan. CIDR is only used by Scan CIDR.'),0,0)
-    $row = New-Object System.Windows.Forms.FlowLayoutPanel; $row.Dock='Fill'
-    $cidr = New-GUITextBox; $cidr.Width=180
-    $cidrLabel = New-GUILabel 'CIDR'; $cidrLabel.Width=44; $cidrLabel.TextAlign='MiddleLeft'
-    $row.Controls.Add($cidrLabel); $row.Controls.Add($cidr); $layout.Controls.Add($row,0,1)
-    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel; $buttons.Dock='Fill'
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $intro = New-GUILabel 'Choose a discovery action'
+    $intro.Dock='Fill'; $intro.Font=New-Object System.Drawing.Font('Segoe UI Semibold',12); $intro.TextAlign='MiddleLeft'
+    $layout.Controls.Add($intro,0,0)
+    $cidrRow = New-Object System.Windows.Forms.TableLayoutPanel
+    $cidrRow.Dock='Fill'; $cidrRow.ColumnCount=2
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $cidrLabel = New-GUILabel 'CIDR for manual scan'; $cidrLabel.Dock='Fill'; $cidrLabel.TextAlign='MiddleLeft'
+    $cidr = New-GUITextBox; $cidr.Dock='Fill'
+    $cidrRow.Controls.Add($cidrLabel,0,0); $cidrRow.Controls.Add($cidr,1,0); $layout.Controls.Add($cidrRow,0,1)
+    $buttons = New-Object System.Windows.Forms.TableLayoutPanel
+    $buttons.Dock='Fill'; $buttons.Padding=New-Object System.Windows.Forms.Padding(0,6,0,4); $buttons.ColumnCount=2; $buttons.RowCount=2
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $buttons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $buttons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $auto = New-GUIButton 'Auto Scan' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Auto Scan' -Invocation 'Invoke-NetworkScan -Timeout 500 -Throttle 128' }
     $manualAction = {
         $value=$cidr.Text.Trim()
@@ -2493,8 +2505,11 @@ function Global:Start-GUINetworkDiscovery {
     $topology = New-GUIButton 'Topology' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Topology' -Invocation 'Get-NetworkTopology' }
     $neighbors = New-GUIButton 'Neighbors' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Neighbors' -Invocation 'Get-NetworkNeighbors' }
     $cancel = New-GUIButton 'Cancel' { $form.Close() }
-    foreach($button in @($auto,$manual,$topology,$neighbors,$cancel)){ $buttons.Controls.Add($button) }
-    $layout.Controls.Add($buttons,0,2); $form.Controls.Add($layout)
+    foreach($button in @($auto,$manual,$topology,$neighbors)){ $button.Dock='Fill'; $button.Width=0; $button.Margin=New-Object System.Windows.Forms.Padding(4) }
+    $buttons.Controls.Add($auto,0,0); $buttons.Controls.Add($manual,1,0); $buttons.Controls.Add($topology,0,1); $buttons.Controls.Add($neighbors,1,1)
+    $layout.Controls.Add($buttons,0,2)
+    $footer = New-Object System.Windows.Forms.FlowLayoutPanel; $footer.Dock='Fill'; $footer.FlowDirection='RightToLeft'
+    $cancel.Width=96; $cancel.Height=30; $footer.Controls.Add($cancel); $layout.Controls.Add($footer,0,3); $form.Controls.Add($layout)
     $auto.Add_Click({ $form.Close() })
     $manual.Add_Click({ if(!$form.IsDisposed){$form.Close()} })
     $topology.Add_Click({ $form.Close() })
