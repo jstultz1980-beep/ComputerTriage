@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260622165913,
-    "SourceUpdatedAt":  "2026-06-22T16:59:13.9375074-05:00",
-    "ReleaseNotes":  "Redesign Network Discovery action dialog with a compact two-column layout."
+    "Build":  20260623085804,
+    "SourceUpdatedAt":  "2026-06-23T08:58:04.9118688-05:00",
+    "ReleaseNotes":  "Make embedded terminal input visible, focused, and immediately flushed to child tools."
 }

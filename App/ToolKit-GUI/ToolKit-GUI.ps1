@@ -2380,15 +2380,17 @@ finally {
         $output = New-Object System.Windows.Forms.RichTextBox
         $output.Dock = 'Fill'; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
         $inputPanel = New-Object System.Windows.Forms.Panel
-        $inputPanel.Dock = 'Bottom'; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
+        $inputPanel.Dock = 'Bottom'; $inputPanel.Height = 50; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,8); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
+        $inputLabel = New-GUILabel 'Input'
+        $inputLabel.Dock = 'Left'; $inputLabel.Width = 48; $inputLabel.ForeColor = [System.Drawing.Color]::White
         $input = New-GUITextBox; $input.Dock = 'Fill'
         $send = New-Object System.Windows.Forms.Button
-        $send.Text = 'Send'; $send.Dock = 'Right'; $send.Width = 82; Set-GUIButtonChrome -Button $send
+        $send.Text = 'Send Input'; $send.Dock = 'Right'; $send.Width = 104; Set-GUIButtonChrome -Button $send
         $close = New-Object System.Windows.Forms.Button
         $close.Text = 'Stop And Close'; $close.Width = 130; Set-GUIButtonChrome -Button $close
-        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
+        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send); $inputPanel.Controls.Add($inputLabel)
         $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
-        $page.Controls.Add($overlay); $overlay.BringToFront()
+        $page.Controls.Add($overlay); $overlay.BringToFront(); $inputPanel.BringToFront(); $input.Focus()
 
         # Start-Process joins an argument array before launching powershell.exe.
         # Quote the generated runner path explicitly because session folder names
@@ -2399,6 +2401,7 @@ finally {
         $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput = $true
         $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi
         if(!$process.Start()){ throw 'Could not start the PowerShell tool process.' }
+        $process.StandardInput.AutoFlush = $true
         $state = [pscustomobject]@{
             Process = $process
             Overlay = $overlay
@@ -2411,8 +2414,8 @@ finally {
         }
         $close.Tag = $state
         $input.Tag = $state; $send.Tag = $state
-        $send.Add_Click({ param($sender,$args) $current=$sender.Tag; if($current -and !$current.Process.HasExited -and $current.Input.Text){ try { $current.Process.StandardInput.WriteLine($current.Input.Text); $current.Input.Clear() } catch {} } })
-        $input.Add_KeyDown({ param($sender,$args) if($args.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($sender.Text); $sender.Clear() } catch {} }; $args.SuppressKeyPress=$true } })
+        $send.Add_Click({ param($sender,$args) $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($current.Input.Text); $current.Process.StandardInput.Flush(); $current.Input.Clear(); $current.Input.Focus() } catch {} } })
+        $input.Add_KeyDown({ param($sender,$args) if($args.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($sender.Text); $current.Process.StandardInput.Flush(); $sender.Clear() } catch {} }; $args.SuppressKeyPress=$true } })
         $close.Add_Click({
             param($sender,$args)
             $current = $sender.Tag
