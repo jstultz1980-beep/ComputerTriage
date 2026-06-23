@@ -120,7 +120,7 @@ function Global:Invoke-PortAndServiceTest {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 

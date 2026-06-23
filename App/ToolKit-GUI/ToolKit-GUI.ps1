@@ -2414,11 +2414,41 @@ finally {
             Timer = $null
             LastLengths = @{}
             Input = $input
+            SendButton = $send
+            Output = $output
         }
         $close.Tag = $state
         $input.Tag = $state; $send.Tag = $state
-        $send.Add_Click({ param($sender,$args) $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($current.Input.Text); $current.Process.StandardInput.Flush(); $current.Input.Clear(); $current.Input.Focus() } catch {} } })
-        $input.Add_KeyDown({ param($sender,$args) if($args.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $current=$sender.Tag; if($current -and !$current.Process.HasExited){ try { $current.Process.StandardInput.WriteLine($sender.Text); $current.Process.StandardInput.Flush(); $sender.Clear() } catch {} }; $args.SuppressKeyPress=$true } })
+        $send.Add_Click({
+            param($sender,$args)
+            $current = $sender.Tag
+            if(!$current -or $current.Process.HasExited){ return }
+            try {
+                $value = [string]$current.Input.Text
+                $current.Process.StandardInput.WriteLine($value)
+                $current.Process.StandardInput.Flush()
+                if($current.Output -and !$current.Output.IsDisposed){
+                    $current.Output.AppendText("`r`n> $value`r`n")
+                    $current.Output.SelectionStart = $current.Output.TextLength
+                    $current.Output.ScrollToCaret()
+                }
+                $current.Input.Clear()
+                $current.Input.Focus()
+                Write-GUIDiagnosticLog -Event 'SafeRunnerInputSent' -Tool $current.Tool -ActivityId $current.ActivityId -Detail ('Characters={0}' -f $value.Length)
+            }
+            catch {
+                if($current -and $current.Output -and !$current.Output.IsDisposed){ $current.Output.AppendText("`r`n[Input error] $($_.Exception.Message)`r`n") }
+                Write-GUIDiagnosticLog -Event 'SafeRunnerInputFailed' -Tool $current.Tool -Level 'ERROR' -ActivityId $current.ActivityId -Detail $_.ScriptStackTrace -Exception $_.Exception
+            }
+        })
+        $input.Add_KeyDown({
+            param($sender,$args)
+            if($args.KeyCode -eq [System.Windows.Forms.Keys]::Enter){
+                $current = $sender.Tag
+                if($current -and $current.SendButton){ $current.SendButton.PerformClick() }
+                $args.SuppressKeyPress = $true
+            }
+        })
         $close.Add_Click({
             param($sender,$args)
             $current = $sender.Tag

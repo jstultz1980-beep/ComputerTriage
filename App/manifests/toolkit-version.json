@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260623103621,
-    "SourceUpdatedAt":  "2026-06-23T10:36:21.2667149-05:00",
-    "ReleaseNotes":  "Add persistent update status and explicit update checks for toolkit and Chocolatey package upgrades."
+    "Build":  20260623160804,
+    "SourceUpdatedAt":  "2026-06-23T16:08:04.1880840-05:00",
+    "ReleaseNotes":  "Repair embedded PowerShell terminal input and route interactive plugin prompts through redirected console input."
 }

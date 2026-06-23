@@ -169,7 +169,7 @@ function Global:Invoke-DNSDiagnostics {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 

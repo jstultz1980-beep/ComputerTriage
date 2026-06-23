@@ -402,7 +402,7 @@ function Global:Invoke-EnableRemoteManagement {
         }
     }
 
-    $targetInput = Read-Host "Target computer(s), comma separated. Blank = local computer"
+    $targetInput = Read-CSIInput "Target computer(s), comma separated. Blank = local computer" -AllowEmpty
     $targets = @()
 
     if([string]::IsNullOrWhiteSpace($targetInput)){
@@ -417,7 +417,7 @@ function Global:Invoke-EnableRemoteManagement {
         return
     }
 
-    $methodInput = Read-Host "Remote method [A=Auto, W=WinRM only, P=PsExec only] (default A)"
+    $methodInput = Read-CSIInput "Remote method [A=Auto, W=WinRM only, P=PsExec only] (default A)" -AllowEmpty
     $method = switch -Regex ($methodInput){
         '^(?i)w' { "WinRM"; break }
         '^(?i)p' { "PsExec"; break }
@@ -430,7 +430,7 @@ function Global:Invoke-EnableRemoteManagement {
         $targets | ForEach-Object { Write-Host "  $_" }
         Write-Host "Method: $method"
         Write-Host ""
-        $confirm = Read-Host "Continue? Type YES"
+        $confirm = Read-CSIInput "Continue? Type YES" -AllowEmpty
         if($confirm -ne "YES"){
             Write-Host "Cancelled." -ForegroundColor Yellow
             return
@@ -475,7 +475,7 @@ function Global:Invoke-RemoteManagementReadiness {
     Write-Host "Read-only check for WinRM, WMI/CIM, RPC/admin share, services, and firewall readiness."
     Write-Host ""
 
-    $targetInput = Read-Host "Target computer(s), comma separated. Blank = local computer"
+    $targetInput = Read-CSIInput "Target computer(s), comma separated. Blank = local computer" -AllowEmpty
     $targets = if([string]::IsNullOrWhiteSpace($targetInput)){
         @($env:COMPUTERNAME)
     }

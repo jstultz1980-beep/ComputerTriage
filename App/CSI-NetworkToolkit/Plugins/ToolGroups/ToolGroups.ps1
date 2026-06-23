@@ -35,7 +35,7 @@ function Global:Invoke-ConnectivityDiagnostics {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 
@@ -70,7 +70,7 @@ function Global:Invoke-InfrastructureServices {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 
@@ -103,7 +103,7 @@ function Global:Invoke-NetworkUtilities {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 
@@ -134,7 +134,7 @@ function Global:Invoke-SoftwareUtilities {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 

@@ -1416,7 +1416,7 @@ function Global:Invoke-WindowsHealthDiagnostics {
         }
 
         Write-Host ""
-        [void](Read-Host "Press ENTER to continue")
+        [void](Read-CSIInput "Press ENTER to continue" -AllowEmpty)
 
     }
 
