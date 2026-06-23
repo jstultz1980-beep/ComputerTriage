@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260623085947,
-    "SourceUpdatedAt":  "2026-06-23T08:59:47.6426254-05:00",
-    "ReleaseNotes":  "Improve manual discovery scans with IP input and CIDR subnet selector."
+    "Build":  20260623093256,
+    "SourceUpdatedAt":  "2026-06-23T09:32:56.3447123-05:00",
+    "ReleaseNotes":  "Add Chocolatey-managed toolkit tool upgrade controls."
 }

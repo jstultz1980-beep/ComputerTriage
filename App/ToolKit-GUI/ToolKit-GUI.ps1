@@ -66,6 +66,8 @@ $script:Commands = @(Get-CSICommands | Where-Object {$_.Name -notin @("File Util
 $script:Fingerprints = @()
 $script:ChocoPackages = @()
 $script:ChocoInstalledPackages = @()
+$script:ChocoToolboxPackages = @()
+$script:ChocoToolboxGrid = $null
 $script:Reports = @()
 $script:CustomTools = @()
 $script:QuickDiagnosisRan = $false
@@ -5632,7 +5634,14 @@ function Get-GUIBestToolboxExecutable {
 }
 
 function Add-SelectedChocoPackageToToolbox {
-    $package = Get-SelectedGUIChocoPackage
+    param(
+        [pscustomobject]$Package = $null,
+        [switch]$SkipPortableCheck,
+        [switch]$SkipExistingPrompt,
+        [switch]$SuppressCompletionDialog
+    )
+
+    $package = if($Package){$Package}else{Get-SelectedGUIChocoPackage}
 
     if(!$package){
         Add-GUILog "Select a Chocolatey package first."
@@ -5646,7 +5655,7 @@ function Add-SelectedChocoPackageToToolbox {
     }
 
     $overrideNonPortable = $false
-    if(!(Test-GUIChocoPackagePortable -Package $package)){
+    if(!$SkipPortableCheck -and !(Test-GUIChocoPackagePortable -Package $package)){
         $portableChoice = [System.Windows.Forms.MessageBox]::Show(
             "$($package.Name) does not look like a portable package.`r`n`r`nYes: search Chocolatey for portable variants.`r`nNo: try to add this package anyway.`r`nCancel: stop.",
             "Portable Package Check",
@@ -5681,7 +5690,7 @@ function Add-SelectedChocoPackageToToolbox {
     $dest = Join-Path $CSIPaths.Custom $safeName
     $destExisted = Test-Path $dest
 
-    if($destExisted){
+    if($destExisted -and !$SkipExistingPrompt){
         $overwrite = [System.Windows.Forms.MessageBox]::Show(
             "$($package.Name) already exists in the Custom toolbox folder.`r`n`r`nReplace/update it?",
             "Update Toolbox Tool",
@@ -5731,6 +5740,15 @@ function Add-SelectedChocoPackageToToolbox {
 
         Add-GUILog "Adding Chocolatey package to toolbox without machine install: $($package.Name)"
         $downloadedPackage = Save-GUIChocoPackageToTemp -Package $package -Session $session
+        $nuspec = Get-ChildItem -Path $downloadedPackage.ExtractRoot -Filter '*.nuspec' -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+        if($nuspec){
+            try {
+                [xml]$nuspecXml = Get-Content -LiteralPath $nuspec.FullName -Raw
+                $downloadedVersion = [string]$nuspecXml.package.metadata.version
+                if($downloadedVersion){ $package.Version = $downloadedVersion }
+            }
+            catch { }
+        }
         $analysisPath = Write-GUIChocoPackageAnalysis -ExtractRoot $downloadedPackage.ExtractRoot -Session $session
         $candidateRoots = @(Get-GUIChocoPackageExtractCandidateRoots -ExtractRoot $downloadedPackage.ExtractRoot)
         $candidateRoots += @(Expand-GUIChocoPackagePayloadArchives -ExtractRoot $downloadedPackage.ExtractRoot -Session $session)
@@ -5876,12 +5894,14 @@ function Add-SelectedChocoPackageToToolbox {
 
         Add-GUILog "Added to toolbox: $($package.Name)"
 
-        [System.Windows.Forms.MessageBox]::Show(
-            "$($package.Name) was added to the Custom toolbox and is ready to launch.",
-            "Added To Toolbox",
-            [System.Windows.Forms.MessageBoxButtons]::OK,
-            [System.Windows.Forms.MessageBoxIcon]::Information
-        ) | Out-Null
+        if(!$SuppressCompletionDialog){
+            [System.Windows.Forms.MessageBox]::Show(
+                "$($package.Name) was added to the Custom toolbox and is ready to launch.",
+                "Added To Toolbox",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Information
+            ) | Out-Null
+        }
     }
     catch {
         Add-GUILog "Rolling back toolbox add attempt for: $($package.Name)"
@@ -6002,6 +6022,79 @@ function Upgrade-AllGUIChocoPackages {
     }
 
     Start-GUIChocoAction -PackageName "all" -Action upgrade
+}
+
+function Refresh-GUIChocoToolboxPackages {
+    $script:ChocoToolboxPackages = @(
+        Get-GUICustomTools | Where-Object { $_.Source -eq 'Chocolatey Toolbox' -and $_.LaunchPath -and (Test-Path $_.LaunchPath) }
+    )
+
+    if($script:ChocoToolboxGrid){
+        $script:ChocoToolboxGrid.Rows.Clear()
+        foreach($tool in $script:ChocoToolboxPackages){
+            $row = $script:ChocoToolboxGrid.Rows.Add($tool.Name,$tool.Version,'Toolkit copy')
+            $script:ChocoToolboxGrid.Rows[$row].Tag = $tool
+        }
+    }
+
+    Add-GUILog ("Toolkit Chocolatey tools: {0}" -f $script:ChocoToolboxPackages.Count)
+}
+
+function Get-SelectedGUIChocoToolboxPackage {
+    if(!$script:ChocoToolboxGrid -or $script:ChocoToolboxGrid.SelectedRows.Count -eq 0){
+        return $null
+    }
+
+    return $script:ChocoToolboxGrid.SelectedRows[0].Tag
+}
+
+function Upgrade-SelectedGUIChocoToolboxPackage {
+    $tool = Get-SelectedGUIChocoToolboxPackage
+    if(!$tool){
+        Add-GUILog 'Select a toolkit Chocolatey tool first.'
+        return
+    }
+
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Download the latest '$($tool.Name)' package and replace its portable toolkit copy?`r`n`r`nThis does not install or upgrade anything on the local computer.",
+        'Upgrade Toolkit Tool',
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Question
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    Add-SelectedChocoPackageToToolbox -Package ([pscustomobject]@{Name=$tool.Name;Version=''}) -SkipPortableCheck -SkipExistingPrompt
+    Refresh-GUIChocoToolboxPackages
+}
+
+function Upgrade-AllGUIChocoToolboxPackages {
+    Refresh-GUIChocoToolboxPackages
+    $tools = @($script:ChocoToolboxPackages)
+    if($tools.Count -eq 0){
+        Add-GUILog 'No Chocolatey-managed toolkit tools are registered.'
+        return
+    }
+
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Download and replace all $($tools.Count) Chocolatey-managed toolkit tools?`r`n`r`nThis updates only portable copies inside the toolkit. It does not modify computer-installed packages.",
+        'Upgrade All Toolkit Tools',
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    Start-GUIBusyIndicator -Message 'Upgrading Toolkit Tools'
+    try {
+        foreach($tool in $tools){
+            Add-GUILog "Updating toolkit tool: $($tool.Name)"
+            Add-SelectedChocoPackageToToolbox -Package ([pscustomobject]@{Name=$tool.Name;Version=''}) -SkipPortableCheck -SkipExistingPrompt -SuppressCompletionDialog
+        }
+    }
+    finally {
+        Stop-GUIBusyIndicator
+        Refresh-GUIChocoToolboxPackages
+        Refresh-GUICustomToolTabs
+    }
 }
 
 function Uninstall-SelectedGUIChocoPackage {
@@ -9822,7 +9915,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,186))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -9863,13 +9956,26 @@ function Build-ChocolateyPage {
     $guidanceGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($guidanceGroup,1,0)
 
-    $guidance = New-Object System.Windows.Forms.Label
-    $guidance.Dock = "Fill"
-    $guidance.Padding = New-Object System.Windows.Forms.Padding(10,6,10,6)
-    $guidance.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    $guidance.TextAlign = "MiddleLeft"
-    $guidance.Text = "Use Add to Toolbox for portable utilities. The toolkit tries Chocolatey's download command first, then package extraction, and only asks for a temporary computer install as a last resort. Tools copied into .\Custom are managed on the Apps tab."
-    $guidanceGroup.Controls.Add($guidance)
+    $toolboxLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $toolboxLayout.Dock = 'Fill'; $toolboxLayout.Padding = New-Object System.Windows.Forms.Padding(8); $toolboxLayout.RowCount = 3; $toolboxLayout.ColumnCount = 1
+    $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,26))) | Out-Null
+    $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $guidanceGroup.Controls.Add($toolboxLayout)
+    $guidance = New-GUILabel 'Toolkit copies only. Updates download and replace portable tool folders; computer packages are not changed.'
+    $guidance.ForeColor = $script:GUITheme.MutedText; $toolboxLayout.Controls.Add($guidance,0,0)
+    $script:ChocoToolboxGrid = New-Object System.Windows.Forms.DataGridView
+    $ChocoToolboxGrid.Dock = 'Fill'; $ChocoToolboxGrid.ReadOnly = $true; $ChocoToolboxGrid.AllowUserToAddRows = $false; $ChocoToolboxGrid.AllowUserToDeleteRows = $false
+    $ChocoToolboxGrid.RowHeadersVisible = $false; $ChocoToolboxGrid.MultiSelect = $false; $ChocoToolboxGrid.SelectionMode = 'FullRowSelect'; $ChocoToolboxGrid.AutoSizeColumnsMode = 'Fill'; $ChocoToolboxGrid.BackgroundColor = [System.Drawing.Color]::White
+    [void]$ChocoToolboxGrid.Columns.Add('Name','Toolkit Tool'); [void]$ChocoToolboxGrid.Columns.Add('Version','Installed'); [void]$ChocoToolboxGrid.Columns.Add('Status','Status')
+    $toolboxLayout.Controls.Add($ChocoToolboxGrid,0,1)
+    $toolboxActions = New-Object System.Windows.Forms.TableLayoutPanel
+    $toolboxActions.Dock='Fill'; $toolboxActions.ColumnCount=3
+    1..3 | ForEach-Object { $toolboxActions.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null }
+    $toolboxLayout.Controls.Add($toolboxActions,0,2)
+    foreach($entry in @(@('Refresh', { Refresh-GUIChocoToolboxPackages }),@('Upgrade Selected', { Upgrade-SelectedGUIChocoToolboxPackage }),@('Upgrade All', { Upgrade-AllGUIChocoToolboxPackages }))){
+        $button = New-GUIButton -Text $entry[0] -Action $entry[1]; $button.Dock='Fill'; $button.Width=0; $toolboxActions.Controls.Add($button)
+    }
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
     $searchGroup.Text = "Install Chocolatey Packages"
@@ -9997,6 +10103,7 @@ function Build-ChocolateyPage {
     [void]$installedButtons.Controls.Add($uninstallComputerButton,1,1)
 
     Refresh-GUIChocoStatus
+    Refresh-GUIChocoToolboxPackages
 }
 
 function Build-SoftwareToolsPage {
