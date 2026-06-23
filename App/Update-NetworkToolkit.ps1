@@ -282,7 +282,14 @@ try {
         (Join-Path $SourceRoot "CSI-NetworkToolkit\ExternalTools"),
         (Join-Path $SourceRoot "Custom")
     )
-    $arguments = @($SourceRoot,$DestinationRoot,"/E","/COPY:DAT","/DCOPY:DAT","/R:1","/W:1","/NFL","/NDL","/NJH","/NJS","/NP","/XD") + $excludeDirectories + @("/XF",(Join-Path $SourceRoot "manifests\gui-settings.json"))
+    # Runtime settings and the technician-maintained toolbox registry belong to
+    # the destination. Updating code must never overwrite either file.
+    $excludedFiles = @(
+        (Join-Path $SourceRoot "manifests\gui-settings.json"),
+        (Join-Path $SourceRoot "manifests\custom-tools.json"),
+        (Join-Path $SourceRoot "manifests\custom-tools.json.bak")
+    )
+    $arguments = @($SourceRoot,$DestinationRoot,"/E","/COPY:DAT","/DCOPY:DAT","/R:1","/W:1","/NFL","/NDL","/NJH","/NJS","/NP","/XD") + $excludeDirectories + @("/XF") + $excludedFiles
     & robocopy @arguments | Out-String | Set-Content -LiteralPath ($ResultPath + ".log") -Encoding UTF8
     $result.ExitCode = $LASTEXITCODE
     if($result.ExitCode -gt 7){
