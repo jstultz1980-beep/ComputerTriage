@@ -3796,7 +3796,10 @@ function Initialize-GUICustomToolProvenance {
                 @{Name='packageName';Value=$packageName},
                 @{Name='installMethod';Value='Legacy Chocolatey toolbox import (inferred)'},
                 @{Name='installedAt';Value=(Get-Date).ToString('o')},
-                @{Name='lastUpdatedAt';Value=(Get-Date).ToString('o')}
+                @{Name='lastUpdatedAt';Value=(Get-Date).ToString('o')},
+                @{Name='upgradeStatus';Value='Not checked'},
+                @{Name='availableVersion';Value=''},
+                @{Name='lastUpdateCheck';Value=''}
             )){
                 if(!($tool.PSObject.Properties.Name -contains $field.Name) -or [string]$tool.$($field.Name) -eq ''){
                     Add-Member -InputObject $tool -MemberType NoteProperty -Name $field.Name -Value $field.Value -Force
@@ -3804,8 +3807,8 @@ function Initialize-GUICustomToolProvenance {
                 }
             }
         }
-        if(!($manifest.PSObject.Properties.Name -contains 'schemaVersion') -or [int]$manifest.schemaVersion -lt 2){
-            Add-Member -InputObject $manifest -MemberType NoteProperty -Name 'schemaVersion' -Value 2 -Force
+        if(!($manifest.PSObject.Properties.Name -contains 'schemaVersion') -or [int]$manifest.schemaVersion -lt 3){
+            Add-Member -InputObject $manifest -MemberType NoteProperty -Name 'schemaVersion' -Value 3 -Force
             $changed = $true
         }
         if($changed){ $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $CSIFiles.CustomTools -Encoding UTF8 }
@@ -3846,6 +3849,9 @@ function Get-GUICustomTools {
                     InstallMethod = if($tool.installMethod){[string]$tool.installMethod}else{''}
                     InstalledAt = if($tool.installedAt){[string]$tool.installedAt}else{''}
                     LastUpdatedAt = if($tool.lastUpdatedAt){[string]$tool.lastUpdatedAt}else{''}
+                    UpgradeStatus = if($tool.upgradeStatus){[string]$tool.upgradeStatus}else{'Not checked'}
+                    AvailableVersion = if($tool.availableVersion){[string]$tool.availableVersion}else{''}
+                    LastUpdateCheck = if($tool.lastUpdateCheck){[string]$tool.lastUpdateCheck}else{''}
                     LaunchPath = $launchPath
                     Arguments = $tool.arguments
                     TabOverride = $tool.tabOverride
@@ -3909,7 +3915,10 @@ function Update-GUICustomToolsManifestEntry {
         [string]$PackageProvider = "",
         [string]$PackageName = "",
         [string]$InstallMethod = "",
-        [string]$InstalledAt = ""
+        [string]$InstalledAt = "",
+        [string]$UpgradeStatus = "",
+        [string]$AvailableVersion = "",
+        [string]$LastUpdateCheck = ""
     )
 
     if(!$CSIFiles.CustomTools){
@@ -3944,6 +3953,9 @@ function Update-GUICustomToolsManifestEntry {
         if(!$PackageName -and $existingEntry[0].packageName){ $PackageName = [string]$existingEntry[0].packageName }
         if(!$InstallMethod -and $existingEntry[0].installMethod){ $InstallMethod = [string]$existingEntry[0].installMethod }
         if(!$InstalledAt -and $existingEntry[0].installedAt){ $InstalledAt = [string]$existingEntry[0].installedAt }
+        if(!$UpgradeStatus -and $existingEntry[0].upgradeStatus){ $UpgradeStatus = [string]$existingEntry[0].upgradeStatus }
+        if(!$AvailableVersion -and $existingEntry[0].availableVersion){ $AvailableVersion = [string]$existingEntry[0].availableVersion }
+        if(!$LastUpdateCheck -and $existingEntry[0].lastUpdateCheck){ $LastUpdateCheck = [string]$existingEntry[0].lastUpdateCheck }
     }
     if(!$InstalledAt){ $InstalledAt = (Get-Date).ToString('o') }
 
@@ -3963,6 +3975,9 @@ function Update-GUICustomToolsManifestEntry {
         installMethod = $InstallMethod
         installedAt = $InstalledAt
         lastUpdatedAt = (Get-Date).ToString('o')
+        upgradeStatus = $(if($UpgradeStatus){$UpgradeStatus}else{'Not checked'})
+        availableVersion = $AvailableVersion
+        lastUpdateCheck = $LastUpdateCheck
     }
 
     $manifest = [pscustomobject]@{ tools = @($existing + $entry | Sort-Object name) }
@@ -5943,7 +5958,10 @@ function Add-SelectedChocoPackageToToolbox {
             -Source "Chocolatey Toolbox" `
             -PackageProvider "Chocolatey" `
             -PackageName $package.Name `
-            -InstallMethod $(if($usedMachineInstallFallback){'Chocolatey temporary machine install and portable extraction'}else{'Chocolatey package download and portable extraction'})
+            -InstallMethod $(if($usedMachineInstallFallback){'Chocolatey temporary machine install and portable extraction'}else{'Chocolatey package download and portable extraction'}) `
+            -UpgradeStatus 'Current' `
+            -AvailableVersion $package.Version `
+            -LastUpdateCheck (Get-Date).ToString('o')
         $manifestUpdated = $true
 
         Refresh-GUICustomTools
@@ -6097,6 +6115,48 @@ function Upgrade-AllGUIChocoPackages {
     Start-GUIChocoAction -PackageName "all" -Action upgrade
 }
 
+function Check-GUIChocoInstalledPackageUpdates {
+    Refresh-GUIChocoInstalledPackages
+    $updates = @($script:ChocoInstalledPackages | Where-Object { $_.Available })
+    $message = if($updates.Count -gt 0){
+        "Updates are available for $($updates.Count) computer-installed Chocolatey package(s):`r`n`r`n" + (($updates | ForEach-Object { "$($_.Name): $($_.Version) -> $($_.Available)" }) -join "`r`n")
+    }
+    else{
+        'No Chocolatey package updates are available on this computer.'
+    }
+    Add-GUILog ("Chocolatey computer update check completed: {0} update(s) available." -f $updates.Count)
+    [System.Windows.Forms.MessageBox]::Show($message,'Check Chocolatey Updates',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+}
+
+function Set-GUICustomToolUpgradeStatus {
+    param(
+        [Parameter(Mandatory=$true)][string]$Name,
+        [Parameter(Mandatory=$true)][string]$Status,
+        [string]$AvailableVersion = ''
+    )
+
+    if(!$CSIFiles.CustomTools -or !(Test-Path -LiteralPath $CSIFiles.CustomTools)){
+        return
+    }
+
+    try {
+        $manifest = Get-Content -LiteralPath $CSIFiles.CustomTools -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        foreach($tool in @($manifest.tools)){
+            if([string]$tool.name -ne $Name){
+                continue
+            }
+            Add-Member -InputObject $tool -MemberType NoteProperty -Name upgradeStatus -Value $Status -Force
+            Add-Member -InputObject $tool -MemberType NoteProperty -Name availableVersion -Value $AvailableVersion -Force
+            Add-Member -InputObject $tool -MemberType NoteProperty -Name lastUpdateCheck -Value (Get-Date).ToString('o') -Force
+        }
+        $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $CSIFiles.CustomTools -Encoding UTF8
+        $script:GuiCustomToolsCache = $null
+    }
+    catch {
+        Add-GUILog "Could not save toolkit tool update status for ${Name}: $($_.Exception.Message)"
+    }
+}
+
 function Refresh-GUIChocoToolboxPackages {
     $script:ChocoToolboxPackages = @(
         Get-GUICustomTools | Where-Object { $_.PackageProvider -eq 'Chocolatey' -and $_.PackageName -and $_.LaunchPath -and (Test-Path $_.LaunchPath) }
@@ -6105,12 +6165,57 @@ function Refresh-GUIChocoToolboxPackages {
     if($script:ChocoToolboxGrid){
         $script:ChocoToolboxGrid.Rows.Clear()
         foreach($tool in $script:ChocoToolboxPackages){
-            $row = $script:ChocoToolboxGrid.Rows.Add($tool.Name,$tool.Version,$tool.PackageName)
+            $status = if($tool.UpgradeStatus){$tool.UpgradeStatus}else{'Not checked'}
+            $latest = if($tool.AvailableVersion){$tool.AvailableVersion}else{'-'}
+            $row = $script:ChocoToolboxGrid.Rows.Add($tool.Name,$tool.Version,$status,$latest)
             $script:ChocoToolboxGrid.Rows[$row].Tag = $tool
         }
     }
 
     Add-GUILog ("Toolkit Chocolatey tools: {0}" -f $script:ChocoToolboxPackages.Count)
+}
+
+function Check-GUIChocoToolboxPackageUpdates {
+    $choco = Get-GUIChocoPath
+    if(!$choco){
+        Add-GUILog 'Chocolatey is not installed. Toolkit package updates cannot be checked.'
+        return
+    }
+
+    Refresh-GUIChocoToolboxPackages
+    $updates = @()
+    foreach($tool in @($script:ChocoToolboxPackages)){
+        try {
+            $raw = & $choco search $tool.PackageName --exact --limit-output --no-color 2>&1
+            $line = @($raw | Where-Object { $_ -match ('^{0}\|' -f [regex]::Escape($tool.PackageName)) } | Select-Object -First 1)
+            if($line.Count -eq 0){
+                Set-GUICustomToolUpgradeStatus -Name $tool.Name -Status 'Check failed'
+                continue
+            }
+
+            $parts = ([string]$line[0]).Split('|')
+            $available = if($parts.Count -gt 1){[string]$parts[1]}else{''}
+            $status = if($available -and $available -ne [string]$tool.Version){'Update available'}else{'Current'}
+            Set-GUICustomToolUpgradeStatus -Name $tool.Name -Status $status -AvailableVersion $available
+            if($status -eq 'Update available'){
+                $updates += [pscustomobject]@{ Name=$tool.Name; Installed=$tool.Version; Available=$available }
+            }
+        }
+        catch {
+            Set-GUICustomToolUpgradeStatus -Name $tool.Name -Status 'Check failed'
+            Add-GUILog "Could not check toolkit package $($tool.PackageName): $($_.Exception.Message)"
+        }
+    }
+
+    Refresh-GUIChocoToolboxPackages
+    $message = if($updates.Count -gt 0){
+        "Portable toolkit updates are available for $($updates.Count) tool(s):`r`n`r`n" + (($updates | ForEach-Object { "$($_.Name): $($_.Installed) -> $($_.Available)" }) -join "`r`n") + "`r`n`r`nUse Upgrade Selected or Upgrade All to replace only the portable toolkit copies."
+    }
+    else{
+        'All tracked portable toolkit packages are current, or Chocolatey did not return a newer package version.'
+    }
+    Add-GUILog ("Toolkit package update check completed: {0} update(s) available." -f $updates.Count)
+    [System.Windows.Forms.MessageBox]::Show($message,'Check Toolkit Tool Updates',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
 }
 
 function Get-SelectedGUIChocoToolboxPackage {
@@ -6204,14 +6309,15 @@ function Show-GUIChocoToolboxManager {
     $script:ChocoToolboxGrid = New-Object System.Windows.Forms.DataGridView
     $ChocoToolboxGrid.Dock='Fill'; $ChocoToolboxGrid.ReadOnly=$true; $ChocoToolboxGrid.AllowUserToAddRows=$false; $ChocoToolboxGrid.AllowUserToDeleteRows=$false
     $ChocoToolboxGrid.RowHeadersVisible=$false; $ChocoToolboxGrid.MultiSelect=$false; $ChocoToolboxGrid.SelectionMode='FullRowSelect'; $ChocoToolboxGrid.AutoSizeColumnsMode='Fill'; $ChocoToolboxGrid.BackgroundColor=[System.Drawing.Color]::White
-    [void]$ChocoToolboxGrid.Columns.Add('Name','Toolkit Tool'); [void]$ChocoToolboxGrid.Columns.Add('Version','Installed'); [void]$ChocoToolboxGrid.Columns.Add('Status','Chocolatey Package')
+    [void]$ChocoToolboxGrid.Columns.Add('Name','Toolkit Tool'); [void]$ChocoToolboxGrid.Columns.Add('Version','Installed'); [void]$ChocoToolboxGrid.Columns.Add('Status','Upgrade Status'); [void]$ChocoToolboxGrid.Columns.Add('Available','Latest')
     $layout.Controls.Add($ChocoToolboxGrid,0,1)
     $actions=New-Object System.Windows.Forms.FlowLayoutPanel; $actions.Dock='Fill'; $actions.FlowDirection='RightToLeft'
-    $close=New-GUIButton 'Close' { $form.Close() }; $refresh=New-GUIButton 'Refresh' { Refresh-GUIChocoToolboxPackages }; $selected=New-GUIButton 'Upgrade Selected' { Upgrade-SelectedGUIChocoToolboxPackage }; $all=New-GUIButton 'Upgrade All' { Upgrade-AllGUIChocoToolboxPackages }
-    foreach($button in @($close,$all,$selected,$refresh)){ $actions.Controls.Add($button) }
+    $close=New-GUIButton 'Close' { $form.Close() }; $refresh=New-GUIButton 'Refresh List' { Refresh-GUIChocoToolboxPackages }; $check=New-GUIButton 'Check For Updates' { Check-GUIChocoToolboxPackageUpdates }; $selected=New-GUIButton 'Upgrade Selected' { Upgrade-SelectedGUIChocoToolboxPackage }; $all=New-GUIButton 'Upgrade All' { Upgrade-AllGUIChocoToolboxPackages }
+    foreach($button in @($close,$all,$selected,$check,$refresh)){ $actions.Controls.Add($button) }
     $layout.Controls.Add($actions,0,2); $form.Controls.Add($layout)
     Refresh-GUIChocoToolboxPackages
     [void]$form.ShowDialog($script:Form)
+    $script:ChocoToolboxGrid = $null
     $form.Dispose()
 }
 
@@ -8862,13 +8968,13 @@ function Build-WindowsUpdatePage {
     $leftActions.Padding = New-Object System.Windows.Forms.Padding(0)
     [void]$top.Controls.Add($leftActions,0,0)
 
-    [void]$leftActions.Controls.Add((New-GUIButton "Refresh Updates" { Refresh-GUIWindowsUpdateData }))
+    [void]$leftActions.Controls.Add((New-GUIButton "Check Updates" { Refresh-GUIWindowsUpdateData }))
     [void]$leftActions.Controls.Add((New-GUIButton "Download Selected" { Download-SelectedGUIWindowsUpdate }))
     [void]$leftActions.Controls.Add((New-GUIButton "Install Selected" { Install-SelectedGUIWindowsUpdate }))
     [void]$leftActions.Controls.Add((New-GUIButton "Uninstall Selected" { Uninstall-SelectedGUIWindowsUpdate }))
 
     $script:WUStatusLabel = New-Object System.Windows.Forms.Label
-    $WUStatusLabel.Text = "Click Refresh Updates to scan Windows Update."
+    $WUStatusLabel.Text = "Click Check Updates to scan Windows Update."
     $WUStatusLabel.Dock = "Fill"
     $WUStatusLabel.Height = 34
     $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(12,8,3,3)
@@ -10160,7 +10266,7 @@ function Build-ChocolateyPage {
     $installedLayout.ColumnCount = 1
     $installedLayout.Padding = New-Object System.Windows.Forms.Padding(10)
     $installedLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $installedLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,84))) | Out-Null
+    $installedLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
     $installedGroup.Controls.Add($installedLayout)
 
     $script:ChocoInstalledGrid = New-Object System.Windows.Forms.DataGridView
@@ -10182,10 +10288,11 @@ function Build-ChocolateyPage {
     $installedButtons = New-Object System.Windows.Forms.TableLayoutPanel
     $installedButtons.Dock = "Fill"
     $installedButtons.ColumnCount = 2
-    $installedButtons.RowCount = 2
+    $installedButtons.RowCount = 3
     $installedButtons.Padding = New-Object System.Windows.Forms.Padding(4)
     $installedButtons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $installedButtons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $installedButtons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $installedButtons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $installedButtons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $installedLayout.Controls.Add($installedButtons,0,1)
@@ -10209,6 +10316,12 @@ function Build-ChocolateyPage {
     $uninstallComputerButton.Dock = "Fill"
     $uninstallComputerButton.Width = 0
     [void]$installedButtons.Controls.Add($uninstallComputerButton,1,1)
+
+    $checkComputerUpdatesButton = New-GUIButton "Check For Updates" { Check-GUIChocoInstalledPackageUpdates }
+    $checkComputerUpdatesButton.Dock = "Fill"
+    $checkComputerUpdatesButton.Width = 0
+    [void]$installedButtons.Controls.Add($checkComputerUpdatesButton,0,2)
+    $installedButtons.SetColumnSpan($checkComputerUpdatesButton,2)
 
     Refresh-GUIChocoStatus
     Refresh-GUIChocoToolboxPackages
@@ -11016,6 +11129,51 @@ function Show-GUIToolkitDeployment {
     if([System.Windows.Forms.MessageBox]::Show('Confirm fresh deployment. Existing destination contents will be deleted.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -eq [System.Windows.Forms.DialogResult]::Yes){ Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination }
 }
 
+function Get-GUIToolkitVersionManifest {
+    param([Parameter(Mandatory=$true)][string]$Path)
+
+    $candidatePaths = @(
+        (Join-Path $Path 'App\manifests\toolkit-version.json'),
+        (Join-Path $Path 'manifests\toolkit-version.json')
+    )
+    $manifestPath = @($candidatePaths | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1)
+    if($manifestPath.Count -eq 0){
+        throw "No toolkit version manifest was found in: $Path"
+    }
+
+    $manifest = Get-Content -LiteralPath $manifestPath[0] -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+    if(!$manifest.Version -or !$manifest.Build){
+        throw "The toolkit version manifest is incomplete: $($manifestPath[0])"
+    }
+    return $manifest
+}
+
+function Show-GUIToolkitUpdateCheck {
+    param([string]$SourceRoot,[string]$DestinationRoot)
+
+    if([string]::IsNullOrWhiteSpace($SourceRoot) -or [string]::IsNullOrWhiteSpace($DestinationRoot)){
+        [System.Windows.Forms.MessageBox]::Show('Select both a source and destination toolkit folder first.','Check Toolkit Update',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    try {
+        $source = Get-GUIToolkitVersionManifest -Path $SourceRoot
+        $destination = Get-GUIToolkitVersionManifest -Path $DestinationRoot
+        $sourceVersion = [version]$source.Version
+        $destinationVersion = [version]$destination.Version
+        $isNewer = $sourceVersion -gt $destinationVersion -or ($sourceVersion -eq $destinationVersion -and [long]$source.Build -gt [long]$destination.Build)
+        $isSame = $sourceVersion -eq $destinationVersion -and [long]$source.Build -eq [long]$destination.Build
+        $summary = if($isNewer){'An update is available for the destination.'}elseif($isSame){'The destination already has this toolkit build.'}else{'The destination is newer than the selected source. Update is blocked.'}
+        $message = "$summary`r`n`r`nSource: $($source.Version) build $($source.Build)`r`nDestination: $($destination.Version) build $($destination.Build)"
+        Add-GUILog "Toolkit update check: $summary Source=$($source.Build); Destination=$($destination.Build)"
+        [System.Windows.Forms.MessageBox]::Show($message,'Check Toolkit Update',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+    }
+    catch {
+        Add-GUILog "Toolkit update check failed: $($_.Exception.Message)"
+        [System.Windows.Forms.MessageBox]::Show("Could not check toolkit versions.`r`n`r`n$($_.Exception.Message)",'Check Toolkit Update',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    }
+}
+
 function Show-GUIToolkitUpdater {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Update Network Toolkit"
@@ -11093,6 +11251,11 @@ function Show-GUIToolkitUpdater {
 
     $result = [pscustomobject]@{ Confirmed = $false; Source = ""; Destination = "" }
     $cancel = New-GUIButton "Cancel" { $form.Close() }
+    $check = New-GUIButton "Check For Update" {
+        $source = $sourceBox.Text.Trim()
+        $destination = $destinationBox.Text.Trim()
+        Show-GUIToolkitUpdateCheck -SourceRoot $source -DestinationRoot $destination
+    }
     $update = New-GUIButton "Update Destination" {
         $source = $sourceBox.Text.Trim()
         $destination = $destinationBox.Text.Trim()
@@ -11138,6 +11301,7 @@ Only a newer source version/build will update. Portable apps and client data are
         $destinationBrowse.Enabled = $false
     }
     $buttons.Controls.Add($update)
+    $buttons.Controls.Add($check)
     $buttons.Controls.Add($cancel)
 
     $script:ToolkitUpdateDialogResult = $result

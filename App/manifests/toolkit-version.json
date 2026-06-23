@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260623094529,
-    "SourceUpdatedAt":  "2026-06-23T09:45:29.7812257-05:00",
-    "ReleaseNotes":  "Harden portable Chocolatey toolbox updates and preserve destination tool registry during updates."
+    "Build":  20260623103621,
+    "SourceUpdatedAt":  "2026-06-23T10:36:21.2667149-05:00",
+    "ReleaseNotes":  "Add persistent update status and explicit update checks for toolkit and Chocolatey package upgrades."
 }
