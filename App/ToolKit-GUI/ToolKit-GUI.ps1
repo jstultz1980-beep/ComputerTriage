@@ -2483,12 +2483,34 @@ function Global:Start-GUINetworkDiscovery {
     $intro.Dock='Fill'; $intro.Font=New-Object System.Drawing.Font('Segoe UI Semibold',12); $intro.TextAlign='MiddleLeft'
     $layout.Controls.Add($intro,0,0)
     $cidrRow = New-Object System.Windows.Forms.TableLayoutPanel
-    $cidrRow.Dock='Fill'; $cidrRow.ColumnCount=2
-    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
-    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $cidrLabel = New-GUILabel 'CIDR for manual scan'; $cidrLabel.Dock='Fill'; $cidrLabel.TextAlign='MiddleLeft'
-    $cidr = New-GUITextBox; $cidr.Dock='Fill'
-    $cidrRow.Controls.Add($cidrLabel,0,0); $cidrRow.Controls.Add($cidr,1,0); $layout.Controls.Add($cidrRow,0,1)
+    $cidrRow.Dock='Fill'; $cidrRow.ColumnCount=4
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,76))) | Out-Null
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,54))) | Out-Null
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $cidrRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,46))) | Out-Null
+    $ipLabel = New-GUILabel 'IP address'; $ipLabel.Dock='Fill'; $ipLabel.TextAlign='MiddleLeft'
+    $ipAddress = New-GUITextBox; $ipAddress.Dock='Fill'
+    $prefixLabel = New-GUILabel 'Subnet'; $prefixLabel.Dock='Fill'; $prefixLabel.TextAlign='MiddleLeft'
+    $prefix = New-Object System.Windows.Forms.ComboBox
+    $prefix.Dock='Fill'; $prefix.DropDownStyle=[System.Windows.Forms.ComboBoxStyle]::DropDownList; $prefix.Font=New-Object System.Drawing.Font('Segoe UI Semilight',9)
+    $prefixItems = @(
+        '/32  Single host', '/30  255.255.255.252', '/29  255.255.255.248', '/28  255.255.255.240',
+        '/27  255.255.255.224', '/26  255.255.255.192', '/25  255.255.255.128', '/24  255.255.255.0',
+        '/23  255.255.254.0', '/22  255.255.252.0', '/21  255.255.248.0', '/20  255.255.240.0',
+        '/19  255.255.224.0', '/18  255.255.192.0', '/17  255.255.128.0', '/16  255.255.0.0'
+    )
+    [void]$prefix.Items.AddRange([object[]]$prefixItems)
+    $prefix.SelectedIndex = 7
+    try {
+        $active = Get-NetIPConfiguration | Where-Object { $_.IPv4Address -and $_.NetAdapter.Status -eq 'Up' } | Select-Object -First 1
+        if($active){
+            $ipAddress.Text = $active.IPv4Address.IPAddress
+            $match = @($prefixItems | Where-Object { $_ -match ('^/{0}(\s|$)' -f $active.IPv4Address.PrefixLength) } | Select-Object -First 1)
+            if($match.Count -gt 0){ $prefix.SelectedItem = $match[0] }
+        }
+    }
+    catch { }
+    $cidrRow.Controls.Add($ipLabel,0,0); $cidrRow.Controls.Add($ipAddress,1,0); $cidrRow.Controls.Add($prefixLabel,2,0); $cidrRow.Controls.Add($prefix,3,0); $layout.Controls.Add($cidrRow,0,1)
     $buttons = New-Object System.Windows.Forms.TableLayoutPanel
     $buttons.Dock='Fill'; $buttons.Padding=New-Object System.Windows.Forms.Padding(0,6,0,4); $buttons.ColumnCount=2; $buttons.RowCount=2
     $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -2497,12 +2519,22 @@ function Global:Start-GUINetworkDiscovery {
     $buttons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $auto = New-GUIButton 'Auto Scan' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Auto Scan' -Invocation 'Invoke-NetworkScan -Timeout 500 -Throttle 128' }
     $manualAction = {
-        $value=$cidr.Text.Trim()
-        if($value -notmatch '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'){
-            [System.Windows.Forms.MessageBox]::Show('Enter an IPv4 CIDR such as 10.10.10.0/24.','Network Toolkit') | Out-Null
+        $address=$ipAddress.Text.Trim()
+        if($address -notmatch '^\d{1,3}(\.\d{1,3}){3}$'){
+            [System.Windows.Forms.MessageBox]::Show('Enter a valid IPv4 address.','Network Toolkit') | Out-Null
             return
         }
-        Start-GUISafeScriptRunner -ToolName 'Network Discovery - CIDR Scan' -Invocation ("Invoke-NetworkPingUtility -CIDR '{0}' -Timeout 500 -Throttle 128" -f $value)
+        $parsedAddress = $null
+        if(![System.Net.IPAddress]::TryParse($address,[ref]$parsedAddress) -or $parsedAddress.AddressFamily -ne [System.Net.Sockets.AddressFamily]::InterNetwork){
+            [System.Windows.Forms.MessageBox]::Show('Enter a valid IPv4 address.','Network Toolkit') | Out-Null
+            return
+        }
+        $prefixLength = [int]([regex]::Match([string]$prefix.SelectedItem,'^/(\d{1,2})').Groups[1].Value)
+        if($prefixLength -lt 16 -or $prefixLength -gt 32){
+            [System.Windows.Forms.MessageBox]::Show('Choose a subnet from /16 through /32.','Network Toolkit') | Out-Null
+            return
+        }
+        Start-GUISafeScriptRunner -ToolName 'Network Discovery - CIDR Scan' -Invocation ("Invoke-NetworkPingUtility -CIDR '{0}/{1}' -Timeout 500 -Throttle 128" -f $address,$prefixLength)
     }.GetNewClosure()
     $manual = New-GUIButton 'Scan CIDR' $manualAction
     $topology = New-GUIButton 'Topology' { Start-GUISafeScriptRunner -ToolName 'Network Discovery - Topology' -Invocation 'Get-NetworkTopology' }
