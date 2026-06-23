@@ -68,6 +68,7 @@ $script:ChocoPackages = @()
 $script:ChocoInstalledPackages = @()
 $script:ChocoToolboxPackages = @()
 $script:ChocoToolboxGrid = $null
+$script:CustomToolProvenanceInitialized = $false
 $script:Reports = @()
 $script:CustomTools = @()
 $script:QuickDiagnosisRan = $false
@@ -3778,6 +3779,41 @@ function Test-GUIInstallerExecutable {
     return Test-GUIFileContainsAsciiPattern -Path $Path -Pattern '(?i)(Nullsoft Install System|NSIS Error|Inno Setup|InstallShield Wizard|Choose Install Location|Destination Folder)'
 }
 
+function Initialize-GUICustomToolProvenance {
+    if($script:CustomToolProvenanceInitialized -or !$CSIFiles.CustomTools -or !(Test-Path $CSIFiles.CustomTools)){
+        return
+    }
+
+    try {
+        $manifest = Get-Content -LiteralPath $CSIFiles.CustomTools -Raw | ConvertFrom-Json
+        $changed = $false
+        foreach($tool in @($manifest.tools)){
+            if([string]$tool.source -ne 'Chocolatey Toolbox'){ continue }
+            $folderName = [System.IO.Path]::GetFileName(([string]$tool.installPath).TrimEnd('\','/'))
+            $packageName = if($folderName){$folderName}else{[string]$tool.name}
+            foreach($field in @(
+                @{Name='packageProvider';Value='Chocolatey'},
+                @{Name='packageName';Value=$packageName},
+                @{Name='installMethod';Value='Legacy Chocolatey toolbox import (inferred)'},
+                @{Name='installedAt';Value=(Get-Date).ToString('o')},
+                @{Name='lastUpdatedAt';Value=(Get-Date).ToString('o')}
+            )){
+                if(!($tool.PSObject.Properties.Name -contains $field.Name) -or [string]$tool.$($field.Name) -eq ''){
+                    Add-Member -InputObject $tool -MemberType NoteProperty -Name $field.Name -Value $field.Value -Force
+                    $changed = $true
+                }
+            }
+        }
+        if(!($manifest.PSObject.Properties.Name -contains 'schemaVersion') -or [int]$manifest.schemaVersion -lt 2){
+            Add-Member -InputObject $manifest -MemberType NoteProperty -Name 'schemaVersion' -Value 2 -Force
+            $changed = $true
+        }
+        if($changed){ $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $CSIFiles.CustomTools -Encoding UTF8 }
+    }
+    catch { Add-GUILog "Custom tool provenance migration failed: $($_.Exception.Message)" }
+    finally { $script:CustomToolProvenanceInitialized = $true }
+}
+
 function Get-GUICustomTools {
     param([switch]$Detailed)
 
@@ -3786,6 +3822,7 @@ function Get-GUICustomTools {
     }
 
     $tools = @()
+    Initialize-GUICustomToolProvenance
 
     if($CSIFiles.CustomTools -and (Test-Path $CSIFiles.CustomTools)){
         try {
@@ -3804,6 +3841,11 @@ function Get-GUICustomTools {
                     Name = $tool.name
                     Source = $tool.source
                     Version = $tool.version
+                    PackageProvider = if($tool.packageProvider){[string]$tool.packageProvider}else{''}
+                    PackageName = if($tool.packageName){[string]$tool.packageName}else{''}
+                    InstallMethod = if($tool.installMethod){[string]$tool.installMethod}else{''}
+                    InstalledAt = if($tool.installedAt){[string]$tool.installedAt}else{''}
+                    LastUpdatedAt = if($tool.lastUpdatedAt){[string]$tool.lastUpdatedAt}else{''}
                     LaunchPath = $launchPath
                     Arguments = $tool.arguments
                     TabOverride = $tool.tabOverride
@@ -3863,7 +3905,11 @@ function Update-GUICustomToolsManifestEntry {
         [string]$InstallPath,
         [string]$Source = "Chocolatey",
         [string]$Arguments = "",
-        [string]$TabOverride = $null
+        [string]$TabOverride = $null,
+        [string]$PackageProvider = "",
+        [string]$PackageName = "",
+        [string]$InstallMethod = "",
+        [string]$InstalledAt = ""
     )
 
     if(!$CSIFiles.CustomTools){
@@ -3893,6 +3939,13 @@ function Update-GUICustomToolsManifestEntry {
     if($null -eq $TabOverride -and $existingEntry.Count -gt 0 -and $existingEntry[0].PSObject.Properties.Name -contains "tabOverride"){
         $TabOverride = [string]$existingEntry[0].tabOverride
     }
+    if($existingEntry.Count -gt 0){
+        if(!$PackageProvider -and $existingEntry[0].packageProvider){ $PackageProvider = [string]$existingEntry[0].packageProvider }
+        if(!$PackageName -and $existingEntry[0].packageName){ $PackageName = [string]$existingEntry[0].packageName }
+        if(!$InstallMethod -and $existingEntry[0].installMethod){ $InstallMethod = [string]$existingEntry[0].installMethod }
+        if(!$InstalledAt -and $existingEntry[0].installedAt){ $InstalledAt = [string]$existingEntry[0].installedAt }
+    }
+    if(!$InstalledAt){ $InstalledAt = (Get-Date).ToString('o') }
 
     $existing = @($manifest.tools | Where-Object {
         $_.name -ne $Name -and $_.launchPath -ne $relativeLaunch
@@ -3905,6 +3958,11 @@ function Update-GUICustomToolsManifestEntry {
         installPath = ConvertTo-GUIRelativeToolkitPath $InstallPath
         arguments = $Arguments
         tabOverride = $TabOverride
+        packageProvider = $PackageProvider
+        packageName = $PackageName
+        installMethod = $InstallMethod
+        installedAt = $InstalledAt
+        lastUpdatedAt = (Get-Date).ToString('o')
     }
 
     $manifest = [pscustomobject]@{ tools = @($existing + $entry | Sort-Object name) }
@@ -5874,7 +5932,10 @@ function Add-SelectedChocoPackageToToolbox {
             -Version $package.Version `
             -LaunchPath $launchExe.FullName `
             -InstallPath $dest `
-            -Source "Chocolatey Toolbox"
+            -Source "Chocolatey Toolbox" `
+            -PackageProvider "Chocolatey" `
+            -PackageName $package.Name `
+            -InstallMethod $(if($usedMachineInstallFallback){'Chocolatey temporary machine install and portable extraction'}else{'Chocolatey package download and portable extraction'})
         $manifestUpdated = $true
 
         Refresh-GUICustomTools
@@ -6026,13 +6087,13 @@ function Upgrade-AllGUIChocoPackages {
 
 function Refresh-GUIChocoToolboxPackages {
     $script:ChocoToolboxPackages = @(
-        Get-GUICustomTools | Where-Object { $_.Source -eq 'Chocolatey Toolbox' -and $_.LaunchPath -and (Test-Path $_.LaunchPath) }
+        Get-GUICustomTools | Where-Object { $_.PackageProvider -eq 'Chocolatey' -and $_.PackageName -and $_.LaunchPath -and (Test-Path $_.LaunchPath) }
     )
 
     if($script:ChocoToolboxGrid){
         $script:ChocoToolboxGrid.Rows.Clear()
         foreach($tool in $script:ChocoToolboxPackages){
-            $row = $script:ChocoToolboxGrid.Rows.Add($tool.Name,$tool.Version,'Toolkit copy')
+            $row = $script:ChocoToolboxGrid.Rows.Add($tool.Name,$tool.Version,$tool.PackageName)
             $script:ChocoToolboxGrid.Rows[$row].Tag = $tool
         }
     }

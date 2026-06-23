@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260623093256,
-    "SourceUpdatedAt":  "2026-06-23T09:32:56.3447123-05:00",
-    "ReleaseNotes":  "Add Chocolatey-managed toolkit tool upgrade controls."
+    "Build":  20260623093830,
+    "SourceUpdatedAt":  "2026-06-23T09:38:30.1380652-05:00",
+    "ReleaseNotes":  "Track toolkit tool package provenance for reliable Chocolatey upgrades."
 }
