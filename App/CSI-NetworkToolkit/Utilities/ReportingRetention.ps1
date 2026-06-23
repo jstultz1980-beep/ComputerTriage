@@ -24,7 +24,11 @@ param([string]$Path)
             }
         }
     }
-    catch {}
+    catch {
+        if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+            Write-CSIWarning -Component 'Retention' -Message ("Could not inspect {0} for severe evidence: {1}" -f $Path,$_.Exception.Message)
+        }
+    }
 
     return $false
 }
@@ -63,7 +67,14 @@ param(
             continue
         }
 
-        Remove-Item -LiteralPath $item.FullName -Recurse:$Directory -Force -ErrorAction SilentlyContinue
+        try {
+            Remove-Item -LiteralPath $item.FullName -Recurse:$Directory -Force -ErrorAction Stop
+        }
+        catch {
+            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                Write-CSIWarning -Component 'Retention' -Message ("Could not remove {0}: {1}" -f $item.FullName,$_.Exception.Message)
+            }
+        }
     }
 }
 
@@ -99,7 +110,14 @@ param(
                 $files = @($toolFolder.Group | Sort-Object LastWriteTime -Descending)
                 foreach($file in @($files | Select-Object -Skip $LogKeepCount)){
                     if(!(Test-CSIOutputHasSevereEvidence -Path $file.FullName)){
-                        Remove-Item -LiteralPath $file.FullName -Force -ErrorAction SilentlyContinue
+                        try {
+                            Remove-Item -LiteralPath $file.FullName -Force -ErrorAction Stop
+                        }
+                        catch {
+                            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                                Write-CSIWarning -Component 'Retention' -Message ("Could not remove {0}: {1}" -f $file.FullName,$_.Exception.Message)
+                            }
+                        }
                     }
                 }
             }

@@ -81,9 +81,8 @@ else{
 }
 
 if(!$cmd){
-
-    Write-Host "Command not found." -ForegroundColor Red
-    return
+    $requested = if($Id){"id '$Id'"}else{"name '$Name'"}
+    throw "Command not found for $requested."
 
 }
 
@@ -95,8 +94,7 @@ if(Get-Command $commandName -ErrorAction SilentlyContinue){
 
 }
 else{
-
-    Write-Host "Command function missing:" $commandName -ForegroundColor Red
+    throw "Command function is missing: $commandName"
 
 }
 

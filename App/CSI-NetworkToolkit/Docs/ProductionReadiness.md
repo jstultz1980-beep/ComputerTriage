@@ -4,7 +4,7 @@
 
 The production package is built with `Build-ProductionPackage.ps1`. It creates a clean `Release\NetworkToolkit-Portable` deployment folder suitable for copying directly to a thumb drive.
 
-Launch the toolkit with `NetworkToolkit-Elevated.bat`. After copying the folder to removable media, run `Test-ProductionPackage.ps1` from the copied folder to verify the primary launch-file hashes and confirm that no client reports, profiles, state, dumps, or Git metadata were included.
+Launch the toolkit with `NetworkToolkit.vbs`. After copying the folder to removable media, run `App\Test-ProductionPackage.ps1` from the copied folder to verify the primary launch-file hashes and confirm that no client reports, profiles, state, dumps, or Git metadata were included.
 
 The package builder excludes:
 

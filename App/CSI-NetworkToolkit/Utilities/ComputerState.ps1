@@ -80,7 +80,11 @@ param([string]$ComputerName = $env:COMPUTERNAME)
         try {
             return (ConvertTo-CSIHashtable (Get-Content -Raw -Path $path | ConvertFrom-Json))
         }
-        catch {}
+        catch {
+            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                Write-CSIWarning -Component 'ComputerState' -Message ("Could not read {0}: {1}. A new state document will be used." -f $path,$_.Exception.Message)
+            }
+        }
     }
 
     return [ordered]@{
@@ -206,7 +210,12 @@ param(
 
     $metadata = $null
     if($MetadataPath -and (Test-Path $MetadataPath)){
-        try { $metadata = Get-Content -Raw -Path $MetadataPath | ConvertFrom-Json } catch {}
+        try { $metadata = Get-Content -Raw -Path $MetadataPath | ConvertFrom-Json }
+        catch {
+            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                Write-CSIWarning -Component 'ComputerState' -Message ("Could not parse tool metadata {0}: {1}" -f $MetadataPath,$_.Exception.Message)
+            }
+        }
     }
 
     $preview = @()
@@ -214,7 +223,11 @@ param(
         try {
             $preview = @(Get-Content -Path $TranscriptPath -Tail 80 -ErrorAction Stop)
         }
-        catch {}
+        catch {
+            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                Write-CSIWarning -Component 'ComputerState' -Message ("Could not read tool transcript {0}: {1}" -f $TranscriptPath,$_.Exception.Message)
+            }
+        }
     }
 
     $state["Sections"]["LatestToolOutputs"]["UpdatedAt"] = (Get-Date).ToString("s")

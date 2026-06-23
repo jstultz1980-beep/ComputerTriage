@@ -63,6 +63,7 @@ catch {
 }
 
 $script:Commands = @(Get-CSICommands | Where-Object {$_.Name -notin @("File Utilities","Software Utilities")})
+$script:ToolkitLoadFailures = if(Get-Command Get-CSIImportFailures -ErrorAction SilentlyContinue){ @(Get-CSIImportFailures) }else{ @() }
 $script:Fingerprints = @()
 $script:ChocoPackages = @()
 $script:ChocoInstalledPackages = @()
@@ -1467,6 +1468,22 @@ function Update-GUIPublicIPSummaryAsync {
         $script:PublicIPProcess = $null
     }
 
+    # Public-IP lookup scripts are process helpers, not technician evidence.
+    # Keep them in the user's temp area so they never pollute portable output
+    # retention or inherit restrictive ACLs from a previous elevated run.
+    $publicIpRoot = Join-Path $env:TEMP 'NetworkToolkit\PublicIP'
+    try {
+        if(Test-Path -LiteralPath $publicIpRoot){
+            foreach($artifact in @(Get-ChildItem -LiteralPath $publicIpRoot -File -Force -ErrorAction Stop)){
+                try { Remove-Item -LiteralPath $artifact.FullName -Force -ErrorAction Stop }
+                catch { Write-GUIDiagnosticLog -Event 'PublicIPArtifactCleanupFailed' -Level 'WARN' -Detail ("Path={0}; Error={1}" -f $artifact.FullName,$_.Exception.Message) }
+            }
+        }
+    }
+    catch {
+        Write-GUIDiagnosticLog -Event 'PublicIPArtifactCleanupFailed' -Level 'WARN' -Detail $_.Exception.Message
+    }
+
     $script:PublicIPStartedAt = Get-Date
     $script:PublicIPQuiet = [bool]$Quiet
 
@@ -1478,7 +1495,7 @@ function Update-GUIPublicIPSummaryAsync {
     }
 
     try {
-        $sessionRoot = Join-Path (Get-CSITempOutputRoot) "_PublicIP"
+        $sessionRoot = $publicIpRoot
         if(!(Test-Path $sessionRoot)){
             New-Item -ItemType Directory -Path $sessionRoot -Force | Out-Null
         }
@@ -1600,6 +1617,15 @@ exit 2
             }
 
             $script:PublicIPProcess = $null
+
+            foreach($artifact in @($script:PublicIPOutputFile,$script:PublicIPScriptFile)){
+                if($artifact -and (Test-Path -LiteralPath $artifact)){
+                    try { Remove-Item -LiteralPath $artifact -Force -ErrorAction Stop }
+                    catch { Add-GUILog "Could not remove Public IP helper file: $($_.Exception.Message)" }
+                }
+            }
+            $script:PublicIPOutputFile = $null
+            $script:PublicIPScriptFile = $null
 
             if($script:DashboardLabels -and $script:DashboardLabels.ContainsKey("PublicIP")){
                 $ipLabel = $script:DashboardLabels["PublicIP"]
@@ -2348,7 +2374,7 @@ function Global:Start-GUISafeScriptRunner {
     $transcriptPath = $session.Transcript
 
     $runner = @"
-`$ErrorActionPreference = 'Continue'
+`$ErrorActionPreference = 'Stop'
 `$metadata = [ordered]@{ Tool = '$($ToolName.Replace("'","''"))'; Invocation = '$($Invocation.Replace("'","''"))'; StartedAt = (Get-Date).ToString('s'); CompletedAt = ''; Status = 'Running'; ComputerName = `$env:COMPUTERNAME }
 `$metadata | ConvertTo-Json | Set-Content -LiteralPath '$($session.Metadata)' -Encoding UTF8
 try {
@@ -2359,7 +2385,9 @@ try {
     `$metadata.Status = 'Completed'
 }
 catch {
-    Write-Error (`$_ | Out-String)
+    Write-Host ''
+    Write-Host 'Command failed.' -ForegroundColor Red
+    Write-Host `$_.Exception.Message -ForegroundColor Red
     `$metadata.Status = 'Error'
     `$metadata.Error = `$_.Exception.Message
 }
@@ -2367,6 +2395,14 @@ finally {
     `$metadata.CompletedAt = (Get-Date).ToString('s')
     try { Stop-Transcript | Out-Null } catch {}
     `$metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath '$($session.Metadata)' -Encoding UTF8
+    try {
+        if(Get-Command Set-CSIComputerStateToolOutput -ErrorAction SilentlyContinue){
+            [void](Set-CSIComputerStateToolOutput -ToolName '$($ToolName.Replace("'","''"))' -SessionPath '$($session.Path)' -TranscriptPath '$($session.Transcript)' -MetadataPath '$($session.Metadata)' -ComputerName `$env:COMPUTERNAME)
+        }
+    }
+    catch {
+        Write-Host "Could not save tool output to computer state: `$(`$_.Exception.Message)" -ForegroundColor Yellow
+    }
 }
 "@
 
@@ -4613,7 +4649,7 @@ function Remove-SelectedGUICustomTool {
             )
 
             if($deleteFolder -eq [System.Windows.Forms.DialogResult]::Yes){
-                Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction Stop
             }
         }
 
@@ -9519,8 +9555,15 @@ function Delete-SelectedGUIReport {
     )
 
     if($confirm -eq [System.Windows.Forms.DialogResult]::Yes){
-        Remove-Item -LiteralPath $report.Path -Recurse:$report.IsDirectory -Force -ErrorAction SilentlyContinue
-        Refresh-GUIReports
+        try {
+            Remove-Item -LiteralPath $report.Path -Recurse:$report.IsDirectory -Force -ErrorAction Stop
+            Refresh-GUIReports
+            Add-GUILog "Deleted report: $($report.Name)"
+        }
+        catch {
+            Add-GUILog "Could not delete report: $($_.Exception.Message)"
+            [System.Windows.Forms.MessageBox]::Show("Could not delete the selected report.`r`n`r`n$($_.Exception.Message)","Delete Report",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
     }
 }
 
@@ -12055,6 +12098,21 @@ Build-Form
 Add-GUILog "Loaded GUI launcher from $GuiRoot"
 Add-GUILog "Using shared toolkit from $SharedToolkitRoot"
 Add-GUILog ("Registered commands: {0}" -f $script:Commands.Count)
+if($script:ToolkitLoadFailures.Count -gt 0){
+    foreach($failure in $script:ToolkitLoadFailures){
+        Add-GUILog ("Toolkit load failure [{0}] {1}: {2}" -f $failure.Stage,$failure.Name,$failure.Error)
+        Write-GUIDiagnosticLog -Event 'ToolkitLoadFailure' -Tool $failure.Name -Level 'ERROR' -Detail ("Stage={0}; Path={1}; Error={2}" -f $failure.Stage,$failure.Path,$failure.Error)
+    }
+
+    if(!$SmokeTest -and !$ButtonSmokeTest){
+        [System.Windows.Forms.MessageBox]::Show(
+            "Network Toolkit loaded with $($script:ToolkitLoadFailures.Count) module or plugin failure(s). The affected tools may be unavailable. Details are in the Live Log.",
+            'Toolkit Load Warning',
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
+    }
+}
 
 if($SmokeTest){
     Write-Host "Network Toolkit GUI loaded successfully."

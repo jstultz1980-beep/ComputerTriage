@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260623160804,
-    "SourceUpdatedAt":  "2026-06-23T16:08:04.1880840-05:00",
-    "ReleaseNotes":  "Repair embedded PowerShell terminal input and route interactive plugin prompts through redirected console input."
+    "Build":  20260623171229,
+    "SourceUpdatedAt":  "2026-06-23T17:12:29.3117406-05:00",
+    "ReleaseNotes":  "Audit launch paths, surface module failures, tighten retention logging, and isolate portable app runtime data from fresh deployments."
 }

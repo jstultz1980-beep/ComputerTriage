@@ -44,8 +44,7 @@ $excludeDirectories = @(
     (Join-Path $sourceRoot "Release"),
     (Join-Path $sourceRoot "CSI-NetworkToolkit\Data"),
     (Join-Path $sourceRoot "CSI-NetworkToolkit\Exports"),
-    (Join-Path $sourceRoot "CSI-NetworkToolkit\Logs"),
-    (Join-Path $sourceRoot "Custom\FirefoxPortable\Data")
+    (Join-Path $sourceRoot "CSI-NetworkToolkit\Logs")
 )
 
 Write-Host "Building clean portable package..." -ForegroundColor Cyan
@@ -97,6 +96,19 @@ Get-ChildItem -LiteralPath $packageAppRoot -Directory -Recurse -Filter "Logs" -E
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     }
 
+# Portable applications keep user profiles, browser history, caches, and
+# application settings under their Data folders. A fresh deployment carries
+# the apps but starts with empty portable profiles.
+$customRoot = Join-Path $packageAppRoot 'Custom'
+if(Test-Path -LiteralPath $customRoot){
+    Get-ChildItem -LiteralPath $customRoot -Directory -Recurse -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ceq 'Data' } |
+        ForEach-Object {
+            Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue |
+                Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        }
+}
+
 Remove-Item -LiteralPath (Join-Path $packageAppRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue
 
 $packageFiles = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue)
@@ -130,7 +142,7 @@ $manifest = [ordered]@{
         "App\\CSI-NetworkToolkit\\Data",
         "App\\CSI-NetworkToolkit\\Exports",
         "App\\CSI-NetworkToolkit\\Logs",
-        "App\\Custom\\FirefoxPortable\\Data",
+        "App\\Custom\\*\\Data",
         "Plugin Logs",
         "App\\manifests\\gui-settings.json"
     )

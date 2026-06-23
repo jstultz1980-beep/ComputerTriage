@@ -121,9 +121,9 @@
     <p>Use the main launcher in the portable root. The GUI is the primary experience for technicians. It hides console noise where possible, organizes tools by purpose, and opens external utilities with the correct working paths.</p>
     <table>
       <tr><th>Launcher</th><th>Use</th></tr>
-      <tr><td><code>NetworkToolkit.ps1</code></td><td>Main PowerShell launcher. Opens the GUI by default. Use <code>-CLI</code> to open the console toolkit.</td></tr>
-      <tr><td><code>NetworkToolkit-Elevated.bat</code></td><td>Batch launcher intended to start the toolkit elevated from the portable root.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\CSI-NetworkToolkit.ps1</code></td><td>Console toolkit backend. Preserved for command-line use and for GUI button actions that still run console-driven tools.</td></tr>
+      <tr><td><code>App\NetworkToolkit.ps1</code></td><td>Main PowerShell launcher. Opens the GUI by default. Use <code>-CLI</code> to open the console toolkit.</td></tr>
+      <tr><td><code>NetworkToolkit.vbs</code></td><td>Primary portable-root launcher. It starts the toolkit elevated while keeping the PowerShell host window hidden.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1</code></td><td>Console toolkit backend. Preserved for command-line use and for GUI button actions that still run console-driven tools.</td></tr>
     </table>
     <h3>Elevation</h3>
     <p>Some tools work fine as a standard user. Others need local administrator rights. The header shows whether the toolkit is running elevated. If the task involves system repair, Windows Update repair, service manipulation, driver inspection, packet capture, security scanners, stale printer cleanup, or some Sysinternals tools, elevation may be required.</p>
@@ -198,12 +198,12 @@
     <h3>Important output locations</h3>
     <table>
       <tr><th>Folder</th><th>Contains</th></tr>
-      <tr><td><code>CSI-NetworkToolkit\Exports</code></td><td>Quick Diagnosis reports, full triage reports, exported computer profiles, network reports, repair outputs, and other intentional reports.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\Data\ComputerProfiles</code></td><td>Latest saved computer profiles used by the Computer Info selector.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\Data\ComputerState</code></td><td>Latest known state per computer in JSON form. This is intended to support richer Computer Profile reports without keeping unlimited history.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\Data\TempToolOutputs</code></td><td>Per-tool temp output sessions for console-backed GUI tools.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\Data\MiniDumps</code></td><td>Collected minidumps copied from the local machine for crash review.</td></tr>
-      <tr><td><code>CSI-NetworkToolkit\Logs\ToolUsage</code></td><td>Small per-tool usage logs for troubleshooting toolkit behavior.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Exports</code></td><td>Quick Diagnosis reports, full triage reports, exported computer profiles, network reports, repair outputs, and other intentional reports.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Data\ComputerProfiles</code></td><td>Latest saved computer profiles used by the Computer Info selector.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Data\ComputerState</code></td><td>Latest known state per computer in JSON form. This is intended to support richer Computer Profile reports without keeping unlimited history.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Data\TempToolOutputs</code></td><td>Per-tool temp output sessions for console-backed GUI tools.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Data\MiniDumps</code></td><td>Collected minidumps copied from the local machine for crash review.</td></tr>
+      <tr><td><code>App\CSI-NetworkToolkit\Logs\ToolUsage</code></td><td>Small per-tool usage logs for troubleshooting toolkit behavior.</td></tr>
     </table>
   </section>
 

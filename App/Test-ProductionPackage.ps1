@@ -6,6 +6,11 @@ param(
 $ErrorActionPreference = "Stop"
 $PackageRoot = if($PackageRoot){$PackageRoot}else{(Split-Path -Parent $PSScriptRoot)}
 $PackageRoot = (Resolve-Path -LiteralPath $PackageRoot).Path
+
+if(!(Test-Path -LiteralPath (Join-Path $PackageRoot "App\manifests\ProductionManifest.json")) -and (Test-Path -LiteralPath (Join-Path $PackageRoot ".git"))){
+    throw "This is the source workspace, not a built portable package. Run Build-ProductionPackage.ps1 first, then run this verifier against the generated package folder."
+}
+
 $failures = New-Object System.Collections.ArrayList
 
 function Test-PackagePath {
@@ -55,7 +60,6 @@ foreach($relativePath in @(
     "App\CSI-NetworkToolkit\Exports",
     "App\CSI-NetworkToolkit\Data\ComputerState",
     "App\CSI-NetworkToolkit\Data\MiniDumps",
-    "App\Custom\FirefoxPortable\Data\profile",
     "App\manifests\gui-settings.json"
 )){
     $path = Join-Path $PackageRoot $relativePath
@@ -70,6 +74,16 @@ foreach($relativePath in @(
         $fileCount = @(Get-ChildItem -LiteralPath $path -Recurse -File -Force -ErrorAction SilentlyContinue).Count
         if($fileCount -gt 0){
             [void]$failures.Add("Client/runtime data is present in $relativePath ($fileCount file(s)).")
+        }
+    }
+}
+
+$customRoot = Join-Path $PackageRoot 'App\Custom'
+if(Test-Path -LiteralPath $customRoot){
+    foreach($dataFolder in @(Get-ChildItem -LiteralPath $customRoot -Directory -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -ceq 'Data' })){
+        $fileCount = @(Get-ChildItem -LiteralPath $dataFolder.FullName -Recurse -File -Force -ErrorAction SilentlyContinue).Count
+        if($fileCount -gt 0){
+            [void]$failures.Add("Portable app data is present in $($dataFolder.FullName) ($fileCount file(s)).")
         }
     }
 }

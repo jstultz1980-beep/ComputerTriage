@@ -50,6 +50,31 @@ if($CSIFiles.ToolCatalog -and (Test-Path $CSIFiles.ToolCatalog)){
     . "$($CSIFiles.ToolCatalog)"
 }
 
+$Global:CSIImportFailures = New-Object System.Collections.Generic.List[object]
+
+function Global:Add-CSIImportFailure {
+    param(
+        [string]$Stage,
+        [string]$Name,
+        [string]$Path,
+        [System.Exception]$Exception
+    )
+
+    $record = [pscustomobject]@{
+        CapturedAt = (Get-Date).ToString('s')
+        Stage = $Stage
+        Name = $Name
+        Path = $Path
+        Error = if($Exception){$Exception.Message}else{'Unknown load failure'}
+    }
+    [void]$Global:CSIImportFailures.Add($record)
+    Write-Host "[$Stage] $Name failed to load: $($record.Error)" -ForegroundColor Red
+}
+
+function Global:Get-CSIImportFailures {
+    return @($Global:CSIImportFailures.ToArray())
+}
+
 # --------------------------------------------------
 # Ensure Required Directories
 # --------------------------------------------------
@@ -117,9 +142,7 @@ foreach($file in $files){
 
     }
     catch{
-
-        Write-Host "Failed loading module:" $file.Name -ForegroundColor Red
-        Write-Host $_
+        Add-CSIImportFailure -Stage 'Module' -Name $file.Name -Path $file.FullName -Exception $_.Exception
 
     }
 
@@ -167,9 +190,7 @@ foreach($plugin in $plugins){
 
         }
         catch{
-
-            Write-Host "Plugin manifest failed: $($plugin.Name)" -ForegroundColor Red
-            Write-Host $_
+            Add-CSIImportFailure -Stage 'Plugin manifest' -Name $plugin.Name -Path $manifestFile -Exception $_.Exception
             continue
 
         }
@@ -203,16 +224,13 @@ foreach($plugin in $plugins){
         catch{
 
             Remove-Variable -Name CSILoadingPlugin -Scope Global -ErrorAction SilentlyContinue
-
-            Write-Host "Plugin failed: $pluginName" -ForegroundColor Red
-            Write-Host $_
+            Add-CSIImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception $_.Exception
 
         }
 
     }
     else{
-
-        Write-Host "Plugin script missing: $script" -ForegroundColor Yellow
+        Add-CSIImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception ([System.IO.FileNotFoundException]::new("Plugin script missing: $script"))
 
     }
 

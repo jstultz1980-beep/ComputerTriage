@@ -102,7 +102,14 @@ param(
     $remove += @($folders | Where-Object { $_.LastWriteTime -lt $cutoff })
 
     foreach($folder in @($remove | Sort-Object FullName -Unique)){
-        Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction SilentlyContinue
+        try {
+            Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction Stop
+        }
+        catch {
+            if(Get-Command Write-CSIWarning -ErrorAction SilentlyContinue){
+                Write-CSIWarning -Component 'TempRetention' -Message ("Could not remove {0}: {1}" -f $folder.FullName,$_.Exception.Message)
+            }
+        }
     }
 
 }
