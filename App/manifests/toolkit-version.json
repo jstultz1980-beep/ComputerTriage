@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260624162208,
-    "SourceUpdatedAt":  "2026-06-24T16:22:08.0651644-05:00",
-    "ReleaseNotes":  "Compact Network tools, route specialized tests to their functional tabs, launch standalone PowerShell GUI apps without hiding their forms, and start the toolkit at its minimum resizable size."
+    "Build":  20260624164303,
+    "SourceUpdatedAt":  "2026-06-24T16:43:03.0533611-05:00",
+    "ReleaseNotes":  "Consolidate repeated tool sections when catalog, mapped, and custom tools are combined."
 }

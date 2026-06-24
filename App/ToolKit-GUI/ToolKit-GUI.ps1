@@ -8408,11 +8408,31 @@ function Add-GUICompactToolGrid {
         $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / $Columns)))) | Out-Null
     }
 
+    # Catalog, mapped, and custom tools arrive in separate batches. Keep their
+    # first-seen section order, but render each section as one contiguous group.
+    $sectionOrder = New-Object System.Collections.ArrayList
+    foreach($tool in @($Tools)){
+        $section = [string]$tool.Section
+        if([string]::IsNullOrWhiteSpace($section)){ $section = 'Other Tools' }
+        if(-not $sectionOrder.Contains($section)){
+            [void]$sectionOrder.Add($section)
+        }
+    }
+
+    $orderedTools = @()
+    foreach($section in $sectionOrder){
+        $orderedTools += @($Tools | Where-Object {
+            $toolSection = [string]$_.Section
+            if([string]::IsNullOrWhiteSpace($toolSection)){ $toolSection = 'Other Tools' }
+            $toolSection -eq $section
+        })
+    }
+
     $row = -1
     $col = 0
     $currentSection = $null
 
-    foreach($tool in $Tools){
+    foreach($tool in $orderedTools){
         if($tool.Section -and $tool.Section -ne $currentSection){
             $currentSection = $tool.Section
             $row++
