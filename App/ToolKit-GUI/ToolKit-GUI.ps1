@@ -3921,6 +3921,7 @@ function Get-GUICustomTools {
                     LaunchPath = $launchPath
                     Arguments = $tool.arguments
                     TabOverride = $tool.tabOverride
+                    LaunchMode = if($tool.launchMode){[string]$tool.launchMode}else{''}
                     Folder = if($tool.installPath){Resolve-GUIToolkitPath $tool.installPath}else{Split-Path -Parent $launchPath}
                     Status = $status
                 }
@@ -4483,6 +4484,35 @@ finally {
     Add-GUILog "Temp output session: $($session.Path)"
 }
 
+function Start-GUIStandalonePowerShellTool {
+    param([pscustomobject]$Tool)
+
+    $toolLabel = if($Tool.Name){[string]$Tool.Name}else{"PowerShell GUI Tool"}
+    $scriptPath = [string]$Tool.LaunchPath
+    $workingFolder = Split-Path -Parent $scriptPath
+    $arguments = @('-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',$scriptPath)
+
+    if($Tool.Arguments){
+        $arguments += @([string]$Tool.Arguments)
+    }
+
+    try {
+        Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workingFolder -WindowStyle Hidden -ErrorAction Stop | Out-Null
+        Add-GUILog "Launched standalone PowerShell GUI tool: $toolLabel"
+        Write-GUIToolUsageLog -Tool $toolLabel -Action 'Launch' -Detail $scriptPath
+    }
+    catch {
+        Add-GUILog "Could not launch standalone PowerShell GUI tool ${toolLabel}: $($_.Exception.Message)"
+        Write-GUIToolUsageLog -Tool $toolLabel -Action 'LaunchFailed' -Detail $_.Exception.Message -Level 'ERROR'
+        [System.Windows.Forms.MessageBox]::Show(
+            "Could not launch $toolLabel.`r`n`r`n$($_.Exception.Message)",
+            'Tool Launch Failed',
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        ) | Out-Null
+    }
+}
+
 function Start-GUICustomTool {
     param([pscustomobject]$Tool)
 
@@ -4519,6 +4549,9 @@ function Start-GUICustomTool {
 
     if($Tool.LaunchPath -match '(?i)\\BulkUninstaller\\BCUninstaller\.exe$'){
         Start-GUIBulkUninstaller
+    }
+    elseif($extension -eq ".ps1" -and $Tool.LaunchMode -eq 'StandaloneGui'){
+        Start-GUIStandalonePowerShellTool -Tool $Tool
     }
     elseif($extension -eq ".ps1"){
         Start-GUICustomPowerShellTool -Tool $Tool
