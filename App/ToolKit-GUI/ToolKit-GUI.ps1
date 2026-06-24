@@ -4490,14 +4490,21 @@ function Start-GUIStandalonePowerShellTool {
     $toolLabel = if($Tool.Name){[string]$Tool.Name}else{"PowerShell GUI Tool"}
     $scriptPath = [string]$Tool.LaunchPath
     $workingFolder = Split-Path -Parent $scriptPath
-    $arguments = @('-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',$scriptPath)
-
+    $argumentText = '-NoProfile -STA -ExecutionPolicy Bypass -File "{0}"' -f $scriptPath.Replace('"','`"')
     if($Tool.Arguments){
-        $arguments += @([string]$Tool.Arguments)
+        $argumentText += ' ' + [string]$Tool.Arguments
     }
 
     try {
-        Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory $workingFolder -WindowStyle Hidden -ErrorAction Stop | Out-Null
+        # CreateNoWindow suppresses the PowerShell host without hiding the
+        # standalone WinForms window created by the child script.
+        $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $startInfo.FileName = 'powershell.exe'
+        $startInfo.Arguments = $argumentText
+        $startInfo.WorkingDirectory = $workingFolder
+        $startInfo.UseShellExecute = $false
+        $startInfo.CreateNoWindow = $true
+        [System.Diagnostics.Process]::Start($startInfo) | Out-Null
         Add-GUILog "Launched standalone PowerShell GUI tool: $toolLabel"
         Write-GUIToolUsageLog -Tool $toolLabel -Action 'Launch' -Detail $scriptPath
     }
@@ -8111,8 +8118,9 @@ function Get-GUICustomToolPlacement {
         "ccleanerportableccleaner" = @{ Tab = "Clean Up"; Section = "Disk Cleanup"; Description = "Run CCleaner for temporary-file and application cleanup checks." }
         "cpuzcpuz" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Inspect CPU, memory, motherboard, and platform details." }
         "cpuzportablecpuz" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Inspect CPU, memory, motherboard, and platform details." }
-        "fastresolverfastresolver" = @{ Tab = "Network"; Section = "Name Resolution"; Description = "Quickly resolve hostnames and IP addresses across a range." }
-        "fastresolverportablefastresolver" = @{ Tab = "Network"; Section = "Name Resolution"; Description = "Quickly resolve hostnames and IP addresses across a range." }
+        "fastresolverfastresolver" = @{ Tab = "Network"; Section = "Connectivity"; Description = "Quickly resolve hostnames and IP addresses across a range." }
+        "fastresolverportablefastresolver" = @{ Tab = "Network"; Section = "Connectivity"; Description = "Quickly resolve hostnames and IP addresses across a range." }
+        "dhcpsleuthdhcpsleuth" = @{ Tab = "Network"; Section = "DHCP Diagnostics"; Description = "Launch DHCP Sleuth as a standalone GUI for DHCP monitoring, probing, rogue-server review, and isolated lab testing." }
         "firefoxportablefirefoxportable" = @{ Tab = "Software"; Section = "Portable Browser"; Description = "Open the toolkit-contained Firefox browser profile." }
         "gpuzgpuz2690" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Inspect GPU model, drivers, sensors, and graphics capabilities." }
         "hwmonitorhwmonitorportable" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "View live hardware voltages, temperatures, fans, and sensor values." }
@@ -9364,7 +9372,7 @@ function Build-SecurityToolsPage {
 
 function Build-NetworkToolsPage {
     param([System.Windows.Forms.TabPage]$Page)
-    Build-GUICatalogToolsPage -Page $Page -Tab "Network" -Title "Network Tools"
+    Build-GUICatalogToolsPage -Page $Page -Tab "Network" -Title "Connectivity And Path Tools"
 }
 
 function Build-RemoteToolsPage {
@@ -11787,7 +11795,9 @@ function Build-Form {
     $Form.Text = "Network Toolkit"
     $Form.StartPosition = "CenterScreen"
     $Form.MinimumSize = New-Object System.Drawing.Size(1280,720)
-    $Form.Size = New-Object System.Drawing.Size(1480,820)
+    $Form.Size = $Form.MinimumSize
+    $Form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::Sizable
+    $Form.MaximizeBox = $true
     $Form.ShowIcon = $true
     $Form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $Form.BackColor = $script:GUITheme.Shell
