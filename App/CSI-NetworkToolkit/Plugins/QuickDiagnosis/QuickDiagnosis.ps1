@@ -28,6 +28,13 @@ param(
     $fingerprint = $Report.Fingerprint
     $overallClass = if($Report.Summary.Critical -gt 0){"critical"}elseif($Report.Summary.Warning -gt 0){"warning"}else{"ok"}
     $overallText = if($Report.Summary.Critical -gt 0){"Immediate attention needed"}elseif($Report.Summary.Warning -gt 0){"Issues found"}else{"No major issues found"}
+    $overallNote = if($Report.Summary.Critical -gt 0){
+        "Review critical findings first."
+    }elseif($Report.Summary.Warning -gt 0){
+        "Review warnings below."
+    }else{
+        "No blocking issues detected."
+    }
     [object[]]$deepDives = if($Report.PSObject.Properties.Name -contains "DeepDives"){ @($Report.DeepDives) }else{ @() }
     $usedDeepDives = @{}
 
@@ -162,13 +169,14 @@ body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: #1f2933; ba
 .topbar h1 { margin: 0; font-size: 28px; font-weight: 650; }
 .topbar p { margin: 8px 0 0; color: #c9d8e5; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 28px 40px; }
-.summary { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 14px; margin-top: -42px; }
-.card { background: #fff; border: 1px solid #d9e1e8; border-radius: 8px; padding: 18px; box-shadow: 0 8px 20px rgba(15,47,74,.08); }
+.summary { display: grid; grid-template-columns: 1.15fr repeat(4, .85fr); gap: 14px; margin-top: -42px; }
+.card { background: #fff; border: 1px solid #d9e1e8; border-radius: 12px; padding: 18px; box-shadow: 0 10px 26px rgba(15,47,74,.09); }
 .status-card { border-left: 7px solid #2e7d32; }
 .status-card.warning { border-left-color: #b7791f; }
 .status-card.critical { border-left-color: #b42318; }
 .status-title { font-size: 13px; color: #66788a; text-transform: uppercase; letter-spacing: .04em; }
-.status-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.status-value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+.status-note { color: #425466; margin: 10px 0 0; line-height: 1.35; }
 .metric { text-align: center; }
 .metric strong { display: block; font-size: 30px; margin-top: 4px; }
 .metric span { color: #66788a; font-size: 13px; text-transform: uppercase; }
@@ -239,7 +247,7 @@ tr:last-child td { border-bottom: none; }
     <div class="card status-card $overallClass">
       <div class="status-title">Overall Status</div>
       <div class="status-value">$overallText</div>
-      <p>Diagnostic-only scan. DISM CheckHealth may run; repair actions are skipped. Use the DISM/SFC Repair Path tool only after reviewing this report.</p>
+      <p class="status-note">$(Convert-CSIHtml $overallNote)</p>
     </div>
     <div class="card metric"><span>Critical</span><strong>$(Convert-CSIHtml $Report.Summary.Critical)</strong></div>
     <div class="card metric"><span>Warning</span><strong>$(Convert-CSIHtml $Report.Summary.Warning)</strong></div>

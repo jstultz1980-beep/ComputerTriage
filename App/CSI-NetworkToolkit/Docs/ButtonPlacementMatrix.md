@@ -1,4 +1,4 @@
-# Network Toolkit Button Placement Matrix
+﻿# Network Toolkit Button Placement Matrix
 
 Updated: 2026-06-25
 
@@ -9,7 +9,7 @@ Purpose: document the current GUI tab strategy so tool placement stays intuitive
 - Put tools where a technician would look while troubleshooting, not where the code happens to live.
 - Keep Network focused on connectivity and path testing.
 - Keep Infrastructure focused on services the computer depends on, especially DHCP, DNS, time, and exposure.
-- Put custom portable apps on the functional tab where they are useful, while still listing them on Apps for management.
+- Put custom portable apps on the functional tab where they are useful, while still listing them in Settings > Toolkit Apps for management.
 - Use Sysinternals as the fallback tab only for tools that do not clearly belong elsewhere.
 - Avoid overloading tabs. Split by intent before allowing vertical scrolling to become normal.
 
@@ -38,7 +38,6 @@ Purpose: document the current GUI tab strategy so tool placement stays intuitive
 | Software | General portable productivity/support apps. | Firefox Portable, Notepad++, LibreOffice, Draw.io, KompoZer, links to safe software sources. | Do not mix Choco management here. |
 | Software Keys | Local product/license key discovery. | Windows/software key discovery GUI. | Keep separate because key discovery is sensitive and distinct from general software management. |
 | Clean Up | Cleanup, uninstallers, stale profiles, leftovers. | BleachBit, CCleaner, Bulk Uninstaller, Revo Uninstaller, Wise Registry Cleaner, Profile Cleanup, Recuva if recovery/remediation is needed. | Use careful wording because cleanup tools can remove data. |
-| Apps | Toolkit-contained app inventory and management. | Launch, Rename, Set Tab Placement, Remove From Toolkit, Refresh Toolkit Tools. | Apps is for management. Functional buttons should appear on the best troubleshooting tab too. |
 | Choco | Chocolatey package workflows. | Install Chocolatey, search packages, install selected, scan installed, upgrade selected/all, uninstall from computer, add to toolbox. | Computer-installed packages and toolkit-installed packages must be clearly distinguished. |
 | Sysinternals | Fallback for Sysinternals tools with no better tab. | ShellRunas, portmon, notmyfault, obscure utilities. | If a Sysinternals tool clearly fits a functional tab, place it there instead. |
 | Reports | Technician-facing output. | Search, Refresh Reports, Open Selected, Delete Selected, AI bundle/import/final report workflows where available. | Do not list raw logs or JSON noise here. |

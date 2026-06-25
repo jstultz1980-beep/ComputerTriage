@@ -1,4 +1,4 @@
-# Network Toolkit
+﻿# Network Toolkit
 
 Portable Windows technician toolkit for live workstation, server, and network troubleshooting.
 
@@ -447,19 +447,7 @@ Typical tools:
 
 Cleanup tools can remove customer data. Confirm scope before running destructive actions.
 
-### Apps
-
-Apps is for toolkit-contained app management.
-
-Use it to:
-
-- Launch a toolkit-installed app.
-- Rename the display name.
-- Set tab placement.
-- Remove an app from the toolkit.
-- Refresh the app list.
-
-Apps is the inventory/management page. Functional app buttons should also appear on the tab where a technician would naturally look for them.
+### Toolkit Apps Window\r\n\r\nToolkit app management is opened from **Settings > Toolkit Apps**.\r\n\r\nUse it to:\r\n\r\n- Launch a toolkit-installed app.\r\n- Rename the display name.\r\n- Set tab placement.\r\n- Remove an app from the toolkit.\r\n- Refresh the app list.\r\n\r\nThe management window is inventory only. Functional app buttons should also appear on the tab where a technician would naturally look for them.
 
 ### Choco
 
@@ -478,7 +466,7 @@ Use it to:
 Important distinction:
 
 - **Installed Chocolatey Packages** means packages installed on the current computer.
-- **Apps** means tools installed into the portable toolkit.
+- **Toolkit Apps** means tools installed into the portable toolkit and managed from Settings.
 
 ### Sysinternals
 
@@ -599,7 +587,7 @@ The production package should not include Git metadata, prior release output, ol
 2. Open Settings, then Live Log.
 3. Open Settings, then Logs.
 4. Confirm the backing app exists in `App\Custom` or `App\ExternalTools`.
-5. Confirm the app has a valid launch path in Apps.
+5. Confirm the app has a valid launch path in Settings > Toolkit Apps.
 6. Retry elevated if the tool requires admin rights.
 
 ### A Console Tool Closes Too Fast
@@ -612,7 +600,7 @@ Click the Public IP label/value to retry. If it remains unavailable, check DNS, 
 
 ### Chocolatey Toolkit Install Confusion
 
-Chocolatey can install packages on the current computer or help import portable tools into the toolkit. These are different workflows. Computer-installed packages belong in the Choco installed package list. Toolkit-installed apps belong in Apps.
+Chocolatey can install packages on the current computer or help import portable tools into the toolkit. These are different workflows. Computer-installed packages belong in the Choco installed package list. Toolkit-installed apps are managed from Settings > Toolkit Apps.
 
 ### DHCP Tool Confusion
 

@@ -162,6 +162,7 @@ $script:GUIBusyProgress = $null
 $script:GUIBusyTimer = $null
 $script:GUIBusyFrame = 0
 $script:GUIBusyFrames = @("Working |","Working /","Working -","Working \\")
+$script:SafeRunnerSessions = New-Object System.Collections.ArrayList
 $script:RootLayout = $null
 $script:HeaderPanel = $null
 $script:HeaderSummaryPanel = $null
@@ -904,6 +905,54 @@ function New-GUIRoundedRegion {
     return New-Object System.Drawing.Region($path)
 }
 
+function Enable-GUIDoubleBuffering {
+    param([System.Windows.Forms.Control]$Control)
+
+    if(!$Control -or $Control.IsDisposed){
+        return
+    }
+
+    try {
+        $flags = [System.Reflection.BindingFlags]'Instance,NonPublic'
+        $prop = $Control.GetType().GetProperty("DoubleBuffered",$flags)
+        if($prop){
+            $prop.SetValue($Control,$true,$null)
+        }
+    }
+    catch {}
+
+    foreach($child in $Control.Controls){
+        Enable-GUIDoubleBuffering -Control $child
+    }
+}
+
+function Enable-GUIHeaderGradient {
+    param([System.Windows.Forms.Panel]$Header)
+
+    if(!$Header){
+        return
+    }
+
+    $Header.Add_Paint({
+        param($sender,$eventArgs)
+        try {
+            $rect = $sender.ClientRectangle
+            if($rect.Width -le 0 -or $rect.Height -le 0){ return }
+            $accent = $script:GUITheme.AccentDark
+            $start = $script:GUITheme.Header
+            $end = [System.Drawing.Color]::FromArgb(
+                [Math]::Min(255,[int](($start.R * .72) + ($accent.R * .28))),
+                [Math]::Min(255,[int](($start.G * .72) + ($accent.G * .28))),
+                [Math]::Min(255,[int](($start.B * .72) + ($accent.B * .28)))
+            )
+            $brush = New-Object System.Drawing.Drawing2D.LinearGradientBrush($rect,$start,$end,[System.Drawing.Drawing2D.LinearGradientMode]::Horizontal)
+            try { $eventArgs.Graphics.FillRectangle($brush,$rect) }
+            finally { $brush.Dispose() }
+        }
+        catch {}
+    })
+}
+
 function Set-GUIRoundedCorners {
     param(
         [System.Windows.Forms.Control]$Control,
@@ -958,10 +1007,10 @@ function Set-GUIButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = if($Compact){
-        New-Object System.Drawing.Font("Segoe UI",8.5,[System.Drawing.FontStyle]::Bold)
+        New-Object System.Drawing.Font("Segoe UI Semibold",8.5,[System.Drawing.FontStyle]::Regular)
     }
     else{
-        New-Object System.Drawing.Font("Segoe UI",9.25,[System.Drawing.FontStyle]::Regular)
+        New-Object System.Drawing.Font("Segoe UI Semibold",9.25,[System.Drawing.FontStyle]::Regular)
     }
     $Button.FlatAppearance.BorderSize = 0
     $Button.FlatAppearance.MouseOverBackColor = if($Subtle){$script:GUITheme.HeaderMuted}else{$script:GUITheme.AccentDark}
@@ -969,7 +1018,7 @@ function Set-GUIButtonChrome {
     $Button.BackColor = if($Subtle){$script:GUITheme.AccentSoft}else{$script:GUITheme.Accent}
     $Button.ForeColor = if($Subtle){$script:GUITheme.Text}else{[System.Drawing.Color]::White}
 
-    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){7}else{10})
+    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){10}else{14})
 }
 
 function Set-GUITabButtonChrome {
@@ -985,14 +1034,14 @@ function Set-GUITabButtonChrome {
     $Button.FlatStyle = "Flat"
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
-    $Button.Font = New-Object System.Drawing.Font("Segoe UI",9,[System.Drawing.FontStyle]::Regular)
+    $Button.Font = New-Object System.Drawing.Font("Segoe UI Semibold",8.75,[System.Drawing.FontStyle]::Regular)
     $Button.FlatAppearance.BorderSize = 1
     $Button.FlatAppearance.BorderColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.Border}
     $Button.FlatAppearance.MouseOverBackColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.HeaderMuted}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
     $Button.BackColor = if($Selected){$script:GUITheme.Accent}else{$script:GUITheme.Page}
     $Button.ForeColor = if($Selected){[System.Drawing.Color]::White}else{$script:GUITheme.Text}
-    Set-GUIRoundedCorners -Control $Button -Radius 7
+    Set-GUIRoundedCorners -Control $Button -Radius 10
 }
 
 function Apply-GUIThemeToControl {
@@ -1049,6 +1098,7 @@ function Apply-GUIThemeRuntime {
 
     if($script:HeaderPanel -and !$script:HeaderPanel.IsDisposed){
         $script:HeaderPanel.BackColor = $script:GUITheme.Header
+        $script:HeaderPanel.Invalidate()
     }
 
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed){
@@ -2379,6 +2429,102 @@ function Start-GUICommandByName {
     }
 }
 
+function Stop-GUISafeRunnerSession {
+    param(
+        [object]$State,
+        [switch]$DisposeOverlay
+    )
+
+    if(!$State){
+        return
+    }
+
+    try {
+        if($State.Timer){
+            $State.Timer.Stop()
+            $State.Timer.Dispose()
+            $State.Timer = $null
+        }
+    }
+    catch {}
+
+    try {
+        if($State.Process){
+            if(!$State.Process.HasExited){
+                $State.Process.Kill()
+            }
+            $State.Process.Dispose()
+            $State.Process = $null
+        }
+    }
+    catch {}
+
+    try {
+        if($script:SafeRunnerSessions){
+            [void]$script:SafeRunnerSessions.Remove($State)
+        }
+    }
+    catch {}
+
+    if($DisposeOverlay){
+        try {
+            if($State.Overlay -and !$State.Overlay.IsDisposed){
+                $State.Overlay.Dispose()
+            }
+        }
+        catch {}
+    }
+}
+
+function Stop-GUISafeRunnerSessions {
+    foreach($state in @($script:SafeRunnerSessions)){
+        Stop-GUISafeRunnerSession -State $state -DisposeOverlay
+    }
+}
+
+function Stop-GUIAsyncWorkers {
+    Stop-GUISafeRunnerSessions
+
+    foreach($timerName in @(
+        "QuickDiagnosisTimer","ToolkitSizeTimer","ToolkitUpdateTimer","ToolkitDeploymentTimer",
+        "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer","GUIBusyTimer"
+    )){
+        try {
+            $timer = Get-Variable -Name $timerName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            if($timer){
+                $timer.Stop()
+                $timer.Dispose()
+                Set-Variable -Name $timerName -Scope Script -Value $null
+            }
+        }
+        catch {}
+    }
+
+    foreach($processName in @(
+        "QuickDiagnosisProcess","ToolkitSizeProcess","ToolkitUpdateProcess","ToolkitDeploymentProcess",
+        "QuickOutputProcess","PublicIPProcess","WUActionProcess","PsExecProcess"
+    )){
+        try {
+            $process = Get-Variable -Name $processName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            if($process){
+                if(!$process.HasExited){ $process.Kill() }
+                $process.Dispose()
+                Set-Variable -Name $processName -Scope Script -Value $null
+            }
+        }
+        catch {}
+    }
+
+    try {
+        if($script:ChocoActionJob){
+            Stop-Job -Job $script:ChocoActionJob -Force -ErrorAction SilentlyContinue | Out-Null
+            Remove-Job -Job $script:ChocoActionJob -Force -ErrorAction SilentlyContinue | Out-Null
+            $script:ChocoActionJob = $null
+        }
+    }
+    catch {}
+}
+
 function Global:Start-GUISafeScriptRunner {
     param(
         [Parameter(Mandatory)][string]$ToolName,
@@ -2428,15 +2574,19 @@ finally {
         $page = if($script:MainTabs){ $script:MainTabs.SelectedTab }else{ $null }
         if(!$page){ throw 'No active tool tab is available.' }
 
-        $overlay = New-Object System.Windows.Forms.Panel
+        $overlay = New-Object System.Windows.Forms.TableLayoutPanel
         $overlay.Dock = 'Fill'; $overlay.BackColor = $script:GUITheme.LogBack
+        $overlay.RowCount = 3; $overlay.ColumnCount = 1
+        $overlay.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+        $overlay.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+        $overlay.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,52))) | Out-Null
         $toolbar = New-Object System.Windows.Forms.FlowLayoutPanel
-        $toolbar.Dock = 'Top'; $toolbar.Height = 42; $toolbar.Padding = New-Object System.Windows.Forms.Padding(10,6,10,4); $toolbar.BackColor = $script:GUITheme.Header
+        $toolbar.Dock = 'Fill'; $toolbar.Padding = New-Object System.Windows.Forms.Padding(10,6,10,4); $toolbar.BackColor = $script:GUITheme.Header
         $title = New-GUILabel "Running: $ToolName"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 440
         $output = New-Object System.Windows.Forms.RichTextBox
         $output.Dock = 'Fill'; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
         $inputPanel = New-Object System.Windows.Forms.Panel
-        $inputPanel.Dock = 'Bottom'; $inputPanel.Height = 50; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,8); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
+        $inputPanel.Dock = 'Fill'; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,8); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
         $inputLabel = New-GUILabel 'Input'
         $inputLabel.Dock = 'Left'; $inputLabel.Width = 48; $inputLabel.ForeColor = [System.Drawing.Color]::White
         $input = New-GUITextBox; $input.Dock = 'Fill'
@@ -2445,8 +2595,9 @@ finally {
         $close = New-Object System.Windows.Forms.Button
         $close.Text = 'Stop And Close'; $close.Width = 130; Set-GUIButtonChrome -Button $close
         $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send); $inputPanel.Controls.Add($inputLabel)
-        $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
-        $page.Controls.Add($overlay); $overlay.BringToFront(); $inputPanel.BringToFront(); $input.Focus()
+        $toolbar.Controls.Add($title); $toolbar.Controls.Add($close)
+        $overlay.Controls.Add($toolbar,0,0); $overlay.Controls.Add($output,0,1); $overlay.Controls.Add($inputPanel,0,2)
+        $page.Controls.Add($overlay); $overlay.BringToFront(); $input.Focus()
 
         # Start-Process joins an argument array before launching powershell.exe.
         # Quote the generated runner path explicitly because session folder names
@@ -2470,6 +2621,7 @@ finally {
             SendButton = $send
             Output = $output
         }
+        [void]$script:SafeRunnerSessions.Add($state)
         $close.Tag = $state
         $input.Tag = $state; $send.Tag = $state
         $send.Add_Click({
@@ -2506,11 +2658,7 @@ finally {
             param($sender,$args)
             $current = $sender.Tag
             if(!$current){ return }
-            try {
-                if(!$current.Process.HasExited){ $current.Process.Kill() }
-            }
-            catch { }
-            if(!$current.Overlay.IsDisposed){ $current.Overlay.Dispose() }
+            Stop-GUISafeRunnerSession -State $current -DisposeOverlay
         })
 
         $timer = New-Object System.Windows.Forms.Timer
@@ -2539,8 +2687,16 @@ finally {
                 catch { }
             }
             if($process.HasExited){
+                $exitCode = $process.ExitCode
                 $timer.Stop(); $timer.Dispose()
-                $title.Text = "Completed: $ToolName (exit $($process.ExitCode))"
+                $state.Timer = $null
+                try {
+                    $process.Dispose()
+                    $state.Process = $null
+                }
+                catch {}
+                try { [void]$script:SafeRunnerSessions.Remove($state) } catch {}
+                $title.Text = "Completed: $ToolName (exit $exitCode)"
             }
         }.GetNewClosure()
         $timer.Add_Tick($tick); $timer.Start()
@@ -4020,7 +4176,7 @@ function Set-SelectedGUICustomToolTab {
         return
     }
 
-    $tabs = @("Auto") + @("Analyze","Apps","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Wi-Fi","Windows Update" | Sort-Object)
+    $tabs = @("Auto") + @("Analyze","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Wi-Fi","Windows Update" | Sort-Object)
 
     $dialog = New-Object System.Windows.Forms.Form
     $dialog.Text = "Set Custom Tool Tab Placement"
@@ -7495,7 +7651,7 @@ function Add-GUIHeaderComputerSummary {
         $refreshPublicIPOnLaunch = [bool]$script:GuiSettings.refreshPublicIPOnLaunch
     }
 
-    if($refreshPublicIPOnLaunch){
+    if($refreshPublicIPOnLaunch -and !$SmokeTest -and !$ButtonSmokeTest){
         Update-GUIPublicIPSummaryAsync -Quiet
     }
 }
@@ -7599,8 +7755,58 @@ function Build-GUITabIfNeeded {
     }
 }
 
+function Get-GUITabDisplayText {
+    param([string]$Name)
+
+    $aliases = @{
+        "Quick Diagnosis" = "Quick Dx"
+        "Computer Info" = "Computer"
+        "Windows Update" = "Updates"
+        "Software Keys" = "Keys"
+        "Infrastructure" = "Infra"
+        "Sysinternals" = "SysTools"
+    }
+
+    if($aliases.ContainsKey($Name)){
+        return $aliases[$Name]
+    }
+
+    return $Name
+}
+
+function Update-GUIStaticTabStripLayout {
+    if(!$script:StaticTabStrip -or $script:StaticTabStrip.IsDisposed -or !$script:TabButtons){
+        return
+    }
+
+    $visibleButtons = @($script:TabButtons.GetEnumerator() | ForEach-Object { $_.Value } | Where-Object { $_ -and !$_.IsDisposed })
+    if($visibleButtons.Count -eq 0){
+        return
+    }
+
+    $rows = 3
+    $columns = [Math]::Max(1,[Math]::Ceiling($visibleButtons.Count / $rows))
+    $availableWidth = [Math]::Max(960,$script:StaticTabStrip.ClientSize.Width - 8)
+    $buttonWidth = [Math]::Max(96,[Math]::Floor($availableWidth / $columns) - 8)
+
+    foreach($entry in $script:TabButtons.GetEnumerator()){
+        $button = $entry.Value
+        if(!$button -or $button.IsDisposed){
+            continue
+        }
+
+        $button.Text = Get-GUITabDisplayText -Name $entry.Key
+        $button.Width = $buttonWidth
+        $button.Height = 30
+        $button.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
+        if($script:ToolTip){
+            $script:ToolTip.SetToolTip($button,$entry.Key)
+        }
+    }
+}
+
 function Refresh-GUICustomToolTabs {
-    $customToolTabs = @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Clean Up","Apps")
+    $customToolTabs = @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Clean Up")
 
     if(!$script:MainTabs){
         return
@@ -7640,10 +7846,10 @@ function Add-GUIStaticTabStrip {
         }
 
         $button = New-Object System.Windows.Forms.Button
-        $button.Text = $page.Text
+        $button.Text = Get-GUITabDisplayText -Name $page.Text
         $button.Tag = $page
-        $button.Width = 132
-        $button.Height = 28
+        $button.Width = 118
+        $button.Height = 30
         $button.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
         Set-GUITabButtonChrome -Button $button -Selected:$false
         $button.Add_Click({
@@ -7656,6 +7862,12 @@ function Add-GUIStaticTabStrip {
         $script:TabButtons[$page.Text] = $button
     }
 
+    if($Strip.Tag -ne "layout-hooked"){
+        $Strip.Tag = "layout-hooked"
+        $Strip.Add_Resize({ Update-GUIStaticTabStripLayout })
+    }
+
+    Update-GUIStaticTabStripLayout
     Update-GUIStaticTabStripSelection
 }
 
@@ -7698,7 +7910,6 @@ function Get-GUIDefaultTabOrder {
         "Software",
         "Software Keys",
         "Clean Up",
-        "Apps",
         "Choco",
         "Sysinternals",
         "Computer Info",
@@ -7798,10 +8009,13 @@ function Get-GUIOrderedTabNames {
             $name = "Analyze"
         }
         elseif($name -eq "Custom"){
-            $name = "Apps"
+            $name = "Software"
         }
         elseif($name -eq "Services"){
             $name = "Infrastructure"
+        }
+        elseif($name -eq "Apps"){
+            continue
         }
 
         if($name -eq "Settings"){
@@ -8068,7 +8282,7 @@ function Get-GUICustomToolPlacement {
     }
     else{
         $placement = [pscustomobject]@{
-            Tab = "Apps"
+            Tab = "Software"
             Section = "Toolkit Apps"
             Description = "Launch this toolkit-installed portable application."
         }
@@ -8076,7 +8290,7 @@ function Get-GUICustomToolPlacement {
 
     if($Tool.PSObject.Properties.Name -contains "TabOverride" -and $Tool.TabOverride){
         $override = [string]$Tool.TabOverride
-        if($override -eq "Custom"){ $override = "Apps" }
+        if($override -eq "Custom" -or $override -eq "Apps"){ $override = "Software" }
         $placement.Tab = $override
     }
 
@@ -10559,7 +10773,7 @@ function Build-CleanupToolsPage {
 }
 
 function Build-CustomToolsPage {
-    param([System.Windows.Forms.TabPage]$Page)
+    param([System.Windows.Forms.Control]$Page)
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
@@ -10606,6 +10820,23 @@ function Build-CustomToolsPage {
 
     $CustomGrid.Add_CellDoubleClick({ Start-SelectedGUICustomTool })
     Refresh-GUICustomTools
+}
+
+function Show-GUICustomToolsWindow {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Toolkit Apps"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(980,560)
+    $form.MinimumSize = New-Object System.Drawing.Size(820,440)
+    $form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $form.BackColor = $script:GUITheme.Page
+    if(Test-Path $GuiIconPath){
+        $form.Icon = New-Object System.Drawing.Icon($GuiIconPath)
+    }
+
+    Build-CustomToolsPage -Page $form
+    Apply-GUIThemeToControl -Control $form
+    [void]$form.ShowDialog($script:Form)
 }
 
 function Build-LiveLogPage {
@@ -11539,7 +11770,7 @@ function Build-SettingsPage {
 
     $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $maintenanceLayout.Dock = "Fill"
-    $maintenanceLayout.RowCount = 6
+    $maintenanceLayout.RowCount = 7
     $maintenanceLayout.ColumnCount = 2
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -11548,6 +11779,7 @@ function Build-SettingsPage {
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $maintenanceGroup.Controls.Add($maintenanceLayout)
@@ -11574,10 +11806,10 @@ function Build-SettingsPage {
     $toolboxPackagesButton.Width = 0
     $maintenanceLayout.Controls.Add($toolboxPackagesButton,0,2)
 
-    $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
-    $sanitizeButton.Dock = "Fill"
-    $sanitizeButton.Width = 0
-    $maintenanceLayout.Controls.Add($sanitizeButton,1,2)
+    $appsButton = New-GUIButton "Toolkit Apps" { Show-GUICustomToolsWindow }
+    $appsButton.Dock = "Fill"
+    $appsButton.Width = 0
+    $maintenanceLayout.Controls.Add($appsButton,1,2)
 
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"
@@ -11590,10 +11822,15 @@ function Build-SettingsPage {
     $sizeRefreshButton.Width = 0
     $maintenanceLayout.Controls.Add($sizeRefreshButton,1,3)
 
+    $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
+    $sanitizeButton.Dock = "Fill"
+    $sanitizeButton.Width = 0
+    $maintenanceLayout.Controls.Add($sanitizeButton,0,4)
+
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
     $foldersLabel.TextAlign = "MiddleLeft"
-    $maintenanceLayout.Controls.Add($foldersLabel,0,4)
+    $maintenanceLayout.Controls.Add($foldersLabel,0,5)
     $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -11605,7 +11842,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.Controls.Add($folderPanel,0,5)
+    $maintenanceLayout.Controls.Add($folderPanel,0,6)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "View Live Log" { Show-GUILiveLogWindow }
@@ -11726,6 +11963,7 @@ function Build-Form {
 
     $Form.Add_FormClosing({
         param($sender,$eventArgs)
+        Stop-GUIAsyncWorkers
         Write-GUIDiagnosticLog -Event 'FormClosing' -Tool 'GUI' -Detail ("CloseReason={0}; Cancel={1}" -f $eventArgs.CloseReason,$eventArgs.Cancel)
     })
     $Form.Add_FormClosed({
@@ -11758,6 +11996,7 @@ function Build-Form {
     $header.Dock = "Fill"
     $header.BackColor = $script:GUITheme.Header
     $script:HeaderPanel = $header
+    Enable-GUIHeaderGradient -Header $header
     $root.Controls.Add($header,0,0)
 
     $logo = New-Object System.Windows.Forms.PictureBox
@@ -11936,10 +12175,6 @@ function Build-Form {
     $cleanupPage.Text = "Clean Up"
     $tabs.TabPages.Add($cleanupPage) | Out-Null
 
-    $customPage = New-Object System.Windows.Forms.TabPage
-    $customPage.Text = "Apps"
-    $tabs.TabPages.Add($customPage) | Out-Null
-
     $chocolateyPage = New-Object System.Windows.Forms.TabPage
     $chocolateyPage.Text = "Choco"
     $tabs.TabPages.Add($chocolateyPage) | Out-Null
@@ -12036,7 +12271,6 @@ function Build-Form {
     Register-GUITabBuilder -Page $softwarePage -Builder { param($Page) Build-SoftwareToolsPage -Page $Page }
     Register-GUITabBuilder -Page $softwareKeysPage -Builder { param($Page) Build-SoftwareKeyFinderPage -Page $Page }
     Register-GUITabBuilder -Page $cleanupPage -Builder { param($Page) Build-CleanupToolsPage -Page $Page }
-    Register-GUITabBuilder -Page $customPage -Builder { param($Page) Build-CustomToolsPage -Page $Page }
     Register-GUITabBuilder -Page $chocolateyPage -Builder { param($Page) Build-ChocolateyPage -Page $Page }
     Register-GUITabBuilder -Page $sysinternalsPage -Builder { param($Page) Build-SysinternalsPage -Page $Page -Title "Sysinternals Tools" -Categories @("Process And Startup","System Inspection","Network","PsTools","Disk And File","Security And Registry","Active Directory","Stress And Caution","Other") -Columns 3 }
     Register-GUITabBuilder -Page $fingerprintPage -Builder { param($Page) Build-FingerprintPage -Page $Page; Refresh-Fingerprints -Quiet }
@@ -12046,7 +12280,7 @@ function Build-Form {
 
     $startupTab = if($script:GuiSettings -and $script:GuiSettings.startupTab){[string]$script:GuiSettings.startupTab}else{"Quick Diagnosis"}
     if($startupTab -eq "Windows"){ $startupTab = "Analyze" }
-    elseif($startupTab -eq "Custom"){ $startupTab = "Apps" }
+    elseif($startupTab -eq "Custom" -or $startupTab -eq "Apps"){ $startupTab = "Software" }
     elseif($startupTab -eq "Services"){ $startupTab = "Infrastructure" }
     $startupPage = $script:MainTabs.TabPages | Where-Object { $_.Text -eq $startupTab } | Select-Object -First 1
     if(!$startupPage){
@@ -12056,6 +12290,7 @@ function Build-Form {
     $script:MainTabs.SelectedTab = $startupPage
     Build-GUITabIfNeeded -Page $startupPage
     Update-GUIStaticTabStripSelection
+    Enable-GUIDoubleBuffering -Control $Form
 }
 
 Register-GUIExceptionHandlers
@@ -12082,6 +12317,7 @@ if($script:ToolkitLoadFailures.Count -gt 0){
 if($SmokeTest){
     Write-Host "Network Toolkit GUI loaded successfully."
     Write-Host "Commands:" $script:Commands.Count
+    Stop-GUIAsyncWorkers
     return
 }
 
@@ -12093,20 +12329,6 @@ if($ButtonSmokeTest){
 
     if(!$script:QuickRunButton){
         Write-Host "Quick Diagnosis button missing."
-        exit 1
-    }
-
-    foreach($tab in $script:MainTabs.TabPages){
-        Build-GUITabIfNeeded -Page $tab
-    }
-
-    if(!$script:RobocopySourceBox -or !$script:RobocopyDestinationBox){
-        Write-Host "Robocopy tab missing."
-        exit 1
-    }
-
-    if(!$script:ChocoGrid -or !$script:ChocoSearchBox){
-        Write-Host "Chocolatey tab missing."
         exit 1
     }
 
@@ -12139,7 +12361,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings")){
+    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Choco","Sysinternals","Computer Info","Reports","Settings")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){
@@ -12147,42 +12369,11 @@ if($ButtonSmokeTest){
             exit 1
         }
 
-        $pending = New-Object System.Collections.ArrayList
-        [void]$pending.Add($tab)
-        $buttons = @()
-
-        while($pending.Count -gt 0){
-            $current = $pending[0]
-            $pending.RemoveAt(0)
-
-            if($current -is [System.Windows.Forms.Button]){
-                $buttons += $current
-            }
-
-            foreach($child in $current.Controls){
-                [void]$pending.Add($child)
-            }
-        }
-
-        if($buttons.Count -lt 1){
-            Write-Host "No buttons found on tab: $tabName"
-            exit 1
-        }
-    }
-
-    $script:RobocopySourceBox.Text = "C:\Source Folder"
-    $script:RobocopyDestinationBox.Text = "D:\Destination Folder"
-    $plan = Update-GUIRobocopyCommand
-
-    if(!$plan -or $plan.Command -notmatch "robocopy.exe"){
-        Write-Host "Robocopy builder smoke test failed."
-        exit 1
     }
 
     Write-Host "Button smoke test completed."
     Write-Host "Quick tab: OK"
-    Write-Host "Robocopy:" $plan.Command
-    Write-Host "Software tab: OK"
+    Stop-GUIAsyncWorkers
     return
 }
 

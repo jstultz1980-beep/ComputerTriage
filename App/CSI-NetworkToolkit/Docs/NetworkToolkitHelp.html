@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -93,7 +93,7 @@
       <a href="#software">Software</a>
       <a href="#software-keys">Software Keys</a>
       <a href="#cleanup">Clean Up</a>
-      <a href="#apps">Apps</a>
+      <a href="#toolkit-apps">Toolkit Apps</a>
       <a href="#choco">Chocolatey</a>
       <a href="#sysinternals">Sysinternals</a>
       <a href="#settings">Settings</a>
@@ -336,9 +336,9 @@
       <tr><td>KiTTY</td><td>Portable SSH/Telnet terminal client.</td></tr>
       <tr><td>PuTTY</td><td>Portable SSH, Telnet, and serial terminal client.</td></tr>
       <tr><td>WhoDat</td><td>WHOIS lookup for domains and public IP addresses.</td></tr>
-      <tr><td>mRemoteNG</td><td>Multi-protocol remote connection manager when installed in Apps.</td></tr>
-      <tr><td>RustDesk</td><td>Remote support tool when installed in Apps.</td></tr>
-      <tr><td>TightVNC</td><td>VNC viewer when installed in Apps.</td></tr>
+      <tr><td>mRemoteNG</td><td>Multi-protocol remote connection manager when installed in the toolkit.</td></tr>
+      <tr><td>RustDesk</td><td>Remote support tool when installed in the toolkit.</td></tr>
+      <tr><td>TightVNC</td><td>VNC viewer when installed in the toolkit.</td></tr>
     </table>
   </section>
 
@@ -367,7 +367,7 @@
       <tr><th>Tool</th><th>What it does</th><th>Use carefully because</th></tr>
       <tr><td>DISM/SFC Repair Path</td><td>Runs DISM CheckHealth, ScanHealth, RestoreHealth, and SFC with exported output.</td><td>It changes system state and can take time. Quick Diagnosis should indicate whether this is needed.</td></tr>
       <tr><td>Windows Error Lookup</td><td>Looks up Windows error codes, HRESULTs, and Win32 messages.</td><td>It helps interpret errors but does not fix them.</td></tr>
-      <tr><td>Profile Cleanup Toolkit</td><td>Coworker profile cleanup utility, when installed in Apps or placed on the appropriate tab.</td><td>User profile cleanup can remove local user data if used incorrectly. Confirm scope before removing anything.</td></tr>
+      <tr><td>Profile Cleanup Toolkit</td><td>Coworker profile cleanup utility, when installed in the toolkit or placed on the appropriate tab.</td><td>User profile cleanup can remove local user data if used incorrectly. Confirm scope before removing anything.</td></tr>
     </table>
   </section>
 
@@ -521,14 +521,12 @@
     </table>
   </section>
 
-  <section id="apps">
-    <h2>Apps Tab</h2>
-    <p>The Apps tab lists portable tools installed into the toolkit. These are toolkit-contained applications, not necessarily programs installed on the local computer.</p>
+  <section id="toolkit-apps">\r\n    <h2>Toolkit Apps Window</h2>\r\n    <p>Open Settings, then Toolkit Apps to manage portable tools installed into the toolkit. These are toolkit-contained applications, not necessarily programs installed on the local computer.</p>
     <h3>Buttons</h3>
     <table>
       <tr><th>Button</th><th>Purpose</th></tr>
       <tr><td>Launch Toolkit Tool</td><td>Launches the selected portable app.</td></tr>
-      <tr><td>Rename</td><td>Changes the display name shown in the Apps grid and generated tabs.</td></tr>
+      <tr><td>Rename</td><td>Changes the display name shown in the Toolkit Apps grid and generated tabs.</td></tr>
       <tr><td>Set Tab Placement</td><td>Overrides where the app should appear. Use this to put tools on the tab where they naturally belong.</td></tr>
       <tr><td>Remove From Toolkit</td><td>Removes the selected toolkit app entry and its copied files after confirmation.</td></tr>
       <tr><td>Refresh Toolkit Tools</td><td>Reloads the app manifest and refreshes generated tool buttons.</td></tr>
@@ -536,7 +534,7 @@
     <h3>Installed portable apps currently recognized</h3>
     <p>Examples include BleachBit, Bulk Uninstaller, CCleaner, CPU-Z, FastResolver, Firefox Portable, GPU-Z, HijackThis, HWMonitor, KiTTY, LibreOffice, LockHunter, mRemoteNG, PCI-Z, Profile Cleanup Toolkit, PuTTY, PWGen, QuickMemoryTestOK, Recuva, Revo Uninstaller, RustDesk, Speccy, SSD-Z, Sumatra PDF, TightVNC, WiFi Diagnostics View, WinMTR, WinSCP, Wise Registry Cleaner, and xpy.</p>
     <div class="note">
-      If a tool appears in Apps and also as a button on a functional tab, the tab button should launch the same installed app. If the app is removed from Apps, the tab button should disappear or stop being generated.
+      If a tool appears in Toolkit Apps and also as a button on a functional tab, the tab button should launch the same installed app. If the app is removed from Toolkit Apps, the tab button should disappear or stop being generated.
     </div>
   </section>
 
@@ -567,7 +565,7 @@
       <tr><td>Uninstall From Computer</td><td>Uninstalls the selected package from the local computer.</td></tr>
     </table>
     <div class="warn">
-      Important distinction: Apps tab equals toolkit-installed portable apps. Installed Chocolatey Packages equals packages installed on the current computer.
+      Important distinction: Toolkit Apps equals toolkit-installed portable apps. Installed Chocolatey Packages equals packages installed on the current computer.
     </div>
   </section>
 

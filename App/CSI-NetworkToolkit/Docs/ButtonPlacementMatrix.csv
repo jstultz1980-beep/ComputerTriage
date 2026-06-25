@@ -1,4 +1,4 @@
-Tab,PrimaryPurpose,TypicalTools,PlacementNotes
+﻿Tab,PrimaryPurpose,TypicalTools,PlacementNotes
 Quick Diagnosis,"One-click walk-up triage and fast target checks.","Run Quick Diagnosis; Open Latest Report; Ping; TCPing; Tracert; NSLookup; DNS lookup; WHOIS; DISM/SFC after review; hardware shortcuts","Keep focused. Do not use as a dumping ground."
 Computer Info,"Saved computer profiles and profile reports.","View; Take Profile; Delete; Refresh","Replaces old fingerprint wording."
 Analyze,"Evidence collection and Windows health analysis.","Event Log Triage; Service Health; Startup Impact; Windows Update Health; GPResult HTML; Hardware Health; Disk Health; Driver Review; Remote Management Readiness","Use after Quick Diagnosis identifies an area to investigate."
@@ -20,7 +20,6 @@ Robocopy,"Plain-language robocopy builder.","Build Command; Copy Command; Previe
 Software,"General portable productivity/support apps.","Firefox Portable; Notepad++; LibreOffice; Draw.io; KompoZer; safe download links","Do not mix Chocolatey management here."
 Software Keys,"Local product/license key discovery.","Windows/software key discovery report","Treat outputs as confidential client data."
 Clean Up,"Cleanup, uninstallers, stale profiles, leftovers, and recovery.","BleachBit; CCleaner; Bulk Uninstaller; Revo Uninstaller; Wise Registry Cleaner; Profile Cleanup; Recuva","Confirm scope before destructive cleanup."
-Apps,"Toolkit-contained app inventory and management.","Launch; Rename; Set Tab Placement; Remove From Toolkit; Refresh Toolkit Tools","Apps is management; functional buttons should also appear where useful."
 Choco,"Chocolatey package discovery and install/update/uninstall workflows.","Install Chocolatey; Search; Install Selected; Scan Installed; Upgrade; Uninstall; Add to Toolbox","Separate computer-installed packages from toolkit-installed apps."
 Sysinternals,"Fallback for Sysinternals tools with no better functional tab.","ShellRunas; portmon; notmyfault; obscure utilities","Move clear fits to functional tabs."
 Reports,"Technician-facing outputs.","Search; Refresh Reports; Open Selected; Delete Selected; AI bundle/import/final report flows","Do not list raw logs or JSON noise here."
