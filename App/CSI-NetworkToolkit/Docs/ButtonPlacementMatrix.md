@@ -9,7 +9,7 @@ Purpose: document the current GUI tab strategy so tool placement stays intuitive
 - Put tools where a technician would look while troubleshooting, not where the code happens to live.
 - Keep Network focused on connectivity and path testing.
 - Keep Infrastructure focused on services the computer depends on, especially DHCP, DNS, time, and exposure.
-- Put custom portable apps on the functional tab where they are useful, while still listing them in Settings > Toolkit Apps for management.
+- Put custom portable apps on the functional tab where they are useful, while still listing them in Settings > Toolkit App Manager for management.
 - Use Sysinternals as the fallback tab only for tools that do not clearly belong elsewhere.
 - Avoid overloading tabs. Split by intent before allowing vertical scrolling to become normal.
 

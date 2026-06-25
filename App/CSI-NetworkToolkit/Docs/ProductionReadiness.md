@@ -90,6 +90,6 @@ The GUI is organized by technician intent rather than by implementation detail:
 - **Infrastructure** is for DHCP, DNS, time, and local exposure checks.
 - **Discovery** is for host, subnet, ARP, service, and wake-on-LAN discovery.
 - **Remote** and **PsExec** support remote access and execution.
-- **Directory**, **Security**, **Wi-Fi**, **Print**, **Files**, **Robocopy**, **Software**, **Software Keys**, **Clean Up**, **Choco**, **Sysinternals**, and **Reports** each group related tools by field workflow. Toolkit app inventory is opened from Settings > Toolkit Apps.
+- **Directory**, **Security**, **Wi-Fi**, **Print**, **Files**, **Robocopy**, **Software**, **Software Keys**, **Clean Up**, **Choco**, **Sysinternals**, and **Reports** each group related tools by field workflow. Toolkit app inventory is opened from Settings > Toolkit App Manager.
 
 DHCP tools belong together under **Infrastructure**. DHCP Sleuth is the live standalone monitor/probe utility; DHCP Scope Inspector checks DHCP scope/lease information where available; DHCP Lease / Rogue Check is the lightweight one-shot evidence collector.

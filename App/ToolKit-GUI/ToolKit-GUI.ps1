@@ -969,20 +969,21 @@ function Set-GUIRoundedCorners {
         if($sender -and !$sender.IsDisposed -and $sender.Width -gt 0 -and $sender.Height -gt 0){
             if($sender.Region){ $sender.Region.Dispose() }
 
-            $path = New-Object System.Drawing.Drawing2D.GraphicsPath
-            $diameter = [Math]::Max(2,($roundedRadius * 2))
             $rect = New-Object System.Drawing.Rectangle(0,0,[Math]::Max(1,$sender.Width),[Math]::Max(1,$sender.Height))
+            $safeRadius = [Math]::Min($roundedRadius,[Math]::Floor(([Math]::Min($rect.Width,$rect.Height) - 2) / 2))
 
-            if($diameter -ge $rect.Width -or $diameter -ge $rect.Height){
-                $path.AddEllipse($rect)
+            if($safeRadius -lt 4){
+                $sender.Region = $null
+                return
             }
-            else{
-                $path.AddArc($rect.X,$rect.Y,$diameter,$diameter,180,90)
-                $path.AddArc(($rect.Right - $diameter - 1),$rect.Y,$diameter,$diameter,270,90)
-                $path.AddArc(($rect.Right - $diameter - 1),($rect.Bottom - $diameter - 1),$diameter,$diameter,0,90)
-                $path.AddArc($rect.X,($rect.Bottom - $diameter - 1),$diameter,$diameter,90,90)
-                $path.CloseFigure()
-            }
+
+            $path = New-Object System.Drawing.Drawing2D.GraphicsPath
+            $diameter = [Math]::Max(2,($safeRadius * 2))
+            $path.AddArc($rect.X,$rect.Y,$diameter,$diameter,180,90)
+            $path.AddArc(($rect.Right - $diameter - 1),$rect.Y,$diameter,$diameter,270,90)
+            $path.AddArc(($rect.Right - $diameter - 1),($rect.Bottom - $diameter - 1),$diameter,$diameter,0,90)
+            $path.AddArc($rect.X,($rect.Bottom - $diameter - 1),$diameter,$diameter,90,90)
+            $path.CloseFigure()
 
             $sender.Region = New-Object System.Drawing.Region($path)
         }
@@ -3972,7 +3973,10 @@ function Refresh-GUICustomTools {
     foreach($tool in $script:CustomTools){
         $placement = Get-GUICustomToolPlacement -Tool $tool
         $tabText = if($tool.TabOverride){"$($placement.Tab) (override)"}else{$placement.Tab}
-        $rowIndex = $script:CustomGrid.Rows.Add($tool.Name,$tool.Source,$tool.Version,$tool.Status,$tabText)
+        $package = if($tool.PackageName){$tool.PackageName}else{""}
+        $upgrade = if($tool.UpgradeStatus){$tool.UpgradeStatus}else{if($package){"Not checked"}else{"Manual"}}
+        $latest = if($tool.AvailableVersion){$tool.AvailableVersion}else{""}
+        $rowIndex = $script:CustomGrid.Rows.Add($tool.Name,$tool.Source,$tool.Version,$tool.Status,$tabText,$package,$upgrade,$latest)
         $script:CustomGrid.Rows[$rowIndex].Tag = $tool
     }
 
@@ -6302,6 +6306,10 @@ function Refresh-GUIChocoToolboxPackages {
         }
     }
 
+    if($script:CustomGrid){
+        Refresh-GUICustomTools
+    }
+
     Add-GUILog ("Toolkit Chocolatey tools: {0}" -f $script:ChocoToolboxPackages.Count)
 }
 
@@ -6349,11 +6357,18 @@ function Check-GUIChocoToolboxPackageUpdates {
 }
 
 function Get-SelectedGUIChocoToolboxPackage {
-    if(!$script:ChocoToolboxGrid -or $script:ChocoToolboxGrid.SelectedRows.Count -eq 0){
-        return $null
+    if($script:ChocoToolboxGrid -and $script:ChocoToolboxGrid.SelectedRows.Count -gt 0){
+        return $script:ChocoToolboxGrid.SelectedRows[0].Tag
     }
 
-    return $script:ChocoToolboxGrid.SelectedRows[0].Tag
+    if($script:CustomGrid -and $script:CustomGrid.SelectedRows.Count -gt 0){
+        $tool = $script:CustomGrid.SelectedRows[0].Tag
+        if($tool -and $tool.PackageProvider -eq 'Chocolatey' -and $tool.PackageName){
+            return $tool
+        }
+    }
+
+    return $null
 }
 
 function Upgrade-SelectedGUIChocoToolboxPackage {
@@ -6385,14 +6400,14 @@ function Upgrade-AllGUIChocoToolboxPackages {
 
     $confirm = [System.Windows.Forms.MessageBox]::Show(
         "Download and replace all $($tools.Count) Chocolatey-managed toolkit tools?`r`n`r`nThis updates only portable copies inside the toolkit. It does not modify computer-installed packages.",
-        'Upgrade All Toolkit Tools',
+        'Upgrade All Toolkit Apps',
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Warning
     )
     if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
 
     $failed = @()
-    Start-GUIBusyIndicator -Message 'Upgrading Toolkit Tools'
+    Start-GUIBusyIndicator -Message 'Upgrading Toolkit Apps'
     try {
         foreach($tool in $tools){
             try {
@@ -6425,30 +6440,7 @@ function Upgrade-AllGUIChocoToolboxPackages {
 }
 
 function Show-GUIChocoToolboxManager {
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Toolkit Chocolatey Tools'
-    $form.StartPosition = 'CenterParent'; $form.ClientSize = New-Object System.Drawing.Size(760,440)
-    $form.MinimizeBox = $false; $form.MaximizeBox = $false; $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
-    $layout = New-Object System.Windows.Forms.TableLayoutPanel
-    $layout.Dock='Fill'; $layout.Padding=New-Object System.Windows.Forms.Padding(14); $layout.RowCount=3; $layout.ColumnCount=1
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
-    $note = New-GUILabel 'Only tools installed into this portable toolkit by Chocolatey are listed. Updates never install or upgrade packages on this computer.'
-    $note.ForeColor=$script:GUITheme.MutedText; $note.Dock='Fill'; $layout.Controls.Add($note,0,0)
-    $script:ChocoToolboxGrid = New-Object System.Windows.Forms.DataGridView
-    $ChocoToolboxGrid.Dock='Fill'; $ChocoToolboxGrid.ReadOnly=$true; $ChocoToolboxGrid.AllowUserToAddRows=$false; $ChocoToolboxGrid.AllowUserToDeleteRows=$false
-    $ChocoToolboxGrid.RowHeadersVisible=$false; $ChocoToolboxGrid.MultiSelect=$false; $ChocoToolboxGrid.SelectionMode='FullRowSelect'; $ChocoToolboxGrid.AutoSizeColumnsMode='Fill'; $ChocoToolboxGrid.BackgroundColor=[System.Drawing.Color]::White
-    [void]$ChocoToolboxGrid.Columns.Add('Name','Toolkit Tool'); [void]$ChocoToolboxGrid.Columns.Add('Version','Installed'); [void]$ChocoToolboxGrid.Columns.Add('Status','Upgrade Status'); [void]$ChocoToolboxGrid.Columns.Add('Available','Latest')
-    $layout.Controls.Add($ChocoToolboxGrid,0,1)
-    $actions=New-Object System.Windows.Forms.FlowLayoutPanel; $actions.Dock='Fill'; $actions.FlowDirection='RightToLeft'
-    $close=New-GUIButton 'Close' { $form.Close() }; $refresh=New-GUIButton 'Refresh List' { Refresh-GUIChocoToolboxPackages }; $check=New-GUIButton 'Check For Updates' { Check-GUIChocoToolboxPackageUpdates }; $selected=New-GUIButton 'Upgrade Selected' { Upgrade-SelectedGUIChocoToolboxPackage }; $all=New-GUIButton 'Upgrade All' { Upgrade-AllGUIChocoToolboxPackages }
-    foreach($button in @($close,$all,$selected,$check,$refresh)){ $actions.Controls.Add($button) }
-    $layout.Controls.Add($actions,0,2); $form.Controls.Add($layout)
-    Refresh-GUIChocoToolboxPackages
-    [void]$form.ShowDialog($script:Form)
-    $script:ChocoToolboxGrid = $null
-    $form.Dispose()
+    Show-GUICustomToolsWindow
 }
 
 function Uninstall-SelectedGUIChocoPackage {
@@ -10430,9 +10422,9 @@ function Build-ChocolateyPage {
     $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $guidanceGroup.Controls.Add($toolboxLayout)
-    $guidance = New-GUILabel 'Add a package from the search results, then manage toolkit-installed Chocolatey apps from Settings. Toolkit updates only replace portable copies and never modify computer packages.'
+    $guidance = New-GUILabel 'Add a package from the search results, then manage every toolkit app from one list in Settings. Update actions only apply to Chocolatey-backed portable copies.'
     $guidance.ForeColor = $script:GUITheme.MutedText; $toolboxLayout.Controls.Add($guidance,0,0)
-    $toolboxManagerButton = New-GUIButton 'Manage Toolkit Tools In Settings' { Show-GUIChocoToolboxManager }
+    $toolboxManagerButton = New-GUIButton 'Open Toolkit App Manager' { Show-GUIChocoToolboxManager }
     $toolboxManagerButton.Dock = 'Fill'; $toolboxManagerButton.Width = 0
     $toolboxLayout.Controls.Add($toolboxManagerButton,0,1)
 
@@ -10799,24 +10791,33 @@ function Build-CustomToolsPage {
     [void]$CustomGrid.Columns.Add("Version","Version")
     [void]$CustomGrid.Columns.Add("Status","Status")
     [void]$CustomGrid.Columns.Add("Tab","Tab Placement")
-    $CustomGrid.Columns["Name"].FillWeight = 28
-    $CustomGrid.Columns["Source"].FillWeight = 22
-    $CustomGrid.Columns["Version"].FillWeight = 12
-    $CustomGrid.Columns["Status"].FillWeight = 12
-    $CustomGrid.Columns["Tab"].FillWeight = 26
+    [void]$CustomGrid.Columns.Add("Package","Package")
+    [void]$CustomGrid.Columns.Add("Upgrade","Upgrade")
+    [void]$CustomGrid.Columns.Add("Latest","Latest")
+    $CustomGrid.Columns["Name"].FillWeight = 24
+    $CustomGrid.Columns["Source"].FillWeight = 18
+    $CustomGrid.Columns["Version"].FillWeight = 10
+    $CustomGrid.Columns["Status"].FillWeight = 10
+    $CustomGrid.Columns["Tab"].FillWeight = 18
+    $CustomGrid.Columns["Package"].FillWeight = 14
+    $CustomGrid.Columns["Upgrade"].FillWeight = 12
+    $CustomGrid.Columns["Latest"].FillWeight = 10
     $layout.Controls.Add($CustomGrid,0,0)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttons.Dock = "Fill"
     $buttons.Padding = New-Object System.Windows.Forms.Padding(8)
     $layout.Controls.Add($buttons,0,1)
-    [void]$buttons.Controls.Add((New-GUIButton "Launch Toolkit Tool" { Start-SelectedGUICustomTool }))
+    [void]$buttons.Controls.Add((New-GUIButton "Launch" { Start-SelectedGUICustomTool }))
     [void]$buttons.Controls.Add((New-GUIButton "Rename" { Rename-SelectedGUICustomTool }))
     [void]$buttons.Controls.Add((New-GUIButton "Set Tab Placement" { Set-SelectedGUICustomToolTab }))
     $removeToolkitButton = New-GUIButton "Remove From Toolkit" { Remove-SelectedGUICustomTool }
     $removeToolkitButton.Width = 180
     [void]$buttons.Controls.Add($removeToolkitButton)
-    [void]$buttons.Controls.Add((New-GUIButton "Refresh Toolkit Tools" { Refresh-GUICustomTools; Refresh-GUICustomToolTabs }))
+    [void]$buttons.Controls.Add((New-GUIButton "Check Updates" { Check-GUIChocoToolboxPackageUpdates }))
+    [void]$buttons.Controls.Add((New-GUIButton "Upgrade Selected" { Upgrade-SelectedGUIChocoToolboxPackage }))
+    [void]$buttons.Controls.Add((New-GUIButton "Upgrade All" { Upgrade-AllGUIChocoToolboxPackages }))
+    [void]$buttons.Controls.Add((New-GUIButton "Refresh List" { Refresh-GUICustomTools; Refresh-GUICustomToolTabs }))
 
     $CustomGrid.Add_CellDoubleClick({ Start-SelectedGUICustomTool })
     Refresh-GUICustomTools
@@ -10824,7 +10825,7 @@ function Build-CustomToolsPage {
 
 function Show-GUICustomToolsWindow {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Toolkit Apps"
+    $form.Text = "Toolkit App Manager"
     $form.StartPosition = "CenterParent"
     $form.Size = New-Object System.Drawing.Size(980,560)
     $form.MinimumSize = New-Object System.Drawing.Size(820,440)
@@ -11801,15 +11802,11 @@ function Build-SettingsPage {
     $maintenanceLayout.SetColumnSpan($ToolkitVersionLabel,2)
     Update-GUIToolkitVersionLabel
 
-    $toolboxPackagesButton = New-GUIButton "Manage Toolkit Tools" { Show-GUIChocoToolboxManager }
-    $toolboxPackagesButton.Dock = "Fill"
-    $toolboxPackagesButton.Width = 0
-    $maintenanceLayout.Controls.Add($toolboxPackagesButton,0,2)
-
-    $appsButton = New-GUIButton "Toolkit Apps" { Show-GUICustomToolsWindow }
-    $appsButton.Dock = "Fill"
-    $appsButton.Width = 0
-    $maintenanceLayout.Controls.Add($appsButton,1,2)
+    $toolkitAppsButton = New-GUIButton "Toolkit App Manager" { Show-GUICustomToolsWindow }
+    $toolkitAppsButton.Dock = "Fill"
+    $toolkitAppsButton.Width = 0
+    $maintenanceLayout.Controls.Add($toolkitAppsButton,0,2)
+    $maintenanceLayout.SetColumnSpan($toolkitAppsButton,2)
 
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"

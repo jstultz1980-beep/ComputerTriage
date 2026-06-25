@@ -93,7 +93,7 @@
       <a href="#software">Software</a>
       <a href="#software-keys">Software Keys</a>
       <a href="#cleanup">Clean Up</a>
-      <a href="#toolkit-apps">Toolkit Apps</a>
+      <a href="#toolkit-apps">Toolkit App Manager</a>
       <a href="#choco">Chocolatey</a>
       <a href="#sysinternals">Sysinternals</a>
       <a href="#settings">Settings</a>
@@ -521,20 +521,24 @@
     </table>
   </section>
 
-  <section id="toolkit-apps">\r\n    <h2>Toolkit Apps Window</h2>\r\n    <p>Open Settings, then Toolkit Apps to manage portable tools installed into the toolkit. These are toolkit-contained applications, not necessarily programs installed on the local computer.</p>
+  <section id="toolkit-apps">
+    <h2>Toolkit App Manager</h2>
+    <p>Open Settings, then Toolkit App Manager to manage portable tools installed into the toolkit. These are toolkit-contained applications, not necessarily programs installed on the local computer.</p>
     <h3>Buttons</h3>
     <table>
       <tr><th>Button</th><th>Purpose</th></tr>
-      <tr><td>Launch Toolkit Tool</td><td>Launches the selected portable app.</td></tr>
-      <tr><td>Rename</td><td>Changes the display name shown in the Toolkit Apps grid and generated tabs.</td></tr>
+      <tr><td>Launch</td><td>Launches the selected portable app.</td></tr>
+      <tr><td>Rename</td><td>Changes the display name shown in the Toolkit App Manager grid and generated tabs.</td></tr>
       <tr><td>Set Tab Placement</td><td>Overrides where the app should appear. Use this to put tools on the tab where they naturally belong.</td></tr>
       <tr><td>Remove From Toolkit</td><td>Removes the selected toolkit app entry and its copied files after confirmation.</td></tr>
-      <tr><td>Refresh Toolkit Tools</td><td>Reloads the app manifest and refreshes generated tool buttons.</td></tr>
+      <tr><td>Check Updates</td><td>Checks Chocolatey-backed toolkit apps for newer portable package versions.</td></tr>
+      <tr><td>Upgrade Selected / Upgrade All</td><td>Updates only portable toolkit copies for rows that have Chocolatey package metadata.</td></tr>
+      <tr><td>Refresh List</td><td>Reloads the app manifest and refreshes generated tool buttons.</td></tr>
     </table>
     <h3>Installed portable apps currently recognized</h3>
     <p>Examples include BleachBit, Bulk Uninstaller, CCleaner, CPU-Z, FastResolver, Firefox Portable, GPU-Z, HijackThis, HWMonitor, KiTTY, LibreOffice, LockHunter, mRemoteNG, PCI-Z, Profile Cleanup Toolkit, PuTTY, PWGen, QuickMemoryTestOK, Recuva, Revo Uninstaller, RustDesk, Speccy, SSD-Z, Sumatra PDF, TightVNC, WiFi Diagnostics View, WinMTR, WinSCP, Wise Registry Cleaner, and xpy.</p>
     <div class="note">
-      If a tool appears in Toolkit Apps and also as a button on a functional tab, the tab button should launch the same installed app. If the app is removed from Toolkit Apps, the tab button should disappear or stop being generated.
+      If a tool appears in Toolkit App Manager and also as a button on a functional tab, the tab button should launch the same installed app. If the app is removed from Toolkit App Manager, the tab button should disappear or stop being generated.
     </div>
   </section>
 
@@ -565,7 +569,7 @@
       <tr><td>Uninstall From Computer</td><td>Uninstalls the selected package from the local computer.</td></tr>
     </table>
     <div class="warn">
-      Important distinction: Toolkit Apps equals toolkit-installed portable apps. Installed Chocolatey Packages equals packages installed on the current computer.
+      Important distinction: Toolkit App Manager equals toolkit-installed portable apps. Installed Chocolatey Packages equals packages installed on the current computer.
     </div>
   </section>
 

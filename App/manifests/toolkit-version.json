@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260625153213,
-    "SourceUpdatedAt":  "2026-06-25T15:32:13.5830100-05:00",
-    "ReleaseNotes":  "Harden GUI smoke tests and async cleanup after layout/report polish."
+    "Build":  20260625160146,
+    "SourceUpdatedAt":  "2026-06-25T16:01:46.8236685-05:00",
+    "ReleaseNotes":  "Merge toolkit app management, fix rounded button clipping, and clean settings wording."
 }
