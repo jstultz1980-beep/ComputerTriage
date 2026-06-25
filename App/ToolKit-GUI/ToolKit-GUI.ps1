@@ -8150,7 +8150,7 @@ function Get-GUICustomToolPlacement {
         "cpuzportablecpuz" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Inspect CPU, memory, motherboard, and platform details." }
         "fastresolverfastresolver" = @{ Tab = "Network"; Section = "Connectivity"; Description = "Quickly resolve hostnames and IP addresses across a range." }
         "fastresolverportablefastresolver" = @{ Tab = "Network"; Section = "Connectivity"; Description = "Quickly resolve hostnames and IP addresses across a range." }
-        "dhcpsleuthdhcpsleuth" = @{ Tab = "Network"; Section = "DHCP Diagnostics"; Description = "Launch DHCP Sleuth as a standalone GUI for DHCP monitoring, probing, rogue-server review, and isolated lab testing." }
+        "dhcpsleuthdhcpsleuth" = @{ Tab = "Infrastructure"; Section = "DHCP"; Description = "Launch DHCP Sleuth as a standalone GUI for DHCP monitoring, probing, rogue-server review, and isolated lab testing." }
         "firefoxportablefirefoxportable" = @{ Tab = "Software"; Section = "Portable Browser"; Description = "Open the toolkit-contained Firefox browser profile." }
         "gpuzgpuz2690" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Inspect GPU model, drivers, sensors, and graphics capabilities." }
         "hwmonitorhwmonitorportable" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "View live hardware voltages, temperatures, fans, and sensor values." }

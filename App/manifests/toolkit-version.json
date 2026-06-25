@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260625082902,
-    "SourceUpdatedAt":  "2026-06-25T08:29:02.4435144-05:00",
-    "ReleaseNotes":  "Rename Services to Infrastructure and compact Quick Diagnosis layout."
+    "Build":  20260625084036,
+    "SourceUpdatedAt":  "2026-06-25T08:40:36.4604215-05:00",
+    "ReleaseNotes":  "Move DHCP Sleuth placement to Infrastructure with other DHCP tools."
 }
