@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260624164303,
-    "SourceUpdatedAt":  "2026-06-24T16:43:03.0533611-05:00",
-    "ReleaseNotes":  "Consolidate repeated tool sections when catalog, mapped, and custom tools are combined."
+    "Build":  20260625082902,
+    "SourceUpdatedAt":  "2026-06-25T08:29:02.4435144-05:00",
+    "ReleaseNotes":  "Rename Services to Infrastructure and compact Quick Diagnosis layout."
 }

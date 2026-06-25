@@ -4153,7 +4153,7 @@ function Set-SelectedGUICustomToolTab {
         return
     }
 
-    $tabs = @("Auto") + @("Analyze","Apps","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Services","Software","Sysinternals","Wi-Fi","Windows Update" | Sort-Object)
+    $tabs = @("Auto") + @("Analyze","Apps","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Wi-Fi","Windows Update" | Sort-Object)
 
     $dialog = New-Object System.Windows.Forms.Form
     $dialog.Text = "Set Custom Tool Tab Placement"
@@ -4183,6 +4183,7 @@ function Set-SelectedGUICustomToolTab {
     $combo.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     foreach($tab in $tabs){ [void]$combo.Items.Add($tab) }
     $current = if($tool.TabOverride){$tool.TabOverride}else{"Auto"}
+    if($current -eq "Services"){ $current = "Infrastructure" }
     $combo.SelectedItem = if($tabs -contains $current){$current}else{"Auto"}
     $layout.Controls.Add($combo,0,1)
 
@@ -7515,7 +7516,7 @@ function Build-QuickTriagePage {
     $hardwareShortcutPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $hardwareShortcutPanel.Dock = "Top"
     $hardwareShortcutPanel.AutoSize = $true
-    $hardwareShortcutPanel.ColumnCount = 2
+    $hardwareShortcutPanel.ColumnCount = 3
     $hardwareShortcutPanel.RowCount = 0
     $hardwareShortcutPanel.Padding = New-Object System.Windows.Forms.Padding(8)
     $hardwareShortcuts.Controls.Add($hardwareShortcutPanel)
@@ -7528,8 +7529,8 @@ function Build-QuickTriagePage {
         @{ Text="HWiNFO"; Action={ Start-GUIExternalToolById -Id "HWiNFO" }; Tip="Open HWiNFO for detailed hardware inventory and sensor review." }
     )
 
-    for($i = 0; $i -lt 2; $i++){
-        $hardwareShortcutPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    for($i = 0; $i -lt 3; $i++){
+        $hardwareShortcutPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 3)))) | Out-Null
     }
 
     $shortcutRow = 0
@@ -7547,7 +7548,7 @@ function Build-QuickTriagePage {
         if($script:ToolTip){ $script:ToolTip.SetToolTip($button,$toolDef.Tip) }
         [void]$hardwareShortcutPanel.Controls.Add($button,$shortcutCol,$shortcutRow)
 
-        $shortcutCol = ($shortcutCol + 1) % 2
+        $shortcutCol = ($shortcutCol + 1) % 3
         if($shortcutCol -eq 0){ $shortcutRow++ }
     }
 
@@ -7632,6 +7633,32 @@ function Add-GUIHeaderComputerSummary {
     }
 }
 
+function Update-GUIHeaderLayout {
+    if(!$script:HeaderPanel -or $script:HeaderPanel.IsDisposed){
+        return
+    }
+
+    $headerWidth = $script:HeaderPanel.ClientSize.Width
+    if($headerWidth -le 0){
+        return
+    }
+
+    if($script:HeaderToolsPanel -and !$script:HeaderToolsPanel.IsDisposed){
+        $script:HeaderToolsPanel.Location = New-Object System.Drawing.Point(
+            ([Math]::Max(12, $headerWidth - $script:HeaderToolsPanel.Width - 12)),
+            14
+        )
+    }
+
+    if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
+        $summaryLeft = 360
+        $summaryWidth = [Math]::Max(500, $script:HeaderToolsPanel.Left - $summaryLeft - 16)
+        $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+        $script:HeaderSummaryPanel.Location = New-Object System.Drawing.Point($summaryLeft,10)
+        $script:HeaderSummaryPanel.Size = New-Object System.Drawing.Size($summaryWidth,58)
+    }
+}
+
 function Update-GUIStaticTabStripSelection {
     if(!$script:MainTabs -or !$script:TabButtons){
         return
@@ -7706,7 +7733,7 @@ function Build-GUITabIfNeeded {
 }
 
 function Refresh-GUICustomToolTabs {
-    $customToolTabs = @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Clean Up","Apps")
+    $customToolTabs = @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Clean Up","Apps")
 
     if(!$script:MainTabs){
         return
@@ -7792,7 +7819,7 @@ function Get-GUIDefaultTabOrder {
         "Network",
         "Remote",
         "PsExec",
-        "Services",
+        "Infrastructure",
         "Repair",
         "Directory",
         "Security",
@@ -7905,6 +7932,9 @@ function Get-GUIOrderedTabNames {
         }
         elseif($name -eq "Custom"){
             $name = "Apps"
+        }
+        elseif($name -eq "Services"){
+            $name = "Infrastructure"
         }
 
         if($name -eq "Settings"){
@@ -11814,6 +11844,7 @@ function Build-Form {
     $script:Form = New-Object System.Windows.Forms.Form
     $Form.Text = "Network Toolkit"
     $Form.StartPosition = "CenterScreen"
+    $Form.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::None
     $Form.MinimumSize = New-Object System.Drawing.Size(1280,720)
     $Form.Size = $Form.MinimumSize
     $Form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::Sizable
@@ -11843,7 +11874,7 @@ function Build-Form {
     $root.BackColor = $script:GUITheme.Page
     $script:RootLayout = $root
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
-    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,26))) | Out-Null
     $Form.Controls.Add($root)
@@ -11933,6 +11964,8 @@ function Build-Form {
     if($script:ToolTip){ $script:ToolTip.SetToolTip($helpButton,"Open the Network Toolkit help guide.") }
 
     Add-GUIHeaderComputerSummary -Header $header
+    $header.Add_Resize({ Update-GUIHeaderLayout })
+    Update-GUIHeaderLayout
 
     $tabStrip = New-Object System.Windows.Forms.FlowLayoutPanel
     $tabStrip.Dock = "Fill"
@@ -11990,7 +12023,7 @@ function Build-Form {
     $tabs.TabPages.Add($psExecPage) | Out-Null
 
     $infrastructurePage = New-Object System.Windows.Forms.TabPage
-    $infrastructurePage.Text = "Services"
+    $infrastructurePage.Text = "Infrastructure"
     $tabs.TabPages.Add($infrastructurePage) | Out-Null
 
     $repairPage = New-Object System.Windows.Forms.TabPage
@@ -12146,6 +12179,9 @@ function Build-Form {
     Register-GUITabBuilder -Page $liveLogPage -Builder { param($Page) Build-LiveLogPage -Page $Page }
 
     $startupTab = if($script:GuiSettings -and $script:GuiSettings.startupTab){[string]$script:GuiSettings.startupTab}else{"Quick Diagnosis"}
+    if($startupTab -eq "Windows"){ $startupTab = "Analyze" }
+    elseif($startupTab -eq "Custom"){ $startupTab = "Apps" }
+    elseif($startupTab -eq "Services"){ $startupTab = "Infrastructure" }
     $startupPage = $script:MainTabs.TabPages | Where-Object { $_.Text -eq $startupTab } | Select-Object -First 1
     if(!$startupPage){
         $startupPage = $quickPage
@@ -12237,7 +12273,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Services","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings")){
+    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Apps","Choco","Sysinternals","Computer Info","Reports","Settings")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){
