@@ -81,7 +81,7 @@
       <a href="#processes">Processes</a>
       <a href="#network">Network</a>
       <a href="#remote">Remote</a>
-      <a href="#services">Services And Infrastructure</a>
+      <a href="#infrastructure">Infrastructure</a>
       <a href="#repair">Repair</a>
       <a href="#directory">Directory</a>
       <a href="#security">Security</a>
@@ -184,14 +184,13 @@
 
   <section id="reports">
     <h2>Reports And Outputs</h2>
-    <p>The Reports tab is for useful technician-facing output, not raw log spam. Logs live in the Live Log tab and ToolUsage log folder. Reports should help answer questions like: what computer did I check, what did Quick Diagnosis find, what profile was captured, what network discovery output exists, and where are the repair records?</p>
+    <p>The Reports tab is for useful technician-facing output, not raw log spam. Logs are opened from Settings and kept in the ToolUsage log folder. Reports should help answer questions like: what computer did I check, what did Quick Diagnosis find, what profile was captured, what network discovery output exists, and where are the repair records?</p>
     <h3>Reports tab buttons</h3>
     <table>
       <tr><th>Button</th><th>Purpose</th></tr>
       <tr><td>Search</td><td>Filters report entries using the search/filter field.</td></tr>
       <tr><td>Refresh Reports</td><td>Reloads the report list from the toolkit output locations.</td></tr>
       <tr><td>Open Selected</td><td>Opens the selected report file.</td></tr>
-      <tr><td>Open Location</td><td>Opens the folder containing the selected report.</td></tr>
       <tr><td>Delete Selected</td><td>Removes the selected report after confirmation.</td></tr>
       <tr><td>Open Help</td><td>Opens this guide.</td></tr>
     </table>
@@ -212,8 +211,8 @@
     <p>The Computer Info tab is the technician-facing view for saved computer profiles. A computer profile is the evolved version of the original computer fingerprint. It captures identity, OS, hardware, network configuration, local administrators, listening ports, security products, Defender, BitLocker, servicing health, pending reboot state, and toolkit latest-state data.</p>
     <table>
       <tr><th>Button</th><th>Purpose</th></tr>
-      <tr><td>Open HTML Report</td><td>Opens the selected computer profile as a readable HTML report.</td></tr>
-      <tr><td>Take Fingerprint / Take Profile</td><td>Captures the current computer profile and saves it for later selection.</td></tr>
+      <tr><td>View</td><td>Opens the selected computer profile as a readable HTML report.</td></tr>
+      <tr><td>Take Profile</td><td>Captures the current computer profile and saves it for later selection.</td></tr>
       <tr><td>Delete</td><td>Deletes the selected saved computer profile after confirmation.</td></tr>
       <tr><td>Refresh</td><td>Reloads the saved profile list.</td></tr>
     </table>
@@ -343,16 +342,17 @@
     </table>
   </section>
 
-  <section id="services">
-    <h2>Services And Infrastructure Tab</h2>
-    <p>The Services/Infrastructure tools focus on local exposure, DHCP, DNS, time, and infrastructure-facing checks.</p>
+  <section id="infrastructure">
+    <h2>Infrastructure Tab</h2>
+    <p>The Infrastructure tab holds network services and dependencies that a workstation or server relies on: DHCP, DNS, time synchronization, and local exposure checks. DHCP tools are grouped here rather than on Network so live connectivity tests stay separate from service/provider investigation.</p>
     <table>
       <tr><th>Tool</th><th>Purpose</th></tr>
+      <tr><td>DHCP Sleuth</td><td>Standalone GUI for live DHCP monitoring, probing, rogue-server review, and isolated lab DHCP testing.</td></tr>
       <tr><td>Local Exposure Inspector</td><td>Reviews listening ports and local exposure risk.</td></tr>
       <tr><td>DHCP Scope Inspector</td><td>Reviews DHCP scope and lease information where available.</td></tr>
       <tr><td>Time Sync Health</td><td>Checks Windows time source and synchronization state.</td></tr>
       <tr><td>Reset Domain Time</td><td>Configures Windows Time to use the domain hierarchy, restarts W32Time, resyncs, and verifies the source. Requires elevation.</td></tr>
-      <tr><td>DHCP Server / Rogue Locator</td><td>Checks current DHCP lease evidence and attempts to identify unexpected DHCP responders.</td></tr>
+      <tr><td>DHCP Lease / Rogue Check</td><td>Runs a lightweight DHCP lease and responder check for quick workstation-side evidence.</td></tr>
       <tr><td>DNS Diagnostics</td><td>Runs DNS diagnostics against configured resolvers and target lookups.</td></tr>
     </table>
     <div class="warn">
@@ -531,7 +531,6 @@
       <tr><td>Rename</td><td>Changes the display name shown in the Apps grid and generated tabs.</td></tr>
       <tr><td>Set Tab Placement</td><td>Overrides where the app should appear. Use this to put tools on the tab where they naturally belong.</td></tr>
       <tr><td>Remove From Toolkit</td><td>Removes the selected toolkit app entry and its copied files after confirmation.</td></tr>
-      <tr><td>Open Location</td><td>Opens the app folder.</td></tr>
       <tr><td>Refresh Toolkit Tools</td><td>Reloads the app manifest and refreshes generated tool buttons.</td></tr>
     </table>
     <h3>Installed portable apps currently recognized</h3>
@@ -601,7 +600,7 @@
       <tr><td>Refresh public IP when the toolkit opens</td><td>Controls startup public IP lookup behavior.</td></tr>
       <tr><td>Apply Settings</td><td>Saves settings and refreshes the visible UI.</td></tr>
       <tr><td>Reset Defaults</td><td>Restores default settings on the settings page. Click Apply Settings to save.</td></tr>
-      <tr><td>Sanitize Toolkit</td><td>Removes old reports, logs, temp tool outputs, minidump collections, and cache data while keeping apps and settings.</td></tr>
+      <tr><td>Remove Client Data</td><td>Removes reports, logs, temp tool outputs, minidump collections, profiles, computer state, and cache data while keeping apps and settings.</td></tr>
       <tr><td>Open Logs</td><td>Opens the toolkit logs folder.</td></tr>
       <tr><td>Open Reports</td><td>Opens the exports/reports folder.</td></tr>
       <tr><td>Open Temp Outputs</td><td>Opens the temp tool output sessions folder.</td></tr>
@@ -611,7 +610,7 @@
 
   <section id="logs">
     <h2>Live Log And Troubleshooting Toolkit Problems</h2>
-    <p>The Live Log tab shows high-level GUI activity and errors. It is not meant to capture every line of every tool. Each tool also has a small usage log under <code>CSI-NetworkToolkit\Logs\ToolUsage</code>.</p>
+    <p>The Live Log view is opened from Settings and shows high-level GUI activity and errors. It is not meant to capture every line of every tool. Each tool also has a small usage log under <code>CSI-NetworkToolkit\Logs\ToolUsage</code>.</p>
     <table>
       <tr><th>Button</th><th>Purpose</th></tr>
       <tr><td>Clear Log</td><td>Clears the visible live log box.</td></tr>
@@ -620,7 +619,7 @@
     <h3>When a button does nothing</h3>
     <ol>
       <li>Check the status bar for a short failure message.</li>
-      <li>Open Live Log and look for a recent error.</li>
+      <li>Open Settings, then View Live Log, and look for a recent error.</li>
       <li>Open Settings, then Open Logs, and inspect the matching ToolUsage log.</li>
       <li>Confirm the portable app still exists in <code>CSI-NetworkToolkit\Custom</code> or <code>ExternalTools</code>.</li>
       <li>If the tool requires elevation, restart the toolkit elevated.</li>
@@ -632,10 +631,10 @@
     <p>The GUI is the primary technician interface, but the console toolkit remains available. This is useful for remote shells, automation, or when the GUI cannot load.</p>
     <table>
       <tr><th>Command</th><th>Purpose</th></tr>
-      <tr><td><code>.\NetworkToolkit.ps1</code></td><td>Launch GUI.</td></tr>
-      <tr><td><code>.\NetworkToolkit.ps1 -CLI</code></td><td>Launch console toolkit.</td></tr>
-      <tr><td><code>.\NetworkToolkit.ps1 -SmokeTest</code></td><td>Developer/test mode to verify GUI loads.</td></tr>
-      <tr><td><code>.\NetworkToolkit.ps1 -ButtonSmokeTest</code></td><td>Developer/test mode to build tabs and verify buttons exist.</td></tr>
+      <tr><td><code>.\App\NetworkToolkit.ps1</code></td><td>Launch GUI from the portable root.</td></tr>
+      <tr><td><code>.\App\NetworkToolkit.ps1 -CLI</code></td><td>Launch console toolkit from the portable root.</td></tr>
+      <tr><td><code>.\App\NetworkToolkit.ps1 -SmokeTest</code></td><td>Developer/test mode to verify GUI loads.</td></tr>
+      <tr><td><code>.\App\NetworkToolkit.ps1 -ButtonSmokeTest</code></td><td>Developer/test mode to build tabs and verify buttons exist.</td></tr>
     </table>
   </section>
 

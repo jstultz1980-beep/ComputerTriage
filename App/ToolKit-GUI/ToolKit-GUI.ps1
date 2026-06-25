@@ -16,6 +16,23 @@ $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 try { Add-Type -AssemblyName Microsoft.VisualBasic -ErrorAction SilentlyContinue } catch {}
+if(-not ("NetworkToolkit.HiddenHeaderTabControl" -as [type])){
+    Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -TypeDefinition @"
+namespace NetworkToolkit {
+    public class HiddenHeaderTabControl : System.Windows.Forms.TabControl {
+        private const int TCM_ADJUSTRECT = 0x1328;
+        public bool HeadersHidden { get { return true; } }
+        protected override void WndProc(ref System.Windows.Forms.Message m) {
+            if (m.Msg == TCM_ADJUSTRECT) {
+                m.Result = (System.IntPtr)1;
+                return;
+            }
+            base.WndProc(ref m);
+        }
+    }
+}
+"@
+}
 
 $script:OwnsGuiInstanceMutex = $false
 if(!$global:NetworkToolkitInstanceMutex){
@@ -2675,156 +2692,6 @@ function Start-GUIToolkitFunctionConsole {
     # runner. The former OutputDataReceived callbacks could execute outside
     # the WinForms runspace and close the toolkit without a recoverable error.
     Start-GUISafeScriptRunner -ToolName $toolLabel -Invocation $FunctionName
-    return
-
-    $activityId = [guid]::NewGuid().ToString('N')
-    $session = New-CSITempOutputSession -ToolName $toolLabel
-    $runnerPath = Join-Path $session.Path "run-tool.ps1"
-
-    $commandText = @"
-try {
-    `$ErrorActionPreference = "Continue"
-    . "$ToolkitLauncher" -NoConsole
-    if(!(Get-Command "$($FunctionName.Replace('"','\"'))" -ErrorAction SilentlyContinue)){
-        throw "Toolkit function not found after module load: $($FunctionName.Replace('"','\"'))"
-    }
-    `$metadata = [pscustomobject]@{
-        Tool = "$($toolLabel.Replace('"','\"'))"
-        Function = "$($FunctionName.Replace('"','\"'))"
-        StartedAt = (Get-Date).ToString("s")
-        CompletedAt = ""
-        Status = "Running"
-        ErrorCount = 0
-        ComputerName = `$env:COMPUTERNAME
-        UserName = [Security.Principal.WindowsIdentity]::GetCurrent().Name
-    }
-    `$metadata | ConvertTo-Json -Depth 4 | Set-Content -Path "$($session.Metadata)" -Encoding UTF8
-    Start-Transcript -Path "$($session.Transcript)" -Force | Out-Null
-    Write-Host ""
-    Write-Host "Running: $($toolLabel.Replace('"','\"'))" -ForegroundColor Cyan
-    Write-Host "Output session: $($session.Path)" -ForegroundColor DarkCyan
-    Write-Host ""
-    $FunctionName
-    `$metadata.CompletedAt = (Get-Date).ToString("s")
-    `$metadata.Status = "Completed"
-}
-catch [System.OperationCanceledException] {
-    Write-Host ""
-    Write-Host `$_.Exception.Message -ForegroundColor Yellow
-    `$metadata.CompletedAt = (Get-Date).ToString("s")
-    `$metadata.Status = "Cancelled"
-}
-catch {
-    Write-Host ""
-    Write-Host "Command failed." -ForegroundColor Red
-    Write-Host `$_
-    if(`$metadata){
-        `$metadata.CompletedAt = (Get-Date).ToString("s")
-        `$metadata.Status = "Error"
-        `$metadata.LastError = `$_.Exception.Message
-    }
-}
-finally {
-    try { Stop-Transcript | Out-Null } catch {}
-    try {
-        if(Test-Path "$($session.Transcript)"){
-            `$transcriptText = Get-Content -Raw -Path "$($session.Transcript)" -ErrorAction SilentlyContinue
-            `$errorMatches = @([regex]::Matches([string]`$transcriptText,'(?im)\b(error|exception|failed|cannot find|not recognized)\b'))
-            if(`$metadata){
-                `$metadata.ErrorCount = `$errorMatches.Count
-                if(`$metadata.Status -eq "Completed" -and `$errorMatches.Count -gt 0){
-                    `$metadata.Status = "CompletedWithWarnings"
-                }
-            }
-        }
-        if(`$metadata){
-            `$metadata | ConvertTo-Json -Depth 6 | Set-Content -Path "$($session.Metadata)" -Encoding UTF8
-        }
-    }
-    catch {}
-    try {
-        if(Get-Command Set-CSIComputerStateToolOutput -ErrorAction SilentlyContinue){
-            `$stateArgs = @{
-                ToolName = "$($toolLabel.Replace('"','\"'))"
-                SessionPath = "$($session.Path)"
-                TranscriptPath = "$($session.Transcript)"
-                MetadataPath = "$($session.Metadata)"
-                ComputerName = `$env:COMPUTERNAME
-            }
-            [void](Set-CSIComputerStateToolOutput @stateArgs)
-        }
-    }
-    catch {}
-    Write-Host ""
-    Write-Host "Output saved to:" -ForegroundColor Green
-    Write-Host "$($session.Path)"
-    Write-Host ""
-}
-"@
-
-    try {
-        $commandText | Set-Content -Path $runnerPath -Encoding UTF8
-        Write-GUIDiagnosticLog -Event 'ConsoleRunnerPrepared' -Tool $toolLabel -ActivityId $activityId -Detail ("Function={0}; Runner={1}; Session={2}; RequiresAdmin={3}" -f $FunctionName,$runnerPath,$session.Path,$RequiresAdmin)
-
-        if($RequiresAdmin -and !(Test-GUIAdministrator)){
-            throw "This tool requires elevation. Restart Network Toolkit elevated, then run it again."
-        }
-
-        $page = if($script:MainTabs){$script:MainTabs.SelectedTab}else{$null}
-        if(!$page){ throw "No active tool tab is available for console output." }
-        $overlay = New-Object System.Windows.Forms.Panel
-        $overlay.Dock = "Fill"; $overlay.BackColor = $script:GUITheme.LogBack; $overlay.BringToFront()
-        $toolbar = New-Object System.Windows.Forms.FlowLayoutPanel
-        $toolbar.Dock = "Top"; $toolbar.Height = 42; $toolbar.Padding = New-Object System.Windows.Forms.Padding(10,6,10,4); $toolbar.BackColor = $script:GUITheme.Header
-        $title = New-GUILabel "Running: $toolLabel"; $title.ForeColor = [System.Drawing.Color]::White; $title.Width = 360
-        $output = New-Object System.Windows.Forms.RichTextBox
-        $output.Dock = "Fill"; $output.ReadOnly = $true; $output.BackColor = $script:GUITheme.LogBack; $output.ForeColor = $script:GUITheme.LogFore; $output.Font = New-Object System.Drawing.Font('Consolas',10)
-        $inputPanel = New-Object System.Windows.Forms.Panel
-        $inputPanel.Dock = "Bottom"; $inputPanel.Height = 38; $inputPanel.Padding = New-Object System.Windows.Forms.Padding(10,5,10,5); $inputPanel.BackColor = $script:GUITheme.HeaderPanel
-        $input = New-GUITextBox; $input.Dock = "Fill"
-        $send = New-Object System.Windows.Forms.Button
-        $send.Text = 'Send'; Set-GUIButtonChrome -Button $send
-        $send.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state -and !$state.Process.HasExited -and $state.Input.Text){ $state.Process.StandardInput.WriteLine($state.Input.Text); $state.Input.Clear() } })
-        $send.Dock = "Right"; $send.Width = 82
-        $input.Add_KeyDown({ if($_.KeyCode -eq [System.Windows.Forms.Keys]::Enter){ $state=$sender.Tag; if($state -and !$state.Process.HasExited){$state.Process.StandardInput.WriteLine($sender.Text); $sender.Clear()}; $_.SuppressKeyPress=$true } })
-        $inputPanel.Controls.Add($input); $inputPanel.Controls.Add($send)
-        $overlay.Controls.Add($output); $overlay.Controls.Add($inputPanel); $overlay.Controls.Add($toolbar); $page.Controls.Add($overlay); $overlay.BringToFront()
-
-        $livePath = Join-Path $session.Path 'live-output.txt'
-        $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = 'powershell.exe'; $psi.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$runnerPath`""; $psi.WorkingDirectory = $SharedToolkitRoot
-        $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
-        $process = New-Object System.Diagnostics.Process; $process.StartInfo = $psi; [void]$process.Start()
-        Write-GUIDiagnosticLog -Event 'ConsoleChildStarted' -Tool $toolLabel -ActivityId $activityId -Detail ("ChildProcessId={0}; FileName={1}; Arguments={2}" -f $process.Id,$psi.FileName,$psi.Arguments)
-        $terminalState = [pscustomobject]@{ Process=$process; Overlay=$overlay; Input=$input; Tool=$toolLabel; ActivityId=$activityId; SessionPath=$session.Path }
-        $input.Tag = $terminalState; $send.Tag = $terminalState
-        $appendLine = { param($line) if($null -ne $line){ $action=[System.Action]{ $output.AppendText($line + "`r`n"); Add-Content -LiteralPath $livePath -Value $line -Encoding UTF8; $output.SelectionStart=$output.TextLength; $output.ScrollToCaret() }; if(!$output.IsDisposed){[void]$output.BeginInvoke($action)} } }
-        $process.add_OutputDataReceived({ param($sender,$args) & $appendLine $args.Data })
-        $process.add_ErrorDataReceived({ param($sender,$args) & $appendLine ("ERROR: " + $args.Data) })
-        $process.BeginOutputReadLine(); $process.BeginErrorReadLine()
-        $close = New-Object System.Windows.Forms.Button
-        $close.Text = 'Stop And Close'; Set-GUIButtonChrome -Button $close
-        $close.Add_Click({ param($sender,$args) $state=$sender.Tag; if($state){ Write-GUIDiagnosticLog -Event 'ConsoleChildStopRequested' -Tool $state.Tool -ActivityId $state.ActivityId -Detail ("ChildProcessId={0}; Session={1}" -f $state.Process.Id,$state.SessionPath); if(!$state.Process.HasExited){try{$state.Process.Kill()}catch{ Write-GUIDiagnosticLog -Event 'ConsoleChildStopFailed' -Tool $state.Tool -Level 'ERROR' -ActivityId $state.ActivityId -Detail $_.ScriptStackTrace -Exception $_.Exception }}; if($state.Overlay -and !$state.Overlay.IsDisposed){$state.Overlay.Dispose()} } })
-        $close.Tag = $terminalState
-        [void]$toolbar.Controls.Add($title); [void]$toolbar.Controls.Add($close)
-        Start-GUIBusyIndicator -Message $toolLabel
-        $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 250
-        $timer.Add_Tick({
-            if($process.HasExited){
-                $timer.Stop(); $timer.Dispose(); Stop-GUIBusyIndicator
-                $title.Text = "Completed: $toolLabel (exit $($process.ExitCode))"
-                Write-GUIDiagnosticLog -Event 'ConsoleChildExited' -Tool $toolLabel -ActivityId $activityId -Detail ("ChildProcessId={0}; ExitCode={1}; Session={2}" -f $process.Id,$process.ExitCode,$session.Path)
-            }
-        })
-        $timer.Start()
-
-        Add-GUILog "Launched: $toolLabel"
-        Add-GUILog "Temp output session: $($session.Path)"
-    }
-    catch {
-        Write-GUIDiagnosticLog -Event 'ConsoleLaunchFailed' -Tool $toolLabel -Level 'ERROR' -ActivityId $activityId -Detail $_.ScriptStackTrace -Exception $_.Exception
-        Add-GUILog "Failed to launch ${toolLabel}: $($_.Exception.Message)"
-    }
 }
 
 function Start-GUIExternalToolById {
@@ -11976,13 +11843,12 @@ function Build-Form {
     $script:StaticTabStrip = $tabStrip
     $root.Controls.Add($tabStrip,0,1)
 
-    $tabs = New-Object System.Windows.Forms.TabControl
+    $tabs = New-Object NetworkToolkit.HiddenHeaderTabControl
     $tabs.Dock = "Fill"
     $tabs.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10)
     $tabs.Multiline = $false
     $tabs.SizeMode = "Fixed"
     $tabs.ItemSize = New-Object System.Drawing.Size(1,1)
-    $tabs.Appearance = [System.Windows.Forms.TabAppearance]::FlatButtons
     $script:MainTabs = $tabs
     $root.Controls.Add($tabs,0,2)
 
