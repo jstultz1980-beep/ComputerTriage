@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260626095258,
-    "SourceUpdatedAt":  "2026-06-26T09:52:58.6944122-05:00",
-    "ReleaseNotes":  "Add consolidated Wi-Fi profile backup and restore tool."
+    "Build":  20260626101517,
+    "SourceUpdatedAt":  "2026-06-26T10:15:17.0661757-05:00",
+    "ReleaseNotes":  "Add GUI theme presets, improve tab switching, and move Quick Dx review status."
 }

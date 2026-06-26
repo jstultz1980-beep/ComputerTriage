@@ -195,7 +195,7 @@ $script:GUITheme = @{
 }
 
 function Get-GUIColorThemeNames {
-    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Custom Theme")
+    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Custom Theme")
 }
 
 function ConvertTo-GUIColorHex {
@@ -698,6 +698,31 @@ function Get-GUIColorTheme {
     }
 
     switch($Name){
+        "Terminal Green" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(8,42,29); HeaderPanel=[System.Drawing.Color]::FromArgb(13,58,40); HeaderMuted=[System.Drawing.Color]::FromArgb(184,244,207); Accent=[System.Drawing.Color]::FromArgb(43,218,116); AccentDark=[System.Drawing.Color]::FromArgb(16,120,68); AccentSoft=[System.Drawing.Color]::FromArgb(224,250,234); Page=[System.Drawing.Color]::FromArgb(247,253,249); Shell=[System.Drawing.Color]::FromArgb(235,247,239); Strip=[System.Drawing.Color]::FromArgb(218,239,225); Text=[System.Drawing.Color]::FromArgb(20,39,29); MutedText=[System.Drawing.Color]::FromArgb(71,104,84); Border=[System.Drawing.Color]::FromArgb(137,190,154); Success=[System.Drawing.Color]::FromArgb(44,191,111); Warning=[System.Drawing.Color]::FromArgb(224,166,51); Danger=[System.Drawing.Color]::FromArgb(211,76,68); Disabled=[System.Drawing.Color]::FromArgb(208,225,214); LogBack=[System.Drawing.Color]::FromArgb(5,17,13); LogFore=[System.Drawing.Color]::FromArgb(105,255,164)
+            }
+        }
+        "Arctic Lime" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(18,103,132); HeaderPanel=[System.Drawing.Color]::FromArgb(31,128,158); HeaderMuted=[System.Drawing.Color]::FromArgb(226,250,255); Accent=[System.Drawing.Color]::FromArgb(132,204,22); AccentDark=[System.Drawing.Color]::FromArgb(72,136,15); AccentSoft=[System.Drawing.Color]::FromArgb(241,252,222); Page=[System.Drawing.Color]::FromArgb(253,255,250); Shell=[System.Drawing.Color]::FromArgb(238,250,251); Strip=[System.Drawing.Color]::FromArgb(224,243,244); Text=[System.Drawing.Color]::FromArgb(26,50,58); MutedText=[System.Drawing.Color]::FromArgb(77,105,113); Border=[System.Drawing.Color]::FromArgb(166,210,214); Success=[System.Drawing.Color]::FromArgb(49,151,91); Warning=[System.Drawing.Color]::FromArgb(221,157,38); Danger=[System.Drawing.Color]::FromArgb(205,75,65); Disabled=[System.Drawing.Color]::FromArgb(214,226,226); LogBack=[System.Drawing.Color]::FromArgb(12,31,38); LogFore=[System.Drawing.Color]::FromArgb(220,247,232)
+            }
+        }
+        "Electric Indigo" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(44,45,133); HeaderPanel=[System.Drawing.Color]::FromArgb(58,64,164); HeaderMuted=[System.Drawing.Color]::FromArgb(231,233,255); Accent=[System.Drawing.Color]::FromArgb(38,198,218); AccentDark=[System.Drawing.Color]::FromArgb(35,91,164); AccentSoft=[System.Drawing.Color]::FromArgb(229,249,252); Page=[System.Drawing.Color]::FromArgb(252,253,255); Shell=[System.Drawing.Color]::FromArgb(241,246,255); Strip=[System.Drawing.Color]::FromArgb(229,238,252); Text=[System.Drawing.Color]::FromArgb(31,36,64); MutedText=[System.Drawing.Color]::FromArgb(82,88,121); Border=[System.Drawing.Color]::FromArgb(178,190,226); Success=[System.Drawing.Color]::FromArgb(47,151,104); Warning=[System.Drawing.Color]::FromArgb(224,158,42); Danger=[System.Drawing.Color]::FromArgb(205,72,82); Disabled=[System.Drawing.Color]::FromArgb(218,223,238); LogBack=[System.Drawing.Color]::FromArgb(17,18,43); LogFore=[System.Drawing.Color]::FromArgb(216,244,250)
+            }
+        }
+        "Copper Harbor" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(75,76,92); HeaderPanel=[System.Drawing.Color]::FromArgb(93,94,112); HeaderMuted=[System.Drawing.Color]::FromArgb(245,239,229); Accent=[System.Drawing.Color]::FromArgb(201,112,55); AccentDark=[System.Drawing.Color]::FromArgb(142,70,35); AccentSoft=[System.Drawing.Color]::FromArgb(250,237,226); Page=[System.Drawing.Color]::FromArgb(255,253,250); Shell=[System.Drawing.Color]::FromArgb(247,242,237); Strip=[System.Drawing.Color]::FromArgb(239,232,225); Text=[System.Drawing.Color]::FromArgb(48,45,43); MutedText=[System.Drawing.Color]::FromArgb(99,91,84); Border=[System.Drawing.Color]::FromArgb(210,193,178); Success=[System.Drawing.Color]::FromArgb(45,145,100); Warning=[System.Drawing.Color]::FromArgb(218,145,36); Danger=[System.Drawing.Color]::FromArgb(199,73,70); Disabled=[System.Drawing.Color]::FromArgb(226,219,213); LogBack=[System.Drawing.Color]::FromArgb(31,30,35); LogFore=[System.Drawing.Color]::FromArgb(246,232,218)
+            }
+        }
+        "Night Ops" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(23,33,49); HeaderPanel=[System.Drawing.Color]::FromArgb(35,50,72); HeaderMuted=[System.Drawing.Color]::FromArgb(211,225,242); Accent=[System.Drawing.Color]::FromArgb(94,170,255); AccentDark=[System.Drawing.Color]::FromArgb(42,105,178); AccentSoft=[System.Drawing.Color]::FromArgb(224,239,255); Page=[System.Drawing.Color]::FromArgb(248,251,255); Shell=[System.Drawing.Color]::FromArgb(234,241,249); Strip=[System.Drawing.Color]::FromArgb(222,233,244); Text=[System.Drawing.Color]::FromArgb(28,38,51); MutedText=[System.Drawing.Color]::FromArgb(78,93,111); Border=[System.Drawing.Color]::FromArgb(168,188,211); Success=[System.Drawing.Color]::FromArgb(57,177,119); Warning=[System.Drawing.Color]::FromArgb(230,166,47); Danger=[System.Drawing.Color]::FromArgb(212,77,77); Disabled=[System.Drawing.Color]::FromArgb(210,220,231); LogBack=[System.Drawing.Color]::FromArgb(9,13,20); LogFore=[System.Drawing.Color]::FromArgb(207,229,255)
+            }
+        }
         "Rosewood" {
             return @{
                 Header=[System.Drawing.Color]::FromArgb(130,55,73); HeaderPanel=[System.Drawing.Color]::FromArgb(155,68,90); HeaderMuted=[System.Drawing.Color]::FromArgb(255,238,242); Accent=[System.Drawing.Color]::FromArgb(218,92,120); AccentDark=[System.Drawing.Color]::FromArgb(112,43,61); AccentSoft=[System.Drawing.Color]::FromArgb(255,239,243); Page=[System.Drawing.Color]::FromArgb(255,252,253); Shell=[System.Drawing.Color]::FromArgb(252,243,246); Strip=[System.Drawing.Color]::FromArgb(250,231,237); Text=[System.Drawing.Color]::FromArgb(57,38,44); MutedText=[System.Drawing.Color]::FromArgb(103,79,87); Border=[System.Drawing.Color]::FromArgb(224,184,195); Success=[System.Drawing.Color]::FromArgb(44,149,104); Warning=[System.Drawing.Color]::FromArgb(218,151,41); Danger=[System.Drawing.Color]::FromArgb(195,65,72); Disabled=[System.Drawing.Color]::FromArgb(231,216,220); LogBack=[System.Drawing.Color]::FromArgb(39,25,30); LogFore=[System.Drawing.Color]::FromArgb(250,233,238)
@@ -3763,9 +3788,7 @@ function Open-GUISettingsPage {
 
     $settingsPage = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Settings" } | Select-Object -First 1
     if($settingsPage){
-        $script:MainTabs.SelectedTab = $settingsPage
-        Build-GUITabIfNeeded -Page $settingsPage
-        Update-GUIStaticTabStripSelection
+        Select-GUITabPage -Page $settingsPage
     }
 }
 
@@ -6890,9 +6913,7 @@ function Start-GUIPsExecHelper {
 
     $page = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "PsExec" } | Select-Object -First 1
     if($page){
-        $script:MainTabs.SelectedTab = $page
-        Build-GUITabIfNeeded -Page $page
-        Update-GUIStaticTabStripSelection
+        Select-GUITabPage -Page $page
     }
 }
 
@@ -7387,32 +7408,13 @@ function Build-QuickTriagePage {
     $statusLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $statusLayout.Dock = "Fill"
     $statusLayout.ColumnCount = 1
-    $statusLayout.RowCount = 4
+    $statusLayout.RowCount = 3
     $statusLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $statusLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $statusLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $statusLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $statusLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $statusLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $statusGroup.Controls.Add($statusLayout)
-
-    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $healthPanel.Dock = "Fill"
-    $healthPanel.FlowDirection = "LeftToRight"
-    $statusLayout.Controls.Add($healthPanel,0,0)
-
-    $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
-    $HealthStatusLight.Width = 24
-    $HealthStatusLight.Height = 24
-    $HealthStatusLight.Margin = New-Object System.Windows.Forms.Padding(4,8,8,4)
-    [void]$healthPanel.Controls.Add($HealthStatusLight)
-
-    $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
-    $HealthStatusLabel.Width = 430
-    $HealthStatusLabel.Height = 36
-    $HealthStatusLabel.TextAlign = "MiddleLeft"
-    $HealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    [void]$healthPanel.Controls.Add($HealthStatusLabel)
 
     $targetPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $targetPanel.Dock = "Fill"
@@ -7424,7 +7426,7 @@ function Build-QuickTriagePage {
     $targetPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
     $targetPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $targetPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
-    $statusLayout.Controls.Add($targetPanel,0,1)
+    $statusLayout.Controls.Add($targetPanel,0,0)
 
     $targetLabel = New-GUILabel "Target"
     $targetLabel.Dock = "Fill"
@@ -7465,7 +7467,7 @@ function Build-QuickTriagePage {
     for($i = 0; $i -lt 6; $i++){
         $actionPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 6)))) | Out-Null
     }
-    $statusLayout.Controls.Add($actionPanel,0,2)
+    $statusLayout.Controls.Add($actionPanel,0,1)
 
     foreach($buttonDef in @(
         @{ Text="Ping"; Action={ Invoke-GUIQuickPing } },
@@ -7491,8 +7493,7 @@ function Build-QuickTriagePage {
     $QuickOutputBox.BackColor = $script:GUITheme.LogBack
     $QuickOutputBox.ForeColor = $script:GUITheme.LogFore
     $QuickOutputBox.Text = "Quick target check output will appear here."
-    $statusLayout.Controls.Add($QuickOutputBox,0,3)
-    Update-GUIComputerHealthLight
+    $statusLayout.Controls.Add($QuickOutputBox,0,2)
 
     $repairGroup = New-Object System.Windows.Forms.GroupBox
     $repairGroup.Text = "Repair After Review"
@@ -7504,11 +7505,32 @@ function Build-QuickTriagePage {
     $repairPanel.Dock = "Fill"
     $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10)
     $repairPanel.ColumnCount = 1
-    $repairPanel.RowCount = 3
+    $repairPanel.RowCount = 4
+    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $repairGroup.Controls.Add($repairPanel)
+
+    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $healthPanel.Dock = "Fill"
+    $healthPanel.FlowDirection = "LeftToRight"
+    $healthPanel.WrapContents = $false
+    $repairPanel.Controls.Add($healthPanel,0,0)
+
+    $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
+    $HealthStatusLight.Width = 24
+    $HealthStatusLight.Height = 24
+    $HealthStatusLight.Margin = New-Object System.Windows.Forms.Padding(4,12,8,4)
+    [void]$healthPanel.Controls.Add($HealthStatusLight)
+
+    $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
+    $HealthStatusLabel.Width = 360
+    $HealthStatusLabel.Height = 42
+    $HealthStatusLabel.TextAlign = "MiddleLeft"
+    $HealthStatusLabel.AutoEllipsis = $true
+    $HealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    [void]$healthPanel.Controls.Add($HealthStatusLabel)
 
     $script:DismRepairNoteLabel = New-Object System.Windows.Forms.Label
     $repairNote = $script:DismRepairNoteLabel
@@ -7516,17 +7538,17 @@ function Build-QuickTriagePage {
     $repairNote.Dock = "Fill"
     $repairNote.TextAlign = "MiddleLeft"
     $repairNote.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    [void]$repairPanel.Controls.Add($repairNote,0,0)
+    [void]$repairPanel.Controls.Add($repairNote,0,1)
 
     $script:DismRepairButton = New-GUIButton "Run DISM/SFC Repair Path" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
-    [void]$repairPanel.Controls.Add($DismRepairButton,0,1)
+    [void]$repairPanel.Controls.Add($DismRepairButton,0,2)
 
     $hardwareShortcuts = New-Object System.Windows.Forms.GroupBox
     $hardwareShortcuts.Text = "Hardware Shortcuts"
     $hardwareShortcuts.Dock = "Fill"
     $hardwareShortcuts.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
-    $repairPanel.Controls.Add($hardwareShortcuts,0,2)
+    $repairPanel.Controls.Add($hardwareShortcuts,0,3)
 
     $hardwareShortcutPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $hardwareShortcutPanel.Dock = "Top"
@@ -7567,6 +7589,7 @@ function Build-QuickTriagePage {
         if($shortcutCol -eq 0){ $shortcutRow++ }
     }
 
+    Update-GUIComputerHealthLight
     Refresh-GUIDismSfcState
 }
 
@@ -7747,6 +7770,44 @@ function Build-GUITabIfNeeded {
     }
 }
 
+function Select-GUITabPage {
+    param([System.Windows.Forms.TabPage]$Page)
+
+    if(!$Page -or !$script:MainTabs -or $Page.IsDisposed){
+        return
+    }
+
+    if($script:GuiTabSwitchInProgress){
+        return
+    }
+
+    $script:GuiTabSwitchInProgress = $true
+    $layoutControls = @($script:Form,$script:RootLayout,$script:StaticTabStrip,$script:MainTabs) |
+                      Where-Object { $_ -and !$_.IsDisposed }
+
+    try {
+        foreach($control in $layoutControls){
+            try { $control.SuspendLayout() } catch {}
+        }
+
+        if($script:MainTabs.SelectedTab -ne $Page){
+            $script:MainTabs.SelectedTab = $Page
+        }
+
+        Build-GUITabIfNeeded -Page $Page
+        Update-GUIStaticTabStripSelection
+    }
+    finally {
+        [array]::Reverse($layoutControls)
+        foreach($control in $layoutControls){
+            try { $control.ResumeLayout($true) } catch {}
+        }
+        try { $script:StaticTabStrip.Invalidate() } catch {}
+        try { $script:MainTabs.Invalidate() } catch {}
+        $script:GuiTabSwitchInProgress = $false
+    }
+}
+
 function Get-GUITabDisplayText {
     param([string]$Name)
 
@@ -7846,9 +7907,7 @@ function Add-GUIStaticTabStrip {
         Set-GUITabButtonChrome -Button $button -Selected:$false
         $button.Add_Click({
             param($sender,$eventArgs)
-            $script:MainTabs.SelectedTab = $sender.Tag
-            Build-GUITabIfNeeded -Page $sender.Tag
-            Update-GUIStaticTabStripSelection
+            Select-GUITabPage -Page $sender.Tag
         })
         [void]$Strip.Controls.Add($button)
         $script:TabButtons[$page.Text] = $button
@@ -9423,7 +9482,7 @@ function Start-GUIDriverUpdateFinder {
     [void]$actions.Controls.Add((New-GUIButton "Open Device Manager" { Start-CSIToolProcess -FilePath "devmgmt.msc" | Out-Null }))
     [void]$actions.Controls.Add((New-GUIButton "Open Windows Update" {
         $page = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Windows Update" } | Select-Object -First 1
-        if($page){ $script:MainTabs.SelectedTab = $page; Build-GUITabIfNeeded -Page $page; Update-GUIStaticTabStripSelection }
+        if($page){ Select-GUITabPage -Page $page }
     }))
     $layout.Controls.Add($actions,0,2)
 
@@ -12209,6 +12268,9 @@ function Build-Form {
 
     Add-GUIStaticTabStrip -Strip $tabStrip -Tabs $tabs
     $tabs.Add_SelectedIndexChanged({
+        if($script:GuiTabSwitchInProgress){
+            return
+        }
         Build-GUITabIfNeeded -Page $script:MainTabs.SelectedTab
         Update-GUIStaticTabStripSelection
     })
@@ -12284,9 +12346,7 @@ function Build-Form {
         $startupPage = $quickPage
     }
 
-    $script:MainTabs.SelectedTab = $startupPage
-    Build-GUITabIfNeeded -Page $startupPage
-    Update-GUIStaticTabStripSelection
+    Select-GUITabPage -Page $startupPage
     Enable-GUIDoubleBuffering -Control $Form
 }
 
