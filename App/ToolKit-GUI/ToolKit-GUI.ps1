@@ -1166,7 +1166,7 @@ function Set-GUIElevationCrownIcon {
         return
     }
 
-    $Control.BackColor = $script:GUITheme.HeaderPanel
+    $Control.BackColor = [System.Drawing.Color]::Transparent
     $Control.Cursor = [System.Windows.Forms.Cursors]::Help
 
     if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked" -and $Control.Tag.PaintHooked){
@@ -1184,50 +1184,36 @@ function Set-GUIElevationCrownIcon {
             $elevated = Test-GUIAdministrator
             $graphics = $eventArgs.Graphics
             $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
-            $graphics.Clear($script:GUITheme.HeaderPanel)
 
             $gold = [System.Drawing.Color]::FromArgb(244,194,76)
-            $goldDark = [System.Drawing.Color]::FromArgb(173,118,33)
             $grey = [System.Drawing.Color]::FromArgb(150,158,166)
-            $greyDark = [System.Drawing.Color]::FromArgb(92,100,108)
-            $fillColor = if($elevated){$gold}else{$grey}
-            $strokeColor = if($elevated){$goldDark}else{$greyDark}
+            $strokeColor = if($elevated){$gold}else{$grey}
 
             $points = @(
-                (New-Object System.Drawing.PointF(6,25)),
-                (New-Object System.Drawing.PointF(7,11)),
-                (New-Object System.Drawing.PointF(14,18)),
-                (New-Object System.Drawing.PointF(22,8)),
-                (New-Object System.Drawing.PointF(30,18)),
-                (New-Object System.Drawing.PointF(37,11)),
-                (New-Object System.Drawing.PointF(38,25))
+                (New-Object System.Drawing.PointF(5,22)),
+                (New-Object System.Drawing.PointF(8,10)),
+                (New-Object System.Drawing.PointF(15,17)),
+                (New-Object System.Drawing.PointF(22,7)),
+                (New-Object System.Drawing.PointF(29,17)),
+                (New-Object System.Drawing.PointF(36,10)),
+                (New-Object System.Drawing.PointF(39,22))
             )
 
-            $fill = New-Object System.Drawing.SolidBrush($fillColor)
-            $shine = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(110,255,255,255))
-            $stroke = New-Object System.Drawing.Pen($strokeColor,1.6)
+            $stroke = New-Object System.Drawing.Pen($strokeColor,2.2)
             try {
-                $graphics.FillPolygon($fill,$points)
-                $graphics.DrawPolygon($stroke,$points)
-                $baseRect = New-Object System.Drawing.Rectangle(7,24,31,7)
-                $graphics.FillRectangle($fill,$baseRect)
-                $graphics.DrawRectangle($stroke,$baseRect)
-                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(12,15,5,5)))
-                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(21,11,5,5)))
-                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(30,15,5,5)))
+                $graphics.DrawLines($stroke,$points)
+                $graphics.DrawLine($stroke,7,25,38,25)
 
                 if(!$elevated){
                     $slash = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(185,90,90,90),3.2)
                     try {
-                        $graphics.DrawEllipse($slash,(New-Object System.Drawing.Rectangle(3,4,39,30)))
-                        $graphics.DrawLine($slash,8,31,38,7)
+                        $graphics.DrawEllipse($slash,(New-Object System.Drawing.Rectangle(3,3,39,28)))
+                        $graphics.DrawLine($slash,8,29,38,6)
                     }
                     finally { $slash.Dispose() }
                 }
             }
             finally {
-                $fill.Dispose()
-                $shine.Dispose()
                 $stroke.Dispose()
             }
         }
@@ -1267,13 +1253,21 @@ function Apply-GUIThemeToControl {
         $Control.ForeColor = $script:GUITheme.Text
     }
     elseif($Control -is [System.Windows.Forms.TextBox] -or $Control -is [System.Windows.Forms.ComboBox] -or $Control -is [System.Windows.Forms.ListBox]){
-        $Control.BackColor = [System.Drawing.Color]::White
+        $isDarkTheme = (($script:GUITheme.Page.R + $script:GUITheme.Page.G + $script:GUITheme.Page.B) -lt 390)
+        $Control.BackColor = if($isDarkTheme){$script:GUITheme.Shell}else{[System.Drawing.Color]::White}
         $Control.ForeColor = $script:GUITheme.Text
     }
     elseif($Control -is [System.Windows.Forms.DataGridView]){
-        $Control.BackgroundColor = [System.Drawing.Color]::White
+        $isDarkTheme = (($script:GUITheme.Page.R + $script:GUITheme.Page.G + $script:GUITheme.Page.B) -lt 390)
+        $inputBack = if($isDarkTheme){$script:GUITheme.Shell}else{[System.Drawing.Color]::White}
+        $Control.BackgroundColor = $inputBack
         $Control.GridColor = $script:GUITheme.Border
         $Control.ForeColor = $script:GUITheme.Text
+        $Control.DefaultCellStyle.BackColor = $inputBack
+        $Control.DefaultCellStyle.ForeColor = $script:GUITheme.Text
+        $Control.ColumnHeadersDefaultCellStyle.BackColor = $script:GUITheme.Strip
+        $Control.ColumnHeadersDefaultCellStyle.ForeColor = $script:GUITheme.Text
+        $Control.EnableHeadersVisualStyles = $false
     }
     elseif($Control -is [System.Windows.Forms.Panel] -or $Control -is [System.Windows.Forms.TableLayoutPanel] -or $Control -is [System.Windows.Forms.FlowLayoutPanel]){
         $Control.BackColor = $script:GUITheme.Page
@@ -1300,11 +1294,12 @@ function Apply-GUIThemeRuntime {
     }
 
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed){
-        $script:HeaderSummaryPanel.BackColor = $script:GUITheme.HeaderPanel
+        $script:HeaderSummaryPanel.BackColor = [System.Drawing.Color]::Transparent
     }
 
     if($script:HeaderToolsPanel -and !$script:HeaderToolsPanel.IsDisposed){
-        $script:HeaderToolsPanel.BackColor = $script:GUITheme.HeaderPanel
+        $script:HeaderToolsPanel.BackColor = [System.Drawing.Color]::Transparent
+        $script:HeaderToolsPanel.Region = $null
     }
 
     if($script:HeaderTitleLabel -and !$script:HeaderTitleLabel.IsDisposed){
@@ -7525,9 +7520,19 @@ function Build-QuickTriagePage {
     $runGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($runGroup,0,0)
 
-    $runPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $runPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $runPanel.Dock = "Fill"
     $runPanel.Padding = New-Object System.Windows.Forms.Padding(10)
+    $runPanel.ColumnCount = 6
+    $runPanel.RowCount = 2
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,265))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,4))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet test target"
@@ -7535,22 +7540,22 @@ function Build-QuickTriagePage {
     $targetLabel.Width = 130
     $targetLabel.Height = 30
     $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,6,3)
-    [void]$runPanel.Controls.Add($targetLabel)
+    [void]$runPanel.Controls.Add($targetLabel,0,0)
 
     $script:QuickTargetBox = New-GUITextBox "www.microsoft.com"
     $QuickTargetBox.Dock = "None"
-    $QuickTargetBox.Width = 260
+    $QuickTargetBox.Width = 220
     $QuickTargetBox.Height = 26
     $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,8,10,3)
-    [void]$runPanel.Controls.Add($QuickTargetBox)
+    [void]$runPanel.Controls.Add($QuickTargetBox,1,0)
 
     $script:QuickRunButton = New-GUIButton "Quick Diagnosis" { Start-GUIQuickDiagnosis }
-    $QuickRunButton.Width = 145
-    [void]$runPanel.Controls.Add($QuickRunButton)
+    $QuickRunButton.Dock = "Fill"
+    [void]$runPanel.Controls.Add($QuickRunButton,2,0)
 
     $reportButton = New-GUIButton "Latest Report" { Open-GUILatestQuickDiagnosisReport }
-    $reportButton.Width = 128
-    [void]$runPanel.Controls.Add($reportButton)
+    $reportButton.Dock = "Fill"
+    [void]$runPanel.Controls.Add($reportButton,3,0)
 
     $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
     $healthPanel.Dock = "None"
@@ -7559,7 +7564,7 @@ function Build-QuickTriagePage {
     $healthPanel.FlowDirection = "LeftToRight"
     $healthPanel.WrapContents = $false
     $healthPanel.Margin = New-Object System.Windows.Forms.Padding(8,4,4,3)
-    [void]$runPanel.Controls.Add($healthPanel)
+    [void]$runPanel.Controls.Add($healthPanel,4,0)
 
     $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
     $HealthStatusLight.Width = 22
@@ -7576,13 +7581,14 @@ function Build-QuickTriagePage {
     [void]$healthPanel.Controls.Add($HealthStatusLabel)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
-    $QuickLastDiagnosisLabel.Width = 310
-    $QuickLastDiagnosisLabel.Height = 30
+    $QuickLastDiagnosisLabel.Dock = "Fill"
+    $QuickLastDiagnosisLabel.Height = 28
     $QuickLastDiagnosisLabel.TextAlign = "MiddleLeft"
     $QuickLastDiagnosisLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
-    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(12,7,3,3)
-    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel)
+    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,0,3,3)
+    $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,5)
+    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,1)
     Refresh-GUILastQuickDiagnosisLabel
 
     $lowerLayout = New-Object System.Windows.Forms.TableLayoutPanel
@@ -7698,11 +7704,11 @@ function Build-QuickTriagePage {
 
     $repairPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $repairPanel.Dock = "Fill"
-    $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10)
+    $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10,4,10,8)
     $repairPanel.ColumnCount = 1
     $repairPanel.RowCount = 3
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $repairGroup.Controls.Add($repairPanel)
 
@@ -7778,7 +7784,7 @@ function Add-GUIHeaderComputerSummary {
     $summary.Anchor = "Top,Left,Right"
     $summary.ColumnCount = 4
     $summary.RowCount = 2
-    $summary.BackColor = $script:GUITheme.HeaderPanel
+    $summary.BackColor = [System.Drawing.Color]::Transparent
     $script:HeaderSummaryPanel = $summary
     $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -8469,8 +8475,8 @@ function Get-GUICustomToolPlacement {
         "puttyputty" = @{ Tab = "Remote"; Section = "Remote Access"; Description = "Open PuTTY for SSH, Telnet, serial, and raw TCP sessions." }
         "pwgenpwgenportable" = @{ Tab = "Security"; Section = "Password Tools"; Description = "Generate strong random passwords from a portable utility." }
         "pwgenportablepwgenportable" = @{ Tab = "Security"; Section = "Password Tools"; Description = "Generate strong random passwords from a portable utility." }
-        "quickmemorytestokquickmemorytestokportable" = @{ Tab = "Hardware"; Section = "Hardware Testing"; Description = "Run a quick memory stress and validation test." }
-        "quickmemorytestokportablequickmemorytestokportable" = @{ Tab = "Hardware"; Section = "Hardware Testing"; Description = "Run a quick memory stress and validation test." }
+        "quickmemorytestokquickmemorytestokportable" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Run a quick memory stress and validation test." }
+        "quickmemorytestokportablequickmemorytestokportable" = @{ Tab = "Hardware"; Section = "Hardware Inspection"; Description = "Run a quick memory stress and validation test." }
         "revouninstallerrevouninstallerportable" = @{ Tab = "Clean Up"; Section = "Uninstall And Leftovers"; Description = "Remove installed programs and scan for leftovers." }
         "revouninstallerportablerevouninstallerportable" = @{ Tab = "Clean Up"; Section = "Uninstall And Leftovers"; Description = "Remove installed programs and scan for leftovers." }
         "rustdeskrustdeskqs" = @{ Tab = "Remote"; Section = "Remote Access"; Description = "Launch RustDesk quick support for remote control sessions." }
@@ -8517,6 +8523,20 @@ function Get-GUICustomToolPlacement {
         $override = [string]$Tool.TabOverride
         if($override -eq "Custom" -or $override -eq "Apps"){ $override = "Software" }
         $placement.Tab = $override
+    }
+
+    if($placement.Tab -eq "Wi-Fi"){
+        $placement.Section = "Wi-Fi"
+    }
+    elseif($placement.Tab -eq "Remote" -and $placement.Section -in @("Remote Desktop","Remote And Transfer")){
+        $placement.Section = "Remote Access"
+    }
+    elseif($placement.Tab -eq "Hardware" -and $placement.Section -in @("Inspection Utilities","Hardware Testing")){
+        $placement.Section = "Hardware Inspection"
+    }
+    elseif($placement.Tab -eq "Software" -and $key -match 'gpuz'){
+        $placement.Tab = "Hardware"
+        $placement.Section = "Hardware Inspection"
     }
 
     return $placement
@@ -8647,10 +8667,11 @@ function Get-GUIMappedSysinternalsItems {
         $risky = if($tool.Risky){"`$true"}else{"`$false"}
         $description = Get-GUISysinternalsDescription -BaseName $tool.Name -FileName $tool.FileName -Category $tool.Category -Console $tool.Console -Risky $tool.Risky
 
+        $sectionName = if($Tab -eq "Directory"){"Active Directory"}else{"Sysinternals"}
         $items += New-GUIToolItem `
             -Text $tool.DisplayName `
             -Description $description `
-            -Section "Sysinternals" `
+            -Section $sectionName `
             -Action ([scriptblock]::Create("Start-GUISysinternalsTool -Path '$path' -DisplayName '$name' -Console $console -Risky $risky"))
     }
 
@@ -9684,12 +9705,12 @@ function Build-HardwareToolsPage {
         "bluescreenview" = "Crash And Dumps"
         "crystaldiskinfo" = "Storage And Disk"
         "ssdz" = "Storage And Disk"
-        "hwinfo" = "Inspection Utilities"
-        "hwmonitor" = "Inspection Utilities"
-        "cpuz" = "Inspection Utilities"
-        "gpuz" = "Inspection Utilities"
-        "pciz" = "Inspection Utilities"
-        "quickmemorytestok" = "Inspection Utilities"
+        "hwinfo" = "Hardware Inspection"
+        "hwmonitor" = "Hardware Inspection"
+        "cpuz" = "Hardware Inspection"
+        "gpuz" = "Hardware Inspection"
+        "pciz" = "Hardware Inspection"
+        "quickmemorytestok" = "Hardware Inspection"
     }
 
     Build-GUIOptimizedToolPage `
@@ -9697,7 +9718,7 @@ function Build-HardwareToolsPage {
         -Tab "Hardware" `
         -Title "Hardware Tools" `
         -SectionMap $sectionMap `
-        -SectionOrder @("Health And Diagnostics","Driver Updates","Storage And Disk","Crash And Dumps","Inspection Utilities","Sysinternals")
+        -SectionOrder @("Health And Diagnostics","Driver Updates","Storage And Disk","Crash And Dumps","Hardware Inspection","Sysinternals")
 }
 
 function Build-DiskToolsPage {
@@ -10430,15 +10451,13 @@ function Build-PsExecPage {
     $builder = New-Object System.Windows.Forms.TableLayoutPanel
     $builder.Dock = "Fill"
     $builder.ColumnCount = 4
-    $builder.RowCount = 11
+    $builder.RowCount = 10
     $builder.Padding = New-Object System.Windows.Forms.Padding(12)
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
     $builder.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    # Keep the command preview compact and reserve the remaining vertical space
-    # for live/captured output where technicians need to read diagnostics.
-    foreach($height in @(28,28,28,28,28,28,34,0,38)){
+    foreach($height in @(28,28,28,28,28,28,34,0)){
         $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,$height))) | Out-Null
     }
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
@@ -10561,9 +10580,7 @@ function Build-PsExecPage {
     foreach($button in @(
         (New-GUIButton "Build Command" { Update-GUIPsExecCommandPreview | Out-Null }),
         (New-GUIButton "Copy Command" { Copy-GUIPsExecCommand }),
-        (New-GUIButton "Run Captured" { Start-GUIPsExecCaptured }),
-        (New-GUIButton "Open Console" { Start-GUIPsExecConsole }),
-        (New-GUIButton "Stop" { Stop-GUIPsExecCommand })
+        (New-GUIButton "Run Console" { Start-GUIPsExecConsole })
     )){
         [void]$actions.Controls.Add($button)
     }
@@ -10577,17 +10594,7 @@ function Build-PsExecPage {
     $builder.SetColumnSpan($PsExecCommandPreviewBox,4)
     $builder.Controls.Add($PsExecCommandPreviewBox,0,8)
 
-    $script:PsExecOutputBox = New-Object System.Windows.Forms.TextBox
-    $PsExecOutputBox.Dock = "Fill"
-    $PsExecOutputBox.Multiline = $true
-    $PsExecOutputBox.ReadOnly = $true
-    $PsExecOutputBox.ScrollBars = "Both"
-    $PsExecOutputBox.WordWrap = $false
-    $PsExecOutputBox.Font = New-Object System.Drawing.Font("Consolas",9)
-    $PsExecOutputBox.BackColor = $script:GUITheme.LogBack
-    $PsExecOutputBox.ForeColor = $script:GUITheme.LogFore
-    $builder.SetColumnSpan($PsExecOutputBox,4)
-    $builder.Controls.Add($PsExecOutputBox,0,9)
+    $script:PsExecOutputBox = $null
 
     if($script:ToolTip){
         $script:ToolTip.SetToolTip($PsExecTargetBox,"Enter one or more remote computers. Blank runs against the local computer.")
@@ -10601,7 +10608,7 @@ function Build-PsExecPage {
     }
 
     Update-GUIPsExecCommandPreview | Out-Null
-    Set-GUIPsExecOutput -Title "PsExec Helper" -Text "Build a command, then use Run Captured for output here or Open Console for interactive commands."
+    Set-GUIPsExecOutput -Title "PsExec Helper" -Text "Build a command, then use Run Console to launch PsExec in an interactive console window."
 }
 
 function Build-FileToolsPage {
@@ -12255,15 +12262,14 @@ function Build-Form {
     $headerTools = New-Object System.Windows.Forms.Panel
     $headerTools.Anchor = "Top,Right"
     $headerTools.Location = New-Object System.Drawing.Point(1070,14)
-    $headerTools.Size = New-Object System.Drawing.Size(322,42)
-    $headerTools.BackColor = $script:GUITheme.HeaderPanel
+    $headerTools.Size = New-Object System.Drawing.Size(238,42)
+    $headerTools.BackColor = [System.Drawing.Color]::Transparent
     $script:HeaderToolsPanel = $headerTools
-    Set-GUIRoundedCorners -Control $headerTools -Radius 12
     $header.Controls.Add($headerTools)
 
     $settingsGear = New-Object System.Windows.Forms.Button
     $settingsGear.Text = [string][char]0x2699
-    $settingsGear.Location = New-Object System.Drawing.Point(185,7)
+    $settingsGear.Location = New-Object System.Drawing.Point(96,7)
     $settingsGear.Size = New-Object System.Drawing.Size(30,28)
     $settingsGear.Font = New-Object System.Drawing.Font("Segoe UI Symbol",10,[System.Drawing.FontStyle]::Bold)
     Set-GUIButtonChrome -Button $settingsGear
@@ -12292,7 +12298,7 @@ function Build-Form {
     $header.Controls.Add($subtitle)
 
     $admin = New-Object System.Windows.Forms.Panel
-    $admin.Location = New-Object System.Drawing.Point(142,4)
+    $admin.Location = New-Object System.Drawing.Point(52,5)
     $admin.Size = New-Object System.Drawing.Size(46,34)
     $admin.Tag = [pscustomobject]@{
         Visual = "ElevationCrown"
@@ -12307,8 +12313,8 @@ function Build-Form {
 
     $helpButton = New-Object System.Windows.Forms.Button
     $helpButton.Text = "Help"
-    $helpButton.Location = New-Object System.Drawing.Point(226,7)
-    $helpButton.Size = New-Object System.Drawing.Size(84,28)
+    $helpButton.Location = New-Object System.Drawing.Point(140,7)
+    $helpButton.Size = New-Object System.Drawing.Size(82,28)
     Set-GUIButtonChrome -Button $helpButton
     $helpButton.BackColor = $script:GUITheme.AccentDark
     $helpButton.Add_Click({ Open-GUIHelpFile })
