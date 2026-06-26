@@ -12262,22 +12262,23 @@ function Build-Form {
     $headerTools = New-Object System.Windows.Forms.Panel
     $headerTools.Anchor = "Top,Right"
     $headerTools.Location = New-Object System.Drawing.Point(1070,14)
-    $headerTools.Size = New-Object System.Drawing.Size(238,42)
+    $headerTools.Size = New-Object System.Drawing.Size(158,42)
     $headerTools.BackColor = [System.Drawing.Color]::Transparent
     $script:HeaderToolsPanel = $headerTools
     $header.Controls.Add($headerTools)
 
-    $settingsGear = New-Object System.Windows.Forms.Button
-    $settingsGear.Text = [string][char]0x2699
-    $settingsGear.Location = New-Object System.Drawing.Point(96,7)
-    $settingsGear.Size = New-Object System.Drawing.Size(30,28)
-    $settingsGear.Font = New-Object System.Drawing.Font("Segoe UI Symbol",10,[System.Drawing.FontStyle]::Bold)
-    Set-GUIButtonChrome -Button $settingsGear
-    $settingsGear.BackColor = $script:GUITheme.AccentDark
-    $settingsGear.Add_Click({ Open-GUISettingsPage })
-    $script:SettingsGearButton = $settingsGear
-    $headerTools.Controls.Add($settingsGear)
-    if($script:ToolTip){ $script:ToolTip.SetToolTip($settingsGear,"Open toolkit settings.") }
+    $settingsMenu = New-Object System.Windows.Forms.Button
+    $settingsMenu.Text = [string][char]0x22EE
+    $settingsMenu.Location = New-Object System.Drawing.Point(68,6)
+    $settingsMenu.Size = New-Object System.Drawing.Size(36,30)
+    $settingsMenu.Font = New-Object System.Drawing.Font("Segoe UI Symbol",15,[System.Drawing.FontStyle]::Bold)
+    $settingsMenu.TextAlign = "MiddleCenter"
+    Set-GUIButtonChrome -Button $settingsMenu
+    $settingsMenu.BackColor = $script:GUITheme.AccentDark
+    $settingsMenu.Add_Click({ Open-GUISettingsPage })
+    $script:SettingsGearButton = $settingsMenu
+    $headerTools.Controls.Add($settingsMenu)
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($settingsMenu,"Open toolkit settings.") }
 
     $title = New-Object System.Windows.Forms.Label
     $title.Text = "Network Toolkit"
@@ -12298,7 +12299,7 @@ function Build-Form {
     $header.Controls.Add($subtitle)
 
     $admin = New-Object System.Windows.Forms.Panel
-    $admin.Location = New-Object System.Drawing.Point(52,5)
+    $admin.Location = New-Object System.Drawing.Point(8,5)
     $admin.Size = New-Object System.Drawing.Size(46,34)
     $admin.Tag = [pscustomobject]@{
         Visual = "ElevationCrown"
@@ -12312,9 +12313,11 @@ function Build-Form {
     }
 
     $helpButton = New-Object System.Windows.Forms.Button
-    $helpButton.Text = "Help"
-    $helpButton.Location = New-Object System.Drawing.Point(140,7)
-    $helpButton.Size = New-Object System.Drawing.Size(82,28)
+    $helpButton.Text = "?"
+    $helpButton.Location = New-Object System.Drawing.Point(116,6)
+    $helpButton.Size = New-Object System.Drawing.Size(36,30)
+    $helpButton.Font = New-Object System.Drawing.Font("Segoe UI Semibold",12,[System.Drawing.FontStyle]::Bold)
+    $helpButton.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $helpButton
     $helpButton.BackColor = $script:GUITheme.AccentDark
     $helpButton.Add_Click({ Open-GUIHelpFile })

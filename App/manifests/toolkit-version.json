@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260626133922,
-    "SourceUpdatedAt":  "2026-06-26T13:39:22.8551773-05:00",
-    "ReleaseNotes":  "Refined header visuals, dark theme input contrast, tool category consolidation, Quick Dx scan timestamp layout, and PsExec console-only launch behavior."
+    "Build":  20260626142608,
+    "SourceUpdatedAt":  "2026-06-26T14:26:08.3068575-05:00",
+    "ReleaseNotes":  "Replaced crowded header settings/help controls with compact icon buttons."
 }
