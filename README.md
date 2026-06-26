@@ -1,4 +1,4 @@
-﻿# Network Toolkit
+# Network Toolkit
 
 Portable Windows technician toolkit for live workstation, server, and network troubleshooting.
 
@@ -16,9 +16,9 @@ The GUI is the primary technician experience. The console toolkit is still prese
 | GUI entry point | `App\NetworkToolkit.ps1` |
 | Console entry point | `App\NetworkToolkit.ps1 -CLI` |
 | Version metadata | `App\manifests\toolkit-version.json` |
-| Main help file | `App\CSI-NetworkToolkit\Docs\NetworkToolkitHelp.html` |
-| Production readiness notes | `App\CSI-NetworkToolkit\Docs\ProductionReadiness.md` |
-| Button/category matrix | `App\CSI-NetworkToolkit\Docs\ButtonPlacementMatrix.md` |
+| Main help file | `App\NetworkToolkit\Docs\NetworkToolkitHelp.html` |
+| Production readiness notes | `App\NetworkToolkit\Docs\ProductionReadiness.md` |
+| Button/category matrix | `App\NetworkToolkit\Docs\ButtonPlacementMatrix.md` |
 
 ## Design Goals
 
@@ -88,7 +88,7 @@ NetworkToolkit\
     Update-NetworkToolkit.ps1
     Update-ToolkitVersion.ps1
     ToolKit-GUI\
-    CSI-NetworkToolkit\
+    NetworkToolkit\
     Custom\
     ExternalTools\
     manifests\
@@ -101,16 +101,16 @@ NetworkToolkit\
 | `NetworkToolkit.vbs` | Root launcher used by technicians. |
 | `App\NetworkToolkit.ps1` | Shared launcher for GUI and CLI. |
 | `App\ToolKit-GUI` | Windows Forms GUI code, icon, and logo assets. |
-| `App\CSI-NetworkToolkit` | Shared toolkit backend, plugins, docs, reports, logs, data, and utilities. |
-| `App\CSI-NetworkToolkit\Config` | Toolkit path/configuration and GUI tool catalog. |
-| `App\CSI-NetworkToolkit\Core` | Core network scan/ping/port scan functions. |
-| `App\CSI-NetworkToolkit\Discovery` | Network topology and neighbor discovery functions. |
-| `App\CSI-NetworkToolkit\Plugins` | Console and GUI-backed feature modules. |
-| `App\CSI-NetworkToolkit\Utilities` | Shared helpers for logging, retention, launch, state, reporting, and AI bundles. |
-| `App\CSI-NetworkToolkit\Docs` | Help, readiness notes, and placement matrix. |
-| `App\CSI-NetworkToolkit\Exports` | Technician-facing reports. Runtime/client data. |
-| `App\CSI-NetworkToolkit\Logs` | Toolkit and tool usage logs. Runtime/client data. |
-| `App\CSI-NetworkToolkit\Data` | Computer profiles, computer state, minidumps, and temp output sessions. Runtime/client data. |
+| `App\NetworkToolkit` | Shared toolkit backend, plugins, docs, reports, logs, data, and utilities. |
+| `App\NetworkToolkit\Config` | Toolkit path/configuration and GUI tool catalog. |
+| `App\NetworkToolkit\Core` | Core network scan/ping/port scan functions. |
+| `App\NetworkToolkit\Discovery` | Network topology and neighbor discovery functions. |
+| `App\NetworkToolkit\Plugins` | Console and GUI-backed feature modules. |
+| `App\NetworkToolkit\Utilities` | Shared helpers for logging, retention, launch, state, reporting, and AI bundles. |
+| `App\NetworkToolkit\Docs` | Help, readiness notes, and placement matrix. |
+| `App\NetworkToolkit\Exports` | Technician-facing reports. Runtime/client data. |
+| `App\NetworkToolkit\Logs` | Toolkit and tool usage logs. Runtime/client data. |
+| `App\NetworkToolkit\Data` | Computer profiles, computer state, minidumps, and temp output sessions. Runtime/client data. |
 | `App\Custom` | Toolkit-installed portable apps and migrated standalone tools. |
 | `App\ExternalTools` | Bundled third-party tools managed outside the custom manifest. |
 | `App\manifests\toolkit-version.json` | Source version/build metadata used by the updater. |
@@ -510,12 +510,12 @@ Runtime output is useful during troubleshooting but must be treated as client da
 
 | Location | Contains |
 | --- | --- |
-| `App\CSI-NetworkToolkit\Exports` | HTML/TXT/CSV reports intended for technicians. |
-| `App\CSI-NetworkToolkit\Data\ComputerProfiles` | Saved computer profile JSON/HTML. |
-| `App\CSI-NetworkToolkit\Data\ComputerState` | Latest known state per computer. |
-| `App\CSI-NetworkToolkit\Data\MiniDumps` | Collected crash dump files. |
-| `App\CSI-NetworkToolkit\Data\TempToolOutputs` | Per-tool output sessions. |
-| `App\CSI-NetworkToolkit\Logs` | Toolkit logs and tool usage logs. |
+| `App\NetworkToolkit\Exports` | HTML/TXT/CSV reports intended for technicians. |
+| `App\NetworkToolkit\Data\ComputerProfiles` | Saved computer profile JSON/HTML. |
+| `App\NetworkToolkit\Data\ComputerState` | Latest known state per computer. |
+| `App\NetworkToolkit\Data\MiniDumps` | Collected crash dump files. |
+| `App\NetworkToolkit\Data\TempToolOutputs` | Per-tool output sessions. |
+| `App\NetworkToolkit\Logs` | Toolkit logs and tool usage logs. |
 
 Use **Settings > Remove Client Data** after an engagement or when preparing a clean field copy. This cleanup is intentionally double-confirmed because it removes reports, profiles, logs, temp output sessions, minidumps, and computer state.
 
@@ -594,7 +594,7 @@ The production package should not include Git metadata, prior release output, ol
 1. Run `.\App\NetworkToolkit.ps1` directly from PowerShell.
 2. Check whether PowerShell execution policy or antivirus blocked a script.
 3. Confirm `App\ToolKit-GUI\ToolKit-GUI.ps1` exists.
-4. Confirm `App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1` exists.
+4. Confirm `App\NetworkToolkit\NetworkToolkit-Core.ps1` exists.
 5. Run `.\App\NetworkToolkit.ps1 -SmokeTest`.
 
 ### A Button Does Nothing

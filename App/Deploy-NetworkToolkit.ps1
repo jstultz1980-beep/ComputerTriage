@@ -45,9 +45,9 @@ try {
     $excludedDirectories = @(
         (Join-Path $appSource '.git'),
         (Join-Path $appSource 'Release'),
-        (Join-Path $appSource 'CSI-NetworkToolkit\Data'),
-        (Join-Path $appSource 'CSI-NetworkToolkit\Exports'),
-        (Join-Path $appSource 'CSI-NetworkToolkit\Logs')
+        (Join-Path $appSource 'NetworkToolkit\Data'),
+        (Join-Path $appSource 'NetworkToolkit\Exports'),
+        (Join-Path $appSource 'NetworkToolkit\Logs')
     )
     $arguments = @($appSource,$appDestination,'/E','/COPY:DAT','/DCOPY:DAT','/R:1','/W:1','/NFL','/NDL','/NJH','/NJS','/NP','/XD') + $excludedDirectories + @('/XF',(Join-Path $appSource 'manifests\gui-settings.json'))
     & robocopy @arguments | Out-String | Set-Content -LiteralPath $result.LogPath -Encoding UTF8
@@ -69,7 +69,7 @@ try {
     $launcher = Join-Path $source 'NetworkToolkit.vbs'
     if(!(Test-Path -LiteralPath $launcher)){ throw "Launcher not found: $launcher" }
     Copy-Item -LiteralPath $launcher -Destination (Join-Path $destination 'NetworkToolkit.vbs') -Force
-    foreach($required in @('NetworkToolkit.ps1','ToolKit-GUI\ToolKit-GUI.ps1','CSI-NetworkToolkit\CSI-NetworkToolkit.ps1','manifests\toolkit-version.json')){
+    foreach($required in @('NetworkToolkit.ps1','ToolKit-GUI\ToolKit-GUI.ps1','NetworkToolkit\NetworkToolkit-Core.ps1','manifests\toolkit-version.json')){
         if(!(Test-Path -LiteralPath (Join-Path $appDestination $required))){ throw "Deployment is missing required file: App\$required" }
     }
     $result.FilesCopied = @(Get-ChildItem -LiteralPath $destination -File -Recurse -Force).Count

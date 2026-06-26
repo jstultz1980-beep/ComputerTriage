@@ -1,7 +1,7 @@
-﻿{
+{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260626142608,
-    "SourceUpdatedAt":  "2026-06-26T14:26:08.3068575-05:00",
-    "ReleaseNotes":  "Replaced crowded header settings/help controls with compact icon buttons."
+    "Build":  20260626152209,
+    "SourceUpdatedAt":  "2026-06-26T15:22:09.2607372-05:00",
+    "ReleaseNotes":  "Removed CSI naming from toolkit folders, launcher, script symbols, documentation, and output path references; renamed backend to NetworkToolkit."
 }

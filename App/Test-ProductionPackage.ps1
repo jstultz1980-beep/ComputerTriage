@@ -26,8 +26,8 @@ foreach($requiredPath in @(
     "NetworkToolkit.vbs",
     "App\NetworkToolkit.ps1",
     "App\ToolKit-GUI\ToolKit-GUI.ps1",
-    "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1",
-    "App\CSI-NetworkToolkit\ExternalTools\Sysinternals",
+    "App\NetworkToolkit\NetworkToolkit-Core.ps1",
+    "App\NetworkToolkit\ExternalTools\Sysinternals",
     "App\manifests\ProductionManifest.json",
     "App\DEPLOYMENT-README.txt"
 )){
@@ -57,9 +57,9 @@ else{
 
 foreach($relativePath in @(
     ".git",
-    "App\CSI-NetworkToolkit\Exports",
-    "App\CSI-NetworkToolkit\Data\ComputerState",
-    "App\CSI-NetworkToolkit\Data\MiniDumps",
+    "App\NetworkToolkit\Exports",
+    "App\NetworkToolkit\Data\ComputerState",
+    "App\NetworkToolkit\Data\MiniDumps",
     "App\manifests\gui-settings.json"
 )){
     $path = Join-Path $PackageRoot $relativePath

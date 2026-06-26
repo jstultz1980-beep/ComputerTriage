@@ -50,7 +50,7 @@ function Move-NetworkToolkitLegacyLayout {
 
     $newAppRoot = Join-Path $Layout.DeploymentRoot "App"
     New-Item -ItemType Directory -Path $newAppRoot -Force | Out-Null
-    foreach($name in @("CSI-NetworkToolkit","Custom","manifests","ToolKit-GUI")){
+    foreach($name in @("NetworkToolkit","Custom","manifests","ToolKit-GUI")){
         $legacyPath = Join-Path $Layout.DeploymentRoot $name
         if(Test-Path -LiteralPath $legacyPath){
             Move-Item -LiteralPath $legacyPath -Destination $newAppRoot -ErrorAction Stop
@@ -112,7 +112,7 @@ function Test-NetworkToolkitCopy {
     foreach($relativePath in @(
         "NetworkToolkit.ps1",
         "ToolKit-GUI\ToolKit-GUI.ps1",
-        "CSI-NetworkToolkit\CSI-NetworkToolkit.ps1",
+        "NetworkToolkit\NetworkToolkit-Core.ps1",
         "manifests\toolkit-version.json"
     )){
         $sourcePath = Join-Path $SourceRoot $relativePath
@@ -138,12 +138,12 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
     # apps, and technician settings are intentionally never part of this pass.
     $managedRoots = @(
         "ToolKit-GUI",
-        "CSI-NetworkToolkit\Config",
-        "CSI-NetworkToolkit\Core",
-        "CSI-NetworkToolkit\Discovery",
-        "CSI-NetworkToolkit\Plugins",
-        "CSI-NetworkToolkit\UI",
-        "CSI-NetworkToolkit\Utilities",
+        "NetworkToolkit\Config",
+        "NetworkToolkit\Core",
+        "NetworkToolkit\Discovery",
+        "NetworkToolkit\Plugins",
+        "NetworkToolkit\UI",
+        "NetworkToolkit\Utilities",
         "manifests"
     )
     $preservedPaths = @(
@@ -276,10 +276,10 @@ try {
     $excludeDirectories = @(
         (Join-Path $SourceRoot ".git"),
         (Join-Path $SourceRoot "Release"),
-        (Join-Path $SourceRoot "CSI-NetworkToolkit\Data"),
-        (Join-Path $SourceRoot "CSI-NetworkToolkit\Exports"),
-        (Join-Path $SourceRoot "CSI-NetworkToolkit\Logs"),
-        (Join-Path $SourceRoot "CSI-NetworkToolkit\ExternalTools"),
+        (Join-Path $SourceRoot "NetworkToolkit\Data"),
+        (Join-Path $SourceRoot "NetworkToolkit\Exports"),
+        (Join-Path $SourceRoot "NetworkToolkit\Logs"),
+        (Join-Path $SourceRoot "NetworkToolkit\ExternalTools"),
         (Join-Path $SourceRoot "Custom")
     )
     # Runtime settings and the technician-maintained toolbox registry belong to

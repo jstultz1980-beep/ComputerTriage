@@ -44,7 +44,7 @@ if(!$createdNew){
 $global:NetworkToolkitInstanceMutex = $toolkitMutex
 
 $root = $PSScriptRoot
-$consoleLauncher = Join-Path $root "CSI-NetworkToolkit\CSI-NetworkToolkit.ps1"
+$consoleLauncher = Join-Path $root "NetworkToolkit\NetworkToolkit-Core.ps1"
 $guiLauncher = Join-Path $root "ToolKit-GUI\ToolKit-GUI.ps1"
 
 try {

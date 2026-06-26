@@ -42,9 +42,9 @@ New-Item -ItemType Directory -Path $packageAppRoot -Force | Out-Null
 $excludeDirectories = @(
     (Join-Path $sourceRoot ".git"),
     (Join-Path $sourceRoot "Release"),
-    (Join-Path $sourceRoot "CSI-NetworkToolkit\Data"),
-    (Join-Path $sourceRoot "CSI-NetworkToolkit\Exports"),
-    (Join-Path $sourceRoot "CSI-NetworkToolkit\Logs")
+    (Join-Path $sourceRoot "NetworkToolkit\Data"),
+    (Join-Path $sourceRoot "NetworkToolkit\Exports"),
+    (Join-Path $sourceRoot "NetworkToolkit\Logs")
 )
 
 Write-Host "Building clean portable package..." -ForegroundColor Cyan
@@ -73,15 +73,15 @@ Copy-Item -LiteralPath (Join-Path $launcherRoot "NetworkToolkit.vbs") -Destinati
 
 # Recreate clean runtime folders expected by the toolkit; no client records are copied.
 $runtimeFolders = @(
-    "CSI-NetworkToolkit\Data",
-    "CSI-NetworkToolkit\Data\Fingerprints",
-    "CSI-NetworkToolkit\Data\ComputerProfiles",
-    "CSI-NetworkToolkit\Data\ComputerState",
-    "CSI-NetworkToolkit\Data\MiniDumps",
-    "CSI-NetworkToolkit\Data\Temp",
-    "CSI-NetworkToolkit\Data\TempToolOutputs",
-    "CSI-NetworkToolkit\Exports",
-    "CSI-NetworkToolkit\Logs\ToolUsage",
+    "NetworkToolkit\Data",
+    "NetworkToolkit\Data\Fingerprints",
+    "NetworkToolkit\Data\ComputerProfiles",
+    "NetworkToolkit\Data\ComputerState",
+    "NetworkToolkit\Data\MiniDumps",
+    "NetworkToolkit\Data\Temp",
+    "NetworkToolkit\Data\TempToolOutputs",
+    "NetworkToolkit\Exports",
+    "NetworkToolkit\Logs\ToolUsage",
     "Custom\FirefoxPortable\Data"
 )
 
@@ -117,7 +117,7 @@ $launchers = @(
     "NetworkToolkit.vbs",
     "App\NetworkToolkit.ps1",
     "App\ToolKit-GUI\ToolKit-GUI.ps1",
-    "App\CSI-NetworkToolkit\CSI-NetworkToolkit.ps1"
+    "App\NetworkToolkit\NetworkToolkit-Core.ps1"
 ) | ForEach-Object {
     $path = Join-Path $packageRoot $_
     if(Test-Path $path){
@@ -139,9 +139,9 @@ $manifest = [ordered]@{
     ClientDataExcluded = @(
         ".git",
         "Release",
-        "App\\CSI-NetworkToolkit\\Data",
-        "App\\CSI-NetworkToolkit\\Exports",
-        "App\\CSI-NetworkToolkit\\Logs",
+        "App\\NetworkToolkit\\Data",
+        "App\\NetworkToolkit\\Exports",
+        "App\\NetworkToolkit\\Logs",
         "App\\Custom\\*\\Data",
         "Plugin Logs",
         "App\\manifests\\gui-settings.json"

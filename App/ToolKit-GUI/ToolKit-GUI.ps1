@@ -1,4 +1,4 @@
-﻿# =====================================================================
+# =====================================================================
 # ToolKit-GUI.ps1
 # Network Toolkit - Technician GUI
 # =====================================================================
@@ -52,8 +52,8 @@ if(!$global:NetworkToolkitInstanceMutex){
 }
 
 $GuiRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$SharedToolkitRoot = Join-Path (Split-Path -Parent $GuiRoot) "CSI-NetworkToolkit"
-$ToolkitLauncher = Join-Path $SharedToolkitRoot "CSI-NetworkToolkit.ps1"
+$SharedToolkitRoot = Join-Path (Split-Path -Parent $GuiRoot) "NetworkToolkit"
+$ToolkitLauncher = Join-Path $SharedToolkitRoot "NetworkToolkit-Core.ps1"
 $GuiIconPath = Join-Path $GuiRoot "NetworkToolkit.ico"
 
 if(!(Test-Path $ToolkitLauncher)){
@@ -79,8 +79,8 @@ catch {
     exit 1
 }
 
-$script:Commands = @(Get-CSICommands | Where-Object {$_.Name -notin @("File Utilities","Software Utilities")})
-$script:ToolkitLoadFailures = if(Get-Command Get-CSIImportFailures -ErrorAction SilentlyContinue){ @(Get-CSIImportFailures) }else{ @() }
+$script:Commands = @(Get-NTKCommands | Where-Object {$_.Name -notin @("File Utilities","Software Utilities")})
+$script:ToolkitLoadFailures = if(Get-Command Get-NTKImportFailures -ErrorAction SilentlyContinue){ @(Get-NTKImportFailures) }else{ @() }
 $script:Fingerprints = @()
 $script:ChocoPackages = @()
 $script:ChocoInstalledPackages = @()
@@ -1434,7 +1434,7 @@ function Write-GUIDiagnosticLog {
     )
 
     try {
-        $logRoot = if($CSIPaths -and $CSIPaths.Logs){ $CSIPaths.Logs }else{ Join-Path $SharedToolkitRoot 'Logs' }
+        $logRoot = if($NTKPaths -and $NTKPaths.Logs){ $NTKPaths.Logs }else{ Join-Path $SharedToolkitRoot 'Logs' }
         if(!(Test-Path -LiteralPath $logRoot)){
             New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
         }
@@ -1528,12 +1528,12 @@ function Write-GUIToolUsageLog {
     )
 
     try {
-        $root = Join-Path $CSIPaths.Logs "ToolUsage"
+        $root = Join-Path $NTKPaths.Logs "ToolUsage"
         if(!(Test-Path $root)){
             New-Item -ItemType Directory -Path $root -Force | Out-Null
         }
 
-        $safeTool = if(Get-Command ConvertTo-CSISafeFileName -ErrorAction SilentlyContinue){ ConvertTo-CSISafeFileName $Tool }else{ $Tool -replace '[^A-Za-z0-9._-]+','_' }
+        $safeTool = if(Get-Command ConvertTo-NTKSafeFileName -ErrorAction SilentlyContinue){ ConvertTo-NTKSafeFileName $Tool }else{ $Tool -replace '[^A-Za-z0-9._-]+','_' }
         $logPath = Join-Path $root "$safeTool.log"
         $line = "{0}`t{1}`t{2}`t{3}`t{4}" -f (Get-Date -Format "s"),$Level,$Tool,$Action,($Detail -replace "\r?\n"," ")
         Add-Content -Path $logPath -Value $line -Encoding UTF8
@@ -1929,7 +1929,7 @@ exit 2
 
 function Get-GUILatestQuickDiagnosisReport {
     try {
-        $reports = @(Get-ChildItem -Path $CSIPaths.Exports -Filter "quick-diagnosis*.html" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
+        $reports = @(Get-ChildItem -Path $NTKPaths.Exports -Filter "quick-diagnosis*.html" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
         if($reports.Count -gt 0){
             return $reports[0].FullName
         }
@@ -1952,7 +1952,7 @@ function Open-GUILatestQuickDiagnosisReport {
         return
     }
 
-    Start-CSIToolProcess -FilePath $report | Out-Null
+    Start-NTKToolProcess -FilePath $report | Out-Null
     Add-GUILog "Opened Quick Diagnosis report: $report"
 }
 
@@ -1960,8 +1960,8 @@ function Get-GUILastQuickDiagnosisInfo {
     $computerName = if($env:COMPUTERNAME){$env:COMPUTERNAME}else{"UnknownComputer"}
 
     try {
-        if(Get-Command Read-CSIComputerState -ErrorAction SilentlyContinue){
-            $state = Read-CSIComputerState -ComputerName $computerName
+        if(Get-Command Read-NTKComputerState -ErrorAction SilentlyContinue){
+            $state = Read-NTKComputerState -ComputerName $computerName
             $capturedAt = ""
             $reportPath = ""
 
@@ -2306,7 +2306,7 @@ function Start-GUIQuickEmbeddedCommand {
         try { $script:QuickOutputProcess.Kill() } catch {}
     }
 
-    $sessionRoot = Join-Path (Get-CSITempOutputRoot) "_QuickChecks"
+    $sessionRoot = Join-Path (Get-NTKTempOutputRoot) "_QuickChecks"
     if(!(Test-Path $sessionRoot)){
         New-Item -ItemType Directory -Path $sessionRoot -Force | Out-Null
     }
@@ -2462,7 +2462,7 @@ function Get-GUILatestComputerProfile {
             return $script:LatestComputerProfileCache
         }
 
-        $profiles = @(Get-CSIStoredFingerprints)
+        $profiles = @(Get-NTKStoredFingerprints)
 
         if($profiles.Count -eq 0){
             $script:LatestComputerProfileCache = $null
@@ -2603,7 +2603,7 @@ function Start-GUICommandByName {
         [System.Diagnostics.ProcessWindowStyle]$WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Normal
     )
 
-    $command = Get-CSICommands | Where-Object {$_.Name -eq $Name} | Select-Object -First 1
+    $command = Get-NTKCommands | Where-Object {$_.Name -eq $Name} | Select-Object -First 1
 
     if(!$command){
         Add-GUILog "Command not found: $Name"
@@ -2725,7 +2725,7 @@ function Global:Start-GUISafeScriptRunner {
     )
 
     $activityId = [guid]::NewGuid().ToString('N')
-    $session = New-CSITempOutputSession -ToolName $ToolName
+    $session = New-NTKTempOutputSession -ToolName $ToolName
     $runnerPath = Join-Path $session.Path 'run-tool.ps1'
     $transcriptPath = $session.Transcript
 
@@ -2752,8 +2752,8 @@ finally {
     try { Stop-Transcript | Out-Null } catch {}
     `$metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath '$($session.Metadata)' -Encoding UTF8
     try {
-        if(Get-Command Set-CSIComputerStateToolOutput -ErrorAction SilentlyContinue){
-            [void](Set-CSIComputerStateToolOutput -ToolName '$($ToolName.Replace("'","''"))' -SessionPath '$($session.Path)' -TranscriptPath '$($session.Transcript)' -MetadataPath '$($session.Metadata)' -ComputerName `$env:COMPUTERNAME)
+        if(Get-Command Set-NTKComputerStateToolOutput -ErrorAction SilentlyContinue){
+            [void](Set-NTKComputerStateToolOutput -ToolName '$($ToolName.Replace("'","''"))' -SessionPath '$($session.Path)' -TranscriptPath '$($session.Transcript)' -MetadataPath '$($session.Metadata)' -ComputerName `$env:COMPUTERNAME)
         }
     }
     catch {
@@ -3063,18 +3063,18 @@ function Invoke-GUINamedAction {
         "Start-GUIReliabilityMonitor" { Start-GUIReliabilityMonitor; break }
         "Start-GUIPsExecHelper" { Start-GUIPsExecHelper; break }
         "Start-GUIDriverUpdateFinder" { Start-GUIDriverUpdateFinder; break }
-        "Open-GUIOutputsFolder" { Open-GUIFolder $CSIPaths.Exports; break }
-        "Open-GUITempOutputsFolder" { Open-GUIFolder (Get-CSITempOutputRoot); break }
-        "Open-GUIDataFolder" { Open-GUIFolder $CSIPaths.Data; break }
-        "Open-GUILogsFolder" { Open-GUIFolder $CSIPaths.Logs; break }
-        "Open-GUIToolkitFolder" { Open-GUIFolder $CSIPaths.Root; break }
+        "Open-GUIOutputsFolder" { Open-GUIFolder $NTKPaths.Exports; break }
+        "Open-GUITempOutputsFolder" { Open-GUIFolder (Get-NTKTempOutputRoot); break }
+        "Open-GUIDataFolder" { Open-GUIFolder $NTKPaths.Data; break }
+        "Open-GUILogsFolder" { Open-GUIFolder $NTKPaths.Logs; break }
+        "Open-GUIToolkitFolder" { Open-GUIFolder $NTKPaths.Root; break }
         default { Add-GUILog "Unknown GUI action: $Action"; break }
     }
 }
 
 function Start-GUIGPResultReport {
     try {
-        $session = New-CSITempOutputSession -ToolName "Group Policy HTML Report"
+        $session = New-NTKTempOutputSession -ToolName "Group Policy HTML Report"
         $shortRoot = Join-Path $env:TEMP "NT-GPResult"
         if(!(Test-Path $shortRoot)){
             New-Item -ItemType Directory -Path $shortRoot -Force | Out-Null
@@ -3113,7 +3113,7 @@ finally {
 "@
 
         $commandText | Set-Content -Path $runnerPath -Encoding UTF8
-        Start-CSIToolProcess `
+        Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$runnerPath`"") `
             -WorkingDirectory $SharedToolkitRoot `
@@ -3129,7 +3129,7 @@ finally {
 
 function Start-GUIReliabilityMonitor {
     try {
-        Start-CSIToolProcess -FilePath "perfmon.exe" -ArgumentList @("/rel") -WindowStyle Normal | Out-Null
+        Start-NTKToolProcess -FilePath "perfmon.exe" -ArgumentList @("/rel") -WindowStyle Normal | Out-Null
         Add-GUILog "Launched Reliability Monitor."
         Write-GUIToolUsageLog -Tool "Reliability Monitor" -Action "Launch" -Detail "perfmon.exe /rel"
     }
@@ -3142,7 +3142,7 @@ function Start-GUIMinidumpCollector {
     try {
         $commandText = ". `"$ToolkitLauncher`" -NoConsole; Invoke-MinidumpCollectorAnalyzer -CollectAll"
 
-        Start-CSIToolProcess `
+        Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-Command",$commandText) `
             -WorkingDirectory $SharedToolkitRoot `
@@ -3187,7 +3187,7 @@ function Start-GUILaunchRDP {
 }
 
 function Start-GUIPrintQueueMaintenance {
-    $toolPath = Join-Path $CSIPaths.Plugins "PrintQueues\Print Queue Cleanup\PrinterSpoolerTool.ps1"
+    $toolPath = Join-Path $NTKPaths.Plugins "PrintQueues\Print Queue Cleanup\PrinterSpoolerTool.ps1"
 
     if(!(Test-Path $toolPath)){
         Add-GUILog "Print Queue Maintenance tool not found: $toolPath"
@@ -3200,13 +3200,13 @@ function Start-GUIPrintQueueMaintenance {
         return
     }
 
-    $dataRoot = Join-Path $CSIPaths.Data "PrintQueueTools"
+    $dataRoot = Join-Path $NTKPaths.Data "PrintQueueTools"
     if(!(Test-Path $dataRoot)){
         New-Item -ItemType Directory -Path $dataRoot -Force | Out-Null
     }
 
     try {
-        Start-CSIToolProcess `
+        Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-WindowStyle","Hidden","-ExecutionPolicy","Bypass","-STA","-File","`"$toolPath`"","-ToolDataRoot","`"$dataRoot`"") `
             -WorkingDirectory (Split-Path -Parent $toolPath) `
@@ -3220,7 +3220,7 @@ function Start-GUIPrintQueueMaintenance {
 }
 
 function Get-GUISysinternalsRoot {
-    return (Join-Path (Get-CSIExternalToolRoot) "Sysinternals")
+    return (Join-Path (Get-NTKExternalToolRoot) "Sysinternals")
 }
 
 function ConvertTo-GUISysinternalsBaseName {
@@ -3462,7 +3462,7 @@ function Read-GUISysinternalsInput {
 function New-GUISysinternalsOutputPath {
     param([string]$ToolName)
 
-    $session = New-CSITempOutputSession -ToolName "Sysinternals-$ToolName"
+    $session = New-NTKTempOutputSession -ToolName "Sysinternals-$ToolName"
     return $session.Path
 }
 
@@ -3730,8 +3730,8 @@ function Start-GUISysinternalsTool {
 
     try {
         $baseName = ConvertTo-GUISysinternalsBaseName ([IO.Path]::GetFileNameWithoutExtension($Path))
-        if(Get-Command Set-CSISysinternalsEulaAccepted -ErrorAction SilentlyContinue){
-            Set-CSISysinternalsEulaAccepted -Path $Path
+        if(Get-Command Set-NTKSysinternalsEulaAccepted -ErrorAction SilentlyContinue){
+            Set-NTKSysinternalsEulaAccepted -Path $Path
         }
 
         $category = Get-GUISysinternalsCategory -BaseName $baseName
@@ -3759,8 +3759,8 @@ function Start-GUISysinternalsTool {
         if($launchPlan.Mode -eq "Help"){
             $args = @()
         }
-        elseif($Console -and (Get-Command Add-CSISysinternalsEulaArgument -ErrorAction SilentlyContinue)){
-            $args = @(Add-CSISysinternalsEulaArgument -Path $Path -Arguments $args)
+        elseif($Console -and (Get-Command Add-NTKSysinternalsEulaArgument -ErrorAction SilentlyContinue)){
+            $args = @(Add-NTKSysinternalsEulaArgument -Path $Path -Arguments $args)
         }
 
         if($Risky -and $launchPlan.Mode -eq "Launch"){
@@ -3783,10 +3783,10 @@ function Start-GUISysinternalsTool {
                 $commandParts += @($args | ForEach-Object { ConvertTo-GUICommandToken $_ })
             }
             $commandLine = $commandParts -join " "
-            Start-CSIToolProcess -FilePath "cmd.exe" -ArgumentList @("/k",$commandLine) -WorkingDirectory (Split-Path -Parent $Path) -WindowStyle Normal | Out-Null
+            Start-NTKToolProcess -FilePath "cmd.exe" -ArgumentList @("/k",$commandLine) -WorkingDirectory (Split-Path -Parent $Path) -WindowStyle Normal | Out-Null
         }
         else{
-            Start-CSIToolProcess -FilePath $Path -ArgumentList $args -WorkingDirectory (Split-Path -Parent $Path) -WindowStyle Normal | Out-Null
+            Start-NTKToolProcess -FilePath $Path -ArgumentList $args -WorkingDirectory (Split-Path -Parent $Path) -WindowStyle Normal | Out-Null
         }
 
         Add-GUILog "Launched Sysinternals: $DisplayName"
@@ -3819,7 +3819,7 @@ function Start-GUIQuickDiagnosis {
             $script:QuickDiagnosisTimer = $null
         }
 
-        $script:QuickDiagnosisProcess = Start-CSIToolProcess `
+        $script:QuickDiagnosisProcess = Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-Command",$commandText) `
             -WorkingDirectory $SharedToolkitRoot `
@@ -3915,7 +3915,7 @@ function Start-GUIDismSfcRepairPath {
 
 function Start-ToolkitConsole {
     try {
-        Start-CSIToolProcess `
+        Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$ToolkitLauncher`"") `
             -WorkingDirectory $SharedToolkitRoot `
@@ -3935,13 +3935,13 @@ function Open-GUIFolder {
         New-Item -ItemType Directory -Path $Path -Force | Out-Null
     }
 
-    Start-CSIToolProcess -FilePath "explorer.exe" -ArgumentList @("`"$Path`"") | Out-Null
+    Start-NTKToolProcess -FilePath "explorer.exe" -ArgumentList @("`"$Path`"") | Out-Null
     Add-GUILog "Opened folder: $Path"
 }
 
 function Open-GUIHelpFile {
-    if($CSIFiles.HelpFile -and (Test-Path $CSIFiles.HelpFile)){
-        Start-CSIToolProcess -FilePath $CSIFiles.HelpFile | Out-Null
+    if($NTKFiles.HelpFile -and (Test-Path $NTKFiles.HelpFile)){
+        Start-NTKToolProcess -FilePath $NTKFiles.HelpFile | Out-Null
     }
     else{
         Add-GUILog "Help file not found."
@@ -4060,12 +4060,12 @@ function Test-GUIInstallerExecutable {
 }
 
 function Initialize-GUICustomToolProvenance {
-    if($script:CustomToolProvenanceInitialized -or !$CSIFiles.CustomTools -or !(Test-Path $CSIFiles.CustomTools)){
+    if($script:CustomToolProvenanceInitialized -or !$NTKFiles.CustomTools -or !(Test-Path $NTKFiles.CustomTools)){
         return
     }
 
     try {
-        $manifest = Get-Content -LiteralPath $CSIFiles.CustomTools -Raw | ConvertFrom-Json
+        $manifest = Get-Content -LiteralPath $NTKFiles.CustomTools -Raw | ConvertFrom-Json
         $changed = $false
         foreach($tool in @($manifest.tools)){
             if([string]$tool.source -ne 'Chocolatey Toolbox'){ continue }
@@ -4091,7 +4091,7 @@ function Initialize-GUICustomToolProvenance {
             Add-Member -InputObject $manifest -MemberType NoteProperty -Name 'schemaVersion' -Value 3 -Force
             $changed = $true
         }
-        if($changed){ $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $CSIFiles.CustomTools -Encoding UTF8 }
+        if($changed){ $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $NTKFiles.CustomTools -Encoding UTF8 }
     }
     catch { Add-GUILog "Custom tool provenance migration failed: $($_.Exception.Message)" }
     finally { $script:CustomToolProvenanceInitialized = $true }
@@ -4107,9 +4107,9 @@ function Get-GUICustomTools {
     $tools = @()
     Initialize-GUICustomToolProvenance
 
-    if($CSIFiles.CustomTools -and (Test-Path $CSIFiles.CustomTools)){
+    if($NTKFiles.CustomTools -and (Test-Path $NTKFiles.CustomTools)){
         try {
-            $manifest = Get-Content -Raw -Path $CSIFiles.CustomTools | ConvertFrom-Json
+            $manifest = Get-Content -Raw -Path $NTKFiles.CustomTools | ConvertFrom-Json
 
             foreach($tool in @($manifest.tools)){
                 $launchPath = Resolve-GUIToolkitPath $tool.launchPath
@@ -4205,19 +4205,19 @@ function Update-GUICustomToolsManifestEntry {
         [string]$LastUpdateCheck = ""
     )
 
-    if(!$CSIFiles.CustomTools){
+    if(!$NTKFiles.CustomTools){
         return
     }
 
-    if(!(Test-Path $CSIPaths.Manifests)){
-        New-Item -ItemType Directory -Path $CSIPaths.Manifests -Force | Out-Null
+    if(!(Test-Path $NTKPaths.Manifests)){
+        New-Item -ItemType Directory -Path $NTKPaths.Manifests -Force | Out-Null
     }
 
     $manifest = [pscustomobject]@{ tools = @() }
 
-    if(Test-Path $CSIFiles.CustomTools){
+    if(Test-Path $NTKFiles.CustomTools){
         try {
-            $manifest = Get-Content -Raw -Path $CSIFiles.CustomTools | ConvertFrom-Json
+            $manifest = Get-Content -Raw -Path $NTKFiles.CustomTools | ConvertFrom-Json
         }
         catch {
             $manifest = [pscustomobject]@{ tools = @() }
@@ -4265,22 +4265,22 @@ function Update-GUICustomToolsManifestEntry {
     }
 
     $manifest = [pscustomobject]@{ tools = @($existing + $entry | Sort-Object name) }
-    $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $CSIFiles.CustomTools -Encoding UTF8
+    $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
 }
 
 function Remove-GUICustomToolsManifestEntry {
     param([string]$Name)
 
-    if(!$Name -or !$CSIFiles.CustomTools -or !(Test-Path $CSIFiles.CustomTools)){
+    if(!$Name -or !$NTKFiles.CustomTools -or !(Test-Path $NTKFiles.CustomTools)){
         return
     }
 
     try {
-        $manifest = Get-Content -Raw -Path $CSIFiles.CustomTools | ConvertFrom-Json
+        $manifest = Get-Content -Raw -Path $NTKFiles.CustomTools | ConvertFrom-Json
         $manifest = [pscustomobject]@{
             tools = @($manifest.tools | Where-Object { $_.name -ne $Name } | Sort-Object name)
         }
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $CSIFiles.CustomTools -Encoding UTF8
+        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
     }
     catch {
         Add-GUILog "Could not update custom tools manifest: $($_.Exception.Message)"
@@ -4293,12 +4293,12 @@ function Set-GUICustomToolsManifestTabOverride {
         [string]$TabOverride
     )
 
-    if(!$Name -or !$CSIFiles.CustomTools -or !(Test-Path $CSIFiles.CustomTools)){
+    if(!$Name -or !$NTKFiles.CustomTools -or !(Test-Path $NTKFiles.CustomTools)){
         return
     }
 
     try {
-        $manifest = Get-Content -Raw -Path $CSIFiles.CustomTools | ConvertFrom-Json
+        $manifest = Get-Content -Raw -Path $NTKFiles.CustomTools | ConvertFrom-Json
         foreach($tool in @($manifest.tools)){
             if($tool.name -eq $Name){
                 if($tool.PSObject.Properties.Name -contains "tabOverride"){
@@ -4310,7 +4310,7 @@ function Set-GUICustomToolsManifestTabOverride {
             }
         }
 
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $CSIFiles.CustomTools -Encoding UTF8
+        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
     }
     catch {
         Add-GUILog "Could not update custom tool tab placement: $($_.Exception.Message)"
@@ -4323,12 +4323,12 @@ function Set-GUICustomToolsManifestName {
         [string]$NewName
     )
 
-    if(!$CurrentName -or [string]::IsNullOrWhiteSpace($NewName) -or !$CSIFiles.CustomTools -or !(Test-Path $CSIFiles.CustomTools)){
+    if(!$CurrentName -or [string]::IsNullOrWhiteSpace($NewName) -or !$NTKFiles.CustomTools -or !(Test-Path $NTKFiles.CustomTools)){
         return
     }
 
     try {
-        $manifest = Get-Content -Raw -Path $CSIFiles.CustomTools | ConvertFrom-Json
+        $manifest = Get-Content -Raw -Path $NTKFiles.CustomTools | ConvertFrom-Json
         foreach($tool in @($manifest.tools)){
             if($tool.name -eq $CurrentName){
                 $tool.name = $NewName.Trim()
@@ -4336,7 +4336,7 @@ function Set-GUICustomToolsManifestName {
         }
 
         $manifest = [pscustomobject]@{ tools = @($manifest.tools | Sort-Object name) }
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $CSIFiles.CustomTools -Encoding UTF8
+        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
     }
     catch {
         Add-GUILog "Could not rename custom tool: $($_.Exception.Message)"
@@ -4568,7 +4568,7 @@ function Start-GUIDotNetPortableProcess {
         [string]$WorkingDirectory = ""
     )
 
-    $dotNetRoot = Join-Path $CSIPaths.Root "ExternalTools\DotNet"
+    $dotNetRoot = Join-Path $NTKPaths.Root "ExternalTools\DotNet"
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
     $startInfo.FileName = $FilePath
     $startInfo.WorkingDirectory = if($WorkingDirectory){$WorkingDirectory}else{Split-Path -Parent $FilePath}
@@ -4595,7 +4595,7 @@ function Start-GUICustomPowerShellTool {
     $toolLabel = if($Tool.Name){[string]$Tool.Name}else{"PowerShell Tool"}
     $scriptPath = [string]$Tool.LaunchPath
     $workingFolder = Split-Path -Parent $scriptPath
-    $session = New-CSITempOutputSession -ToolName $toolLabel
+    $session = New-NTKTempOutputSession -ToolName $toolLabel
     $runnerPath = Join-Path $session.Path "run-custom-powershell-tool.ps1"
     $argsPath = Join-Path $session.Path "arguments.json"
     $arguments = @()
@@ -4669,7 +4669,7 @@ finally {
 
         `$metadata | ConvertTo-Json -Depth 6 | Set-Content -Path "$($session.Metadata)" -Encoding UTF8
 
-        if(Get-Command Set-CSIComputerStateToolOutput -ErrorAction SilentlyContinue){
+        if(Get-Command Set-NTKComputerStateToolOutput -ErrorAction SilentlyContinue){
             `$stateArgs = @{
                 ToolName = "$($toolLabel.Replace('"','\"'))"
                 SessionPath = "$($session.Path)"
@@ -4677,7 +4677,7 @@ finally {
                 MetadataPath = "$($session.Metadata)"
                 ComputerName = `$env:COMPUTERNAME
             }
-            [void](Set-CSIComputerStateToolOutput @stateArgs)
+            [void](Set-NTKComputerStateToolOutput @stateArgs)
         }
     }
     catch {}
@@ -4692,7 +4692,7 @@ finally {
 
     $commandText | Set-Content -Path $runnerPath -Encoding UTF8
 
-    Start-CSIToolProcess `
+    Start-NTKToolProcess `
         -FilePath "powershell.exe" `
         -ArgumentList @("-NoProfile","-STA","-ExecutionPolicy","Bypass","-File","`"$runnerPath`"") `
         -WorkingDirectory $workingFolder `
@@ -4782,13 +4782,13 @@ function Start-GUICustomTool {
         Start-GUICustomPowerShellTool -Tool $Tool
     }
     elseif($extension -eq ".bat" -or $extension -eq ".cmd"){
-        Start-CSIToolProcess -FilePath "cmd.exe" -ArgumentList (@("/k","`"$($Tool.LaunchPath)`"") + $args) -WorkingDirectory $folder -WindowStyle Normal | Out-Null
+        Start-NTKToolProcess -FilePath "cmd.exe" -ArgumentList (@("/k","`"$($Tool.LaunchPath)`"") + $args) -WorkingDirectory $folder -WindowStyle Normal | Out-Null
     }
     elseif(Test-GUIRequiresBundledDotNet -LaunchPath $Tool.LaunchPath){
         Start-GUIDotNetPortableProcess -FilePath $Tool.LaunchPath -ArgumentList $args -WorkingDirectory $folder
     }
     else {
-        Start-CSIToolProcess -FilePath $Tool.LaunchPath -ArgumentList $args -WorkingDirectory $folder -WindowStyle Normal | Out-Null
+        Start-NTKToolProcess -FilePath $Tool.LaunchPath -ArgumentList $args -WorkingDirectory $folder -WindowStyle Normal | Out-Null
     }
 
     Add-GUILog "Launched custom tool: $($Tool.Name)"
@@ -4796,7 +4796,7 @@ function Start-GUICustomTool {
 }
 
 function Start-GUIFirefoxPortable {
-    $firefoxPath = Join-Path $CSIPaths.Custom "FirefoxPortable\FirefoxPortable.exe"
+    $firefoxPath = Join-Path $NTKPaths.Custom "FirefoxPortable\FirefoxPortable.exe"
 
     if(!(Test-Path $firefoxPath)){
         Add-GUILog "Firefox Portable is not installed in the toolkit: $firefoxPath"
@@ -4809,7 +4809,7 @@ function Start-GUIFirefoxPortable {
         return
     }
 
-    Start-CSIToolProcess `
+    Start-NTKToolProcess `
         -FilePath $firefoxPath `
         -WorkingDirectory (Split-Path -Parent $firefoxPath) `
         -WindowStyle Normal | Out-Null
@@ -4819,8 +4819,8 @@ function Start-GUIFirefoxPortable {
 }
 
 function Start-GUIBulkUninstaller {
-    $bcuPath = Join-Path $CSIPaths.Custom "BulkUninstaller\BCUninstaller.exe"
-    $dotNetRoot = Join-Path $CSIPaths.Root "ExternalTools\DotNet"
+    $bcuPath = Join-Path $NTKPaths.Custom "BulkUninstaller\BCUninstaller.exe"
+    $dotNetRoot = Join-Path $NTKPaths.Root "ExternalTools\DotNet"
 
     if(!(Test-Path $bcuPath)){
         Add-GUILog "Bulk Uninstaller is not installed in the toolkit: $bcuPath"
@@ -4898,7 +4898,7 @@ function Remove-SelectedGUICustomTool {
         Remove-GUICustomToolsManifestEntry -Name $tool.Name
 
         $folder = $tool.Folder
-        if($folder -and (Test-Path $folder) -and $folder.StartsWith($CSIPaths.Custom,[System.StringComparison]::OrdinalIgnoreCase)){
+        if($folder -and (Test-Path $folder) -and $folder.StartsWith($NTKPaths.Custom,[System.StringComparison]::OrdinalIgnoreCase)){
             $deleteFolder = [System.Windows.Forms.MessageBox]::Show(
                 "Delete the toolbox folder too?`r`n`r`n$folder",
                 "Delete Custom Tool Files",
@@ -4947,7 +4947,7 @@ function Refresh-Fingerprints {
         return
     }
 
-    $script:Fingerprints = @(Get-CSIStoredFingerprints)
+    $script:Fingerprints = @(Get-NTKStoredFingerprints)
 
     $script:FingerprintGrid.Rows.Clear()
     $script:FingerprintGrid.Columns.Clear()
@@ -4989,7 +4989,7 @@ function Open-SelectedFingerprintReport {
         return
     }
 
-    Open-CSIComputerFingerprintReport -Path $fingerprint.Path
+    Open-NTKComputerFingerprintReport -Path $fingerprint.Path
     Add-GUILog "Opened computer profile report: $($fingerprint.ComputerName)"
 }
 
@@ -5027,7 +5027,7 @@ function Take-FingerprintFromGUI {
 }
 
 function Get-GUIChocoPath {
-    $choco = Get-CSIChocolateyCommand
+    $choco = Get-NTKChocolateyCommand
 
     if($script:ChocoStatusLabel){
         if($choco){
@@ -5093,7 +5093,7 @@ finally {
 "@
 
     try {
-        Start-CSIToolProcess `
+        Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-Command",$installCommand) `
             -WindowStyle Normal `
@@ -5293,7 +5293,7 @@ function Start-GUIChocoAction {
         $script:ChocoActionJob = $null
     }
 
-    $session = New-CSITempOutputSession -ToolName "Chocolatey-$Action-$PackageName"
+    $session = New-NTKTempOutputSession -ToolName "Chocolatey-$Action-$PackageName"
     $script:ChocoActionSession = $session
     $script:ChocoActionName = $Action
     $script:ChocoActionPackage = $PackageName
@@ -6078,8 +6078,8 @@ function Add-SelectedChocoPackageToToolbox {
         Add-GUILog "Portable check override approved for: $($package.Name)"
     }
 
-    if(!$CSIPaths.Custom -or !(Test-Path $CSIPaths.Custom)){
-        New-Item -ItemType Directory -Path $CSIPaths.Custom -Force | Out-Null
+    if(!$NTKPaths.Custom -or !(Test-Path $NTKPaths.Custom)){
+        New-Item -ItemType Directory -Path $NTKPaths.Custom -Force | Out-Null
     }
 
     $safeName = ($package.Name -replace '[^A-Za-z0-9._-]+','_').Trim('_')
@@ -6087,7 +6087,7 @@ function Add-SelectedChocoPackageToToolbox {
         $safeName = $package.Name
     }
 
-    $dest = Join-Path $CSIPaths.Custom $safeName
+    $dest = Join-Path $NTKPaths.Custom $safeName
     $destExisted = Test-Path $dest
 
     if($destExisted -and !$SkipExistingPrompt){
@@ -6133,12 +6133,12 @@ function Add-SelectedChocoPackageToToolbox {
 
     try {
         if($destExisted){
-            $backupDest = Join-Path $CSIPaths.Custom ("{0}.rollback-{1}" -f $safeName,(Get-Date -Format "yyyyMMddHHmmss"))
+            $backupDest = Join-Path $NTKPaths.Custom ("{0}.rollback-{1}" -f $safeName,(Get-Date -Format "yyyyMMddHHmmss"))
             Move-Item -LiteralPath $dest -Destination $backupDest -Force
             Add-GUILog "Existing toolbox copy backed up for rollback: $safeName"
         }
 
-        $session = New-CSITempOutputSession -ToolName "Choco-AddToToolbox-$($package.Name)"
+        $session = New-NTKTempOutputSession -ToolName "Choco-AddToToolbox-$($package.Name)"
 
         Add-GUILog "Adding Chocolatey package to toolbox without machine install: $($package.Name)"
         $downloadedPackage = Save-GUIChocoPackageToTemp -Package $package -Session $session
@@ -6459,12 +6459,12 @@ function Set-GUICustomToolUpgradeStatus {
         [string]$AvailableVersion = ''
     )
 
-    if(!$CSIFiles.CustomTools -or !(Test-Path -LiteralPath $CSIFiles.CustomTools)){
+    if(!$NTKFiles.CustomTools -or !(Test-Path -LiteralPath $NTKFiles.CustomTools)){
         return
     }
 
     try {
-        $manifest = Get-Content -LiteralPath $CSIFiles.CustomTools -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $manifest = Get-Content -LiteralPath $NTKFiles.CustomTools -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
         foreach($tool in @($manifest.tools)){
             if([string]$tool.name -ne $Name){
                 continue
@@ -6473,7 +6473,7 @@ function Set-GUICustomToolUpgradeStatus {
             Add-Member -InputObject $tool -MemberType NoteProperty -Name availableVersion -Value $AvailableVersion -Force
             Add-Member -InputObject $tool -MemberType NoteProperty -Name lastUpdateCheck -Value (Get-Date).ToString('o') -Force
         }
-        $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $CSIFiles.CustomTools -Encoding UTF8
+        $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $NTKFiles.CustomTools -Encoding UTF8
         $script:GuiCustomToolsCache = $null
     }
     catch {
@@ -6717,14 +6717,14 @@ function Split-GUICommandLine {
 }
 
 function Get-GUIPsExecTool {
-    $tool = Resolve-CSIExternalTool -Id "PsExec"
+    $tool = Resolve-NTKExternalTool -Id "PsExec"
 
     if(!$tool -or !$tool.Found){
         throw "PsExec was not found under ExternalTools\Sysinternals."
     }
 
-    if(Get-Command Set-CSISysinternalsEulaAccepted -ErrorAction SilentlyContinue){
-        Set-CSISysinternalsEulaAccepted -Path $tool.Path
+    if(Get-Command Set-NTKSysinternalsEulaAccepted -ErrorAction SilentlyContinue){
+        Set-NTKSysinternalsEulaAccepted -Path $tool.Path
     }
 
     return $tool
@@ -6821,8 +6821,8 @@ function Get-GUIPsExecArgumentList {
 
     $arguments += $commandParts
 
-    if(Get-Command Add-CSISysinternalsEulaArgument -ErrorAction SilentlyContinue){
-        $arguments = @(Add-CSISysinternalsEulaArgument -Path $tool.Path -Arguments $arguments)
+    if(Get-Command Add-NTKSysinternalsEulaArgument -ErrorAction SilentlyContinue){
+        $arguments = @(Add-NTKSysinternalsEulaArgument -Path $tool.Path -Arguments $arguments)
     }
 
     return [pscustomobject]@{
@@ -6835,8 +6835,8 @@ function Get-GUIPsExecCommandLine {
     $plan = Get-GUIPsExecArgumentList
     $parts = @($plan.Tool.Path) + @($plan.Arguments)
 
-    if(Get-Command Join-CSICommandLine -ErrorAction SilentlyContinue){
-        return Join-CSICommandLine -Parts $parts
+    if(Get-Command Join-NTKCommandLine -ErrorAction SilentlyContinue){
+        return Join-NTKCommandLine -Parts $parts
     }
 
     return (($parts | ForEach-Object { ConvertTo-GUICommandToken $_ }) -join " ")
@@ -6952,7 +6952,7 @@ function Start-GUIPsExecCaptured {
         $script:PsExecTimer = $null
     }
 
-    $session = New-CSITempOutputSession -ToolName "PsExec Helper"
+    $session = New-NTKTempOutputSession -ToolName "PsExec Helper"
     $stdout = Join-Path $session.Path "psexec-output.txt"
     $stderr = Join-Path $session.Path "psexec-error.txt"
     $connectionTimeoutSeconds = 10
@@ -7069,7 +7069,7 @@ function Start-GUIPsExecConsole {
         RequiresAdmin = [bool]$plan.Tool.RequiresAdmin
     }
 
-    Start-CSIExternalProcess -Tool $consoleTool -Arguments @("/k",$commandLine)
+    Start-NTKExternalProcess -Tool $consoleTool -Arguments @("/k",$commandLine)
     Add-GUILog "Opened PsExec console."
 }
 
@@ -7195,18 +7195,18 @@ function Get-GUIRobocopyPlan {
     }
 
     if($script:RobocopyLogCheck.Checked){
-        if(!(Test-Path $CSIPaths.Exports)){
-            New-Item -ItemType Directory -Path $CSIPaths.Exports -Force | Out-Null
+        if(!(Test-Path $NTKPaths.Exports)){
+            New-Item -ItemType Directory -Path $NTKPaths.Exports -Force | Out-Null
         }
 
         $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-        $logPath = Join-Path $CSIPaths.Exports "robocopy-$timestamp.log"
+        $logPath = Join-Path $NTKPaths.Exports "robocopy-$timestamp.log"
         $switches += "/TEE"
         $switches += "/LOG:`"$logPath`""
         $reasons += "Writes a robocopy log to the toolkit Outputs folder."
     }
 
-    $command = Format-CSIRobocopyCommand `
+    $command = Format-NTKRobocopyCommand `
         -Source $source `
         -Destination $destination `
         -FilePatterns $filePatterns `
@@ -7283,7 +7283,7 @@ function Start-GUIRobocopyCommand {
         }
     }
 
-    Start-CSIToolProcess -FilePath "cmd.exe" -ArgumentList @("/k",$command) -WindowStyle Normal | Out-Null
+    Start-NTKToolProcess -FilePath "cmd.exe" -ArgumentList @("/k",$command) -WindowStyle Normal | Out-Null
 
     if($Preview){
         Add-GUILog "Started robocopy preview."
@@ -7297,7 +7297,7 @@ function Start-GUIExternalFileTool {
     param([string]$Id)
 
     try {
-        $tool = Resolve-CSIExternalTool -Id $Id
+        $tool = Resolve-NTKExternalTool -Id $Id
 
         if(!$tool -or !$tool.Found){
             Add-GUILog "External tool not found: $Id"
@@ -7306,12 +7306,12 @@ function Start-GUIExternalFileTool {
 
         $arguments = @($tool.Arguments | Where-Object {$null -ne $_ -and $_ -ne ""})
 
-        if(Get-Command Set-CSISysinternalsEulaAccepted -ErrorAction SilentlyContinue){
-            Set-CSISysinternalsEulaAccepted -Path $tool.Path
+        if(Get-Command Set-NTKSysinternalsEulaAccepted -ErrorAction SilentlyContinue){
+            Set-NTKSysinternalsEulaAccepted -Path $tool.Path
         }
 
-        if($tool.Console -and (Get-Command Add-CSISysinternalsEulaArgument -ErrorAction SilentlyContinue)){
-            $arguments = @(Add-CSISysinternalsEulaArgument -Path $tool.Path -Arguments $arguments)
+        if($tool.Console -and (Get-Command Add-NTKSysinternalsEulaArgument -ErrorAction SilentlyContinue)){
+            $arguments = @(Add-NTKSysinternalsEulaArgument -Path $tool.Path -Arguments $arguments)
         }
 
         # Autoruns is a GUI-only launcher in this toolkit. It does not accept
@@ -7330,8 +7330,8 @@ function Start-GUIExternalFileTool {
 
         if($Id -eq "BlueScreenView"){
             $latestDumpCollection = $null
-            if(Get-Command Get-CSILatestMinidumpCollection -ErrorAction SilentlyContinue){
-                $latestDumpCollection = Get-CSILatestMinidumpCollection
+            if(Get-Command Get-NTKLatestMinidumpCollection -ErrorAction SilentlyContinue){
+                $latestDumpCollection = Get-NTKLatestMinidumpCollection
             }
 
             if($latestDumpCollection -and (Test-Path $latestDumpCollection)){
@@ -7356,10 +7356,10 @@ function Start-GUIExternalFileTool {
                 RequiresAdmin = $tool.RequiresAdmin
             }
 
-            Start-CSIExternalProcess -Tool $consoleTool -Arguments @("/k",$commandLine)
+            Start-NTKExternalProcess -Tool $consoleTool -Arguments @("/k",$commandLine)
         }
         else{
-            Start-CSIExternalProcess -Tool $tool -Arguments $arguments
+            Start-NTKExternalProcess -Tool $tool -Arguments $arguments
         }
 
         Add-GUILog "Launched: $($tool.Name)"
@@ -7510,7 +7510,7 @@ function Build-QuickTriagePage {
     $layout.ColumnCount = 1
     $layout.RowCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(16)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,96))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -7522,17 +7522,17 @@ function Build-QuickTriagePage {
 
     $runPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $runPanel.Dock = "Fill"
-    $runPanel.Padding = New-Object System.Windows.Forms.Padding(10)
+    $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,6)
     $runPanel.ColumnCount = 6
     $runPanel.RowCount = 2
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,265))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,138))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,230))) | Out-Null
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,4))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet test target"
@@ -7543,10 +7543,10 @@ function Build-QuickTriagePage {
     [void]$runPanel.Controls.Add($targetLabel,0,0)
 
     $script:QuickTargetBox = New-GUITextBox "www.microsoft.com"
-    $QuickTargetBox.Dock = "None"
-    $QuickTargetBox.Width = 220
+    $QuickTargetBox.Dock = "Fill"
+    $QuickTargetBox.Width = 0
     $QuickTargetBox.Height = 26
-    $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,8,10,3)
+    $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,7,10,5)
     [void]$runPanel.Controls.Add($QuickTargetBox,1,0)
 
     $script:QuickRunButton = New-GUIButton "Quick Diagnosis" { Start-GUIQuickDiagnosis }
@@ -7559,7 +7559,7 @@ function Build-QuickTriagePage {
 
     $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
     $healthPanel.Dock = "None"
-    $healthPanel.Width = 260
+    $healthPanel.Width = 224
     $healthPanel.Height = 40
     $healthPanel.FlowDirection = "LeftToRight"
     $healthPanel.WrapContents = $false
@@ -7573,7 +7573,7 @@ function Build-QuickTriagePage {
     [void]$healthPanel.Controls.Add($HealthStatusLight)
 
     $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
-    $HealthStatusLabel.Width = 220
+    $HealthStatusLabel.Width = 188
     $HealthStatusLabel.Height = 34
     $HealthStatusLabel.TextAlign = "MiddleLeft"
     $HealthStatusLabel.AutoEllipsis = $true
@@ -7582,11 +7582,11 @@ function Build-QuickTriagePage {
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
     $QuickLastDiagnosisLabel.Dock = "Fill"
-    $QuickLastDiagnosisLabel.Height = 28
+    $QuickLastDiagnosisLabel.Height = 30
     $QuickLastDiagnosisLabel.TextAlign = "MiddleLeft"
     $QuickLastDiagnosisLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
-    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,0,3,3)
+    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,2,3,2)
     $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,5)
     [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,1)
     Refresh-GUILastQuickDiagnosisLabel
@@ -8150,11 +8150,11 @@ function Get-GUIDefaultTabOrder {
 }
 
 function Get-GUISettingsPath {
-    if($CSIFiles -and $CSIFiles.PSObject.Properties.Name -contains "GuiSettings" -and $CSIFiles.GuiSettings){
-        return $CSIFiles.GuiSettings
+    if($NTKFiles -and $NTKFiles.PSObject.Properties.Name -contains "GuiSettings" -and $NTKFiles.GuiSettings){
+        return $NTKFiles.GuiSettings
     }
 
-    return Join-Path $CSIPaths.Manifests "gui-settings.json"
+    return Join-Path $NTKPaths.Manifests "gui-settings.json"
 }
 
 function Get-GUIDefaultSettings {
@@ -8221,8 +8221,8 @@ function Save-GUISettings {
     param([pscustomobject]$Settings)
 
     $path = Get-GUISettingsPath
-    if(!(Test-Path $CSIPaths.Manifests)){
-        New-Item -ItemType Directory -Path $CSIPaths.Manifests -Force | Out-Null
+    if(!(Test-Path $NTKPaths.Manifests)){
+        New-Item -ItemType Directory -Path $NTKPaths.Manifests -Force | Out-Null
     }
 
     $Settings | ConvertTo-Json -Depth 6 | Set-Content -Path $path -Encoding UTF8
@@ -8432,11 +8432,11 @@ function Get-GUIToolAction {
 function Get-GUICatalogTools {
     param([string]$Tab)
 
-    if(!(Get-Command Get-CSIToolCatalog -ErrorAction SilentlyContinue)){
+    if(!(Get-Command Get-NTKToolCatalog -ErrorAction SilentlyContinue)){
         return @()
     }
 
-    return @(Get-CSIToolCatalog | Where-Object { $_.Tab -eq $Tab } | ForEach-Object {
+    return @(Get-NTKToolCatalog | Where-Object { $_.Tab -eq $Tab } | ForEach-Object {
         New-GUIToolItem `
             -Text $_.Text `
             -Description $_.Description `
@@ -8971,8 +8971,8 @@ function Get-GUISelectedGridTags {
 
 function Get-GUIWindowsUpdateRebootPendingText {
     try {
-        if(Get-Command Get-CSIPendingRebootState -ErrorAction SilentlyContinue){
-            $pending = Get-CSIPendingRebootState
+        if(Get-Command Get-NTKPendingRebootState -ErrorAction SilentlyContinue){
+            $pending = Get-NTKPendingRebootState
             if($pending -and $pending.Pending){
                 return "Reboot pending"
             }
@@ -9001,7 +9001,7 @@ function Start-GUIWindowsUpdateBackgroundAction {
         return
     }
 
-    $session = New-CSITempOutputSession -ToolName "Windows Update $Action"
+    $session = New-NTKTempOutputSession -ToolName "Windows Update $Action"
     $titlesPath = Join-Path $session.Path "selected-updates.json"
     $resultPath = Join-Path $session.Path "windows-update-result.json"
     $runnerPath = Join-Path $session.Path "run-windows-update-action.ps1"
@@ -9072,7 +9072,7 @@ finally {
     $scriptText | Set-Content -Path $runnerPath -Encoding UTF8
 
     try {
-        $process = Start-CSIToolProcess `
+        $process = Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$runnerPath`"") `
             -WorkingDirectory $SharedToolkitRoot `
@@ -9317,8 +9317,8 @@ function Invoke-GUIWindowsUpdateRepair {
     $oldCursor = if($script:Form){$script:Form.Cursor}else{$null}
     $log = New-Object System.Collections.ArrayList
     $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $sessionPath = if($CSIPaths -and $CSIPaths.TempOutputs){
-        Join-Path $CSIPaths.TempOutputs "$stamp-Windows Update Repair"
+    $sessionPath = if($NTKPaths -and $NTKPaths.TempOutputs){
+        Join-Path $NTKPaths.TempOutputs "$stamp-Windows Update Repair"
     }
     else{
         Join-Path $env:TEMP "$stamp-Windows Update Repair"
@@ -9680,7 +9680,7 @@ function Start-GUIDriverUpdateFinder {
     $actions.FlowDirection = "LeftToRight"
     [void]$actions.Controls.Add((New-GUIButton "Refresh Drivers" { Refresh-GUIDriverUpdateFinder }))
     [void]$actions.Controls.Add((New-GUIButton "Search Official Driver" { Search-GUISelectedDriverUpdate }))
-    [void]$actions.Controls.Add((New-GUIButton "Open Device Manager" { Start-CSIToolProcess -FilePath "devmgmt.msc" | Out-Null }))
+    [void]$actions.Controls.Add((New-GUIButton "Open Device Manager" { Start-NTKToolProcess -FilePath "devmgmt.msc" | Out-Null }))
     [void]$actions.Controls.Add((New-GUIButton "Open Windows Update" {
         $page = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Windows Update" } | Select-Object -First 1
         if($page){ Select-GUITabPage -Page $page }
@@ -9863,19 +9863,19 @@ function Build-ReportsPage {
 function Get-GUIReportItems {
     $items = @()
     $roots = @(
-        @{ Type="Quick Diagnosis"; Path=$CSIPaths.Exports; Pattern="quick-diagnosis*.html" },
-        @{ Type="Final Reports"; Path=$CSIPaths.Exports; Pattern="final-report*.html" },
-        @{ Type="Software Keys"; Path=$CSIPaths.Exports; Pattern="software-key-report*.html" },
-        @{ Type="Crash Events"; Path=$CSIPaths.Exports; Pattern="crash-event-summary*.html" },
-        @{ Type="Computer Profiles"; Path=(Get-CSIFingerprintPath); Pattern="*.html" },
-        @{ Type="Minidumps"; Path=(Join-Path $CSIPaths.Data "MiniDumps"); Pattern="*" },
-        @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*inventory*.csv" },
-        @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*network*.csv" },
-        @{ Type="Discovery Exports"; Path=$CSIPaths.Exports; Pattern="*discovery*.txt" },
-        @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="full-triage*.txt" },
-        @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="full-triage*.json" },
-        @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="dism*.log" },
-        @{ Type="Repair And Triage"; Path=$CSIPaths.Exports; Pattern="sfc*.log" }
+        @{ Type="Quick Diagnosis"; Path=$NTKPaths.Exports; Pattern="quick-diagnosis*.html" },
+        @{ Type="Final Reports"; Path=$NTKPaths.Exports; Pattern="final-report*.html" },
+        @{ Type="Software Keys"; Path=$NTKPaths.Exports; Pattern="software-key-report*.html" },
+        @{ Type="Crash Events"; Path=$NTKPaths.Exports; Pattern="crash-event-summary*.html" },
+        @{ Type="Computer Profiles"; Path=(Get-NTKFingerprintPath); Pattern="*.html" },
+        @{ Type="Minidumps"; Path=(Join-Path $NTKPaths.Data "MiniDumps"); Pattern="*" },
+        @{ Type="Discovery Exports"; Path=$NTKPaths.Exports; Pattern="*inventory*.csv" },
+        @{ Type="Discovery Exports"; Path=$NTKPaths.Exports; Pattern="*network*.csv" },
+        @{ Type="Discovery Exports"; Path=$NTKPaths.Exports; Pattern="*discovery*.txt" },
+        @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="full-triage*.txt" },
+        @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="full-triage*.json" },
+        @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="dism*.log" },
+        @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="sfc*.log" }
     )
 
     foreach($root in $roots){
@@ -9947,7 +9947,7 @@ function Open-SelectedGUIReport {
         Open-GUIFolder $report.Path
     }
     else{
-        Open-CSIOutputFile -Path $report.Path
+        Open-NTKOutputFile -Path $report.Path
     }
 }
 
@@ -10011,23 +10011,23 @@ function Import-GUIAIAnalysis {
         $missing = @($analysis.missingEvidence | ForEach-Object { "<li>$( & $encode $_ )</li>" }) -join "`n"
         $checklist = @($analysis.technicianChecklist | ForEach-Object { "<li>$( & $encode $_ )</li>" }) -join "`n"
         $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-        $path = Join-Path $CSIPaths.Exports ("ai-analysis-{0}-{1}.html" -f $analysis.computerName,$stamp)
+        $path = Join-Path $NTKPaths.Exports ("ai-analysis-{0}-{1}.html" -f $analysis.computerName,$stamp)
         @"
 <!doctype html><html><head><meta charset="utf-8"><title>Network Toolkit AI Analysis</title><style>body{font:15px Segoe UI,Arial;background:#eef4f8;color:#18324b;margin:0}main{max-width:1200px;margin:28px auto;background:#fff;padding:30px;border:1px solid #cbd8e4;border-radius:8px}h1{margin:0;color:#124c7a}h2{margin-top:28px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #cbd8e4;vertical-align:top;text-align:left}th{background:#e7f1fa}li{margin:8px 0}span{color:#526070}</style></head><body><main><h1>Network Toolkit AI Analysis</h1><p><strong>Computer:</strong> $( & $encode $analysis.computerName ) &nbsp; <strong>Risk:</strong> $( & $encode $analysis.riskLevel ) &nbsp; <strong>Imported:</strong> $stamp</p><h2>Executive Summary</h2><p>$( & $encode $analysis.executiveSummary )</p><h2>Findings</h2><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Impact</th><th>Confidence</th><th>Next Action</th></tr>$findings</table><h2>Event Timeline</h2><ul>$timeline</ul><h2>Likely Root Cause Candidates</h2><ul>$causes</ul><h2>Missing Evidence</h2><ul>$missing</ul><h2>Technician Checklist</h2><ol>$checklist</ol></main></body></html>
 "@ | Set-Content -LiteralPath $path -Encoding UTF8
-        if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){
-            [void](Set-CSIComputerStateSection -SectionName "AIAnalysis" -Data $analysis -ComputerName $analysis.computerName -Source "Import-GUIAIAnalysis")
+        if(Get-Command Set-NTKComputerStateSection -ErrorAction SilentlyContinue){
+            [void](Set-NTKComputerStateSection -SectionName "AIAnalysis" -Data $analysis -ComputerName $analysis.computerName -Source "Import-GUIAIAnalysis")
         }
         Export-GUIFinalComputerReport -ComputerName $analysis.computerName | Out-Null
-        Add-GUILog "Imported AI analysis: $path"; Refresh-GUIReports; Open-CSIOutputFile -Path $path
+        Add-GUILog "Imported AI analysis: $path"; Refresh-GUIReports; Open-NTKOutputFile -Path $path
     }
     catch { [System.Windows.Forms.MessageBox]::Show("Could not import AI analysis.`r`n`r`n$($_.Exception.Message)","Import AI Analysis",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null }
 }
 
 function Export-GUIFinalComputerReport {
     param([string]$ComputerName=$env:COMPUTERNAME)
-    if(!(Get-Command Read-CSIComputerState -ErrorAction SilentlyContinue)){ throw "Computer state storage is unavailable." }
-    $state = Read-CSIComputerState -ComputerName $ComputerName
+    if(!(Get-Command Read-NTKComputerState -ErrorAction SilentlyContinue)){ throw "Computer state storage is unavailable." }
+    $state = Read-NTKComputerState -ComputerName $ComputerName
     $sections = $state.Sections
     if(!$sections -or !$sections.AIAnalysis -or !$sections.AIAnalysis.Data){ throw "Import an AI analysis JSON for $ComputerName first." }
     $ai = $sections.AIAnalysis.Data
@@ -10036,11 +10036,11 @@ function Export-GUIFinalComputerReport {
     $findings = @($ai.findings | ForEach-Object { "<tr><td>$( & $enc $_.severity )</td><td>$( & $enc $_.title )</td><td>$( & $enc (@($_.evidence) -join '<br>') )</td><td>$( & $enc $_.nextAction )</td></tr>" }) -join "`n"
     $checklist = @($ai.technicianChecklist | ForEach-Object { "<li>$( & $enc $_ )</li>" }) -join "`n"
     $problems = if($quick -and $quick.Problems){@($quick.Problems | ForEach-Object { "<li><strong>$( & $enc ("$($_.Area) - $($_.Check)") )</strong>: $( & $enc $_.Detail )</li>" }) -join "`n"}else{'<li>No saved Quick Diagnosis findings were available.</li>'}
-    $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'; $path=Join-Path $CSIPaths.Exports ("final-report-{0}-{1}.html" -f $ComputerName,$stamp)
+    $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'; $path=Join-Path $NTKPaths.Exports ("final-report-{0}-{1}.html" -f $ComputerName,$stamp)
     @"
 <!doctype html><html><head><meta charset="utf-8"><title>Network Toolkit Final Report</title><style>body{font:15px Segoe UI,Arial;background:#edf4f8;color:#18324b;margin:0}main{max-width:1180px;margin:28px auto;background:white;padding:32px;border:1px solid #cbd8e4;border-radius:8px}h1{color:#125c96;margin:0}h2{margin-top:28px;color:#18324b}table{border-collapse:collapse;width:100%}th,td{border:1px solid #cbd8e4;padding:10px;text-align:left;vertical-align:top}th{background:#e7f1fa}.meta{color:#526070}</style></head><body><main><h1>Network Toolkit Final Report</h1><p class="meta">Computer: $( & $enc $ComputerName ) | Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | AI risk: $( & $enc $ai.riskLevel )</p><h2>Executive Summary</h2><p>$( & $enc $ai.executiveSummary )</p><h2>Local Quick Diagnosis Findings</h2><ul>$problems</ul><h2>AI Evidence-Backed Findings</h2><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th><th>Next Action</th></tr>$findings</table><h2>Technician Checklist</h2><ol>$checklist</ol><h2>Provenance</h2><p>Local Quick Diagnosis state: $( & $enc $state.LastQuickDiagnosisAt )<br>AI analysis imported: $( & $enc $sections.AIAnalysis.UpdatedAt )<br>AI content was imported from validated JSON and rendered by Network Toolkit.</p></main></body></html>
 "@ | Set-Content -LiteralPath $path -Encoding UTF8
-    if(Get-Command Set-CSIComputerStateSection -ErrorAction SilentlyContinue){ [void](Set-CSIComputerStateSection -SectionName 'FinalReport' -Data ([pscustomobject]@{Path=$path;GeneratedAt=(Get-Date).ToString('s')}) -ComputerName $ComputerName -Source 'Export-GUIFinalComputerReport') }
+    if(Get-Command Set-NTKComputerStateSection -ErrorAction SilentlyContinue){ [void](Set-NTKComputerStateSection -SectionName 'FinalReport' -Data ([pscustomobject]@{Path=$path;GeneratedAt=(Get-Date).ToString('s')}) -ComputerName $ComputerName -Source 'Export-GUIFinalComputerReport') }
     Add-GUILog "Generated Final Report: $path"; return $path
 }
 
@@ -10083,7 +10083,7 @@ function New-GUIChatGPTBundle {
     if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
 
     try {
-        $bundleRoot = Join-Path $CSIPaths.Exports "AI-Bundles"
+        $bundleRoot = Join-Path $NTKPaths.Exports "AI-Bundles"
         New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
         $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
         $bundleFolder = Join-Path $bundleRoot ("chatgpt-bundle-{0}-{1}" -f $computerName,$stamp)
@@ -10091,8 +10091,8 @@ function New-GUIChatGPTBundle {
         $collectionRoot = $null
         $collectFreshEvidence = $false
         $usedRecentEvidence = $false
-        if(Get-Command New-CSIAIDiagnosticCollection -ErrorAction SilentlyContinue){
-            $latestCollection = @(Get-ChildItem -LiteralPath $CSIPaths.Exports -Directory -Filter ("AI-Collection-{0}-*" -f $computerName) -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1)[0]
+        if(Get-Command New-NTKAIDiagnosticCollection -ErrorAction SilentlyContinue){
+            $latestCollection = @(Get-ChildItem -LiteralPath $NTKPaths.Exports -Directory -Filter ("AI-Collection-{0}-*" -f $computerName) -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1)[0]
             $collectionIsRecent = $latestCollection -and ((Get-Date) - $latestCollection.LastWriteTime).TotalHours -lt 24
             $collectionChoice = [System.Windows.Forms.MessageBox]::Show(
                 "Run a fresh expanded evidence collection before creating the bundle?`r`n`r`nThis repeats some Quick Diagnosis read-only checks and additionally gathers targeted event, driver, service, network, process, policy, and role evidence. Choose No to reuse evidence collected within the last 24 hours; if no current collection exists, the expanded collector will run once.",
@@ -10112,7 +10112,7 @@ function New-GUIChatGPTBundle {
         if($collectFreshEvidence){
             Start-GUIBusyIndicator -Message "Collecting diagnostic evidence"
             try {
-                $collectionRoot = New-CSIAIDiagnosticCollection -ComputerName $computerName
+                $collectionRoot = New-NTKAIDiagnosticCollection -ComputerName $computerName
                 if($collectionRoot -and (Test-Path -LiteralPath $collectionRoot)){
                     Copy-Item -LiteralPath $collectionRoot -Destination (Join-Path $bundleFolder "Diagnostic-Collection") -Recurse -Force
                 }
@@ -10871,13 +10871,13 @@ function Refresh-GUISoftwareKeyFinderResults {
 
 function Start-GUISoftwareKeyFinderScan {
     try {
-        if(!(Get-Command Get-CSIWindowsLicenseKeys -ErrorAction SilentlyContinue)){
+        if(!(Get-Command Get-NTKWindowsLicenseKeys -ErrorAction SilentlyContinue)){
             throw "Software Key Finder did not load. Restart the toolkit and try again."
         }
 
-        $keys = @(Get-CSIWindowsLicenseKeys) + @(Get-CSIOfficeLicenseKeys) + @(Get-CSIApplicationLicenseEntries)
-        $activation = @(Get-CSIMicrosoftActivationInventory)
-        $script:SoftwareKeyReportPath = Export-CSISoftwareKeyReport -RecoveredKeys $keys -ActivationInventory $activation
+        $keys = @(Get-NTKWindowsLicenseKeys) + @(Get-NTKOfficeLicenseKeys) + @(Get-NTKApplicationLicenseEntries)
+        $activation = @(Get-NTKMicrosoftActivationInventory)
+        $script:SoftwareKeyReportPath = Export-NTKSoftwareKeyReport -RecoveredKeys $keys -ActivationInventory $activation
         Refresh-GUISoftwareKeyFinderResults -Keys $keys -Activation $activation
         Add-GUILog "Software Key Finder completed. Confidential report: $script:SoftwareKeyReportPath"
         Write-GUIToolUsageLog -Tool "Software Key Finder" -Action "Completed" -Detail ("Recovered={0}; ActivationRecords={1}" -f $keys.Count,$activation.Count)
@@ -10911,7 +10911,7 @@ function Copy-GUISelectedSoftwareKey {
 
 function Open-GUISoftwareKeyReport {
     if(!$script:SoftwareKeyReportPath -or !(Test-Path $script:SoftwareKeyReportPath)){
-        $reports = @(Get-ChildItem -Path $CSIPaths.Exports -Filter "software-key-report*.html" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
+        $reports = @(Get-ChildItem -Path $NTKPaths.Exports -Filter "software-key-report*.html" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending)
         if($reports.Count -gt 0){
             $script:SoftwareKeyReportPath = $reports[0].FullName
         }
@@ -10922,7 +10922,7 @@ function Open-GUISoftwareKeyReport {
         return
     }
 
-    Start-CSIToolProcess -FilePath $script:SoftwareKeyReportPath | Out-Null
+    Start-NTKToolProcess -FilePath $script:SoftwareKeyReportPath | Out-Null
     Add-GUILog "Opened Software Key Finder report."
 }
 
@@ -11243,15 +11243,15 @@ function Save-GUISettingsFromPage {
 }
 
 function Get-GUIClientDataTargets {
-    $targets = @($CSIPaths.Exports,$CSIPaths.Data)
+    $targets = @($NTKPaths.Exports,$NTKPaths.Data)
 
     # A few plugins maintain their own logs outside the central Logs folder.
     $targets += @(
-        (Join-Path $CSIPaths.Root "Plugins\PrintQueues\Logs"),
-        (Join-Path $CSIPaths.Root "Plugins\PrintQueues\Print Queue Cleanup\Logs")
+        (Join-Path $NTKPaths.Root "Plugins\PrintQueues\Logs"),
+        (Join-Path $NTKPaths.Root "Plugins\PrintQueues\Print Queue Cleanup\Logs")
     )
 
-    $targets += @(Get-ChildItem -Path $CSIPaths.Root -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    $targets += @(Get-ChildItem -Path $NTKPaths.Root -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
     return @($targets | Where-Object { $_ -and (Test-Path $_) } | Sort-Object -Unique)
 }
 
@@ -11453,7 +11453,7 @@ function Start-GUIToolkitSizeRefresh {
 
     try {
         $script:ToolkitSizeResultPath = $resultPath
-        $script:ToolkitSizeProcess = Start-CSIToolProcess `
+        $script:ToolkitSizeProcess = Start-NTKToolProcess `
             -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-Command",$command) `
             -WorkingDirectory $deploymentRoot `
@@ -11518,7 +11518,7 @@ function Start-GUIToolkitUpdate {
     $arguments = @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$updaterPath`"","-SourceRoot","`"$SourceRoot`"","-DestinationRoot","`"$DestinationRoot`"","-ResultPath","`"$resultPath`"")
     try {
         $script:ToolkitUpdateResultPath = $resultPath
-        $script:ToolkitUpdateProcess = Start-CSIToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
+        $script:ToolkitUpdateProcess = Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
         Start-GUIBusyIndicator -Message "Updating Toolkit"
         Add-GUILog "Toolkit update started: $SourceRoot -> $DestinationRoot"
         Write-GUIToolUsageLog -Tool "Toolkit Updater" -Action "Started" -Detail ("Source={0}; Destination={1}" -f $SourceRoot,$DestinationRoot)
@@ -11600,7 +11600,7 @@ function Start-GUIToolkitDeployment {
     $resultPath = Join-Path $env:TEMP ("NetworkToolkit-deployment-{0}.json" -f [guid]::NewGuid().ToString('N'))
     $arguments = @('-NoProfile','-ExecutionPolicy','Bypass','-File',"`"$deployerPath`"",'-SourceRoot',"`"$SourceRoot`"",'-DestinationRoot',"`"$DestinationRoot`"",'-ResultPath',"`"$resultPath`"")
     $script:ToolkitDeploymentResultPath = $resultPath
-    $script:ToolkitDeploymentProcess = Start-CSIToolProcess -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
+    $script:ToolkitDeploymentProcess = Start-NTKToolProcess -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
     Start-GUIBusyIndicator -Message 'Deploying Toolkit'
     Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Started' -Detail "Source=$SourceRoot; Destination=$DestinationRoot"
     $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 1200
@@ -12094,17 +12094,17 @@ function Build-SettingsPage {
     $logsButton.Width = 0
     $folderPanel.Controls.Add($logsButton,0,0)
 
-    $reportsButton = New-GUIButton "Open Reports" { Open-GUIFolder $CSIPaths.Exports }
+    $reportsButton = New-GUIButton "Open Reports" { Open-GUIFolder $NTKPaths.Exports }
     $reportsButton.Dock = "Fill"
     $reportsButton.Width = 0
     $folderPanel.Controls.Add($reportsButton,1,0)
 
-    $tempButton = New-GUIButton "Open Temp Outputs" { Open-GUIFolder (Get-CSITempOutputRoot) }
+    $tempButton = New-GUIButton "Open Temp Outputs" { Open-GUIFolder (Get-NTKTempOutputRoot) }
     $tempButton.Dock = "Fill"
     $tempButton.Width = 0
     $folderPanel.Controls.Add($tempButton,0,1)
 
-    $dataButton = New-GUIButton "Open Data" { Open-GUIFolder $CSIPaths.Data }
+    $dataButton = New-GUIButton "Open Data" { Open-GUIFolder $NTKPaths.Data }
     $dataButton.Dock = "Fill"
     $dataButton.Width = 0
     $folderPanel.Controls.Add($dataButton,1,1)
@@ -12608,7 +12608,7 @@ if($ButtonSmokeTest){
     )
 
     $unknownActions = @(
-        Get-CSIToolCatalog |
+        Get-NTKToolCatalog |
             Where-Object { $_.Action -and $knownGuiActions -notcontains $_.Action } |
             Select-Object -ExpandProperty Action -Unique
     )
