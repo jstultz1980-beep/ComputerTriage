@@ -371,6 +371,9 @@ Typical tools:
 - Wi-Fi Status
 - Wi-Fi Profiles
 - Wi-Fi Networks
+- Wi-Fi Backup / Restore
+
+Wi-Fi Backup / Restore consolidates the old separate export/import scripts into one workflow. It exports saved wireless profiles to the toolkit data store under the current computer name, imports profile XML files back onto a workstation, and can open the backup folder for review. Exported profile XML may include saved Wi-Fi keys in clear text, so handle these files as client-sensitive data and remove them with the toolkit sanitization process when they are no longer needed.
 
 ### Print
 

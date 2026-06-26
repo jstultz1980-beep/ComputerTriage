@@ -341,6 +341,195 @@ param([switch]$PassThru)
 
 }
 
+function Global:Get-CSIWiFiProfileStorePath {
+
+param([string]$ComputerName = $env:COMPUTERNAME)
+
+    $safeComputer = if($ComputerName){$ComputerName -replace '[^\w.-]','_'}else{'UnknownComputer'}
+
+    if($script:CSIPaths -and $script:CSIPaths.Data){
+        $root = Join-Path $script:CSIPaths.Data "WiFiProfiles"
+    }
+    elseif($global:CSIPaths -and $global:CSIPaths.Data){
+        $root = Join-Path $global:CSIPaths.Data "WiFiProfiles"
+    }
+    else{
+        $root = Join-Path $PSScriptRoot "WiFiProfiles"
+    }
+
+    return (Join-Path $root $safeComputer)
+
+}
+
+function Global:Export-CSIWiFiProfiles {
+
+param(
+    [string]$Destination,
+    [switch]$PassThru
+)
+
+    $service = Get-CSIWiFiServiceState
+
+    if(!$service.Present){
+        throw $service.Detail
+    }
+
+    if($service.Status -ne "Running"){
+        throw "Wireless AutoConfig service is $($service.Status). Start WlanSvc before exporting Wi-Fi profiles."
+    }
+
+    if(!$Destination){
+        $Destination = Get-CSIWiFiProfileStorePath
+    }
+
+    New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+
+    $before = @(Get-ChildItem -LiteralPath $Destination -Filter "*.xml" -File -ErrorAction SilentlyContinue)
+    $output = netsh wlan export profile key=clear folder="$Destination" 2>&1
+    $exitCode = $LASTEXITCODE
+    $after = @(Get-ChildItem -LiteralPath $Destination -Filter "*.xml" -File -ErrorAction SilentlyContinue)
+
+    $result = [pscustomobject]@{
+        Action      = "Export"
+        Status      = if($exitCode -eq 0 -and $after.Count -gt 0){"Completed"}else{"Warning"}
+        Destination = $Destination
+        FilesBefore = $before.Count
+        FilesAfter  = $after.Count
+        ExitCode    = $exitCode
+        Output      = ($output -join "`r`n")
+        Sensitive   = "Exported XML may contain Wi-Fi keys in clear text."
+    }
+
+    if($PassThru){
+        return $result
+    }
+
+    Write-Host ""
+    Write-Host "WI-FI PROFILE EXPORT" -ForegroundColor Cyan
+    Write-Host "====================" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "Destination: $Destination"
+    Write-Host "Profiles exported: $($after.Count)"
+    Write-Host "Warning: exported XML may contain Wi-Fi keys in clear text." -ForegroundColor Yellow
+    Write-Host ""
+    if($output){ $output | ForEach-Object { Write-Host $_ } }
+
+}
+
+function Global:Import-CSIWiFiProfiles {
+
+param(
+    [string]$Source,
+    [switch]$PassThru
+)
+
+    $service = Get-CSIWiFiServiceState
+
+    if(!$service.Present){
+        throw $service.Detail
+    }
+
+    if($service.Status -ne "Running"){
+        throw "Wireless AutoConfig service is $($service.Status). Start WlanSvc before importing Wi-Fi profiles."
+    }
+
+    if(!$Source){
+        $Source = Get-CSIWiFiProfileStorePath
+    }
+
+    if(!(Test-Path -LiteralPath $Source)){
+        throw "Wi-Fi profile source folder was not found: $Source"
+    }
+
+    $files = @(Get-ChildItem -LiteralPath $Source -Filter "*.xml" -File -ErrorAction SilentlyContinue)
+
+    if($files.Count -eq 0){
+        throw "No Wi-Fi profile XML files were found in: $Source"
+    }
+
+    $results = @()
+
+    foreach($file in $files){
+
+        $output = netsh wlan add profile filename="$($file.FullName)" user=all 2>&1
+        $results += [pscustomobject]@{
+            File     = $file.Name
+            FullName = $file.FullName
+            Status   = if($LASTEXITCODE -eq 0){"Imported"}else{"Failed"}
+            ExitCode = $LASTEXITCODE
+            Output   = ($output -join " ")
+        }
+
+    }
+
+    if($PassThru){
+        return $results
+    }
+
+    Write-Host ""
+    Write-Host "WI-FI PROFILE IMPORT" -ForegroundColor Cyan
+    Write-Host "====================" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "Source: $Source"
+    Write-Host ""
+    $results | Select-Object File,Status,ExitCode,Output | Format-Table -Wrap -AutoSize
+
+}
+
+function Global:Invoke-WiFiProfileBackupRestore {
+
+param([switch]$PassThru)
+
+    Clear-Host
+
+    Write-Host ""
+    Write-Host "WI-FI PROFILE BACKUP / RESTORE" -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "This consolidates Wi-Fi profile export and import into one portable workflow."
+    Write-Host "Default profile store: $(Get-CSIWiFiProfileStorePath)"
+    Write-Host "Security note: exported XML may contain saved Wi-Fi keys in clear text." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "1. Export saved Wi-Fi profiles from this computer"
+    Write-Host "2. Import saved Wi-Fi profiles into this computer"
+    Write-Host "3. Open Wi-Fi profile backup folder"
+    Write-Host ""
+
+    $choice = Read-CSIInput "Select Wi-Fi profile task"
+
+    switch($choice){
+        "1" {
+            $default = Get-CSIWiFiProfileStorePath
+            $destination = Read-CSIInput "Export folder, blank for default [$default]" -AllowEmpty
+            if([string]::IsNullOrWhiteSpace($destination)){ $destination = $default }
+            $result = Export-CSIWiFiProfiles -Destination $destination -PassThru
+            Write-Host ""
+            Write-Host "Exported $($result.FilesAfter) profile XML file(s) to: $($result.Destination)" -ForegroundColor Green
+            Write-Host "Keep this folder protected. It may contain Wi-Fi passwords." -ForegroundColor Yellow
+            if($PassThru){ return $result }
+        }
+        "2" {
+            $default = Get-CSIWiFiProfileStorePath
+            $source = Read-CSIInput "Import folder, blank for default [$default]" -AllowEmpty
+            if([string]::IsNullOrWhiteSpace($source)){ $source = $default }
+            $results = @(Import-CSIWiFiProfiles -Source $source -PassThru)
+            Write-Host ""
+            $results | Select-Object File,Status,ExitCode,Output | Format-Table -Wrap -AutoSize
+            if($PassThru){ return $results }
+        }
+        "3" {
+            $folder = Get-CSIWiFiProfileStorePath
+            New-Item -ItemType Directory -Force -Path $folder | Out-Null
+            Start-Process explorer.exe -ArgumentList "`"$folder`""
+            Write-Host "Opened: $folder"
+        }
+        default {
+            Write-Host "Invalid selection." -ForegroundColor Red
+        }
+    }
+
+}
+
 function Global:Invoke-WiFiIssueScan {
 
 param([switch]$PassThru)
@@ -465,6 +654,7 @@ function Global:Invoke-WiFiDiagnostics {
         Write-Host "2. Wi-Fi Status"
         Write-Host "3. Visible Wi-Fi Networks"
         Write-Host "4. Saved Wi-Fi Profiles"
+        Write-Host "5. Backup / Restore Wi-Fi Profiles"
         Write-Host ""
 
         $choice = Read-CSIInput "Select Wi-Fi task"
@@ -474,6 +664,7 @@ function Global:Invoke-WiFiDiagnostics {
             "2" { Invoke-WiFiStatus }
             "3" { Invoke-WiFiNetworks }
             "4" { Invoke-WiFiProfiles }
+            "5" { Invoke-WiFiProfileBackupRestore }
             default { Write-Host "Invalid selection." -ForegroundColor Red }
         }
 
@@ -490,3 +681,10 @@ Register-CSICommand `
     -Category "Wi-Fi" `
     -Description "Signal, service, channel, visible network, and saved profile diagnostics" `
     -Order 60
+
+Register-CSICommand `
+    -Name "Wi-Fi Profile Backup / Restore" `
+    -Command "Invoke-WiFiProfileBackupRestore" `
+    -Category "Wi-Fi" `
+    -Description "Export or import saved Wi-Fi profiles from the toolkit data store" `
+    -Order 61

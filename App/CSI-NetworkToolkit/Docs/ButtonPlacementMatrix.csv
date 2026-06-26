@@ -13,7 +13,7 @@ Remote,"Remote access and file transfer.","Launch RDP; WinSCP; PuTTY; KiTTY; mRe
 PsExec,"Guided PsExec command building and execution.","Target; credentials; elevation; interactive/system flags; captured output","Dedicated tab because argument prompts and output handling are required."
 Directory,"Domain, Active Directory, secure channel, and Group Policy checks.","Domain Logon Health; GPO Health; GPResult; ADExplorer; ADInsight; ADRestore","Directory and policy work has distinct technician intent."
 Security,"Malware, persistence, signatures, privacy, and hardening.","Microsoft Safety Scanner; Malwarebytes AdwCleaner; ClamWin; Autoruns; Sigcheck; HijackThis; xpy; password tools","Security scanners and persistence tools live together."
-Wi-Fi,"Wireless-specific troubleshooting.","Wi-Fi Issue Scan; Wi-Fi Status; Wi-Fi Profiles; Wi-Fi Networks","Separate from Network because wireless failures have distinct causes."
+Wi-Fi,"Wireless-specific troubleshooting.","Wi-Fi Issue Scan; Wi-Fi Status; Wi-Fi Profiles; Wi-Fi Networks; Wi-Fi Backup / Restore","Separate from Network because wireless failures have distinct causes. Profile backup/restore is a wireless migration and recovery workflow."
 Print,"Printer, spooler, queue, and stale printer artifact work.","Print Queue Maintenance; Print Spooler Triage; Stale Printer Cleanup","Custom print tools belong here."
 Files,"File search, comparison, disk usage, and file-level utilities.","Everything; WizTree; WinDirStat; WinMerge; Kudu; Handle","Cleanup/removal-first tools should move to Clean Up."
 Robocopy,"Plain-language robocopy builder.","Build Command; Copy Command; Preview Only; Run Copy","Dedicated tab because this is a full workflow."
