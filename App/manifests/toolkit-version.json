@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260626104117,
-    "SourceUpdatedAt":  "2026-06-26T10:41:17.9075283-05:00",
-    "ReleaseNotes":  "Refine Quick Dx layout, settings maintenance layout, themes, and button styling."
+    "Build":  20260626105351,
+    "SourceUpdatedAt":  "2026-06-26T10:53:51.7139419-05:00",
+    "ReleaseNotes":  "Replace tool launch glyphs with LED indicators and add elevation crown icon."
 }

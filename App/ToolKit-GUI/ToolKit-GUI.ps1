@@ -1082,6 +1082,160 @@ function Set-GUITabButtonChrome {
     Set-GUIRoundedCorners -Control $Button -Radius 10
 }
 
+function Set-GUIToolLaunchLed {
+    param([System.Windows.Forms.Control]$Control)
+
+    if(!$Control){
+        return
+    }
+
+    $Control.BackColor = $script:GUITheme.Page
+    $Control.Cursor = [System.Windows.Forms.Cursors]::Hand
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Hover"){
+        $Control.Tag.Hover = $false
+    }
+
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked" -and $Control.Tag.PaintHooked){
+        $Control.Invalidate()
+        return
+    }
+
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked"){
+        $Control.Tag.PaintHooked = $true
+    }
+
+    $Control.Add_MouseEnter({
+        param($sender,$eventArgs)
+        if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "Hover"){
+            $sender.Tag.Hover = $true
+            $sender.Invalidate()
+        }
+    })
+    $Control.Add_MouseLeave({
+        param($sender,$eventArgs)
+        if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "Hover"){
+            $sender.Tag.Hover = $false
+            $sender.Invalidate()
+        }
+    })
+    $Control.Add_Paint({
+        param($sender,$eventArgs)
+        try {
+            $graphics = $eventArgs.Graphics
+            $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+            $rect = New-Object System.Drawing.Rectangle(2,2,($sender.Width - 4),($sender.Height - 4))
+            if($rect.Width -le 0 -or $rect.Height -le 0){ return }
+
+            $hover = $false
+            if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "Hover"){
+                $hover = [bool]$sender.Tag.Hover
+            }
+
+            $haloColor = if($hover){$script:GUITheme.HeaderMuted}else{$script:GUITheme.AccentSoft}
+            $coreColor = if($hover){$script:GUITheme.AccentDark}else{$script:GUITheme.Accent}
+            $shineColor = [System.Drawing.Color]::FromArgb(210,255,255,255)
+
+            $halo = New-Object System.Drawing.SolidBrush($haloColor)
+            $core = New-Object System.Drawing.SolidBrush($coreColor)
+            $shine = New-Object System.Drawing.SolidBrush($shineColor)
+            $border = New-Object System.Drawing.Pen($script:GUITheme.AccentDark,1)
+            try {
+                $graphics.FillEllipse($halo,$rect)
+                $inner = New-Object System.Drawing.Rectangle(($rect.X + 4),($rect.Y + 4),($rect.Width - 8),($rect.Height - 8))
+                $graphics.FillEllipse($core,$inner)
+                $graphics.DrawEllipse($border,$inner)
+                $spark = New-Object System.Drawing.Rectangle(($inner.X + 3),($inner.Y + 3),[Math]::Max(3,[int]($inner.Width / 3)),[Math]::Max(3,[int]($inner.Height / 3)))
+                $graphics.FillEllipse($shine,$spark)
+            }
+            finally {
+                $halo.Dispose()
+                $core.Dispose()
+                $shine.Dispose()
+                $border.Dispose()
+            }
+        }
+        catch {}
+    })
+    $Control.Invalidate()
+}
+
+function Set-GUIElevationCrownIcon {
+    param([System.Windows.Forms.Control]$Control)
+
+    if(!$Control){
+        return
+    }
+
+    $Control.BackColor = $script:GUITheme.HeaderPanel
+    $Control.Cursor = [System.Windows.Forms.Cursors]::Help
+
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked" -and $Control.Tag.PaintHooked){
+        $Control.Invalidate()
+        return
+    }
+
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked"){
+        $Control.Tag.PaintHooked = $true
+    }
+
+    $Control.Add_Paint({
+        param($sender,$eventArgs)
+        try {
+            $elevated = Test-GUIAdministrator
+            $graphics = $eventArgs.Graphics
+            $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+            $graphics.Clear($script:GUITheme.HeaderPanel)
+
+            $gold = [System.Drawing.Color]::FromArgb(244,194,76)
+            $goldDark = [System.Drawing.Color]::FromArgb(173,118,33)
+            $grey = [System.Drawing.Color]::FromArgb(150,158,166)
+            $greyDark = [System.Drawing.Color]::FromArgb(92,100,108)
+            $fillColor = if($elevated){$gold}else{$grey}
+            $strokeColor = if($elevated){$goldDark}else{$greyDark}
+
+            $points = @(
+                (New-Object System.Drawing.PointF(6,25)),
+                (New-Object System.Drawing.PointF(7,11)),
+                (New-Object System.Drawing.PointF(14,18)),
+                (New-Object System.Drawing.PointF(22,8)),
+                (New-Object System.Drawing.PointF(30,18)),
+                (New-Object System.Drawing.PointF(37,11)),
+                (New-Object System.Drawing.PointF(38,25))
+            )
+
+            $fill = New-Object System.Drawing.SolidBrush($fillColor)
+            $shine = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(110,255,255,255))
+            $stroke = New-Object System.Drawing.Pen($strokeColor,1.6)
+            try {
+                $graphics.FillPolygon($fill,$points)
+                $graphics.DrawPolygon($stroke,$points)
+                $baseRect = New-Object System.Drawing.Rectangle(7,24,31,7)
+                $graphics.FillRectangle($fill,$baseRect)
+                $graphics.DrawRectangle($stroke,$baseRect)
+                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(12,15,5,5)))
+                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(21,11,5,5)))
+                $graphics.FillEllipse($shine,(New-Object System.Drawing.Rectangle(30,15,5,5)))
+
+                if(!$elevated){
+                    $slash = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(185,90,90,90),3.2)
+                    try {
+                        $graphics.DrawEllipse($slash,(New-Object System.Drawing.Rectangle(3,4,39,30)))
+                        $graphics.DrawLine($slash,8,31,38,7)
+                    }
+                    finally { $slash.Dispose() }
+                }
+            }
+            finally {
+                $fill.Dispose()
+                $shine.Dispose()
+                $stroke.Dispose()
+            }
+        }
+        catch {}
+    })
+    $Control.Invalidate()
+}
+
 function Apply-GUIThemeToControl {
     param([System.Windows.Forms.Control]$Control)
 
@@ -1094,13 +1248,13 @@ function Apply-GUIThemeToControl {
     }
 
     if($Control -is [System.Windows.Forms.Button]){
-        if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "ToolLaunch"){
-            Set-GUIButtonChrome -Button $Control -Compact -Subtle
-            $Control.ForeColor = $script:GUITheme.AccentDark
-        }
-        else{
-            Set-GUIButtonChrome -Button $Control
-        }
+        Set-GUIButtonChrome -Button $Control
+    }
+    elseif($Control -is [System.Windows.Forms.Panel] -and $Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "ElevationCrown"){
+        Set-GUIElevationCrownIcon -Control $Control
+    }
+    elseif($Control -is [System.Windows.Forms.Panel] -and $Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "ToolLaunchLed"){
+        Set-GUIToolLaunchLed -Control $Control
     }
     elseif($Control -is [System.Windows.Forms.TabPage]){
         $Control.BackColor = $script:GUITheme.Page
@@ -1162,7 +1316,7 @@ function Apply-GUIThemeRuntime {
     }
 
     if($script:AdminStatusLabel -and !$script:AdminStatusLabel.IsDisposed){
-        $script:AdminStatusLabel.ForeColor = if(Test-GUIAdministrator){[System.Drawing.Color]::FromArgb(170,230,205)}else{[System.Drawing.Color]::FromArgb(250,215,135)}
+        Set-GUIElevationCrownIcon -Control $script:AdminStatusLabel
     }
 
     foreach($headerButton in @($script:SettingsGearButton,$script:HelpButton)){
@@ -8511,31 +8665,28 @@ function New-GUICompactToolControl {
     $panel.Margin = New-Object System.Windows.Forms.Padding(6,4,6,4)
     $panel.Height = 32
 
-    $button = New-Object System.Windows.Forms.Button
-    $button.Text = "â€º"
-    $button.Tag = [pscustomobject]@{
+    $led = New-Object System.Windows.Forms.Panel
+    $led.Tag = [pscustomobject]@{
         Action = (Get-GUIToolAction -Tool $Tool)
-        Visual = "ToolLaunch"
+        Visual = "ToolLaunchLed"
+        Hover = $false
+        PaintHooked = $false
     }
-    $button.Location = New-Object System.Drawing.Point(0,4)
-    $button.Size = New-Object System.Drawing.Size(34,24)
-    Set-GUIButtonChrome -Button $button -Compact
-    $button.BackColor = $script:GUITheme.AccentSoft
-    $button.ForeColor = $script:GUITheme.AccentDark
-    $button.FlatAppearance.BorderColor = $script:GUITheme.Border
-    $button.FlatAppearance.MouseOverBackColor = $script:GUITheme.HeaderMuted
-    $button.Add_Click({
+    $led.Location = New-Object System.Drawing.Point(6,6)
+    $led.Size = New-Object System.Drawing.Size(22,22)
+    Set-GUIToolLaunchLed -Control $led
+    $led.Add_Click({
         param($sender,$eventArgs)
         $action = if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "Action"){$sender.Tag.Action}else{$sender.Tag}
         Invoke-GUISafely -Tool $sender.Parent.Controls[1].Text -Action $action
     })
-    $panel.Controls.Add($button)
+    $panel.Controls.Add($led)
 
     $label = New-Object System.Windows.Forms.Label
     $label.Text = $Tool.Text
-    $label.Tag = $button.Tag.Action
-    $label.Location = New-Object System.Drawing.Point(44,4)
-    $label.Size = New-Object System.Drawing.Size(210,24)
+    $label.Tag = $led.Tag.Action
+    $label.Location = New-Object System.Drawing.Point(38,4)
+    $label.Size = New-Object System.Drawing.Size(216,24)
     $label.Anchor = "Top,Left,Right"
     $label.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $label.ForeColor = $script:GUITheme.Text
@@ -8550,7 +8701,7 @@ function New-GUICompactToolControl {
 
     if($script:ToolTip){
         $tip = if($Tool.Description){$Tool.Description}else{$Tool.Text}
-        $script:ToolTip.SetToolTip($button,$tip)
+        $script:ToolTip.SetToolTip($led,$tip)
         $script:ToolTip.SetToolTip($label,$tip)
         $script:ToolTip.SetToolTip($panel,$tip)
     }
@@ -12140,15 +12291,19 @@ function Build-Form {
     $script:HeaderSubtitleLabel = $subtitle
     $header.Controls.Add($subtitle)
 
-    $admin = New-Object System.Windows.Forms.Label
-    $admin.Text = if(Test-GUIAdministrator){"Running elevated"}else{"Not elevated"}
-    $admin.Location = New-Object System.Drawing.Point(10,9)
-    $admin.Size = New-Object System.Drawing.Size(166,24)
-    $admin.TextAlign = "MiddleRight"
-    $admin.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $admin.ForeColor = if(Test-GUIAdministrator){[System.Drawing.Color]::FromArgb(170,230,205)}else{[System.Drawing.Color]::FromArgb(250,215,135)}
+    $admin = New-Object System.Windows.Forms.Panel
+    $admin.Location = New-Object System.Drawing.Point(142,4)
+    $admin.Size = New-Object System.Drawing.Size(46,34)
+    $admin.Tag = [pscustomobject]@{
+        Visual = "ElevationCrown"
+        PaintHooked = $false
+    }
+    Set-GUIElevationCrownIcon -Control $admin
     $script:AdminStatusLabel = $admin
     $headerTools.Controls.Add($admin)
+    if($script:ToolTip){
+        $script:ToolTip.SetToolTip($admin,$(if(Test-GUIAdministrator){"Toolkit is running elevated."}else{"Toolkit is not elevated. Admin-required tools may prompt or fail until restarted elevated."}))
+    }
 
     $helpButton = New-Object System.Windows.Forms.Button
     $helpButton.Text = "Help"
