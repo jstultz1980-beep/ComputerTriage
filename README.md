@@ -284,7 +284,7 @@ Typical tools:
 - DHCP Lease / Rogue Check
 - DNS Diagnostics
 - Time Sync Health
-- Reset Domain Time
+- Reset to Domain Time
 - Local Exposure Inspector
 
 DHCP tools belong together here. DHCP is not just connectivity; it is a provider/service behavior problem. The Network tab stays cleaner when DHCP, DNS, time, and exposure checks are grouped as infrastructure.

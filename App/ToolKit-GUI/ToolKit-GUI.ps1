@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 # ToolKit-GUI.ps1
 # Network Toolkit - Technician GUI
 # =====================================================================
@@ -195,7 +195,7 @@ $script:GUITheme = @{
 }
 
 function Get-GUIColorThemeNames {
-    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Custom Theme")
+    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Obsidian Blue","Carbon Fiber","Custom Theme")
 }
 
 function ConvertTo-GUIColorHex {
@@ -723,6 +723,16 @@ function Get-GUIColorTheme {
                 Header=[System.Drawing.Color]::FromArgb(23,33,49); HeaderPanel=[System.Drawing.Color]::FromArgb(35,50,72); HeaderMuted=[System.Drawing.Color]::FromArgb(211,225,242); Accent=[System.Drawing.Color]::FromArgb(94,170,255); AccentDark=[System.Drawing.Color]::FromArgb(42,105,178); AccentSoft=[System.Drawing.Color]::FromArgb(224,239,255); Page=[System.Drawing.Color]::FromArgb(248,251,255); Shell=[System.Drawing.Color]::FromArgb(234,241,249); Strip=[System.Drawing.Color]::FromArgb(222,233,244); Text=[System.Drawing.Color]::FromArgb(28,38,51); MutedText=[System.Drawing.Color]::FromArgb(78,93,111); Border=[System.Drawing.Color]::FromArgb(168,188,211); Success=[System.Drawing.Color]::FromArgb(57,177,119); Warning=[System.Drawing.Color]::FromArgb(230,166,47); Danger=[System.Drawing.Color]::FromArgb(212,77,77); Disabled=[System.Drawing.Color]::FromArgb(210,220,231); LogBack=[System.Drawing.Color]::FromArgb(9,13,20); LogFore=[System.Drawing.Color]::FromArgb(207,229,255)
             }
         }
+        "Obsidian Blue" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(13,24,36); HeaderPanel=[System.Drawing.Color]::FromArgb(24,39,58); HeaderMuted=[System.Drawing.Color]::FromArgb(187,215,236); Accent=[System.Drawing.Color]::FromArgb(58,142,208); AccentDark=[System.Drawing.Color]::FromArgb(27,86,139); AccentSoft=[System.Drawing.Color]::FromArgb(36,55,75); Page=[System.Drawing.Color]::FromArgb(28,34,42); Shell=[System.Drawing.Color]::FromArgb(20,26,34); Strip=[System.Drawing.Color]::FromArgb(31,43,55); Text=[System.Drawing.Color]::FromArgb(232,239,245); MutedText=[System.Drawing.Color]::FromArgb(170,185,198); Border=[System.Drawing.Color]::FromArgb(72,91,108); Success=[System.Drawing.Color]::FromArgb(82,190,136); Warning=[System.Drawing.Color]::FromArgb(236,178,68); Danger=[System.Drawing.Color]::FromArgb(224,91,91); Disabled=[System.Drawing.Color]::FromArgb(74,83,94); LogBack=[System.Drawing.Color]::FromArgb(6,10,15); LogFore=[System.Drawing.Color]::FromArgb(196,226,246)
+            }
+        }
+        "Carbon Fiber" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(28,29,32); HeaderPanel=[System.Drawing.Color]::FromArgb(43,45,49); HeaderMuted=[System.Drawing.Color]::FromArgb(216,222,228); Accent=[System.Drawing.Color]::FromArgb(110,186,215); AccentDark=[System.Drawing.Color]::FromArgb(55,116,141); AccentSoft=[System.Drawing.Color]::FromArgb(50,61,67); Page=[System.Drawing.Color]::FromArgb(33,35,38); Shell=[System.Drawing.Color]::FromArgb(25,27,30); Strip=[System.Drawing.Color]::FromArgb(39,43,47); Text=[System.Drawing.Color]::FromArgb(236,238,240); MutedText=[System.Drawing.Color]::FromArgb(176,182,188); Border=[System.Drawing.Color]::FromArgb(82,88,94); Success=[System.Drawing.Color]::FromArgb(87,181,126); Warning=[System.Drawing.Color]::FromArgb(231,169,65); Danger=[System.Drawing.Color]::FromArgb(222,90,86); Disabled=[System.Drawing.Color]::FromArgb(75,78,82); LogBack=[System.Drawing.Color]::FromArgb(12,13,15); LogFore=[System.Drawing.Color]::FromArgb(218,232,238)
+            }
+        }
         "Rosewood" {
             return @{
                 Header=[System.Drawing.Color]::FromArgb(130,55,73); HeaderPanel=[System.Drawing.Color]::FromArgb(155,68,90); HeaderMuted=[System.Drawing.Color]::FromArgb(255,238,242); Accent=[System.Drawing.Color]::FromArgb(218,92,120); AccentDark=[System.Drawing.Color]::FromArgb(112,43,61); AccentSoft=[System.Drawing.Color]::FromArgb(255,239,243); Page=[System.Drawing.Color]::FromArgb(255,252,253); Shell=[System.Drawing.Color]::FromArgb(252,243,246); Strip=[System.Drawing.Color]::FromArgb(250,231,237); Text=[System.Drawing.Color]::FromArgb(57,38,44); MutedText=[System.Drawing.Color]::FromArgb(103,79,87); Border=[System.Drawing.Color]::FromArgb(224,184,195); Success=[System.Drawing.Color]::FromArgb(44,149,104); Warning=[System.Drawing.Color]::FromArgb(218,151,41); Danger=[System.Drawing.Color]::FromArgb(195,65,72); Disabled=[System.Drawing.Color]::FromArgb(231,216,220); LogBack=[System.Drawing.Color]::FromArgb(39,25,30); LogFore=[System.Drawing.Color]::FromArgb(250,233,238)
@@ -1033,18 +1043,20 @@ function Set-GUIButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = if($Compact){
-        New-Object System.Drawing.Font("Segoe UI Semibold",8.5,[System.Drawing.FontStyle]::Regular)
+        New-Object System.Drawing.Font("Segoe UI Semibold",8.75,[System.Drawing.FontStyle]::Regular)
     }
     else{
-        New-Object System.Drawing.Font("Segoe UI Semibold",9.25,[System.Drawing.FontStyle]::Regular)
+        New-Object System.Drawing.Font("Segoe UI Semibold",9,[System.Drawing.FontStyle]::Regular)
     }
-    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.BorderSize = 1
+    $Button.FlatAppearance.BorderColor = if($Subtle){$script:GUITheme.Border}else{$script:GUITheme.AccentDark}
     $Button.FlatAppearance.MouseOverBackColor = if($Subtle){$script:GUITheme.HeaderMuted}else{$script:GUITheme.AccentDark}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
     $Button.BackColor = if($Subtle){$script:GUITheme.AccentSoft}else{$script:GUITheme.Accent}
     $Button.ForeColor = if($Subtle){$script:GUITheme.Text}else{[System.Drawing.Color]::White}
+    $Button.Padding = New-Object System.Windows.Forms.Padding(8,0,8,1)
 
-    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){10}else{14})
+    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){8}else{12})
 }
 
 function Set-GUITabButtonChrome {
@@ -1082,7 +1094,13 @@ function Apply-GUIThemeToControl {
     }
 
     if($Control -is [System.Windows.Forms.Button]){
-        Set-GUIButtonChrome -Button $Control
+        if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "ToolLaunch"){
+            Set-GUIButtonChrome -Button $Control -Compact -Subtle
+            $Control.ForeColor = $script:GUITheme.AccentDark
+        }
+        else{
+            Set-GUIButtonChrome -Button $Control
+        }
     }
     elseif($Control -is [System.Windows.Forms.TabPage]){
         $Control.BackColor = $script:GUITheme.Page
@@ -7343,7 +7361,7 @@ function Build-QuickTriagePage {
     $layout.ColumnCount = 1
     $layout.RowCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(16)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,82))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,96))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -7372,13 +7390,36 @@ function Build-QuickTriagePage {
     $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,8,10,3)
     [void]$runPanel.Controls.Add($QuickTargetBox)
 
-    $script:QuickRunButton = New-GUIButton "Run Quick Diagnosis" { Start-GUIQuickDiagnosis }
-    $QuickRunButton.Width = 190
+    $script:QuickRunButton = New-GUIButton "Quick Diagnosis" { Start-GUIQuickDiagnosis }
+    $QuickRunButton.Width = 145
     [void]$runPanel.Controls.Add($QuickRunButton)
 
-    $reportButton = New-GUIButton "Open Latest Report" { Open-GUILatestQuickDiagnosisReport }
-    $reportButton.Width = 160
+    $reportButton = New-GUIButton "Latest Report" { Open-GUILatestQuickDiagnosisReport }
+    $reportButton.Width = 128
     [void]$runPanel.Controls.Add($reportButton)
+
+    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $healthPanel.Dock = "None"
+    $healthPanel.Width = 260
+    $healthPanel.Height = 40
+    $healthPanel.FlowDirection = "LeftToRight"
+    $healthPanel.WrapContents = $false
+    $healthPanel.Margin = New-Object System.Windows.Forms.Padding(8,4,4,3)
+    [void]$runPanel.Controls.Add($healthPanel)
+
+    $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
+    $HealthStatusLight.Width = 22
+    $HealthStatusLight.Height = 22
+    $HealthStatusLight.Margin = New-Object System.Windows.Forms.Padding(4,8,8,4)
+    [void]$healthPanel.Controls.Add($HealthStatusLight)
+
+    $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
+    $HealthStatusLabel.Width = 220
+    $HealthStatusLabel.Height = 34
+    $HealthStatusLabel.TextAlign = "MiddleLeft"
+    $HealthStatusLabel.AutoEllipsis = $true
+    $HealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    [void]$healthPanel.Controls.Add($HealthStatusLabel)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
     $QuickLastDiagnosisLabel.Width = 310
@@ -7505,32 +7546,11 @@ function Build-QuickTriagePage {
     $repairPanel.Dock = "Fill"
     $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10)
     $repairPanel.ColumnCount = 1
-    $repairPanel.RowCount = 4
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $repairPanel.RowCount = 3
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $repairGroup.Controls.Add($repairPanel)
-
-    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $healthPanel.Dock = "Fill"
-    $healthPanel.FlowDirection = "LeftToRight"
-    $healthPanel.WrapContents = $false
-    $repairPanel.Controls.Add($healthPanel,0,0)
-
-    $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
-    $HealthStatusLight.Width = 24
-    $HealthStatusLight.Height = 24
-    $HealthStatusLight.Margin = New-Object System.Windows.Forms.Padding(4,12,8,4)
-    [void]$healthPanel.Controls.Add($HealthStatusLight)
-
-    $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
-    $HealthStatusLabel.Width = 360
-    $HealthStatusLabel.Height = 42
-    $HealthStatusLabel.TextAlign = "MiddleLeft"
-    $HealthStatusLabel.AutoEllipsis = $true
-    $HealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    [void]$healthPanel.Controls.Add($HealthStatusLabel)
 
     $script:DismRepairNoteLabel = New-Object System.Windows.Forms.Label
     $repairNote = $script:DismRepairNoteLabel
@@ -7538,17 +7558,17 @@ function Build-QuickTriagePage {
     $repairNote.Dock = "Fill"
     $repairNote.TextAlign = "MiddleLeft"
     $repairNote.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    [void]$repairPanel.Controls.Add($repairNote,0,1)
+    [void]$repairPanel.Controls.Add($repairNote,0,0)
 
     $script:DismRepairButton = New-GUIButton "Run DISM/SFC Repair Path" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
-    [void]$repairPanel.Controls.Add($DismRepairButton,0,2)
+    [void]$repairPanel.Controls.Add($DismRepairButton,0,1)
 
     $hardwareShortcuts = New-Object System.Windows.Forms.GroupBox
     $hardwareShortcuts.Text = "Hardware Shortcuts"
     $hardwareShortcuts.Dock = "Fill"
     $hardwareShortcuts.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
-    $repairPanel.Controls.Add($hardwareShortcuts,0,3)
+    $repairPanel.Controls.Add($hardwareShortcuts,0,2)
 
     $hardwareShortcutPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $hardwareShortcutPanel.Dock = "Top"
@@ -8166,9 +8186,9 @@ function New-GUIButton {
     $button = New-Object System.Windows.Forms.Button
     $button.Text = $Text
     $button.Tag = $Action
-    $button.Width = 150
-    $button.Height = 32
-    $button.Margin = New-Object System.Windows.Forms.Padding(5)
+    $button.Width = 132
+    $button.Height = 30
+    $button.Margin = New-Object System.Windows.Forms.Padding(4)
     $button.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $button
     $button.Add_Click({
@@ -8488,28 +8508,37 @@ function New-GUICompactToolControl {
 
     $panel = New-Object System.Windows.Forms.Panel
     $panel.Dock = "Fill"
-    $panel.Margin = New-Object System.Windows.Forms.Padding(4)
-    $panel.Height = 30
+    $panel.Margin = New-Object System.Windows.Forms.Padding(6,4,6,4)
+    $panel.Height = 32
 
     $button = New-Object System.Windows.Forms.Button
-    $button.Text = ">"
-    $button.Tag = (Get-GUIToolAction -Tool $Tool)
-    $button.Location = New-Object System.Drawing.Point(0,2)
-    $button.Size = New-Object System.Drawing.Size(26,26)
+    $button.Text = "â€º"
+    $button.Tag = [pscustomobject]@{
+        Action = (Get-GUIToolAction -Tool $Tool)
+        Visual = "ToolLaunch"
+    }
+    $button.Location = New-Object System.Drawing.Point(0,4)
+    $button.Size = New-Object System.Drawing.Size(34,24)
     Set-GUIButtonChrome -Button $button -Compact
+    $button.BackColor = $script:GUITheme.AccentSoft
+    $button.ForeColor = $script:GUITheme.AccentDark
+    $button.FlatAppearance.BorderColor = $script:GUITheme.Border
+    $button.FlatAppearance.MouseOverBackColor = $script:GUITheme.HeaderMuted
     $button.Add_Click({
         param($sender,$eventArgs)
-        Invoke-GUISafely -Tool $sender.Parent.Controls[1].Text -Action $sender.Tag
+        $action = if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "Action"){$sender.Tag.Action}else{$sender.Tag}
+        Invoke-GUISafely -Tool $sender.Parent.Controls[1].Text -Action $action
     })
     $panel.Controls.Add($button)
 
     $label = New-Object System.Windows.Forms.Label
     $label.Text = $Tool.Text
-    $label.Tag = $button.Tag
-    $label.Location = New-Object System.Drawing.Point(34,4)
-    $label.Size = New-Object System.Drawing.Size(220,22)
+    $label.Tag = $button.Tag.Action
+    $label.Location = New-Object System.Drawing.Point(44,4)
+    $label.Size = New-Object System.Drawing.Size(210,24)
     $label.Anchor = "Top,Left,Right"
-    $label.Font = New-Object System.Drawing.Font("Segoe UI",9)
+    $label.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $label.ForeColor = $script:GUITheme.Text
     $label.TextAlign = "MiddleLeft"
     $label.AutoEllipsis = $true
     $label.Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -10206,15 +10235,17 @@ function Build-RobocopyPage {
     $actions = New-Object System.Windows.Forms.FlowLayoutPanel
     $actions.Dock = "Fill"
     $actions.FlowDirection = "LeftToRight"
+    $actions.Padding = New-Object System.Windows.Forms.Padding(0,8,0,0)
     $builder.SetColumnSpan($actions,4)
     $builder.Controls.Add($actions,0,6)
 
     foreach($button in @(
-        (New-GUIButton "Build Command" { Update-GUIRobocopyCommand | Out-Null }),
-        (New-GUIButton "Copy Command" { Copy-GUIRobocopyCommand }),
-        (New-GUIButton "Preview Only" { Start-GUIRobocopyCommand -Preview }),
-        (New-GUIButton "Run Copy" { Start-GUIRobocopyCommand })
+        (New-GUIButton "Build" { Update-GUIRobocopyCommand | Out-Null }),
+        (New-GUIButton "Copy" { Copy-GUIRobocopyCommand }),
+        (New-GUIButton "Preview" { Start-GUIRobocopyCommand -Preview }),
+        (New-GUIButton "Run" { Start-GUIRobocopyCommand })
     )){
+        $button.Width = 118
         [void]$actions.Controls.Add($button)
     }
 
@@ -11699,12 +11730,12 @@ function Build-SettingsPage {
     $moveButtons.WrapContents = $false
     $moveButtons.Padding = New-Object System.Windows.Forms.Padding(6,2,0,0)
     $orderLayout.Controls.Add($moveButtons,1,0)
-    $moveUpButton = New-GUIButton "Move Up" { Move-GUISettingsSelectedTab -Offset -1 }
+    $moveUpButton = New-GUIButton "^ Up" { Move-GUISettingsSelectedTab -Offset -1 }
     $moveUpButton.Width = 100
     $moveUpButton.Height = 34
     $moveUpButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,8)
     [void]$moveButtons.Controls.Add($moveUpButton)
-    $moveDownButton = New-GUIButton "Move Down" { Move-GUISettingsSelectedTab -Offset 1 }
+    $moveDownButton = New-GUIButton "v Down" { Move-GUISettingsSelectedTab -Offset 1 }
     $moveDownButton.Width = 100
     $moveDownButton.Height = 34
     $moveDownButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
@@ -11835,53 +11866,52 @@ function Build-SettingsPage {
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
-    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
-    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,12))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $maintenanceGroup.Controls.Add($maintenanceLayout)
-
-    $updateButton = New-GUIButton "Update Toolkit" { Show-GUIToolkitUpdater }
-    $updateButton.Dock = "Fill"
-    $updateButton.Width = 0
-    $maintenanceLayout.Controls.Add($updateButton,0,0)
-    $deployButton = New-GUIButton "Deploy Fresh Toolkit" { Show-GUIToolkitDeployment }
-    $deployButton.Dock = "Fill"
-    $deployButton.Width = 0
-    $maintenanceLayout.Controls.Add($deployButton,1,0)
 
     $script:ToolkitVersionLabel = New-GUILabel "Toolkit version: unavailable"
     $ToolkitVersionLabel.Dock = "Fill"
     $ToolkitVersionLabel.TextAlign = "MiddleLeft"
     $ToolkitVersionLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitVersionLabel,0,1)
+    $maintenanceLayout.Controls.Add($ToolkitVersionLabel,0,0)
     $maintenanceLayout.SetColumnSpan($ToolkitVersionLabel,2)
     Update-GUIToolkitVersionLabel
-
-    $toolkitAppsButton = New-GUIButton "Toolkit App Manager" { Show-GUICustomToolsWindow }
-    $toolkitAppsButton.Dock = "Fill"
-    $toolkitAppsButton.Width = 0
-    $maintenanceLayout.Controls.Add($toolkitAppsButton,0,2)
-    $maintenanceLayout.SetColumnSpan($toolkitAppsButton,2)
 
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,3)
+    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,1)
 
     $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
     $sizeRefreshButton.Dock = "Fill"
     $sizeRefreshButton.Width = 0
-    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,3)
+    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,1)
+
+    $toolkitAppsButton = New-GUIButton "App Manager" { Show-GUICustomToolsWindow }
+    $toolkitAppsButton.Dock = "Fill"
+    $toolkitAppsButton.Width = 0
+    $maintenanceLayout.Controls.Add($toolkitAppsButton,0,2)
 
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
     $sanitizeButton.Dock = "Fill"
     $sanitizeButton.Width = 0
-    $maintenanceLayout.Controls.Add($sanitizeButton,0,4)
+    $maintenanceLayout.Controls.Add($sanitizeButton,1,2)
+
+    $updateButton = New-GUIButton "Update Toolkit" { Show-GUIToolkitUpdater }
+    $updateButton.Dock = "Fill"
+    $updateButton.Width = 0
+    $maintenanceLayout.Controls.Add($updateButton,0,3)
+    $deployButton = New-GUIButton "Deploy Fresh Toolkit" { Show-GUIToolkitDeployment }
+    $deployButton.Dock = "Fill"
+    $deployButton.Width = 0
+    $maintenanceLayout.Controls.Add($deployButton,1,3)
 
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
@@ -11931,15 +11961,21 @@ function Set-GUIFallbackButtonToolTips {
 
     $tooltips = @{
         "Run Quick Diagnosis" = "Run the primary health check and create a technician-ready HTML report."
+        "Quick Diagnosis" = "Run the primary health check and create a technician-ready HTML report."
+        "Latest Report" = "Open the latest Quick Diagnosis HTML report."
         "Run DISM/SFC Repair Path" = "Start the Windows image and system file repair workflow after reviewing diagnosis results."
         "Open HTML Report" = "Open the selected computer profile report in the default browser."
         "Create Profile" = "Run Quick Diagnosis and save a fresh computer profile with the report."
         "Delete" = "Delete the selected saved computer profile record and related report files."
         "Refresh" = "Reload the list with the latest available computer profiles."
         "Build Command" = "Generate a robocopy command from the selected source, destination, and options."
+        "Build" = "Generate a robocopy command from the selected source, destination, and options."
         "Copy Command" = "Copy the generated robocopy command to the clipboard."
+        "Copy" = "Copy the generated command to the clipboard."
         "Preview Only" = "Run robocopy in list-only mode so you can review what would copy."
+        "Preview" = "Run robocopy in list-only mode so you can review what would copy."
         "Run Copy" = "Start the generated robocopy job with the selected options."
+        "Run" = "Start the generated robocopy job with the selected options."
         "Open WizTree" = "Launch WizTree for fast disk space analysis."
         "Everything" = "Launch Everything for instant local filename search."
         "WinDirStat" = "Launch WinDirStat to visualize disk usage and large folders."

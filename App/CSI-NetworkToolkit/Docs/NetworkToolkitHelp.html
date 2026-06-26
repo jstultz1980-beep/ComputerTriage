@@ -153,8 +153,8 @@
     <h3>Main buttons</h3>
     <table>
       <tr><th>Button</th><th>Purpose</th><th>Expected output</th></tr>
-      <tr><td>Run Quick Diagnosis</td><td>Runs the one-click triage workflow. It collects a computer profile, runs common health checks, performs live target checks, runs DISM CheckHealth, checks drivers and hardware signals, and exports an HTML report.</td><td>An HTML Quick Diagnosis report in <code>CSI-NetworkToolkit\Exports</code>, plus a Computer Profile JSON/HTML. The report is not automatically opened unless Settings says to do so.</td></tr>
-      <tr><td>Open Latest Report</td><td>Opens the most recent Quick Diagnosis HTML report.</td><td>The latest report opens in the default browser.</td></tr>
+      <tr><td>Quick Diagnosis</td><td>Runs the one-click triage workflow. It collects a computer profile, runs common health checks, performs live target checks, runs DISM CheckHealth, checks drivers and hardware signals, and exports an HTML report.</td><td>An HTML Quick Diagnosis report in <code>CSI-NetworkToolkit\Exports</code>, plus a Computer Profile JSON/HTML. The report is not automatically opened unless Settings says to do so.</td></tr>
+      <tr><td>Latest Report</td><td>Opens the most recent Quick Diagnosis HTML report.</td><td>The latest report opens in the default browser.</td></tr>
       <tr><td>Run DISM/SFC Repair Path</td><td>Runs the repair path after Quick Diagnosis indicates it may be needed. If the button is disabled, pressing it should require confirmation to override.</td><td>Repair output and logs. This is a remediation step, not a discovery-only step.</td></tr>
     </table>
     <h3>Quick target checks</h3>
@@ -351,7 +351,7 @@
       <tr><td>Local Exposure Inspector</td><td>Reviews listening ports and local exposure risk.</td></tr>
       <tr><td>DHCP Scope Inspector</td><td>Reviews DHCP scope and lease information where available.</td></tr>
       <tr><td>Time Sync Health</td><td>Checks Windows time source and synchronization state.</td></tr>
-      <tr><td>Reset Domain Time</td><td>Configures Windows Time to use the domain hierarchy, restarts W32Time, resyncs, and verifies the source. Requires elevation.</td></tr>
+      <tr><td>Reset to Domain Time</td><td>Configures Windows Time to use the domain hierarchy, restarts W32Time, resyncs, and verifies the source. Requires elevation.</td></tr>
       <tr><td>DHCP Lease / Rogue Check</td><td>Runs a lightweight DHCP lease and responder check for quick workstation-side evidence.</td></tr>
       <tr><td>DNS Diagnostics</td><td>Runs DNS diagnostics against configured resolvers and target lookups.</td></tr>
     </table>
@@ -472,10 +472,10 @@
       <tr><td>Destination</td><td>Folder to copy to.</td></tr>
       <tr><td>File pattern</td><td>Defaults to <code>*.*</code>. Can be changed for specific file types.</td></tr>
       <tr><td>Copy mode/options</td><td>Controls recursive copy behavior, retries, multithreading, logging, mirroring, and metadata options.</td></tr>
-      <tr><td>Build Command</td><td>Generates the robocopy command without running it.</td></tr>
-      <tr><td>Copy Command</td><td>Copies the generated command to clipboard.</td></tr>
-      <tr><td>Preview Only</td><td>Runs the copy as a dry run/list preview if configured.</td></tr>
-      <tr><td>Run Copy</td><td>Runs the generated robocopy command.</td></tr>
+      <tr><td>Build</td><td>Generates the robocopy command without running it.</td></tr>
+      <tr><td>Copy</td><td>Copies the generated command to clipboard.</td></tr>
+      <tr><td>Preview</td><td>Runs the copy as a dry run/list preview if configured.</td></tr>
+      <tr><td>Run</td><td>Runs the generated robocopy command.</td></tr>
     </table>
     <div class="danger">
       Be careful with mirror/delete behavior. A wrong source/destination with mirror options can remove files from the destination. Confirm both paths before running.
@@ -595,9 +595,9 @@
     <p>Settings are opened from the gear icon in the header. Settings are intentionally not part of the normal technician workflow tabs.</p>
     <table>
       <tr><th>Setting/Button</th><th>Purpose</th></tr>
-      <tr><td>Tab Order</td><td>Reorder visible tabs. Move Up and Move Down adjust the selected tab.</td></tr>
+      <tr><td>Tab Order</td><td>Reorder visible tabs. Up and Down adjust the selected tab.</td></tr>
       <tr><td>Startup tab</td><td>Chooses which tab opens first.</td></tr>
-      <tr><td>Color theme</td><td>Chooses a built-in theme or Custom Theme. Built-in presets include Bright Blue, Ocean Teal, Soft Graphite, Terminal Green, Arctic Lime, Electric Indigo, Copper Harbor, and Night Ops.</td></tr>
+      <tr><td>Color theme</td><td>Chooses a built-in theme or Custom Theme. Built-in presets include Bright Blue, Ocean Teal, Soft Graphite, Terminal Green, Arctic Lime, Electric Indigo, Copper Harbor, Night Ops, Obsidian Blue, and Carbon Fiber.</td></tr>
       <tr><td>Custom Theme</td><td>Prompts for header, accent/button, page background, text, and live log background colors. Click Apply Settings to save.</td></tr>
       <tr><td>Open Quick Diagnosis report when finished</td><td>When enabled, the latest Quick Diagnosis report opens automatically after the run.</td></tr>
       <tr><td>Refresh public IP when the toolkit opens</td><td>Controls startup public IP lookup behavior.</td></tr>
