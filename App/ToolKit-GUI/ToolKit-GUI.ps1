@@ -106,7 +106,7 @@ $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
 $script:SettingsStartupTabCombo = $null
 $script:SettingsThemeCombo = $null
-$script:SettingsPreviousTheme = "Bright Blue"
+$script:SettingsPreviousTheme = "Modern Glass"
 $script:PendingCustomTheme = $null
 $script:SettingsAutoOpenQuickReportCheck = $null
 $script:SettingsRefreshPublicIPCheck = $null
@@ -210,9 +210,10 @@ $script:GUITheme = @{
     LogBack     = [System.Drawing.Color]::FromArgb(20,31,44)
     LogFore     = [System.Drawing.Color]::FromArgb(224,235,242)
 }
+$script:GUITextureHooks = New-Object 'System.Collections.Generic.HashSet[string]'
 
 function Get-GUIColorThemeNames {
-    return @("Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Obsidian Blue","Carbon Fiber","Custom Theme")
+    return @("Modern Glass","Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Obsidian Blue","Carbon Fiber","Aurora Dark","Command Center","Custom Theme")
 }
 
 function ConvertTo-GUIColorHex {
@@ -349,7 +350,7 @@ function New-GUICustomThemeFromCoreColors {
 }
 
 function Get-GUICustomTheme {
-    $base = Get-GUIColorTheme -Name "Bright Blue"
+    $base = Get-GUIColorTheme -Name "Modern Glass"
     $source = $null
 
     if($script:PendingCustomTheme){
@@ -675,10 +676,10 @@ function Invoke-GUICustomThemePicker {
     $cancel.Add_Click({ $editor.DialogResult = [System.Windows.Forms.DialogResult]::Cancel; $editor.Close() })
     $buttons.Controls.Add($cancel) | Out-Null
 
-    $reset = New-GUIButton "Start From Bright Blue" { }
+    $reset = New-GUIButton "Start From Modern Glass" { }
     $reset.Width = 170
     $reset.Add_Click({
-        $base = Get-GUIColorTheme -Name "Bright Blue"
+        $base = Get-GUIColorTheme -Name "Modern Glass"
         foreach($key in (Get-GUIThemeColorKeys)){
             $working[$key] = $base[$key]
             if($swatches.ContainsKey($key)){ $swatches[$key].BackColor = $working[$key] }
@@ -715,6 +716,11 @@ function Get-GUIColorTheme {
     }
 
     switch($Name){
+        "Modern Glass" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(38,64,82); HeaderPanel=[System.Drawing.Color]::FromArgb(48,82,104); HeaderMuted=[System.Drawing.Color]::FromArgb(224,242,247); Accent=[System.Drawing.Color]::FromArgb(73,158,191); AccentDark=[System.Drawing.Color]::FromArgb(38,103,132); AccentSoft=[System.Drawing.Color]::FromArgb(232,246,250); Page=[System.Drawing.Color]::FromArgb(253,254,255); Shell=[System.Drawing.Color]::FromArgb(238,247,250); Strip=[System.Drawing.Color]::FromArgb(225,241,247); Text=[System.Drawing.Color]::FromArgb(28,42,54); MutedText=[System.Drawing.Color]::FromArgb(83,101,113); Border=[System.Drawing.Color]::FromArgb(191,212,221); Success=[System.Drawing.Color]::FromArgb(54,172,119); Warning=[System.Drawing.Color]::FromArgb(224,158,43); Danger=[System.Drawing.Color]::FromArgb(211,76,73); Disabled=[System.Drawing.Color]::FromArgb(214,225,230); LogBack=[System.Drawing.Color]::FromArgb(17,27,34); LogFore=[System.Drawing.Color]::FromArgb(225,241,246)
+            }
+        }
         "Terminal Green" {
             return @{
                 Header=[System.Drawing.Color]::FromArgb(8,42,29); HeaderPanel=[System.Drawing.Color]::FromArgb(13,58,40); HeaderMuted=[System.Drawing.Color]::FromArgb(184,244,207); Accent=[System.Drawing.Color]::FromArgb(43,218,116); AccentDark=[System.Drawing.Color]::FromArgb(16,120,68); AccentSoft=[System.Drawing.Color]::FromArgb(224,250,234); Page=[System.Drawing.Color]::FromArgb(247,253,249); Shell=[System.Drawing.Color]::FromArgb(235,247,239); Strip=[System.Drawing.Color]::FromArgb(218,239,225); Text=[System.Drawing.Color]::FromArgb(20,39,29); MutedText=[System.Drawing.Color]::FromArgb(71,104,84); Border=[System.Drawing.Color]::FromArgb(137,190,154); Success=[System.Drawing.Color]::FromArgb(44,191,111); Warning=[System.Drawing.Color]::FromArgb(224,166,51); Danger=[System.Drawing.Color]::FromArgb(211,76,68); Disabled=[System.Drawing.Color]::FromArgb(208,225,214); LogBack=[System.Drawing.Color]::FromArgb(5,17,13); LogFore=[System.Drawing.Color]::FromArgb(105,255,164)
@@ -748,6 +754,16 @@ function Get-GUIColorTheme {
         "Carbon Fiber" {
             return @{
                 Header=[System.Drawing.Color]::FromArgb(28,29,32); HeaderPanel=[System.Drawing.Color]::FromArgb(43,45,49); HeaderMuted=[System.Drawing.Color]::FromArgb(216,222,228); Accent=[System.Drawing.Color]::FromArgb(110,186,215); AccentDark=[System.Drawing.Color]::FromArgb(55,116,141); AccentSoft=[System.Drawing.Color]::FromArgb(50,61,67); Page=[System.Drawing.Color]::FromArgb(33,35,38); Shell=[System.Drawing.Color]::FromArgb(25,27,30); Strip=[System.Drawing.Color]::FromArgb(39,43,47); Text=[System.Drawing.Color]::FromArgb(236,238,240); MutedText=[System.Drawing.Color]::FromArgb(176,182,188); Border=[System.Drawing.Color]::FromArgb(82,88,94); Success=[System.Drawing.Color]::FromArgb(87,181,126); Warning=[System.Drawing.Color]::FromArgb(231,169,65); Danger=[System.Drawing.Color]::FromArgb(222,90,86); Disabled=[System.Drawing.Color]::FromArgb(75,78,82); LogBack=[System.Drawing.Color]::FromArgb(12,13,15); LogFore=[System.Drawing.Color]::FromArgb(218,232,238)
+            }
+        }
+        "Aurora Dark" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(30,37,55); HeaderPanel=[System.Drawing.Color]::FromArgb(42,53,78); HeaderMuted=[System.Drawing.Color]::FromArgb(219,233,242); Accent=[System.Drawing.Color]::FromArgb(86,198,180); AccentDark=[System.Drawing.Color]::FromArgb(42,127,129); AccentSoft=[System.Drawing.Color]::FromArgb(37,58,66); Page=[System.Drawing.Color]::FromArgb(26,31,39); Shell=[System.Drawing.Color]::FromArgb(19,23,30); Strip=[System.Drawing.Color]::FromArgb(31,42,53); Text=[System.Drawing.Color]::FromArgb(238,243,246); MutedText=[System.Drawing.Color]::FromArgb(176,190,200); Border=[System.Drawing.Color]::FromArgb(69,86,99); Success=[System.Drawing.Color]::FromArgb(84,202,143); Warning=[System.Drawing.Color]::FromArgb(235,176,66); Danger=[System.Drawing.Color]::FromArgb(228,92,92); Disabled=[System.Drawing.Color]::FromArgb(70,79,89); LogBack=[System.Drawing.Color]::FromArgb(7,10,15); LogFore=[System.Drawing.Color]::FromArgb(208,245,236)
+            }
+        }
+        "Command Center" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(35,50,69); HeaderPanel=[System.Drawing.Color]::FromArgb(48,69,94); HeaderMuted=[System.Drawing.Color]::FromArgb(228,239,246); Accent=[System.Drawing.Color]::FromArgb(240,139,72); AccentDark=[System.Drawing.Color]::FromArgb(168,83,39); AccentSoft=[System.Drawing.Color]::FromArgb(255,239,226); Page=[System.Drawing.Color]::FromArgb(255,254,251); Shell=[System.Drawing.Color]::FromArgb(244,248,250); Strip=[System.Drawing.Color]::FromArgb(232,241,246); Text=[System.Drawing.Color]::FromArgb(32,42,53); MutedText=[System.Drawing.Color]::FromArgb(83,97,110); Border=[System.Drawing.Color]::FromArgb(190,207,217); Success=[System.Drawing.Color]::FromArgb(49,160,105); Warning=[System.Drawing.Color]::FromArgb(223,151,41); Danger=[System.Drawing.Color]::FromArgb(207,75,70); Disabled=[System.Drawing.Color]::FromArgb(216,224,229); LogBack=[System.Drawing.Color]::FromArgb(14,22,30); LogFore=[System.Drawing.Color]::FromArgb(238,240,232)
             }
         }
         "Rosewood" {
@@ -926,7 +942,7 @@ function Set-GUIColorTheme {
     param([string]$Name)
 
     if((Get-GUIColorThemeNames) -notcontains $Name){
-        $Name = "Bright Blue"
+        $Name = "Modern Glass"
     }
 
     $script:GUITheme = Get-GUIColorTheme -Name $Name
@@ -1005,6 +1021,50 @@ function Enable-GUIHeaderGradient {
     })
 }
 
+function Enable-GUISubtleSurfaceTexture {
+    param([System.Windows.Forms.Control]$Control)
+
+    if(!$Control -or $Control.IsDisposed){
+        return
+    }
+
+    $key = [string][System.Runtime.CompilerServices.RuntimeHelpers]::GetHashCode($Control)
+    if($script:GUITextureHooks.Contains($key)){
+        $Control.Invalidate()
+        return
+    }
+
+    [void]$script:GUITextureHooks.Add($key)
+    $Control.Add_Paint({
+        param($sender,$eventArgs)
+        try {
+            $rect = $sender.ClientRectangle
+            if($rect.Width -le 0 -or $rect.Height -le 0){ return }
+
+            $graphics = $eventArgs.Graphics
+            $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+
+            $isDarkTheme = (($script:GUITheme.Page.R + $script:GUITheme.Page.G + $script:GUITheme.Page.B) -lt 390)
+            $tint = if($isDarkTheme){
+                [System.Drawing.Color]::FromArgb(16,255,255,255)
+            }
+            else{
+                [System.Drawing.Color]::FromArgb(22,$script:GUITheme.Accent.R,$script:GUITheme.Accent.G,$script:GUITheme.Accent.B)
+            }
+
+            $pen = New-Object System.Drawing.Pen($tint,1)
+            try {
+                for($x = -$rect.Height; $x -lt $rect.Width; $x += 34){
+                    $graphics.DrawLine($pen,$x,$rect.Height,($x + $rect.Height),0)
+                }
+            }
+            finally { $pen.Dispose() }
+        }
+        catch {}
+    })
+    $Control.Invalidate()
+}
+
 function Set-GUIRoundedCorners {
     param(
         [System.Windows.Forms.Control]$Control,
@@ -1060,20 +1120,20 @@ function Set-GUIButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = if($Compact){
-        New-Object System.Drawing.Font("Segoe UI Semibold",8.75,[System.Drawing.FontStyle]::Regular)
+        New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
     }
     else{
-        New-Object System.Drawing.Font("Segoe UI Semibold",9,[System.Drawing.FontStyle]::Regular)
+        New-Object System.Drawing.Font("Segoe UI",9,[System.Drawing.FontStyle]::Bold)
     }
-    $Button.FlatAppearance.BorderSize = 1
-    $Button.FlatAppearance.BorderColor = if($Subtle){$script:GUITheme.Border}else{$script:GUITheme.AccentDark}
+    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.BorderColor = if($Subtle){$script:GUITheme.Border}else{$script:GUITheme.Accent}
     $Button.FlatAppearance.MouseOverBackColor = if($Subtle){$script:GUITheme.HeaderMuted}else{$script:GUITheme.AccentDark}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
     $Button.BackColor = if($Subtle){$script:GUITheme.AccentSoft}else{$script:GUITheme.Accent}
     $Button.ForeColor = if($Subtle){$script:GUITheme.Text}else{[System.Drawing.Color]::White}
     $Button.Padding = New-Object System.Windows.Forms.Padding(8,0,8,1)
 
-    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){8}else{12})
+    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){10}else{14})
 }
 
 function Set-GUITabButtonChrome {
@@ -1089,14 +1149,14 @@ function Set-GUITabButtonChrome {
     $Button.FlatStyle = "Flat"
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
-    $Button.Font = New-Object System.Drawing.Font("Segoe UI Semibold",8.75,[System.Drawing.FontStyle]::Regular)
-    $Button.FlatAppearance.BorderSize = 1
-    $Button.FlatAppearance.BorderColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.Border}
+    $Button.Font = New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
+    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.BorderColor = if($Selected){$script:GUITheme.Accent}else{$script:GUITheme.Border}
     $Button.FlatAppearance.MouseOverBackColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.HeaderMuted}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
-    $Button.BackColor = if($Selected){$script:GUITheme.Accent}else{$script:GUITheme.Page}
+    $Button.BackColor = if($Selected){$script:GUITheme.Accent}else{[System.Drawing.Color]::White}
     $Button.ForeColor = if($Selected){[System.Drawing.Color]::White}else{$script:GUITheme.Text}
-    Set-GUIRoundedCorners -Control $Button -Radius 10
+    Set-GUIRoundedCorners -Control $Button -Radius 12
 }
 
 function Set-GUIToolLaunchLed {
@@ -1261,10 +1321,13 @@ function Apply-GUIThemeToControl {
     }
     elseif($Control -is [System.Windows.Forms.TabPage]){
         $Control.BackColor = $script:GUITheme.Page
+        Enable-GUISubtleSurfaceTexture -Control $Control
     }
     elseif($Control -is [System.Windows.Forms.GroupBox]){
         $Control.BackColor = $script:GUITheme.Page
-        $Control.ForeColor = $script:GUITheme.Text
+        $Control.ForeColor = $script:GUITheme.AccentDark
+        $Control.Font = New-Object System.Drawing.Font("Segoe UI",9.25,[System.Drawing.FontStyle]::Regular)
+        $Control.Padding = New-Object System.Windows.Forms.Padding(12,10,12,12)
     }
     elseif($Control -is [System.Windows.Forms.Label] -or $Control -is [System.Windows.Forms.CheckBox]){
         $Control.ForeColor = $script:GUITheme.Text
@@ -1288,6 +1351,9 @@ function Apply-GUIThemeToControl {
     }
     elseif($Control -is [System.Windows.Forms.Panel] -or $Control -is [System.Windows.Forms.TableLayoutPanel] -or $Control -is [System.Windows.Forms.FlowLayoutPanel]){
         $Control.BackColor = $script:GUITheme.Page
+        if($Control -eq $script:RootLayout){
+            Enable-GUISubtleSurfaceTexture -Control $Control
+        }
     }
 
     foreach($child in $Control.Controls){
@@ -1298,11 +1364,13 @@ function Apply-GUIThemeToControl {
 function Apply-GUIThemeRuntime {
     if($script:Form -and !$script:Form.IsDisposed){
         $script:Form.BackColor = $script:GUITheme.Shell
+        Enable-GUISubtleSurfaceTexture -Control $script:Form
         Apply-GUIThemeToControl -Control $script:Form
     }
 
     if($script:RootLayout -and !$script:RootLayout.IsDisposed){
-        $script:RootLayout.BackColor = $script:GUITheme.Page
+        $script:RootLayout.BackColor = $script:GUITheme.Shell
+        Enable-GUISubtleSurfaceTexture -Control $script:RootLayout
     }
 
     if($script:HeaderPanel -and !$script:HeaderPanel.IsDisposed){
@@ -1377,6 +1445,7 @@ function Apply-GUIThemeRuntime {
     if($script:MainTabs){
         foreach($page in $script:MainTabs.TabPages){
             $page.BackColor = $script:GUITheme.Page
+            Enable-GUISubtleSurfaceTexture -Control $page
         }
     }
 
@@ -8573,7 +8642,10 @@ function Build-GUITabIfNeeded {
     $Page.SuspendLayout()
 
     try {
+        $Page.BackColor = $script:GUITheme.Page
+        Enable-GUISubtleSurfaceTexture -Control $Page
         & $entry.Builder $Page
+        Apply-GUIThemeToControl -Control $Page
         $script:BuiltTabs[$Page.Text] = $true
         Set-GUIFallbackButtonToolTips
         $buildTimer.Stop()
@@ -8805,17 +8877,18 @@ function Get-GUISettingsPath {
 }
 
 function Get-GUIDefaultSettings {
-    $defaultTheme = Get-GUIColorTheme -Name "Bright Blue"
+    $defaultTheme = Get-GUIColorTheme -Name "Modern Glass"
 
     [pscustomobject]@{
         tabOrder = @(Get-GUIDefaultTabOrder)
         startupTab = "Quick Diagnosis"
-        colorTheme = "Bright Blue"
+        colorTheme = "Modern Glass"
         customTheme = ConvertTo-GUICustomThemeSettings $defaultTheme
         autoOpenQuickDiagnosisReport = $false
         refreshPublicIPOnLaunch = $true
         toolkitUpdateSource = (Split-Path -Parent $SharedToolkitRoot)
         toolkitUpdateDestination = ""
+        toolkitDeploymentDestination = ""
         toolkitUpdateMode = "Push"
     }
 }
@@ -8850,6 +8923,9 @@ function Get-GUISettings {
             }
             if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateDestination"){
                 $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateDestination -Value $default.toolkitUpdateDestination -Force
+            }
+            if($settings.PSObject.Properties.Name -notcontains "toolkitDeploymentDestination"){
+                $settings | Add-Member -MemberType NoteProperty -Name toolkitDeploymentDestination -Value $default.toolkitDeploymentDestination -Force
             }
             if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateMode" -or $settings.toolkitUpdateMode -notin @("Push","Pull")){
                 $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateMode -Value $default.toolkitUpdateMode -Force
@@ -12004,7 +12080,7 @@ function Save-GUISettingsFromPage {
         [string]$script:SettingsThemeCombo.SelectedItem
     }
     else{
-        "Bright Blue"
+        "Modern Glass"
     }
 
     $customTheme = if($script:PendingCustomTheme){
@@ -12431,13 +12507,101 @@ function Start-GUIToolkitDeployment {
 
 function Show-GUIToolkitDeployment {
     $source = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
-    $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
-    $dialog.Description = 'Choose the USB-drive folder for the fresh Network Toolkit deployment'
-    if($dialog.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){ return }
-    $destination = $dialog.SelectedPath
+
+    $settings = if($script:GuiSettings){$script:GuiSettings}else{Get-GUISettings}
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = 'Create Fresh Toolkit Deployment'
+    $form.StartPosition = 'CenterParent'
+    $form.Size = New-Object System.Drawing.Size(760,300)
+    $form.MinimumSize = New-Object System.Drawing.Size(760,300)
+    $form.MaximizeBox = $false
+    $form.Font = New-Object System.Drawing.Font('Segoe UI',9.5)
+    $form.BackColor = $script:GUITheme.Shell
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = 'Fill'
+    $layout.ColumnCount = 3
+    $layout.RowCount = 5
+    $layout.Padding = New-Object System.Windows.Forms.Padding(18)
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,64))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $form.Controls.Add($layout)
+
+    $sourceBox = New-GUITextBox $source
+    $sourceBox.ReadOnly = $true
+    $destinationBox = New-GUITextBox $(if($settings.PSObject.Properties.Name -contains 'toolkitDeploymentDestination' -and $settings.toolkitDeploymentDestination){[string]$settings.toolkitDeploymentDestination}else{''})
+
+    $layout.Controls.Add((New-GUILabel 'Source'),0,0)
+    $layout.Controls.Add($sourceBox,1,0)
+    $layout.SetColumnSpan($sourceBox,2)
+    $layout.Controls.Add((New-GUILabel 'Destination'),0,1)
+    $layout.Controls.Add($destinationBox,1,1)
+
+    $browse = New-GUIButton 'Browse' {
+        $picker = New-Object System.Windows.Forms.FolderBrowserDialog
+        $picker.Description = 'Choose a USB-drive folder or destination folder for the fresh Network Toolkit deployment'
+        if($destinationBox.Text.Trim()){
+            try {
+                $candidate = $destinationBox.Text.Trim()
+                if(Test-Path -LiteralPath $candidate){ $picker.SelectedPath = $candidate }
+                else {
+                    $parent = Split-Path -Parent $candidate
+                    if($parent -and (Test-Path -LiteralPath $parent)){ $picker.SelectedPath = $parent }
+                }
+            }
+            catch {}
+        }
+        if($picker.ShowDialog($form) -eq [System.Windows.Forms.DialogResult]::OK){ $destinationBox.Text = $picker.SelectedPath }
+    }
+    $browse.Dock = 'Fill'
+    $layout.Controls.Add($browse,2,1)
+
+    $hint = New-GUILabel 'Type or paste a local path, USB path, UNC path, or admin share path. Examples: E:\NetworkToolkit or \\atlas\c$\Computer_Toolkit. The destination contents will be replaced after confirmation.'
+    $hint.ForeColor = $script:GUITheme.MutedText
+    $hint.Dock = 'Fill'
+    $layout.SetColumnSpan($hint,3)
+    $layout.Controls.Add($hint,0,2)
+
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons.Dock = 'Fill'
+    $buttons.FlowDirection = 'RightToLeft'
+    $layout.SetColumnSpan($buttons,3)
+    $layout.Controls.Add($buttons,0,4)
+
+    $cancel = New-GUIButton 'Cancel' { $form.Close() }
+    $deploy = New-GUIButton 'Deploy Toolkit' {
+        $destination = $destinationBox.Text.Trim()
+        if([string]::IsNullOrWhiteSpace($destination)){
+            [System.Windows.Forms.MessageBox]::Show('Type or select a destination folder first.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            return
+        }
+
+        $script:ToolkitDeploymentDialogResult = $destination
+        $form.Close()
+    }
+    $buttons.Controls.Add($cancel)
+    $buttons.Controls.Add($deploy)
+
+    Apply-GUIThemeToControl -Control $form
+    $script:ToolkitDeploymentDialogResult = $null
+    [void]$form.ShowDialog($script:Form)
+    $destination = $script:ToolkitDeploymentDialogResult
+    $script:ToolkitDeploymentDialogResult = $null
+    if([string]::IsNullOrWhiteSpace($destination)){ return }
+
     $message = "A fresh deployment will replace all content in this destination folder.`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r`nPortable apps and ExternalTools are included. Reports, logs, profiles, settings, and client data are not copied."
     if([System.Windows.Forms.MessageBox]::Show($message,'Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -ne [System.Windows.Forms.DialogResult]::Yes){ return }
-    if([System.Windows.Forms.MessageBox]::Show('Confirm fresh deployment. Existing destination contents will be deleted.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -eq [System.Windows.Forms.DialogResult]::Yes){ Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination }
+    if([System.Windows.Forms.MessageBox]::Show('Confirm fresh deployment. Existing destination contents will be deleted.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -eq [System.Windows.Forms.DialogResult]::Yes){
+        $settings.toolkitDeploymentDestination = $destination
+        Save-GUISettings -Settings $settings
+        Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination
+    }
 }
 
 function Get-GUIToolkitVersionManifest {
@@ -12754,7 +12918,7 @@ function Build-SettingsPage {
     foreach($themeName in (Get-GUIColorThemeNames)){
         [void]$SettingsThemeCombo.Items.Add($themeName)
     }
-    $selectedTheme = if($settings.colorTheme -and (Get-GUIColorThemeNames) -contains $settings.colorTheme){$settings.colorTheme}else{"Bright Blue"}
+    $selectedTheme = if($settings.colorTheme -and (Get-GUIColorThemeNames) -contains $settings.colorTheme){$settings.colorTheme}else{"Modern Glass"}
     $SettingsThemeCombo.SelectedItem = $selectedTheme
     $script:SettingsPreviousTheme = $selectedTheme
     $SettingsThemeCombo.Add_SelectedIndexChanged({
@@ -12771,7 +12935,7 @@ function Build-SettingsPage {
                 Add-GUILog "Custom theme colors selected. Click Apply Settings to save them."
             }
             else{
-                $fallback = if($script:SettingsPreviousTheme){$script:SettingsPreviousTheme}else{"Bright Blue"}
+                $fallback = if($script:SettingsPreviousTheme){$script:SettingsPreviousTheme}else{"Modern Glass"}
                 $script:SettingsThemeCombo.SelectedItem = $fallback
                 Add-GUILog "Custom theme selection cancelled."
             }
@@ -13026,7 +13190,7 @@ function Build-Form {
     $root.RowCount = 4
     $root.ColumnCount = 1
     $root.Padding = New-Object System.Windows.Forms.Padding(10)
-    $root.BackColor = $script:GUITheme.Page
+    $root.BackColor = $script:GUITheme.Shell
     $script:RootLayout = $root
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
@@ -13264,6 +13428,7 @@ function Build-Form {
     foreach($page in $tabs.TabPages){
         $page.UseVisualStyleBackColor = $false
         $page.BackColor = $script:GUITheme.Page
+        Enable-GUISubtleSurfaceTexture -Control $page
     }
 
     Add-GUIStaticTabStrip -Strip $tabStrip -Tabs $tabs
