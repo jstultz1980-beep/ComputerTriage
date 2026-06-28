@@ -35,7 +35,7 @@ namespace NetworkToolkit {
 }
 
 $script:OwnsGuiInstanceMutex = $false
-if(!$global:NetworkToolkitInstanceMutex){
+if(!$SmokeTest -and !$ButtonSmokeTest -and !$global:NetworkToolkitInstanceMutex){
     $mutexName = "NetworkToolkit-$([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)"
     $createdNew = $false
     $global:NetworkToolkitInstanceMutex = New-Object System.Threading.Mutex($true,$mutexName,[ref]$createdNew)
@@ -154,6 +154,21 @@ $script:WUActionSession = $null
 $script:PsExecProcess = $null
 $script:PsExecTimer = $null
 $script:PsExecFiles = $null
+$script:PrintQueueCredential = $null
+$script:PrintQueuePrinterCache = @()
+$script:PrintQueueConnected = $false
+$script:PrintQueueLastComputer = ""
+$script:PrintQueueLastUser = ""
+$script:PrintQueueConnectedComputer = ""
+$script:PrintQueueComputerBox = $null
+$script:PrintQueueUserBox = $null
+$script:PrintQueueShowAllCheck = $null
+$script:PrintQueueGrid = $null
+$script:PrintQueueStatusLabel = $null
+$script:PrintQueueRefreshButton = $null
+$script:PrintQueueClearButton = $null
+$script:PrintQueueRestartButton = $null
+$script:PrintQueueResetButton = $null
 $script:DriverUpdateGrid = $null
 $script:DriverUpdateStatusLabel = $null
 $script:GUIBusyCount = 0
@@ -3234,6 +3249,440 @@ function Start-GUIPrintQueueMaintenance {
     }
     catch {
         Add-GUILog "Failed to launch Print Queue Maintenance: $($_.Exception.Message)"
+    }
+}
+
+function Get-GUIPrintQueueDataRoot {
+    $dataRoot = Join-Path $NTKPaths.Data "PrintQueueTools"
+    if(!(Test-Path -LiteralPath $dataRoot)){
+        New-Item -ItemType Directory -Path $dataRoot -Force | Out-Null
+    }
+    return $dataRoot
+}
+
+function Write-GUIPrintQueueLog {
+    param([string]$Message)
+
+    try {
+        $dataRoot = Get-GUIPrintQueueDataRoot
+        $logDir = Join-Path $dataRoot "Logs"
+        if(!(Test-Path -LiteralPath $logDir)){
+            New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+        }
+        $line = "{0} [{1}] {2}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"),$env:USERNAME,$Message
+        Add-Content -LiteralPath (Join-Path $logDir "PrintQueueMaintenance.log") -Value $line -Encoding UTF8
+    }
+    catch {}
+}
+
+function Set-GUIPrintQueueStatus {
+    param(
+        [string]$Text,
+        [System.Drawing.Color]$Color = [System.Drawing.Color]::DimGray
+    )
+
+    if($script:PrintQueueStatusLabel -and !$script:PrintQueueStatusLabel.IsDisposed){
+        $script:PrintQueueStatusLabel.Text = $Text
+        $script:PrintQueueStatusLabel.ForeColor = $Color
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+    Add-GUILog "Print queue: $Text"
+    Write-GUIPrintQueueLog $Text
+}
+
+function Get-GUIPrintQueueConfigPath {
+    return (Join-Path (Get-GUIPrintQueueDataRoot) "PrintQueueMaintenance.ini")
+}
+
+function Load-GUIPrintQueueConfig {
+    $configPath = Get-GUIPrintQueueConfigPath
+    if(!(Test-Path -LiteralPath $configPath)){
+        return
+    }
+
+    foreach($line in @(Get-Content -LiteralPath $configPath -ErrorAction SilentlyContinue)){
+        if($line -notmatch "="){ continue }
+        $key,$value = $line -split "=",2
+        switch($key){
+            "ComputerName" { $script:PrintQueueLastComputer = $value }
+            "Username" { $script:PrintQueueLastUser = $value }
+        }
+    }
+}
+
+function Save-GUIPrintQueueConfig {
+    @(
+        "ComputerName=$($script:PrintQueueComputerBox.Text.Trim())"
+        "Username=$($script:PrintQueueUserBox.Text.Trim())"
+    ) | Set-Content -LiteralPath (Get-GUIPrintQueueConfigPath) -Encoding UTF8
+}
+
+function Test-GUIPrintQueueLocalComputer {
+    param([string]$ComputerName)
+
+    if(!$ComputerName -or $ComputerName.Trim() -in @(".","localhost")){
+        return $true
+    }
+
+    $name = $ComputerName.Trim()
+    $localNames = @($env:COMPUTERNAME, "$env:COMPUTERNAME.$env:USERDNSDOMAIN") | Where-Object { $_ }
+    return (@($localNames | Where-Object { $_ -ieq $name }).Count -gt 0)
+}
+
+function Test-GUIPrintQueueAuthError {
+    param([string]$Message)
+    return ($Message -match "Access is denied|Logon failure|authentication|unauthorized|credentials|WinRM cannot process the request")
+}
+
+function Get-GUIPrintQueueCredential {
+    if(!$script:PrintQueueUserBox -or [string]::IsNullOrWhiteSpace($script:PrintQueueUserBox.Text)){
+        return $null
+    }
+
+    $script:PrintQueueLastUser = $script:PrintQueueUserBox.Text.Trim()
+    return Get-Credential -UserName $script:PrintQueueLastUser -Message "Enter password for $($script:PrintQueueLastUser)"
+}
+
+function Invoke-GUIPrintQueueTarget {
+    param(
+        [Parameter(Mandatory=$true)][scriptblock]$ScriptBlock,
+        [object[]]$ArgumentList = @(),
+        [string]$ComputerName = "",
+        [switch]$NoCredentialPrompt
+    )
+
+    $computerName = if($ComputerName -and $ComputerName.Trim()){ $ComputerName.Trim() }elseif($script:PrintQueueComputerBox){ $script:PrintQueueComputerBox.Text.Trim() }else{ "" }
+    if(!$computerName){
+        throw "Print server is blank."
+    }
+
+    if(Test-GUIPrintQueueLocalComputer -ComputerName $computerName){
+        return & $ScriptBlock @ArgumentList
+    }
+
+    for($attempt = 1; $attempt -le 3; $attempt++){
+        try {
+            $invokeParams = @{
+                ComputerName = $computerName
+                ScriptBlock = $ScriptBlock
+                ErrorAction = "Stop"
+            }
+            if($script:PrintQueueCredential){ $invokeParams.Credential = $script:PrintQueueCredential }
+            if($ArgumentList -and $ArgumentList.Count -gt 0){ $invokeParams.ArgumentList = $ArgumentList }
+            Set-GUIPrintQueueStatus "Remote call attempt $attempt to $computerName..."
+            return Invoke-Command @invokeParams
+        }
+        catch {
+            $message = $_.Exception.Message
+            if(!(Test-GUIPrintQueueAuthError -Message $message) -or $attempt -ge 3 -or $NoCredentialPrompt){
+                throw
+            }
+
+            [System.Windows.Forms.MessageBox]::Show(
+                "Authentication failed. Enter credentials again.`r`n`r`n$message",
+                "Print Queue Authentication",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Warning
+            ) | Out-Null
+            $script:PrintQueueCredential = Get-GUIPrintQueueCredential
+            if(!$script:PrintQueueCredential){
+                throw "Credential prompt was cancelled."
+            }
+        }
+    }
+}
+
+function Add-GUIPrintQueueServerCandidate {
+    param([string]$ComputerName)
+
+    if(!$script:PrintQueueComputerBox -or [string]::IsNullOrWhiteSpace($ComputerName)){
+        return
+    }
+
+    $candidate = $ComputerName.Trim()
+    foreach($item in $script:PrintQueueComputerBox.Items){
+        if([string]$item -ieq $candidate){
+            return
+        }
+    }
+    [void]$script:PrintQueueComputerBox.Items.Add($candidate)
+}
+
+function Get-GUIPrintQueueServerCandidates {
+    $candidates = New-Object System.Collections.Generic.List[string]
+
+    foreach($candidate in @($script:PrintQueueLastComputer)){
+        if($candidate -and $candidate.Trim() -and !$candidates.Contains($candidate.Trim())){
+            [void]$candidates.Add($candidate.Trim())
+        }
+    }
+
+    try {
+        if(Get-Command Get-ADComputer -ErrorAction SilentlyContinue){
+            $adCandidates = @(Get-ADComputer -Filter "OperatingSystem -like '*Server*' -and (Name -like '*print*' -or Name -like '*prn*' -or Name -like '*queue*' -or Description -like '*print*' -or Description -like '*printer*')" -Properties DNSHostName,Description,OperatingSystem -ErrorAction Stop | Select-Object -First 12)
+            foreach($server in $adCandidates){
+                $name = if($server.DNSHostName){ [string]$server.DNSHostName }else{ [string]$server.Name }
+                if($name -and $name.Trim() -and !$candidates.Contains($name.Trim())){
+                    [void]$candidates.Add($name.Trim())
+                }
+            }
+        }
+    }
+    catch {
+        Write-GUIPrintQueueLog "Print server AD discovery skipped: $($_.Exception.Message)"
+    }
+
+    if($env:COMPUTERNAME -and !$candidates.Contains($env:COMPUTERNAME.Trim())){
+        [void]$candidates.Add($env:COMPUTERNAME.Trim())
+    }
+
+    return @($candidates)
+}
+
+function Get-GUIPrintQueuePrinterSummary {
+    $includeUnshared = ($script:PrintQueueShowAllCheck -and $script:PrintQueueShowAllCheck.Checked)
+    $data = Invoke-GUIPrintQueueTarget {
+        param([bool]$IncludeUnshared)
+
+        $printers = @(Get-Printer -ErrorAction Stop)
+        if(!$IncludeUnshared){
+            $printers = @($printers | Where-Object { $_.Shared })
+        }
+
+        foreach($printer in $printers){
+            $jobCount = 0
+            if($printer.PSObject.Properties["JobCount"] -and $null -ne $printer.JobCount){
+                try { $jobCount = [int]$printer.JobCount } catch { $jobCount = 0 }
+            }
+
+            [pscustomobject]@{
+                DisplayName = if($printer.ShareName){ $printer.ShareName }else{ $printer.Name }
+                Name = $printer.Name
+                ShareName = $printer.ShareName
+                Shared = [bool]$printer.Shared
+                JobCount = $jobCount
+                Status = [string]$printer.PrinterStatus
+                DriverName = $printer.DriverName
+                PortName = $printer.PortName
+            }
+        }
+    } -ArgumentList @($includeUnshared)
+
+    $script:PrintQueuePrinterCache = @($data)
+    return $script:PrintQueuePrinterCache
+}
+
+function Set-GUIPrintQueueConnectedState {
+    param([bool]$Connected)
+
+    $script:PrintQueueConnected = $Connected
+    foreach($button in @($script:PrintQueueRefreshButton,$script:PrintQueueClearButton,$script:PrintQueueRestartButton,$script:PrintQueueResetButton)){
+        if($button -and !$button.IsDisposed){
+            $button.Enabled = $Connected
+        }
+    }
+}
+
+function Refresh-GUIPrintQueueGrid {
+    param([switch]$Silent,[switch]$ThrowOnError)
+
+    if(!$script:PrintQueueConnected){
+        if(!$Silent){
+            [System.Windows.Forms.MessageBox]::Show("Connect to a print server first.","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
+        }
+        if($ThrowOnError){ throw "Connect to a print server first." }
+        return
+    }
+
+    try {
+        Set-GUIPrintQueueStatus "Refreshing printer list..."
+        $data = @(Get-GUIPrintQueuePrinterSummary)
+        $table = New-Object System.Data.DataTable
+        foreach($column in @("DisplayName","Jobs","Status","Shared","Driver","Port","RealName")){
+            [void]$table.Columns.Add($column)
+        }
+
+        foreach($printer in $data){
+            $row = $table.NewRow()
+            $row.DisplayName = $printer.DisplayName
+            $row.Jobs = $printer.JobCount
+            $row.Status = $printer.Status
+            $row.Shared = $printer.Shared
+            $row.Driver = $printer.DriverName
+            $row.Port = $printer.PortName
+            $row.RealName = $printer.Name
+            $table.Rows.Add($row)
+        }
+
+        $script:PrintQueueGrid.DataSource = $null
+        $script:PrintQueueGrid.DataSource = $table
+        if($script:PrintQueueGrid.Columns.Contains("RealName")){
+            $script:PrintQueueGrid.Columns["RealName"].Visible = $false
+        }
+        Set-GUIPrintQueueStatus "Connected to $script:PrintQueueConnectedComputer. Printers shown: $($data.Count)." ([System.Drawing.Color]::ForestGreen)
+    }
+    catch {
+        Set-GUIPrintQueueStatus "Refresh failed." ([System.Drawing.Color]::Firebrick)
+        if(!$Silent){
+            [System.Windows.Forms.MessageBox]::Show("Refresh failed:`r`n$($_.Exception.Message)","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+        if($ThrowOnError){ throw }
+    }
+}
+
+function Connect-GUIPrintQueueServer {
+    param(
+        [string]$ComputerName,
+        [switch]$PromptForCredentials,
+        [switch]$ShowErrors,
+        [bool]$SaveTarget = $true
+    )
+
+    if([string]::IsNullOrWhiteSpace($ComputerName)){
+        if($ShowErrors){
+            [System.Windows.Forms.MessageBox]::Show("Enter a print server.","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
+        }
+        return $false
+    }
+
+    $target = $ComputerName.Trim()
+    $script:PrintQueueComputerBox.Text = $target
+    Add-GUIPrintQueueServerCandidate -ComputerName $target
+
+    try {
+        $script:PrintQueueCredential = $null
+        if($PromptForCredentials -and $script:PrintQueueUserBox.Text.Trim() -and !(Test-GUIPrintQueueLocalComputer -ComputerName $target)){
+            $script:PrintQueueCredential = Get-GUIPrintQueueCredential
+            if(!$script:PrintQueueCredential){ return $false }
+        }
+
+        Set-GUIPrintQueueStatus "Connecting to $target..."
+        $hostname = Invoke-GUIPrintQueueTarget -ComputerName $target -NoCredentialPrompt:(!$PromptForCredentials) -ScriptBlock { hostname }
+        $script:PrintQueueConnectedComputer = ([string]$hostname).Trim()
+        if($SaveTarget){ Save-GUIPrintQueueConfig }
+        Set-GUIPrintQueueConnectedState -Connected $true
+        Refresh-GUIPrintQueueGrid -Silent:(!$ShowErrors) -ThrowOnError:(!$ShowErrors)
+        return $true
+    }
+    catch {
+        Set-GUIPrintQueueConnectedState -Connected $false
+        Set-GUIPrintQueueStatus "Connection failed for $target." ([System.Drawing.Color]::Firebrick)
+        Write-GUIPrintQueueLog "Connection failed for $target`: $($_.Exception.Message)"
+        if($ShowErrors){
+            [System.Windows.Forms.MessageBox]::Show("Connection failed:`r`n$($_.Exception.Message)","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+        return $false
+    }
+}
+
+function Start-GUIPrintQueueDiscovery {
+    Set-GUIPrintQueueStatus "Finding likely print servers..."
+    foreach($candidate in @(Get-GUIPrintQueueServerCandidates)){
+        Add-GUIPrintQueueServerCandidate -ComputerName $candidate
+    }
+
+    $candidates = @(Get-GUIPrintQueueServerCandidates)
+    if($candidates.Count -eq 0){
+        Set-GUIPrintQueueStatus "No likely print servers found. Type a server name and click Connect." ([System.Drawing.Color]::DarkGoldenrod)
+        return
+    }
+
+    foreach($candidate in $candidates){
+        if(Connect-GUIPrintQueueServer -ComputerName $candidate -SaveTarget:$false){
+            if($script:PrintQueuePrinterCache.Count -gt 0){
+                Save-GUIPrintQueueConfig
+                return
+            }
+            Write-GUIPrintQueueLog "Print server candidate $candidate was reachable but no shared queues were found."
+        }
+    }
+
+    $script:PrintQueueComputerBox.Text = $candidates[0]
+    Set-GUIPrintQueueStatus "No accessible print server found automatically. Select or type a server and click Connect." ([System.Drawing.Color]::DarkGoldenrod)
+}
+
+function Clear-GUIPrintQueueSelected {
+    if(!$script:PrintQueueGrid -or $script:PrintQueueGrid.SelectedRows.Count -eq 0){
+        return
+    }
+
+    $row = $script:PrintQueueGrid.SelectedRows[0]
+    $printerName = [string]$row.Cells["RealName"].Value
+    $displayName = [string]$row.Cells["DisplayName"].Value
+    if(!$printerName){
+        [System.Windows.Forms.MessageBox]::Show("Unable to resolve selected printer name.","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
+        return
+    }
+
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Clear all visible jobs from '$displayName'?`r`n`r`nThis modifies the selected print queue.",
+        "Confirm Clear Selected Queue",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    try {
+        $message = Invoke-GUIPrintQueueTarget {
+            param([string]$TargetPrinter)
+            $jobs = @(Get-PrintJob -PrinterName $TargetPrinter -ErrorAction Stop)
+            foreach($job in $jobs){
+                Remove-PrintJob -PrinterName $TargetPrinter -ID $job.ID -ErrorAction Stop
+            }
+            return "Cleared $($jobs.Count) job(s) from $TargetPrinter."
+        } -ArgumentList @($printerName)
+
+        Set-GUIPrintQueueStatus ([string]$message) ([System.Drawing.Color]::ForestGreen)
+        Refresh-GUIPrintQueueGrid
+    }
+    catch {
+        Set-GUIPrintQueueStatus "Clear selected failed." ([System.Drawing.Color]::Firebrick)
+        [System.Windows.Forms.MessageBox]::Show("Clear selected failed:`r`n$($_.Exception.Message)","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    }
+}
+
+function Restart-GUIPrintQueueSpooler {
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Restart the Print Spooler service on '$($script:PrintQueueComputerBox.Text.Trim())'?",
+        "Confirm Restart Spooler",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    try {
+        Invoke-GUIPrintQueueTarget { Restart-Service Spooler -Force -ErrorAction Stop }
+        Set-GUIPrintQueueStatus "Spooler restarted." ([System.Drawing.Color]::ForestGreen)
+        Refresh-GUIPrintQueueGrid
+    }
+    catch {
+        Set-GUIPrintQueueStatus "Restart spooler failed." ([System.Drawing.Color]::Firebrick)
+        [System.Windows.Forms.MessageBox]::Show("Restart spooler failed:`r`n$($_.Exception.Message)","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    }
+}
+
+function Reset-GUIPrintQueueSpooler {
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Clear ALL queues and restart the spooler on '$($script:PrintQueueComputerBox.Text.Trim())'?`r`n`r`nUse only with approval.",
+        "Confirm Full Spooler Reset",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    try {
+        Invoke-GUIPrintQueueTarget {
+            Stop-Service Spooler -Force -ErrorAction Stop
+            Start-Sleep -Seconds 2
+            Remove-Item -LiteralPath "$env:SystemRoot\System32\spool\PRINTERS\*" -Force -ErrorAction SilentlyContinue
+            Start-Service Spooler -ErrorAction Stop
+        }
+        Set-GUIPrintQueueStatus "All queues cleared and spooler restarted." ([System.Drawing.Color]::ForestGreen)
+        Refresh-GUIPrintQueueGrid
+    }
+    catch {
+        Set-GUIPrintQueueStatus "Full spooler reset failed." ([System.Drawing.Color]::Firebrick)
+        [System.Windows.Forms.MessageBox]::Show("Full spooler reset failed:`r`n$($_.Exception.Message)","Print Queue Maintenance",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
     }
 }
 
@@ -9842,7 +10291,140 @@ function Build-WiFiToolsPage {
 
 function Build-PrintToolsPage {
     param([System.Windows.Forms.TabPage]$Page)
-    Build-GUICatalogToolsPage -Page $Page -Tab "Print" -Title "Print Tools"
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 1
+    $layout.RowCount = 2
+    $layout.Padding = New-Object System.Windows.Forms.Padding(10)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,72))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,28))) | Out-Null
+    $Page.Controls.Add($layout)
+
+    $queueGroup = New-Object System.Windows.Forms.GroupBox
+    $queueGroup.Text = "Print Queue Maintenance"
+    $queueGroup.Dock = "Fill"
+    $queueGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $queueGroup.Padding = New-Object System.Windows.Forms.Padding(10)
+    $layout.Controls.Add($queueGroup,0,0)
+
+    $queueLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $queueLayout.Dock = "Fill"
+    $queueLayout.ColumnCount = 1
+    $queueLayout.RowCount = 4
+    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
+    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $queueGroup.Controls.Add($queueLayout)
+
+    $top = New-Object System.Windows.Forms.TableLayoutPanel
+    $top.Dock = "Fill"
+    $top.ColumnCount = 7
+    $top.RowCount = 1
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,84))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,42))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,74))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,160))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,108))) | Out-Null
+    $queueLayout.Controls.Add($top,0,0)
+
+    Load-GUIPrintQueueConfig
+
+    $serverLabel = New-GUILabel "Print server"
+    $serverLabel.Dock = "Fill"
+    $top.Controls.Add($serverLabel,0,0)
+
+    $script:PrintQueueComputerBox = New-Object System.Windows.Forms.ComboBox
+    $PrintQueueComputerBox.Dock = "Fill"
+    $PrintQueueComputerBox.DropDownStyle = "DropDown"
+    $PrintQueueComputerBox.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $PrintQueueComputerBox.Text = $script:PrintQueueLastComputer
+    $PrintQueueComputerBox.Margin = New-Object System.Windows.Forms.Padding(3,8,8,4)
+    $top.Controls.Add($PrintQueueComputerBox,1,0)
+
+    $userLabel = New-GUILabel "Username"
+    $userLabel.Dock = "Fill"
+    $top.Controls.Add($userLabel,2,0)
+
+    $script:PrintQueueUserBox = New-GUITextBox $script:PrintQueueLastUser
+    $PrintQueueUserBox.Dock = "Fill"
+    $PrintQueueUserBox.Margin = New-Object System.Windows.Forms.Padding(3,8,8,4)
+    $top.Controls.Add($PrintQueueUserBox,3,0)
+
+    $script:PrintQueueShowAllCheck = New-Object System.Windows.Forms.CheckBox
+    $PrintQueueShowAllCheck.Text = "Show unshared printers"
+    $PrintQueueShowAllCheck.AutoSize = $true
+    $PrintQueueShowAllCheck.Margin = New-Object System.Windows.Forms.Padding(3,10,8,4)
+    $PrintQueueShowAllCheck.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    $PrintQueueShowAllCheck.Add_CheckedChanged({ if($script:PrintQueueConnected){ Refresh-GUIPrintQueueGrid } })
+    $top.Controls.Add($PrintQueueShowAllCheck,4,0)
+
+    $connectButton = New-GUIButton "Connect" { [void](Connect-GUIPrintQueueServer -ComputerName $script:PrintQueueComputerBox.Text -PromptForCredentials -ShowErrors) }
+    $connectButton.Dock = "Fill"
+    $top.Controls.Add($connectButton,5,0)
+
+    $findButton = New-GUIButton "Find Servers" { Start-GUIPrintQueueDiscovery }
+    $findButton.Dock = "Fill"
+    $top.Controls.Add($findButton,6,0)
+
+    $script:PrintQueueGrid = New-Object System.Windows.Forms.DataGridView
+    $PrintQueueGrid.Dock = "Fill"
+    $PrintQueueGrid.ReadOnly = $true
+    $PrintQueueGrid.AutoSizeColumnsMode = "Fill"
+    $PrintQueueGrid.SelectionMode = "FullRowSelect"
+    $PrintQueueGrid.MultiSelect = $false
+    $PrintQueueGrid.AllowUserToAddRows = $false
+    $PrintQueueGrid.AllowUserToDeleteRows = $false
+    $PrintQueueGrid.RowHeadersVisible = $false
+    $PrintQueueGrid.BackgroundColor = [System.Drawing.Color]::White
+    $queueLayout.Controls.Add($PrintQueueGrid,0,1)
+
+    $actions = New-Object System.Windows.Forms.TableLayoutPanel
+    $actions.Dock = "Fill"
+    $actions.ColumnCount = 6
+    $actions.RowCount = 1
+    for($i = 0; $i -lt 6; $i++){
+        $actions.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 6)))) | Out-Null
+    }
+    $queueLayout.Controls.Add($actions,0,2)
+
+    $script:PrintQueueRefreshButton = New-GUIButton "Refresh" { Refresh-GUIPrintQueueGrid }
+    $script:PrintQueueClearButton = New-GUIButton "Clear Selected" { Clear-GUIPrintQueueSelected }
+    $script:PrintQueueRestartButton = New-GUIButton "Restart Spooler" { Restart-GUIPrintQueueSpooler }
+    $script:PrintQueueResetButton = New-GUIButton "Full Reset" { Reset-GUIPrintQueueSpooler }
+    $saveButton = New-GUIButton "Save Target" {
+        Add-GUIPrintQueueServerCandidate -ComputerName $script:PrintQueueComputerBox.Text
+        Save-GUIPrintQueueConfig
+        Set-GUIPrintQueueStatus "Target saved." ([System.Drawing.Color]::ForestGreen)
+    }
+    $standaloneButton = New-GUIButton "Standalone" { Start-GUIPrintQueueMaintenance }
+
+    foreach($button in @($script:PrintQueueRefreshButton,$script:PrintQueueClearButton,$script:PrintQueueRestartButton,$script:PrintQueueResetButton,$saveButton,$standaloneButton)){
+        $button.Dock = "Fill"
+        $button.Width = 0
+        $button.Margin = New-Object System.Windows.Forms.Padding(4)
+        [void]$actions.Controls.Add($button)
+    }
+
+    $script:PrintQueueStatusLabel = New-Object System.Windows.Forms.Label
+    $PrintQueueStatusLabel.Dock = "Fill"
+    $PrintQueueStatusLabel.TextAlign = "MiddleLeft"
+    $PrintQueueStatusLabel.AutoEllipsis = $true
+    $PrintQueueStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    $PrintQueueStatusLabel.ForeColor = $script:GUITheme.MutedText
+    $PrintQueueStatusLabel.Text = "Data folder: $(Get-GUIPrintQueueDataRoot)"
+    $queueLayout.Controls.Add($PrintQueueStatusLabel,0,3)
+
+    Set-GUIPrintQueueConnectedState -Connected:$false
+    foreach($candidate in @(Get-GUIPrintQueueServerCandidates)){
+        Add-GUIPrintQueueServerCandidate -ComputerName $candidate
+    }
+
+    $tools = @(Get-GUIToolsForTab -Tab "Print" | Where-Object { $_.Text -ne "Print Queue Maintenance" })
+    Add-GUICompactToolGrid -Page $layout -Title "Print Diagnostics And Cleanup" -Tools $tools -Columns 4
 }
 
 function Build-ReportsPage {

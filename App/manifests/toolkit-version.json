@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260627204511,
-    "SourceUpdatedAt":  "2026-06-27T20:45:11.2536344-05:00",
-    "ReleaseNotes":  "Refined Quick Diagnosis layout and header health status, hardened computer profile opening, cleaned Chocolatey and Reports pages, expanded PsExec presets, adjusted RoboCopy builder, and exposed bundled Sysinternals help files."
+    "Build":  20260627210301,
+    "SourceUpdatedAt":  "2026-06-27T21:03:01.1343225-05:00",
+    "ReleaseNotes":  "Embedded Print Queue Maintenance directly on the Print tab, added native print queue connection, refresh, clear, restart, reset, server discovery, and logging actions, and made GUI smoke tests bypass the single-instance guard."
 }
