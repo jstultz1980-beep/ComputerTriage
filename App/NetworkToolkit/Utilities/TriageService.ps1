@@ -47,6 +47,13 @@ function Global:Write-NTKTriageLog {
     }
 }
 
+function Global:Get-NTKTriageCount {
+    param($Value)
+    if($null -eq $Value){ return 0 }
+    if($Value -is [System.Collections.ICollection]){ return [int]$Value.Count }
+    return [int]($Value | Measure-Object).Count
+}
+
 function Global:New-NTKDefaultTriageManifest {
     $tools = @(
         @{name="Microsoft TSS Toolset";id="tss";category="Triage";source="Microsoft";downloadUrl="https://learn.microsoft.com/en-us/troubleshoot/windows-client/windows-tss/introduction-to-troubleshootingscript-toolset-tss";localPath=".\Triage\Tools\TSS";executables=@(@{name="TSS";path=".\Triage\Tools\TSS\TSS.ps1";arguments="";outputFile="ToolOutput\tss.txt";captureStdout=$true;autoRun=$false;requiresConsent=$true});required=$false;portable=$true;notes="Optional long-running Microsoft collector."}
@@ -269,7 +276,7 @@ function Global:Export-NTKTriagePowerShellObject {
         Write-NTKTriageLog "PowerShell collector started: $Name" $RunLog
         $data = & $ScriptBlock
         $data | Out-String -Width 260 | Set-Content -LiteralPath $TxtPath -Encoding UTF8
-        $data | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $JsonPath -Encoding UTF8
+        $data | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $JsonPath -Encoding UTF8
         Write-NTKTriageLog "PowerShell collector completed: $Name" $RunLog
         return [pscustomobject]@{name=$Name;succeeded=$true;txt=$TxtPath;json=$JsonPath;error=$null}
     }
@@ -297,7 +304,6 @@ function Global:Get-NTKTriageCommandPlan {
         @{Name="drivers_all";Exe="sc.exe";Args="query type= driver state= all";Out="drivers_all.txt";Timeout=60},
         @{Name="driverquery_verbose";Exe="driverquery.exe";Args="/v";Out="driverquery_verbose.txt";Timeout=60},
         @{Name="driverquery_signed";Exe="driverquery.exe";Args="/si";Out="driverquery_signed.txt";Timeout=60},
-        @{Name="hotfixes";Exe="wmic.exe";Args="qfe list full";Out="hotfixes.txt";Timeout=60},
         @{Name="scheduled_tasks";Exe="schtasks.exe";Args="/query /fo LIST /v";Out="scheduled_tasks.txt";Timeout=120},
         @{Name="firewall_profiles";Exe="netsh.exe";Args="advfirewall show allprofiles";Out="firewall_profiles.txt";Timeout=60},
         @{Name="eventlog_channels";Exe="wevtutil.exe";Args="el";Out="eventlog_channels.txt";Timeout=60}
@@ -319,9 +325,21 @@ function Global:Get-NTKTriageCommandPlan {
 }
 
 function Global:Copy-NTKTriageFileSafe {
-    param([string]$Path,[string]$DestinationRoot,[long]$MaxBytes=104857600,[switch]$MetadataOnly,[string]$RunLog)
+    param([string]$Path,[string]$DestinationRoot,[long]$MaxBytes=104857600,[switch]$MetadataOnly,[switch]$Recurse,[string]$RunLog)
     $records = @()
-    foreach($item in @(Get-ChildItem -Path $Path -File -Recurse -Force -ErrorAction SilentlyContinue)){
+    $items = @()
+    try {
+        if(Test-Path -LiteralPath $Path -PathType Leaf){
+            $items = @(Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue)
+        }
+        else {
+            $items = @(Get-ChildItem -Path $Path -File -Force -Recurse:$Recurse -ErrorAction SilentlyContinue)
+        }
+    }
+    catch {
+        Write-NTKTriageLog "File discovery skipped: $Path $($_.Exception.Message)" $RunLog
+    }
+    foreach($item in $items){
         try {
             $record = [ordered]@{source=$item.FullName;fileName=$item.Name;sizeBytes=$item.Length;created=$item.CreationTimeUtc.ToString("o");modified=$item.LastWriteTimeUtc.ToString("o");copied=$false;destination=$null;warning=$null}
             if($MetadataOnly -or $item.Length -gt $MaxBytes){
@@ -363,7 +381,7 @@ function Global:Export-NTKTriageEventSummary {
 }
 
 function Global:New-NTKTriageFileInventory {
-    param([string]$RunPath,[string]$OutputPath,[long]$HashThresholdBytes=524288000)
+    param([string]$RunPath,[string]$OutputPath,[long]$HashThresholdBytes=52428800)
     $rows = foreach($file in Get-ChildItem -LiteralPath $RunPath -File -Recurse -Force -ErrorAction SilentlyContinue){
         $relative = $file.FullName.Substring($RunPath.Length).TrimStart('\')
         $hash = ""
@@ -381,6 +399,12 @@ function Global:Invoke-NTKTriageAnalysis {
     param($Run,$CommandResults,$EventResults,$FileRecords,$ToolResults,$MissingTools,$Warnings,$StartedUtc)
     $analysisDir = Join-Path $Run.Path "Analysis"
     $findings = New-Object System.Collections.Generic.List[object]
+    $getCount = {
+        param($Value)
+        if($null -eq $Value){ return 0 }
+        if($Value -is [System.Collections.ICollection]){ return [int]$Value.Count }
+        return [int]($Value | Measure-Object).Count
+    }
     $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
     $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
     $volumes = @(Get-Volume -ErrorAction SilentlyContinue | Select-Object DriveLetter,FileSystemLabel,Size,SizeRemaining,HealthStatus)
@@ -400,45 +424,52 @@ function Global:Invoke-NTKTriageAnalysis {
         [void]$findings.Add([pscustomobject]@{severity="Low";category="Setup";title="Required triage tool missing";evidence="$($tool.name) is marked required but was not found.";recommendation="Install the tool under Triage\Tools or update manifests\triage-tools.json."})
     }
     $findings | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $analysisDir "findings.json") -Encoding UTF8
-    $summary = New-Object System.Collections.Generic.List[string]
-    $summary.Add("# Network Toolkit Triage Summary")
-    $summary.Add("")
-    $summary.Add("Computer: $env:COMPUTERNAME")
-    $summary.Add("Profile: $($Run.Profile)")
-    $summary.Add("Started UTC: $StartedUtc")
-    $summary.Add("Generated UTC: $((Get-Date).ToUniversalTime().ToString('o'))")
-    $summary.Add("OS: $($os.Caption) $($os.Version) build $($os.BuildNumber)")
-    $summary.Add("Last boot: $($os.LastBootUpTime)")
-    $summary.Add("Domain/workgroup: $($cs.Domain)")
-    $summary.Add("User: $env:USERDOMAIN\$env:USERNAME")
-    $summary.Add("Elevated: $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))")
-    $summary.Add("RAM GB: $([Math]::Round(($cs.TotalPhysicalMemory/1GB),2))")
-    $summary.Add("")
-    $summary.Add("## Collection Summary")
-    $summary.Add("- Commands run: $(@($CommandResults).Count)")
-    $summary.Add("- Tools run: $(@($ToolResults | Where-Object {$_.succeeded}).Count)")
-    $summary.Add("- Missing tools: $(@($MissingTools).Count)")
-    $summary.Add("- File records: $(@($FileRecords).Count)")
-    $summary.Add("- Event summaries: $(@($EventResults).Count)")
-    $summary.Add("- Warnings/errors: $(@($Warnings).Count)")
-    $summary.Add("")
-    $summary.Add("## Findings")
-    if($findings.Count -eq 0){ $summary.Add("No high-confidence local findings were detected by the basic analyzer. Upload the bundle for deeper review.") }
+    $summary = New-Object System.Collections.ArrayList
+    $addSummary = { param($Line) [void]$summary.Add([string]$Line) }
+    $commandCount = & $getCount $CommandResults
+    $toolRunCount = & $getCount ($ToolResults | Where-Object {$_.succeeded})
+    $missingToolCount = & $getCount $MissingTools
+    $fileRecordCount = & $getCount $FileRecords
+    $eventSummaryCount = & $getCount $EventResults
+    $warningCount = & $getCount $Warnings
+    & $addSummary "# Network Toolkit Triage Summary"
+    & $addSummary ""
+    & $addSummary "Computer: $env:COMPUTERNAME"
+    & $addSummary "Profile: $($Run.Profile)"
+    & $addSummary "Started UTC: $StartedUtc"
+    & $addSummary "Generated UTC: $((Get-Date).ToUniversalTime().ToString('o'))"
+    & $addSummary "OS: $($os.Caption) $($os.Version) build $($os.BuildNumber)"
+    & $addSummary "Last boot: $($os.LastBootUpTime)"
+    & $addSummary "Domain/workgroup: $($cs.Domain)"
+    & $addSummary "User: $env:USERDOMAIN\$env:USERNAME"
+    & $addSummary "Elevated: $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))"
+    & $addSummary "RAM GB: $([Math]::Round(($cs.TotalPhysicalMemory/1GB),2))"
+    & $addSummary ""
+    & $addSummary "## Collection Summary"
+    & $addSummary ("- Commands run: {0}" -f $commandCount)
+    & $addSummary ("- Tools run: {0}" -f $toolRunCount)
+    & $addSummary ("- Missing tools: {0}" -f $missingToolCount)
+    & $addSummary ("- File records: {0}" -f $fileRecordCount)
+    & $addSummary ("- Event summaries: {0}" -f $eventSummaryCount)
+    & $addSummary ("- Warnings/errors: {0}" -f $warningCount)
+    & $addSummary ""
+    & $addSummary "## Findings"
+    if($findings.Count -eq 0){ & $addSummary "No high-confidence local findings were detected by the basic analyzer. Upload the bundle for deeper review." }
     foreach($finding in $findings){
-        $summary.Add("- [$($finding.severity)] $($finding.title): $($finding.evidence) Recommended next step: $($finding.recommendation)")
+        & $addSummary "- [$($finding.severity)] $($finding.title): $($finding.evidence) Recommended next step: $($finding.recommendation)"
     }
-    $summary.Add("")
-    $summary.Add("## Network Adapters")
+    & $addSummary ""
+    & $addSummary "## Network Adapters"
     try {
         foreach($nic in @(Get-NetIPConfiguration -ErrorAction Stop)){
-            $summary.Add("- $($nic.InterfaceAlias): IPv4=$($nic.IPv4Address.IPAddress -join ', ') Gateway=$($nic.IPv4DefaultGateway.NextHop) DNS=$($nic.DNSServer.ServerAddresses -join ', ')")
+            & $addSummary "- $($nic.InterfaceAlias): IPv4=$($nic.IPv4Address.IPAddress -join ', ') Gateway=$($nic.IPv4DefaultGateway.NextHop) DNS=$($nic.DNSServer.ServerAddresses -join ', ')"
         }
-    } catch { $summary.Add("- Network adapter summary unavailable: $($_.Exception.Message)") }
-    $summary.Add("")
-    $summary.Add("Upload the ZIP bundle to ChatGPT for deeper analysis. Do not upload it to public locations unless approved.")
+    } catch { & $addSummary "- Network adapter summary unavailable: $($_.Exception.Message)" }
+    & $addSummary ""
+    & $addSummary "Upload the ZIP bundle to ChatGPT for deeper analysis. Do not upload it to public locations unless approved."
     $summary -join "`r`n" | Set-Content -LiteralPath (Join-Path $analysisDir "summary.md") -Encoding UTF8
     "Upload the ZIP bundle from the Bundle folder to ChatGPT. Ask it to review Analysis\summary.md, Analysis\findings.json, Metadata\collection_manifest.json, event summaries, command output, and collected dumps/logs. Request prioritized findings, confidence, evidence, and remediation steps. Ask for feedback as downloadable HTML or JSON if needed." | Set-Content -LiteralPath (Join-Path $analysisDir "chatgpt_upload_instructions.txt") -Encoding UTF8
-    return @($findings)
+    return @($findings.ToArray())
 }
 
 function Global:Test-NTKTriageSetup {
@@ -497,14 +528,14 @@ function Global:Invoke-NTKTriageRun {
             $commandResults += Invoke-NTKTriageCommand -Name $cmd.Name -FilePath $cmd.Exe -Arguments $cmd.Args -OutputPath $out -TimeoutSeconds $cmd.Timeout -RunLog $run.RunLog
         }
         $psCollectors = @(
-            @{Name="Get-ComputerInfo";Script={Get-ComputerInfo}},
-            @{Name="Get-HotFix";Script={Get-HotFix}},
-            @{Name="Get-Service";Script={Get-Service | Sort-Object Status,Name}},
-            @{Name="Get-Process";Script={Get-Process | Sort-Object CPU -Descending | Select-Object -First 250}},
-            @{Name="Get-NetIPConfiguration";Script={Get-NetIPConfiguration}},
-            @{Name="Get-NetAdapter";Script={Get-NetAdapter}},
-            @{Name="Get-NetTCPConnection";Script={Get-NetTCPConnection}},
-            @{Name="Get-PhysicalDisk";Script={Get-PhysicalDisk}},
+            @{Name="Get-ComputerInfo";Script={Get-ComputerInfo | Select-Object CsName,WindowsProductName,WindowsVersion,OsHardwareAbstractionLayer,OsArchitecture,OsBuildNumber,OsInstallDate,OsLastBootUpTime,CsManufacturer,CsModel,CsDomain,CsTotalPhysicalMemory,BiosSerialNumber,BiosSMBIOSBIOSVersion}},
+            @{Name="Get-HotFix";Script={Get-HotFix | Select-Object HotFixID,Description,InstalledBy,InstalledOn}},
+            @{Name="Get-Service";Script={Get-Service | Sort-Object Status,Name | Select-Object Name,DisplayName,Status,StartType,ServiceType}},
+            @{Name="Get-Process";Script={Get-Process | Sort-Object CPU -Descending | Select-Object -First 125 Name,Id,CPU,WorkingSet64,Path,StartTime}},
+            @{Name="Get-NetIPConfiguration";Script={Get-NetIPConfiguration | Select-Object InterfaceAlias,InterfaceDescription,NetProfile,IPv4Address,IPv4DefaultGateway,DNSServer}},
+            @{Name="Get-NetAdapter";Script={Get-NetAdapter | Select-Object Name,InterfaceDescription,Status,LinkSpeed,MacAddress,DriverInformation}},
+            @{Name="Get-NetTCPConnection";Script={Get-NetTCPConnection | Select-Object -First 1000 LocalAddress,LocalPort,RemoteAddress,RemotePort,State,OwningProcess}},
+            @{Name="Get-PhysicalDisk";Script={Get-PhysicalDisk | Select-Object FriendlyName,SerialNumber,MediaType,BusType,HealthStatus,OperationalStatus,Size}},
             @{Name="Win32_PnPSignedDriver";Script={Get-CimInstance Win32_PnPSignedDriver | Select-Object DeviceName,Manufacturer,DriverVersion,DriverDate,IsSigned,InfName}}
         )
         foreach($collector in $psCollectors){
@@ -516,15 +547,21 @@ function Global:Invoke-NTKTriageRun {
         foreach($ev in @(@{Log="Setup";Days=30;File="Setup_recent.csv"},@{Log="Microsoft-Windows-WindowsUpdateClient/Operational";Days=30;File="WindowsUpdateClient_recent.csv"},@{Log="Microsoft-Windows-TaskScheduler/Operational";Days=30;File="TaskScheduler_recent.csv"},@{Log="Microsoft-Windows-WER-Diag/Operational";Days=30;File="WER_Diag_recent.csv"},@{Log="Microsoft-Windows-Kernel-Boot/Operational";Days=30;File="KernelBoot_recent.csv"})){
             $eventResults += Export-NTKTriageEventSummary -LogName $ev.Log -Days $ev.Days -OutputPath (Join-Path $run.Path "EventLogs\$($ev.File)") -RunLog $run.RunLog
         }
+        Write-NTKTriageLog "Collecting crash dump metadata/files." $run.RunLog
         $fileRecords += Copy-NTKTriageFileSafe -Path "$env:SystemRoot\Minidump\*.dmp" -DestinationRoot (Join-Path $run.Path "Dumps") -MaxBytes 104857600 -RunLog $run.RunLog
         $fileRecords += Copy-NTKTriageFileSafe -Path "$env:SystemRoot\LiveKernelReports\*.dmp" -DestinationRoot (Join-Path $run.Path "Dumps") -MaxBytes 104857600 -RunLog $run.RunLog
         $fileRecords += Copy-NTKTriageFileSafe -Path "$env:SystemRoot\MEMORY.DMP" -DestinationRoot (Join-Path $run.Path "Dumps") -MaxBytes $(if($IncludeMemoryDump -or $Profile -eq "Full"){1073741824}else{0}) -MetadataOnly:(!$IncludeMemoryDump -and $Profile -ne "Full") -RunLog $run.RunLog
-        foreach($pattern in @("$env:SystemRoot\Logs\CBS\*.log","$env:SystemRoot\Logs\DISM\*.log","$env:SystemRoot\Panther\*.log","$env:SystemRoot\INF\setupapi*.log","$env:LOCALAPPDATA\CrashDumps\*.dmp","$env:TEMP\*.log")){
-            $fileRecords += Copy-NTKTriageFileSafe -Path $pattern -DestinationRoot (Join-Path $run.Path "CollectedFiles") -MaxBytes 52428800 -RunLog $run.RunLog
+        $filePatterns = @()
+        if($Profile -ne "Quick"){
+            $filePatterns += @("$env:SystemRoot\Logs\CBS\*.log","$env:SystemRoot\Logs\DISM\*.log","$env:SystemRoot\INF\setupapi*.log","$env:LOCALAPPDATA\CrashDumps\*.dmp","$env:SystemRoot\Panther\*.log","$env:TEMP\*.log")
+        }
+        foreach($pattern in $filePatterns){
+            $fileRecords += Copy-NTKTriageFileSafe -Path $pattern -DestinationRoot (Join-Path $run.Path "CollectedFiles") -MaxBytes 52428800 -Recurse -RunLog $run.RunLog
         }
         $fileRecords | Export-Csv -LiteralPath (Join-Path $run.Path "Dumps\dump_inventory.csv") -NoTypeInformation -Encoding UTF8
 
-        $toolStatus = @(Get-NTKTriageToolStatus -Deep)
+        Write-NTKTriageLog "Checking triage tool availability." $run.RunLog
+        $toolStatus = if($Profile -eq "Quick" -and !$SelectedToolsOnly){ @(Get-NTKTriageToolStatus) } else { @(Get-NTKTriageToolStatus -Deep) }
         if($SelectedToolsOnly){
             $selectedLookup = @{}
             foreach($id in @($SelectedToolIds)){ if($id){ $selectedLookup[[string]$id] = $true } }
@@ -532,6 +569,10 @@ function Global:Invoke-NTKTriageRun {
             if($toolStatus.Count -eq 0){
                 [void]$warnings.Add([pscustomobject]@{severity="Warning";message="Selected tool triage was requested, but no selected tools matched the triage manifest."})
             }
+        }
+        elseif($Profile -eq "Quick"){
+            [void]$warnings.Add([pscustomobject]@{severity="Info";message="Quick triage skipped portable/Sysinternals tool auto-runs to keep one-click collection fast and reliable. Use Full Triage or Run Selected for external collectors."})
+            $toolStatus = @()
         }
         $toolStatus | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "triage-tools-status.json") -Encoding UTF8
         foreach($tool in $toolStatus){
@@ -554,25 +595,29 @@ function Global:Invoke-NTKTriageRun {
         $commandResults | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\command_results.json") -Encoding UTF8
         $findings = Invoke-NTKTriageAnalysis -Run $run -CommandResults $commandResults -EventResults $eventResults -FileRecords $fileRecords -ToolResults $toolResults -MissingTools $missingTools -Warnings $warnings -StartedUtc $started
         $bundlePath = Join-Path $run.Path ("Bundle\{0}_DiagnosticsBundle.zip" -f $run.RunId)
-        $manifest = [pscustomobject]@{runId=$run.RunId;toolkitVersion=(Get-Content -LiteralPath (Join-Path (Get-NTKTriagePaths).Manifests "toolkit-version.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue);computerName=$env:COMPUTERNAME;profile=$Profile;startedUtc=$started;endedUtc=(Get-Date).ToUniversalTime().ToString("o");selectedToolsOnly=[bool]$SelectedToolsOnly;selectedToolIds=@($SelectedToolIds);filesCollected=@($fileRecords).Count;commandsRun=@($commandResults).Count;toolsRun=@($toolResults).Count;missingTools=@($missingTools | Select-Object name,id,required,status);warnings=$warnings;bundleFileName=[IO.Path]::GetFileName($bundlePath);bundlePath=$bundlePath;bundleSha256=""}
+        $manifest = [pscustomobject]@{runId=$run.RunId;toolkitVersion=(Get-Content -LiteralPath (Join-Path (Get-NTKTriagePaths).Manifests "toolkit-version.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue);computerName=$env:COMPUTERNAME;profile=$Profile;startedUtc=$started;endedUtc=(Get-Date).ToUniversalTime().ToString("o");selectedToolsOnly=[bool]$SelectedToolsOnly;selectedToolIds=@($SelectedToolIds);filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);missingTools=@($missingTools | Select-Object name,id,required,status);warnings=$warnings;bundleFileName=[IO.Path]::GetFileName($bundlePath);bundlePath=$bundlePath;bundleSha256=""}
         $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Encoding UTF8
         Copy-Item -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Destination (Join-Path $run.Path "Metadata\collection_manifest.json") -Force
+        Write-NTKTriageLog "Creating file inventory." $run.RunLog
         $inventory = New-NTKTriageFileInventory -RunPath $run.Path -OutputPath (Join-Path $run.Path "Metadata\file_inventory.csv")
         $items = @("CollectedFiles","CommandOutput","ToolOutput","EventLogs","Dumps","Reports","Analysis","Metadata","run.log","triage-tools-status.json") | ForEach-Object { Join-Path $run.Path $_ } | Where-Object { Test-Path -LiteralPath $_ }
+        Write-NTKTriageLog "Creating bundle: $bundlePath" $run.RunLog
         Compress-Archive -LiteralPath $items -DestinationPath $bundlePath -Force
         $bundleHash = (Get-FileHash -LiteralPath $bundlePath -Algorithm SHA256).Hash
-        $manifest.bundleSha256 = $bundleHash
+        $manifest | Add-Member -MemberType NoteProperty -Name bundleSha256 -Value $bundleHash -Force
         $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Encoding UTF8
         Copy-Item -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Destination (Join-Path $run.Path "Metadata\collection_manifest.json") -Force
         Compress-Archive -LiteralPath $items -DestinationPath $bundlePath -Force
         $post = Test-NTKTriagePostRun -RunPath $run.Path -BundlePath $bundlePath
         $post | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\validation_postrun.json") -Encoding UTF8
         "Preflight validation: $($preflight.passed)`r`nCollection: PASS`r`nLocal analysis: PASS`r`nBundle creation: PASS`r`nPost-run validation: $($post.passed)" | Set-Content -LiteralPath (Join-Path $run.Path "Reports\validation_summary.txt") -Encoding UTF8
-        $result = [pscustomobject]@{status="Completed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path "Analysis\summary.md");filesCollected=@($fileRecords).Count;commandsRun=@($commandResults).Count;toolsRun=@($toolResults).Count;toolsMissing=@($missingTools).Count;warnings=@($warnings).Count;findings=@($findings).Count;postValidationPassed=$post.passed}
+        $result = [pscustomobject]@{status="Completed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path "Analysis\summary.md");filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);toolsMissing=(Get-NTKTriageCount $missingTools);warnings=(Get-NTKTriageCount $warnings);findings=(Get-NTKTriageCount $findings);postValidationPassed=$post.passed}
     }
     catch {
         Write-NTKTriageLog "Triage failed: $($_.Exception.Message)" $run.RunLog
-        $result = [pscustomobject]@{status="Failed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message}
+        Write-NTKTriageLog "Triage failure type: $($_.Exception.GetType().FullName)" $run.RunLog
+        Write-NTKTriageLog "Triage failure stack: $($_.ScriptStackTrace)" $run.RunLog
+        $result = [pscustomobject]@{status="Failed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message;errorType=$_.Exception.GetType().FullName;stack=$_.ScriptStackTrace}
     }
     if($ResultPath){ $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ResultPath -Encoding UTF8 }
     return $result
