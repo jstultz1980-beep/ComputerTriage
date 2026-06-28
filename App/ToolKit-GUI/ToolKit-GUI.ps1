@@ -135,6 +135,7 @@ $script:TriageProgressBar = $null
 $script:TriageLogBox = $null
 $script:TriageLatestRunPath = $null
 $script:TriageLatestBundlePath = $null
+$script:TriageStatusRefreshTimer = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -8747,10 +8748,9 @@ function Select-GUITabPage {
     finally {
         [array]::Reverse($layoutControls)
         foreach($control in $layoutControls){
-            try { $control.ResumeLayout($true) } catch {}
+            try { $control.ResumeLayout($false) } catch {}
         }
         try { $script:StaticTabStrip.Invalidate() } catch {}
-        try { $script:MainTabs.Invalidate() } catch {}
         $script:GuiTabSwitchInProgress = $false
     }
 }
@@ -11562,7 +11562,9 @@ function Build-FileToolsPage {
 function Refresh-GUITriageStatus {
     if(!$script:TriageToolGrid){ return }
     try {
+        $timer = [System.Diagnostics.Stopwatch]::StartNew()
         Initialize-NTKTriageStructure | Out-Null
+        $script:TriageToolGrid.SuspendLayout()
         $script:TriageToolGrid.Rows.Clear()
         foreach($tool in @(Get-NTKTriageToolStatus)){
             $presentCount = @($tool.executables | Where-Object { $_.present }).Count
@@ -11576,13 +11578,35 @@ function Refresh-GUITriageStatus {
                 $script:TriageToolGrid.Rows[$row].DefaultCellStyle.ForeColor = $script:GUITheme.Warning
             }
         }
-        if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage setup loaded. Tools are grouped by triage manifest." }
-        Add-GUILog "Refreshed triage tool status."
+        $timer.Stop()
+        if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage setup loaded in $($timer.ElapsedMilliseconds) ms. Tools are grouped by triage manifest." }
+        Add-GUILog "Refreshed triage tool status in $($timer.ElapsedMilliseconds) ms."
     }
     catch {
         if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage status refresh failed: $($_.Exception.Message)" }
         Add-GUILog "Triage status refresh failed: $($_.Exception.Message)"
     }
+    finally {
+        try { $script:TriageToolGrid.ResumeLayout($true) } catch {}
+    }
+}
+
+function Start-GUITriageStatusRefresh {
+    if($script:TriageStatusRefreshTimer){
+        try { $script:TriageStatusRefreshTimer.Stop(); $script:TriageStatusRefreshTimer.Dispose() } catch {}
+        $script:TriageStatusRefreshTimer = $null
+    }
+    if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Loading triage tool status..." }
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 250
+    $timer.Add_Tick({
+        $script:TriageStatusRefreshTimer.Stop()
+        $script:TriageStatusRefreshTimer.Dispose()
+        $script:TriageStatusRefreshTimer = $null
+        Refresh-GUITriageStatus
+    })
+    $script:TriageStatusRefreshTimer = $timer
+    $timer.Start()
 }
 
 function Add-GUITriageLogLine {
@@ -11873,7 +11897,7 @@ function Build-TriagePage {
     $TriageLogBox.BackColor = $script:GUITheme.LogBack
     $TriageLogBox.ForeColor = $script:GUITheme.LogFore
     $logGroup.Controls.Add($TriageLogBox)
-    Refresh-GUITriageStatus
+    Start-GUITriageStatusRefresh
 }
 
 function Build-ChocolateyPage {

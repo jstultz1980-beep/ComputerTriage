@@ -113,7 +113,7 @@ function Global:Get-NTKTriageManifest {
 }
 
 function Global:Resolve-NTKTriageToolPath {
-    param([string]$Path)
+    param([string]$Path,[hashtable]$PathIndex,[switch]$SkipRecursiveSearch)
     if([string]::IsNullOrWhiteSpace($Path)){ return $null }
     $appRoot = Get-NTKTriageAppRoot
     $relative = $Path.Trim()
@@ -128,7 +128,10 @@ function Global:Resolve-NTKTriageToolPath {
         if(Test-Path -LiteralPath $candidate){ return (Get-Item -LiteralPath $candidate).FullName }
     }
     $fileName = [IO.Path]::GetFileName($relative)
-    if($fileName){
+    if($fileName -and $PathIndex -and $PathIndex.ContainsKey($fileName.ToLowerInvariant())){
+        return $PathIndex[$fileName.ToLowerInvariant()]
+    }
+    if(!$SkipRecursiveSearch -and $fileName){
         foreach($root in @((Join-Path $appRoot "Triage\Tools"),(Join-Path $appRoot "NetworkToolkit\ExternalTools"),(Join-Path $appRoot "Custom"))){
             $match = Get-ChildItem -LiteralPath $root -Filter $fileName -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
             if($match){ return $match.FullName }
@@ -137,13 +140,52 @@ function Global:Resolve-NTKTriageToolPath {
     return $null
 }
 
+function Global:New-NTKTriageToolPathIndex {
+    param([string[]]$ExpectedFileNames = @())
+    $appRoot = Get-NTKTriageAppRoot
+    $index = @{}
+    $expected = @{}
+    foreach($name in @($ExpectedFileNames)){
+        if($name){ $expected[$name.ToLowerInvariant()] = $true }
+    }
+    $addIfExpected = {
+        param($File)
+        if(!$File){ return }
+        $key = $File.Name.ToLowerInvariant()
+        if($expected.Count -gt 0 -and !$expected.ContainsKey($key)){ return }
+        if(!$index.ContainsKey($key)){
+            $index[$key] = $File.FullName
+        }
+    }
+    foreach($root in @((Join-Path $appRoot "Triage\Tools"),(Join-Path $appRoot "NetworkToolkit\ExternalTools"),(Join-Path $appRoot "Custom"))){
+        if(!(Test-Path -LiteralPath $root)){ continue }
+        foreach($file in @(Get-ChildItem -LiteralPath $root -File -ErrorAction SilentlyContinue)){
+            & $addIfExpected $file
+        }
+        foreach($dir in @(Get-ChildItem -LiteralPath $root -Directory -ErrorAction SilentlyContinue)){
+            foreach($file in @(Get-ChildItem -LiteralPath $dir.FullName -File -ErrorAction SilentlyContinue)){
+                & $addIfExpected $file
+            }
+            foreach($childDir in @(Get-ChildItem -LiteralPath $dir.FullName -Directory -ErrorAction SilentlyContinue)){
+                foreach($file in @(Get-ChildItem -LiteralPath $childDir.FullName -File -ErrorAction SilentlyContinue)){
+                    & $addIfExpected $file
+                }
+            }
+        }
+    }
+    return $index
+}
+
 function Global:Get-NTKTriageToolStatus {
+    param([switch]$Deep)
     $manifest = Get-NTKTriageManifest
+    $expectedNames = @($manifest.tools | ForEach-Object { $_.executables } | ForEach-Object { [IO.Path]::GetFileName([string]$_.path) } | Where-Object { $_ } | Select-Object -Unique)
+    $pathIndex = New-NTKTriageToolPathIndex -ExpectedFileNames $expectedNames
     foreach($tool in @($manifest.tools)){
         $present = $false
         $exeStatuses = @()
         foreach($exe in @($tool.executables)){
-            $resolved = Resolve-NTKTriageToolPath -Path $exe.path
+            $resolved = Resolve-NTKTriageToolPath -Path $exe.path -PathIndex $pathIndex -SkipRecursiveSearch:(!$Deep)
             if($resolved){ $present = $true }
             $exeStatuses += [pscustomobject]@{name=$exe.name;configuredPath=$exe.path;resolvedPath=$resolved;present=[bool]$resolved;autoRun=[bool]$exe.autoRun;requiresConsent=[bool]$exe.requiresConsent}
         }
@@ -482,7 +524,7 @@ function Global:Invoke-NTKTriageRun {
         }
         $fileRecords | Export-Csv -LiteralPath (Join-Path $run.Path "Dumps\dump_inventory.csv") -NoTypeInformation -Encoding UTF8
 
-        $toolStatus = @(Get-NTKTriageToolStatus)
+        $toolStatus = @(Get-NTKTriageToolStatus -Deep)
         if($SelectedToolsOnly){
             $selectedLookup = @{}
             foreach($id in @($SelectedToolIds)){ if($id){ $selectedLookup[[string]$id] = $true } }

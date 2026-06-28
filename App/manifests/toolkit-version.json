@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260627233409,
-    "SourceUpdatedAt":  "2026-06-27T23:34:09.7352356-05:00",
-    "ReleaseNotes":  "Added the Triage diagnostics workflow with manifest-driven tool status, background collection, validation, local analysis, and AI-ready ZIP bundles. Added a deployment option to omit Sysinternals where endpoint protection blocks those tools."
+    "Build":  20260627235801,
+    "SourceUpdatedAt":  "2026-06-27T23:58:01.1364098-05:00",
+    "ReleaseNotes":  "Improved Triage page responsiveness by deferring status refresh, replacing recursive per-tool scans with a fast shallow index for the GUI, and reducing forced repaint work during tab changes."
 }
