@@ -1,0 +1,478 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "updatedUtc":  "2026-06-28T04:26:29.2785193Z",
+    "tools":  [
+                  {
+                      "source":  "Microsoft",
+                      "downloadUrl":  "https://learn.microsoft.com/en-us/troubleshoot/windows-client/windows-tss/introduction-to-troubleshootingscript-toolset-tss",
+                      "id":  "tss",
+                      "category":  "Triage",
+                      "notes":  "Optional long-running Microsoft collector.",
+                      "localPath":  ".\\Triage\\Tools\\TSS",
+                      "name":  "Microsoft TSS Toolset",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "TSS",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\TSS\\TSS.ps1",
+                                              "outputFile":  "ToolOutput\\tss.txt",
+                                              "captureStdout":  true,
+                                              "requiresConsent":  true
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "Microsoft",
+                      "downloadUrl":  "https://learn.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite",
+                      "id":  "sysinternals",
+                      "category":  "Triage",
+                      "notes":  "Endpoint tools may be blocked by security software.",
+                      "localPath":  ".\\Triage\\Tools\\Sysinternals",
+                      "name":  "Sysinternals Suite",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "Autoruns",
+                                              "arguments":  "-accepteula -a * -ct -h -s -m",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\autorunsc.exe",
+                                              "outputFile":  "ToolOutput\\autoruns.csv",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "PsInfo",
+                                              "arguments":  "-accepteula -s -d",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\psinfo.exe",
+                                              "outputFile":  "ToolOutput\\psinfo.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "PsList",
+                                              "arguments":  "-accepteula",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\pslist.exe",
+                                              "outputFile":  "ToolOutput\\pslist.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "PsService",
+                                              "arguments":  "-accepteula",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\psservice.exe",
+                                              "outputFile":  "ToolOutput\\psservice.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "Handle",
+                                              "arguments":  "-accepteula -a",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\handle.exe",
+                                              "outputFile":  "ToolOutput\\handle.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "ListDLLs",
+                                              "arguments":  "-accepteula",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\listdlls.exe",
+                                              "outputFile":  "ToolOutput\\listdlls.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "TCPView Console",
+                                              "arguments":  "-accepteula -a -c",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\tcpvcon.exe",
+                                              "outputFile":  "ToolOutput\\tcpvcon.csv",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "Sigcheck",
+                                              "arguments":  "-accepteula -nobanner -q -m c:\\windows\\system32",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\sigcheck.exe",
+                                              "outputFile":  "ToolOutput\\sigcheck_system32.txt",
+                                              "captureStdout":  true
+                                          },
+                                          {
+                                              "name":  "ProcDump",
+                                              "arguments":  "-accepteula",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\Sysinternals\\procdump.exe",
+                                              "outputFile":  "ToolOutput\\procdump.txt",
+                                              "captureStdout":  true,
+                                              "requiresConsent":  true
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/full_event_log_view.html",
+                      "id":  "fulleventlogview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\FullEventLogView",
+                      "name":  "FullEventLogView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "FullEventLogView",
+                                              "arguments":  "/scomma ToolOutput\\fulleventlogview.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\FullEventLogView\\FullEventLogView.exe",
+                                              "outputFile":  "ToolOutput\\fulleventlogview.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/event_log_channels_view.html",
+                      "id":  "eventlogchannelsview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\EventLogChannelsView",
+                      "name":  "EventLogChannelsView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "EventLogChannelsView",
+                                              "arguments":  "/scomma ToolOutput\\eventlogchannels.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\EventLogChannelsView\\EventLogChannelsView.exe",
+                                              "outputFile":  "ToolOutput\\eventlogchannels.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/blue_screen_view.html",
+                      "id":  "bluescreenview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\BlueScreenView",
+                      "name":  "BlueScreenView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "BlueScreenView",
+                                              "arguments":  "/scomma ToolOutput\\bluescreenview.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\BlueScreenView\\BlueScreenView.exe",
+                                              "outputFile":  "ToolOutput\\bluescreenview.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/app_crash_view.html",
+                      "id":  "appcrashview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\AppCrashView",
+                      "name":  "AppCrashView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "AppCrashView",
+                                              "arguments":  "/scomma ToolOutput\\appcrashview.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\AppCrashView\\AppCrashView.exe",
+                                              "outputFile":  "ToolOutput\\appcrashview.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/driverview.html",
+                      "id":  "driverview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\DriverView",
+                      "name":  "DriverView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "DriverView",
+                                              "arguments":  "/scomma ToolOutput\\driverview.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\DriverView\\DriverView.exe",
+                                              "outputFile":  "ToolOutput\\driverview.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/serviwin.html",
+                      "id":  "serviwin",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\ServiWin",
+                      "name":  "ServiWin",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "ServiWin",
+                                              "arguments":  "/scomma ToolOutput\\serviwin.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\ServiWin\\ServiWin.exe",
+                                              "outputFile":  "ToolOutput\\serviwin.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/usb_devices_view.html",
+                      "id":  "usbdeview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\USBDeview",
+                      "name":  "USBDeview",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "USBDeview",
+                                              "arguments":  "/scomma ToolOutput\\usbdeview.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\USBDeview\\USBDeview.exe",
+                                              "outputFile":  "ToolOutput\\usbdeview.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/network_interfaces.html",
+                      "id":  "networkinterfacesview",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\NetworkInterfacesView",
+                      "name":  "NetworkInterfacesView",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "NetworkInterfacesView",
+                                              "arguments":  "/scomma ToolOutput\\networkinterfaces.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\NetworkInterfacesView\\NetworkInterfacesView.exe",
+                                              "outputFile":  "ToolOutput\\networkinterfaces.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "NirSoft",
+                      "downloadUrl":  "https://www.nirsoft.net/utils/cports.html",
+                      "id":  "currports",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\CurrPorts",
+                      "name":  "CurrPorts",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "CurrPorts",
+                                              "arguments":  "/scomma ToolOutput\\currports.csv",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\CurrPorts\\cports.exe",
+                                              "outputFile":  "ToolOutput\\currports.csv",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "ESET",
+                      "downloadUrl":  "https://www.eset.com/int/support/sysinspector/",
+                      "id":  "eset-sysinspector",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\ESET SysInspector",
+                      "name":  "ESET SysInspector",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "ESET SysInspector",
+                                              "arguments":  "/gen ToolOutput\\eset-sysinspector.xml",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\ESET SysInspector\\SysInspector.exe",
+                                              "outputFile":  "ToolOutput\\eset-sysinspector.xml",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "BleepingComputer",
+                      "downloadUrl":  "https://www.bleepingcomputer.com/download/farbar-recovery-scan-tool/",
+                      "id":  "frst",
+                      "category":  "Triage",
+                      "notes":  "Security-sensitive. Requires explicit consent.",
+                      "localPath":  ".\\Triage\\Tools\\FRST",
+                      "name":  "FRST",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "FRST",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\FRST\\FRST64.exe",
+                                              "outputFile":  "ToolOutput\\FRST.txt",
+                                              "captureStdout":  false,
+                                              "requiresConsent":  true
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "HWiNFO",
+                      "downloadUrl":  "https://www.hwinfo.com/download/",
+                      "id":  "hwinfo",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\HWiNFO",
+                      "name":  "HWiNFO Portable",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "HWiNFO",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\HWiNFO\\HWiNFO64.exe",
+                                              "outputFile":  "ToolOutput\\hwinfo.txt",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "PortableApps.com",
+                      "downloadUrl":  "https://portableapps.com/apps/utilities/crystaldiskinfo_portable",
+                      "id":  "crystaldiskinfo",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\CrystalDiskInfo",
+                      "name":  "CrystalDiskInfo Portable",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "CrystalDiskInfo",
+                                              "arguments":  "/CopyExit",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\CrystalDiskInfo\\DiskInfo64.exe",
+                                              "outputFile":  "ToolOutput\\crystaldiskinfo.txt",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "Parmavex",
+                      "downloadUrl":  "https://www.parmavex.co.uk/winaudit.html",
+                      "id":  "winaudit",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\WinAudit",
+                      "name":  "WinAudit",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "WinAudit",
+                                              "arguments":  "/r=gsoPxuTUeERNtnzDaIbMpmidcSArCOHG /f=ToolOutput\\winaudit.html",
+                                              "autoRun":  true,
+                                              "path":  ".\\Triage\\Tools\\WinAudit\\WinAudit.exe",
+                                              "outputFile":  "ToolOutput\\winaudit.html",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "MiTeC",
+                      "downloadUrl":  "https://www.mitec.cz/msi.html",
+                      "id":  "mitec-msi",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\MiTeC",
+                      "name":  "MiTeC System Information X",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "MiTeC System Information X",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\MiTeC\\MSIX64.exe",
+                                              "outputFile":  "ToolOutput\\mitec.txt",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "PortableApps.com",
+                      "downloadUrl":  "https://portableapps.com/apps/utilities/winmtr_portable",
+                      "id":  "winmtr",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\WinMTR",
+                      "name":  "WinMTR Portable",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "WinMTR",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\WinMTR\\WinMTR.exe",
+                                              "outputFile":  "ToolOutput\\winmtr.txt",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "PortableApps.com",
+                      "downloadUrl":  "https://portableapps.com/apps/internet/wireshark_portable",
+                      "id":  "wireshark",
+                      "category":  "Triage",
+                      "notes":  "Packet captures are large and sensitive.",
+                      "localPath":  ".\\Triage\\Tools\\Wireshark",
+                      "name":  "Wireshark Portable",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "Wireshark",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\Wireshark\\WiresharkPortable.exe",
+                                              "outputFile":  "ToolOutput\\wireshark.txt",
+                                              "captureStdout":  false,
+                                              "requiresConsent":  true
+                                          }
+                                      ],
+                      "required":  false
+                  },
+                  {
+                      "source":  "Resplendence",
+                      "downloadUrl":  "https://www.resplendence.com/latencymon",
+                      "id":  "latencymon",
+                      "category":  "Triage",
+                      "localPath":  ".\\Triage\\Tools\\LatencyMon",
+                      "name":  "LatencyMon",
+                      "portable":  true,
+                      "executables":  [
+                                          {
+                                              "name":  "LatencyMon",
+                                              "arguments":  "",
+                                              "autoRun":  false,
+                                              "path":  ".\\Triage\\Tools\\LatencyMon\\LatMon.exe",
+                                              "outputFile":  "ToolOutput\\latencymon.txt",
+                                              "captureStdout":  false
+                                          }
+                                      ],
+                      "required":  false
+                  }
+              ]
+}

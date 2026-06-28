@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$SourceRoot,
     [Parameter(Mandatory=$true)][string]$DestinationRoot,
-    [Parameter(Mandatory=$true)][string]$ResultPath
+    [Parameter(Mandatory=$true)][string]$ResultPath,
+    [switch]$ExcludeSysinternals
 )
 
 $ErrorActionPreference = 'Stop'
@@ -22,6 +23,7 @@ $result = [ordered]@{
     SourceRoot = $SourceRoot; DestinationRoot = $DestinationRoot
     StartedAt = (Get-Date).ToString('s'); CompletedAt = ''; Status = 'Running'
     ExitCode = $null; FilesCopied = 0; Error = ''; LogPath = "$ResultPath.log"
+    ExcludeSysinternals = [bool]$ExcludeSysinternals
 }
 
 try {
@@ -49,6 +51,9 @@ try {
         (Join-Path $appSource 'NetworkToolkit\Exports'),
         (Join-Path $appSource 'NetworkToolkit\Logs')
     )
+    if($ExcludeSysinternals){
+        $excludedDirectories += (Join-Path $appSource 'NetworkToolkit\ExternalTools\Sysinternals')
+    }
     $arguments = @($appSource,$appDestination,'/E','/COPY:DAT','/DCOPY:DAT','/R:1','/W:1','/NFL','/NDL','/NJH','/NJS','/NP','/XD') + $excludedDirectories + @('/XF',(Join-Path $appSource 'manifests\gui-settings.json'))
     & robocopy @arguments | Out-String | Set-Content -LiteralPath $result.LogPath -Encoding UTF8
     $result.ExitCode = $LASTEXITCODE

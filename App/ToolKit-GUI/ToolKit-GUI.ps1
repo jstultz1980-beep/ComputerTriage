@@ -125,6 +125,16 @@ $script:ToolkitUpdateResultPath = $null
 $script:ToolkitDeploymentProcess = $null
 $script:ToolkitDeploymentTimer = $null
 $script:ToolkitDeploymentResultPath = $null
+$script:TriageProcess = $null
+$script:TriageTimer = $null
+$script:TriageResultPath = $null
+$script:TriageRunStartedAt = $null
+$script:TriageToolGrid = $null
+$script:TriageStatusLabel = $null
+$script:TriageProgressBar = $null
+$script:TriageLogBox = $null
+$script:TriageLatestRunPath = $null
+$script:TriageLatestBundlePath = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -5085,7 +5095,7 @@ function Set-SelectedGUICustomToolTab {
         return
     }
 
-    $tabs = @("Auto") + @("Analyze","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Wi-Fi","Windows Update" | Sort-Object)
+    $tabs = @("Auto") + @("Analyze","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Triage","Wi-Fi","Windows Update" | Sort-Object)
 
     $dialog = New-Object System.Windows.Forms.Form
     $dialog.Text = "Set Custom Tool Tab Placement"
@@ -8750,6 +8760,7 @@ function Get-GUITabDisplayText {
 
     $aliases = @{
         "Quick Diagnosis" = "Quick Dx"
+        "Triage" = "Triage"
         "Computer Info" = "Computer"
         "Windows Update" = "Updates"
         "Software Keys" = "Keys"
@@ -8878,6 +8889,7 @@ function Add-GUIComboItems {
 function Get-GUIDefaultTabOrder {
     return @(
         "Quick Diagnosis",
+        "Triage",
         "Analyze",
         "Windows Update",
         "Hardware",
@@ -8927,6 +8939,7 @@ function Get-GUIDefaultSettings {
         toolkitUpdateSource = (Split-Path -Parent $SharedToolkitRoot)
         toolkitUpdateDestination = ""
         toolkitDeploymentDestination = ""
+        toolkitDeploymentExcludeSysinternals = $true
         toolkitUpdateMode = "Push"
     }
 }
@@ -8964,6 +8977,9 @@ function Get-GUISettings {
             }
             if($settings.PSObject.Properties.Name -notcontains "toolkitDeploymentDestination"){
                 $settings | Add-Member -MemberType NoteProperty -Name toolkitDeploymentDestination -Value $default.toolkitDeploymentDestination -Force
+            }
+            if($settings.PSObject.Properties.Name -notcontains "toolkitDeploymentExcludeSysinternals"){
+                $settings | Add-Member -MemberType NoteProperty -Name toolkitDeploymentExcludeSysinternals -Value $default.toolkitDeploymentExcludeSysinternals -Force
             }
             if($settings.PSObject.Properties.Name -notcontains "toolkitUpdateMode" -or $settings.toolkitUpdateMode -notin @("Push","Pull")){
                 $settings | Add-Member -MemberType NoteProperty -Name toolkitUpdateMode -Value $default.toolkitUpdateMode -Force
@@ -11543,6 +11559,323 @@ function Build-FileToolsPage {
     Build-GUICatalogToolsPage -Page $Page -Tab "Files" -Title "File Tools"
 }
 
+function Refresh-GUITriageStatus {
+    if(!$script:TriageToolGrid){ return }
+    try {
+        Initialize-NTKTriageStructure | Out-Null
+        $script:TriageToolGrid.Rows.Clear()
+        foreach($tool in @(Get-NTKTriageToolStatus)){
+            $presentCount = @($tool.executables | Where-Object { $_.present }).Count
+            $totalCount = @($tool.executables).Count
+            $row = $script:TriageToolGrid.Rows.Add($tool.name,$tool.status,"$presentCount / $totalCount",$tool.source,$tool.notes)
+            $script:TriageToolGrid.Rows[$row].Tag = $tool
+            if(!$tool.present -and $tool.required){
+                $script:TriageToolGrid.Rows[$row].DefaultCellStyle.ForeColor = $script:GUITheme.Danger
+            }
+            elseif(!$tool.present){
+                $script:TriageToolGrid.Rows[$row].DefaultCellStyle.ForeColor = $script:GUITheme.Warning
+            }
+        }
+        if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage setup loaded. Tools are grouped by triage manifest." }
+        Add-GUILog "Refreshed triage tool status."
+    }
+    catch {
+        if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage status refresh failed: $($_.Exception.Message)" }
+        Add-GUILog "Triage status refresh failed: $($_.Exception.Message)"
+    }
+}
+
+function Add-GUITriageLogLine {
+    param([string]$Text)
+    if($script:TriageLogBox -and !$script:TriageLogBox.IsDisposed){
+        $script:TriageLogBox.AppendText("[$(Get-Date -Format HH:mm:ss)] $Text`r`n")
+    }
+    Add-GUILog $Text
+}
+
+function Get-GUITriageSelectedToolIds {
+    $ids = @()
+    if(!$script:TriageToolGrid){ return $ids }
+    foreach($row in @($script:TriageToolGrid.SelectedRows)){
+        if($row.Tag -and $row.Tag.id){
+            $ids += [string]$row.Tag.id
+        }
+    }
+    return @($ids | Where-Object { $_ } | Select-Object -Unique)
+}
+
+function Start-GUITriageRun {
+    param(
+        [ValidateSet("Quick","Full","Crash")][string]$Profile = "Quick",
+        [string[]]$SelectedToolIds = @()
+    )
+    if($script:TriageProcess -and !$script:TriageProcess.HasExited){
+        [System.Windows.Forms.MessageBox]::Show("A triage run is already running.","Triage",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+    if(!(Test-GUIAdministrator)){
+        $choice = [System.Windows.Forms.MessageBox]::Show(
+            "Some logs, dumps, registry keys, and tool outputs may be incomplete without administrator rights.`r`n`r`nContinue anyway?",
+            "Triage Elevation Warning",
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        )
+        if($choice -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+    }
+    $privacy = [System.Windows.Forms.MessageBox]::Show(
+        "This triage bundle may contain usernames, hostnames, IP addresses, installed software, logs, crash dumps, paths, event logs, and other sensitive diagnostic data.`r`n`r`nCreate the local bundle?",
+        "Triage Privacy Notice",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($privacy -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    $paths = Initialize-NTKTriageStructure
+    $resultPath = Join-Path $paths.Cache ("triage-result-{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $runner = Join-Path $paths.Cache ("run-triage-{0}.ps1" -f [guid]::NewGuid().ToString("N"))
+    $launcherEscaped = $ToolkitLauncher.Replace("'","''")
+    $resultEscaped = $resultPath.Replace("'","''")
+    $selectedLiteral = "@()"
+    if($SelectedToolIds -and $SelectedToolIds.Count -gt 0){
+        $escapedIds = $SelectedToolIds | ForEach-Object { "'$(([string]$_).Replace("'","''"))'" }
+        $selectedLiteral = "@($($escapedIds -join ','))"
+    }
+    $selectedSwitch = if($SelectedToolIds -and $SelectedToolIds.Count -gt 0){" -SelectedToolsOnly -SelectedToolIds `$selectedToolIds"}else{""}
+    $scriptText = @"
+`$ErrorActionPreference = 'Stop'
+. '$launcherEscaped' -NoConsole
+`$selectedToolIds = $selectedLiteral
+Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwitch | Out-Null
+"@
+    $scriptText | Set-Content -LiteralPath $runner -Encoding UTF8
+    $arguments = @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$runner`"")
+    $script:TriageResultPath = $resultPath
+    $script:TriageRunStartedAt = Get-Date
+    $script:TriageProcess = Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -PassThru
+    if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "$Profile triage running..." }
+    if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee; $script:TriageProgressBar.MarqueeAnimationSpeed = 30 }
+    if($SelectedToolIds -and $SelectedToolIds.Count -gt 0){
+        Add-GUITriageLogLine "Started $Profile triage for selected tools: $($SelectedToolIds -join ', ')."
+    }
+    else {
+        Add-GUITriageLogLine "Started $Profile triage."
+    }
+    Start-GUIBusyIndicator -Message "Triage"
+
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 1500
+    $timer.Add_Tick({
+        if($script:TriageProcess -and !$script:TriageProcess.HasExited){
+            $elapsed = [int]((Get-Date) - $script:TriageRunStartedAt).TotalSeconds
+            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage running... ${elapsed}s elapsed" }
+            return
+        }
+        $timer.Stop(); $timer.Dispose(); $script:TriageTimer = $null
+        Stop-GUIBusyIndicator
+        if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
+        try {
+            $result = Get-Content -LiteralPath $script:TriageResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+            $script:TriageLatestRunPath = $result.runPath
+            $script:TriageLatestBundlePath = $result.bundlePath
+            if($result.status -eq "Completed"){
+                $message = "Diagnostics collection completed.`r`n`r`nBundle:`r`n$($result.bundlePath)`r`n`r`nLocal analysis:`r`n$($result.summaryPath)`r`n`r`nUpload the ZIP bundle to ChatGPT for deeper analysis."
+                Add-GUITriageLogLine "Triage completed. Bundle: $($result.bundlePath)"
+                if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage completed. Bundle ready." }
+                [System.Windows.Forms.MessageBox]::Show($message,"Triage Complete",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            }
+            else {
+                Add-GUITriageLogLine "Triage failed: $($result.error)"
+                if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage failed. See live log." }
+                [System.Windows.Forms.MessageBox]::Show("Triage failed.`r`n`r`n$($result.error)`r`n`r`nRun folder:`r`n$($result.runPath)","Triage Failed",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+            }
+        }
+        catch {
+            Add-GUITriageLogLine "Triage result could not be read: $($_.Exception.Message)"
+            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage result could not be read." }
+        }
+        finally {
+            $script:TriageProcess = $null
+            $script:TriageResultPath = $null
+            Refresh-GUITriageStatus
+        }
+    })
+    $script:TriageTimer = $timer
+    $script:TriageTimer.Start()
+}
+
+function Stop-GUITriageRun {
+    if($script:TriageProcess -and !$script:TriageProcess.HasExited){
+        try {
+            $script:TriageProcess.Kill()
+            Add-GUITriageLogLine "Triage process was cancelled by the technician."
+            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage cancelled." }
+        }
+        catch {
+            Add-GUITriageLogLine "Triage cancel failed: $($_.Exception.Message)"
+        }
+    }
+}
+
+function Start-GUITriageSelectedToolsRun {
+    $ids = @(Get-GUITriageSelectedToolIds)
+    if($ids.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("Select one or more triage tools first.","Run Selected Tools",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+    Start-GUITriageRun -Profile "Quick" -SelectedToolIds $ids
+}
+
+function Invoke-GUITriageValidation {
+    try {
+        $paths = Initialize-NTKTriageStructure
+        $report = Test-NTKTriageSetup
+        $out = Join-Path $paths.Cache "validation_latest.json"
+        $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $out -Encoding UTF8
+        Refresh-GUITriageStatus
+        $failed = @($report.checks | Where-Object { !$_.passed }).Count
+        $message = if($report.passed){"Triage setup validation passed."}else{"Triage setup validation found $failed issue(s)."}
+        Add-GUITriageLogLine "$message Report: $out"
+        [System.Windows.Forms.MessageBox]::Show("$message`r`n`r`nReport:`r`n$out","Triage Validation",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+    }
+    catch {
+        Add-GUITriageLogLine "Triage validation failed: $($_.Exception.Message)"
+    }
+}
+
+function Export-GUITriageManifest {
+    try {
+        $paths = Initialize-NTKTriageStructure
+        $export = Join-Path $paths.Cache ("triage-tools-{0}.json" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
+        Copy-Item -LiteralPath $paths.Manifest -Destination $export -Force
+        Add-GUITriageLogLine "Exported triage manifest: $export"
+        Start-NTKToolProcess -FilePath "explorer.exe" -ArgumentList @("/select,`"$export`"") | Out-Null
+    }
+    catch {
+        Add-GUITriageLogLine "Triage manifest export failed: $($_.Exception.Message)"
+    }
+}
+
+function Open-GUITriageLatestRun {
+    $paths = Initialize-NTKTriageStructure
+    $path = $script:TriageLatestRunPath
+    if(!$path -or !(Test-Path -LiteralPath $path)){
+        $latest = Get-ChildItem -LiteralPath $paths.Runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if($latest){ $path = $latest.FullName }
+    }
+    if($path -and (Test-Path -LiteralPath $path)){ Open-GUIFolder $path } else { Add-GUITriageLogLine "No triage run folder found yet." }
+}
+
+function Open-GUITriageBundleFolder {
+    $paths = Initialize-NTKTriageStructure
+    $path = $null
+    if($script:TriageLatestBundlePath -and (Test-Path -LiteralPath $script:TriageLatestBundlePath)){ $path = Split-Path -Parent $script:TriageLatestBundlePath }
+    if(!$path){
+        $latest = Get-ChildItem -LiteralPath $paths.Runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if($latest){ $path = Join-Path $latest.FullName "Bundle" }
+    }
+    if($path -and (Test-Path -LiteralPath $path)){ Open-GUIFolder $path } else { Add-GUITriageLogLine "No triage bundle folder found yet." }
+}
+
+function Build-TriagePage {
+    param([System.Windows.Forms.TabPage]$Page)
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 2
+    $layout.RowCount = 3
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,62))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,38))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
+    $Page.Controls.Add($layout)
+
+    $actions = New-Object System.Windows.Forms.GroupBox
+    $actions.Text = "Triage Actions"
+    $actions.Dock = "Fill"
+    $layout.SetColumnSpan($actions,2)
+    $layout.Controls.Add($actions,0,0)
+
+    $actionPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $actionPanel.Dock = "Fill"
+    $actionPanel.Padding = New-Object System.Windows.Forms.Padding(10,14,10,8)
+    $actions.Controls.Add($actionPanel)
+    foreach($button in @(
+        (New-GUIButton "One-Click Triage" { Start-GUITriageRun -Profile "Quick" }),
+        (New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }),
+        (New-GUIButton "Full Triage" { Start-GUITriageRun -Profile "Full" }),
+        (New-GUIButton "Crash Triage" { Start-GUITriageRun -Profile "Crash" }),
+        (New-GUIButton "Run Selected" { Start-GUITriageSelectedToolsRun }),
+        (New-GUIButton "Cancel" { Stop-GUITriageRun }),
+        (New-GUIButton "Open Latest Run" { Open-GUITriageLatestRun }),
+        (New-GUIButton "Open Bundle" { Open-GUITriageBundleFolder }),
+        (New-GUIButton "Validate Setup" { Invoke-GUITriageValidation }),
+        (New-GUIButton "Export Manifest" { Export-GUITriageManifest })
+    )){
+        $button.Width = 142
+        [void]$actionPanel.Controls.Add($button)
+    }
+
+    $toolGroup = New-Object System.Windows.Forms.GroupBox
+    $toolGroup.Text = "Triage Tools"
+    $toolGroup.Dock = "Fill"
+    $layout.Controls.Add($toolGroup,0,1)
+    $script:TriageToolGrid = New-Object System.Windows.Forms.DataGridView
+    $TriageToolGrid.Dock = "Fill"
+    $TriageToolGrid.ReadOnly = $true
+    $TriageToolGrid.AllowUserToAddRows = $false
+    $TriageToolGrid.AllowUserToDeleteRows = $false
+    $TriageToolGrid.RowHeadersVisible = $false
+    $TriageToolGrid.SelectionMode = "FullRowSelect"
+    $TriageToolGrid.AutoSizeColumnsMode = "Fill"
+    [void]$TriageToolGrid.Columns.Add("Name","Tool")
+    [void]$TriageToolGrid.Columns.Add("Status","Status")
+    [void]$TriageToolGrid.Columns.Add("Executables","EXEs")
+    [void]$TriageToolGrid.Columns.Add("Source","Source")
+    [void]$TriageToolGrid.Columns.Add("Notes","Notes")
+    $toolGroup.Controls.Add($TriageToolGrid)
+
+    $progressGroup = New-Object System.Windows.Forms.GroupBox
+    $progressGroup.Text = "Progress"
+    $progressGroup.Dock = "Fill"
+    $layout.Controls.Add($progressGroup,1,1)
+    $progressLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $progressLayout.Dock = "Fill"
+    $progressLayout.RowCount = 3
+    $progressLayout.ColumnCount = 1
+    $progressLayout.Padding = New-Object System.Windows.Forms.Padding(10)
+    $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $progressGroup.Controls.Add($progressLayout)
+    $script:TriageStatusLabel = New-GUILabel "Ready."
+    $TriageStatusLabel.Dock = "Fill"
+    $progressLayout.Controls.Add($TriageStatusLabel,0,0)
+    $script:TriageProgressBar = New-Object System.Windows.Forms.ProgressBar
+    $TriageProgressBar.Dock = "Fill"
+    $progressLayout.Controls.Add($TriageProgressBar,0,1)
+    $explain = New-GUILabel "One-Click and Quick Triage collect read-only diagnostics, event summaries, command output, safe file evidence, local analysis, and a ZIP bundle. Full Triage collects more command output and may take longer."
+    $explain.Dock = "Fill"
+    $explain.ForeColor = $script:GUITheme.MutedText
+    $progressLayout.Controls.Add($explain,0,2)
+
+    $logGroup = New-Object System.Windows.Forms.GroupBox
+    $logGroup.Text = "Live Triage Log"
+    $logGroup.Dock = "Fill"
+    $layout.SetColumnSpan($logGroup,2)
+    $layout.Controls.Add($logGroup,0,2)
+    $script:TriageLogBox = New-Object System.Windows.Forms.TextBox
+    $TriageLogBox.Dock = "Fill"
+    $TriageLogBox.Multiline = $true
+    $TriageLogBox.ScrollBars = "Vertical"
+    $TriageLogBox.ReadOnly = $true
+    $TriageLogBox.Font = New-Object System.Drawing.Font("Consolas",9)
+    $TriageLogBox.BackColor = $script:GUITheme.LogBack
+    $TriageLogBox.ForeColor = $script:GUITheme.LogFore
+    $logGroup.Controls.Add($TriageLogBox)
+    Refresh-GUITriageStatus
+}
+
 function Build-ChocolateyPage {
     param([System.Windows.Forms.TabPage]$Page)
 
@@ -12512,19 +12845,26 @@ Log: $logPath","Toolkit Updater",[System.Windows.Forms.MessageBoxButtons]::OK,[S
 }
 
 function Start-GUIToolkitDeployment {
-    param([string]$SourceRoot,[string]$DestinationRoot)
+    param(
+        [string]$SourceRoot,
+        [string]$DestinationRoot,
+        [switch]$ExcludeSysinternals
+    )
     $deployerPath = Join-Path (Split-Path -Parent $SharedToolkitRoot) 'Deploy-NetworkToolkit.ps1'
     if(!(Test-Path -LiteralPath $deployerPath)){ throw "Deployment script was not found: $deployerPath" }
     if($script:ToolkitDeploymentProcess -and !$script:ToolkitDeploymentProcess.HasExited){
         [System.Windows.Forms.MessageBox]::Show('A fresh toolkit deployment is already running.','Network Toolkit Deployment') | Out-Null
         return
     }
-    $resultPath = Join-Path $env:TEMP ("NetworkToolkit-deployment-{0}.json" -f [guid]::NewGuid().ToString('N'))
+    $deploymentLogRoot = Join-Path $NTKPaths.Logs "Deployments"
+    if(!(Test-Path -LiteralPath $deploymentLogRoot)){ New-Item -ItemType Directory -Path $deploymentLogRoot -Force | Out-Null }
+    $resultPath = Join-Path $deploymentLogRoot ("deployment-{0}.json" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
     $arguments = @('-NoProfile','-ExecutionPolicy','Bypass','-File',"`"$deployerPath`"",'-SourceRoot',"`"$SourceRoot`"",'-DestinationRoot',"`"$DestinationRoot`"",'-ResultPath',"`"$resultPath`"")
+    if($ExcludeSysinternals){ $arguments += '-ExcludeSysinternals' }
     $script:ToolkitDeploymentResultPath = $resultPath
     $script:ToolkitDeploymentProcess = Start-NTKToolProcess -FilePath 'powershell.exe' -ArgumentList $arguments -WorkingDirectory (Split-Path -Parent $SharedToolkitRoot) -WindowStyle Hidden -PassThru
     Start-GUIBusyIndicator -Message 'Deploying Toolkit'
-    Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Started' -Detail "Source=$SourceRoot; Destination=$DestinationRoot"
+    Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Started' -Detail "Source=$SourceRoot; Destination=$DestinationRoot; ExcludeSysinternals=$([bool]$ExcludeSysinternals)"
     $timer = New-Object System.Windows.Forms.Timer; $timer.Interval = 1200
     $timer.Add_Tick({
         if(!$script:ToolkitDeploymentProcess -or !$script:ToolkitDeploymentProcess.HasExited){ return }
@@ -12532,8 +12872,9 @@ function Start-GUIToolkitDeployment {
         try {
             $result = Get-Content -LiteralPath $script:ToolkitDeploymentResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
             if($result.Status -eq 'Completed'){
-                Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Completed' -Detail "Destination=$($result.DestinationRoot); Files=$($result.FilesCopied)"
-                $message = "Fresh toolkit deployment completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nFiles deployed: $($result.FilesCopied)`r`n`r`nLaunch it from NetworkToolkit.vbs at the destination root."
+                Write-GUIToolUsageLog -Tool 'Toolkit Deployment' -Action 'Completed' -Detail "Destination=$($result.DestinationRoot); Files=$($result.FilesCopied); ExcludeSysinternals=$($result.ExcludeSysinternals)"
+                $sysinternalsNote = if($result.ExcludeSysinternals){"`r`n`r`nSysinternals was omitted for endpoint-protection compatibility."}else{""}
+                $message = "Fresh toolkit deployment completed.`r`n`r`nDestination:`r`n$($result.DestinationRoot)`r`n`r`nFiles deployed: $($result.FilesCopied)$sysinternalsNote`r`n`r`nLog:`r`n$($result.LogPath)`r`n`r`nLaunch it from NetworkToolkit.vbs at the destination root."
                 [System.Windows.Forms.MessageBox]::Show($message,'Network Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
             }
             else {
@@ -12544,7 +12885,6 @@ function Start-GUIToolkitDeployment {
         catch { Add-GUILog "Toolkit deployment result could not be read: $($_.Exception.Message)" }
         finally {
             $script:ToolkitDeploymentProcess=$null
-            if($script:ToolkitDeploymentResultPath -and (Test-Path $script:ToolkitDeploymentResultPath)){ Remove-Item -LiteralPath $script:ToolkitDeploymentResultPath -Force -ErrorAction SilentlyContinue }
             $script:ToolkitDeploymentResultPath=$null
         }
     })
@@ -12558,8 +12898,8 @@ function Show-GUIToolkitDeployment {
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Create Fresh Toolkit Deployment'
     $form.StartPosition = 'CenterParent'
-    $form.Size = New-Object System.Drawing.Size(760,300)
-    $form.MinimumSize = New-Object System.Drawing.Size(760,300)
+    $form.Size = New-Object System.Drawing.Size(800,350)
+    $form.MinimumSize = New-Object System.Drawing.Size(800,350)
     $form.MaximizeBox = $false
     $form.Font = New-Object System.Drawing.Font('Segoe UI',9.5)
     $form.BackColor = $script:GUITheme.Shell
@@ -12567,7 +12907,7 @@ function Show-GUIToolkitDeployment {
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = 'Fill'
     $layout.ColumnCount = 3
-    $layout.RowCount = 5
+    $layout.RowCount = 6
     $layout.Padding = New-Object System.Windows.Forms.Padding(18)
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
@@ -12575,6 +12915,7 @@ function Show-GUIToolkitDeployment {
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,64))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $form.Controls.Add($layout)
@@ -12614,11 +12955,22 @@ function Show-GUIToolkitDeployment {
     $layout.SetColumnSpan($hint,3)
     $layout.Controls.Add($hint,0,2)
 
+    $excludeSysinternalsCheck = New-Object System.Windows.Forms.CheckBox
+    $excludeSysinternalsCheck.Text = 'Omit Sysinternals during fresh deployment'
+    $excludeSysinternalsCheck.AutoSize = $true
+    $excludeSysinternalsCheck.Checked = if($settings.PSObject.Properties.Name -contains 'toolkitDeploymentExcludeSysinternals'){[bool]$settings.toolkitDeploymentExcludeSysinternals}else{$true}
+    $excludeSysinternalsCheck.Margin = New-Object System.Windows.Forms.Padding(3,8,3,3)
+    $layout.SetColumnSpan($excludeSysinternalsCheck,3)
+    $layout.Controls.Add($excludeSysinternalsCheck,0,3)
+    if($script:ToolTip){
+        $script:ToolTip.SetToolTip($excludeSysinternalsCheck,'Recommended when deploying to endpoints protected by Sophos or similar products. This avoids copying tools commonly blocked by endpoint protection.')
+    }
+
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttons.Dock = 'Fill'
     $buttons.FlowDirection = 'RightToLeft'
     $layout.SetColumnSpan($buttons,3)
-    $layout.Controls.Add($buttons,0,4)
+    $layout.Controls.Add($buttons,0,5)
 
     $cancel = New-GUIButton 'Cancel' { $form.Close() }
     $deploy = New-GUIButton 'Deploy Toolkit' {
@@ -12628,7 +12980,10 @@ function Show-GUIToolkitDeployment {
             return
         }
 
-        $script:ToolkitDeploymentDialogResult = $destination
+        $script:ToolkitDeploymentDialogResult = [pscustomobject]@{
+            Destination = $destination
+            ExcludeSysinternals = [bool]$excludeSysinternalsCheck.Checked
+        }
         $form.Close()
     }
     $buttons.Controls.Add($cancel)
@@ -12637,16 +12992,21 @@ function Show-GUIToolkitDeployment {
     Apply-GUIThemeToControl -Control $form
     $script:ToolkitDeploymentDialogResult = $null
     [void]$form.ShowDialog($script:Form)
-    $destination = $script:ToolkitDeploymentDialogResult
+    $deploymentChoice = $script:ToolkitDeploymentDialogResult
     $script:ToolkitDeploymentDialogResult = $null
+    if(!$deploymentChoice){ return }
+    $destination = [string]$deploymentChoice.Destination
+    $excludeSysinternals = [bool]$deploymentChoice.ExcludeSysinternals
     if([string]::IsNullOrWhiteSpace($destination)){ return }
 
-    $message = "A fresh deployment will replace all content in this destination folder.`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r`nPortable apps and ExternalTools are included. Reports, logs, profiles, settings, and client data are not copied."
+    $sysinternalsLine = if($excludeSysinternals){"Sysinternals will be omitted to reduce endpoint-protection quarantine risk."}else{"Sysinternals will be included. Endpoint protection may quarantine some tools unless they are allowed by policy."}
+    $message = "A fresh deployment will replace all content in this destination folder.`r`n`r`nSource:`r`n$source`r`n`r`nDestination:`r`n$destination`r`n`r`n$sysinternalsLine`r`n`r`nPortable apps and ExternalTools are included except items you choose to omit. Reports, logs, profiles, settings, and client data are not copied."
     if([System.Windows.Forms.MessageBox]::Show($message,'Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -ne [System.Windows.Forms.DialogResult]::Yes){ return }
     if([System.Windows.Forms.MessageBox]::Show('Confirm fresh deployment. Existing destination contents will be deleted.','Create Fresh Toolkit Deployment',[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning) -eq [System.Windows.Forms.DialogResult]::Yes){
         $settings.toolkitDeploymentDestination = $destination
+        $settings.toolkitDeploymentExcludeSysinternals = $excludeSysinternals
         Save-GUISettings -Settings $settings
-        Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination
+        Start-GUIToolkitDeployment -SourceRoot $source -DestinationRoot $destination -ExcludeSysinternals:$excludeSysinternals
     }
 }
 
@@ -13361,6 +13721,10 @@ function Build-Form {
     $quickPage.Text = "Quick Diagnosis"
     $tabs.TabPages.Add($quickPage) | Out-Null
 
+    $triagePage = New-Object System.Windows.Forms.TabPage
+    $triagePage.Text = "Triage"
+    $tabs.TabPages.Add($triagePage) | Out-Null
+
     $analyzePage = New-Object System.Windows.Forms.TabPage
     $analyzePage.Text = "Analyze"
     $tabs.TabPages.Add($analyzePage) | Out-Null
@@ -13521,6 +13885,7 @@ function Build-Form {
     }
 
     Register-GUITabBuilder -Page $quickPage -Builder { param($Page) Build-QuickTriagePage -Page $Page }
+    Register-GUITabBuilder -Page $triagePage -Builder { param($Page) Build-TriagePage -Page $Page }
     Register-GUITabBuilder -Page $analyzePage -Builder { param($Page) Build-WindowsToolsPage -Page $Page }
     Register-GUITabBuilder -Page $windowsUpdatePage -Builder { param($Page) Build-WindowsUpdatePage -Page $Page }
     Register-GUITabBuilder -Page $hardwarePage -Builder { param($Page) Build-HardwareToolsPage -Page $Page }
@@ -13629,7 +13994,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Choco","Sysinternals","Computer Info","Reports","Settings")){
+    foreach($tabName in @("Quick Diagnosis","Triage","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Choco","Sysinternals","Computer Info","Reports","Settings")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260627220513,
-    "SourceUpdatedAt":  "2026-06-27T22:05:13.0135866-05:00",
-    "ReleaseNotes":  "Shifted the GUI toward a sharper terminal-style default theme, tightened button sizing/chrome to prevent clipped labels, improved Chocolatey action alignment, and expanded print server discovery."
+    "Build":  20260627233409,
+    "SourceUpdatedAt":  "2026-06-27T23:34:09.7352356-05:00",
+    "ReleaseNotes":  "Added the Triage diagnostics workflow with manifest-driven tool status, background collection, validation, local analysis, and AI-ready ZIP bundles. Added a deployment option to omit Sysinternals where endpoint protection blocks those tools."
 }
