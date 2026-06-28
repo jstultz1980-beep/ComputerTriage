@@ -106,7 +106,7 @@ $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
 $script:SettingsStartupTabCombo = $null
 $script:SettingsThemeCombo = $null
-$script:SettingsPreviousTheme = "Modern Glass"
+$script:SettingsPreviousTheme = "Terminal Green"
 $script:PendingCustomTheme = $null
 $script:SettingsAutoOpenQuickReportCheck = $null
 $script:SettingsRefreshPublicIPCheck = $null
@@ -350,7 +350,7 @@ function New-GUICustomThemeFromCoreColors {
 }
 
 function Get-GUICustomTheme {
-    $base = Get-GUIColorTheme -Name "Modern Glass"
+    $base = Get-GUIColorTheme -Name "Terminal Green"
     $source = $null
 
     if($script:PendingCustomTheme){
@@ -676,10 +676,10 @@ function Invoke-GUICustomThemePicker {
     $cancel.Add_Click({ $editor.DialogResult = [System.Windows.Forms.DialogResult]::Cancel; $editor.Close() })
     $buttons.Controls.Add($cancel) | Out-Null
 
-    $reset = New-GUIButton "Start From Modern Glass" { }
+    $reset = New-GUIButton "Start From Terminal Green" { }
     $reset.Width = 170
     $reset.Add_Click({
-        $base = Get-GUIColorTheme -Name "Modern Glass"
+        $base = Get-GUIColorTheme -Name "Terminal Green"
         foreach($key in (Get-GUIThemeColorKeys)){
             $working[$key] = $base[$key]
             if($swatches.ContainsKey($key)){ $swatches[$key].BackColor = $working[$key] }
@@ -942,7 +942,7 @@ function Set-GUIColorTheme {
     param([string]$Name)
 
     if((Get-GUIColorThemeNames) -notcontains $Name){
-        $Name = "Modern Glass"
+        $Name = "Terminal Green"
     }
 
     $script:GUITheme = Get-GUIColorTheme -Name $Name
@@ -1120,20 +1120,20 @@ function Set-GUIButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = if($Compact){
-        New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
+        New-Object System.Drawing.Font("Segoe UI",8.25,[System.Drawing.FontStyle]::Bold)
     }
     else{
-        New-Object System.Drawing.Font("Segoe UI",9,[System.Drawing.FontStyle]::Bold)
+        New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
     }
-    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.BorderSize = 1
     $Button.FlatAppearance.BorderColor = if($Subtle){$script:GUITheme.Border}else{$script:GUITheme.Accent}
-    $Button.FlatAppearance.MouseOverBackColor = if($Subtle){$script:GUITheme.HeaderMuted}else{$script:GUITheme.AccentDark}
+    $Button.FlatAppearance.MouseOverBackColor = if($Subtle){$script:GUITheme.Strip}else{$script:GUITheme.Accent}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
-    $Button.BackColor = if($Subtle){$script:GUITheme.AccentSoft}else{$script:GUITheme.Accent}
+    $Button.BackColor = if($Subtle){$script:GUITheme.Page}else{$script:GUITheme.AccentDark}
     $Button.ForeColor = if($Subtle){$script:GUITheme.Text}else{[System.Drawing.Color]::White}
-    $Button.Padding = New-Object System.Windows.Forms.Padding(8,0,8,1)
+    $Button.Padding = New-Object System.Windows.Forms.Padding(10,0,10,1)
 
-    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){10}else{14})
+    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){6}else{8})
 }
 
 function Set-GUITabButtonChrome {
@@ -1150,13 +1150,13 @@ function Set-GUITabButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
-    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.BorderSize = 1
     $Button.FlatAppearance.BorderColor = if($Selected){$script:GUITheme.Accent}else{$script:GUITheme.Border}
     $Button.FlatAppearance.MouseOverBackColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.HeaderMuted}
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
-    $Button.BackColor = if($Selected){$script:GUITheme.Accent}else{[System.Drawing.Color]::White}
+    $Button.BackColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.Page}
     $Button.ForeColor = if($Selected){[System.Drawing.Color]::White}else{$script:GUITheme.Text}
-    Set-GUIRoundedCorners -Control $Button -Radius 12
+    Set-GUIRoundedCorners -Control $Button -Radius 7
 }
 
 function Set-GUIToolLaunchLed {
@@ -3481,21 +3481,28 @@ function Add-GUIPrintQueueServerCandidate {
 
 function Get-GUIPrintQueueServerCandidates {
     $candidates = New-Object System.Collections.Generic.List[string]
+    $addCandidate = {
+        param([string]$Name)
+        if([string]::IsNullOrWhiteSpace($Name)){ return }
+        $clean = $Name.Trim().TrimStart('\')
+        if($clean -match '^([^\\]+)\\.+$'){ $clean = $matches[1] }
+        if([string]::IsNullOrWhiteSpace($clean)){ return }
+        foreach($existing in $candidates){
+            if([string]$existing -ieq $clean){ return }
+        }
+        [void]$candidates.Add($clean)
+    }
 
     foreach($candidate in @($script:PrintQueueLastComputer)){
-        if($candidate -and $candidate.Trim() -and !$candidates.Contains($candidate.Trim())){
-            [void]$candidates.Add($candidate.Trim())
-        }
+        & $addCandidate $candidate
     }
 
     try {
         if(Get-Command Get-ADComputer -ErrorAction SilentlyContinue){
-            $adCandidates = @(Get-ADComputer -Filter "OperatingSystem -like '*Server*' -and (Name -like '*print*' -or Name -like '*prn*' -or Name -like '*queue*' -or Description -like '*print*' -or Description -like '*printer*')" -Properties DNSHostName,Description,OperatingSystem -ErrorAction Stop | Select-Object -First 12)
+            $adCandidates = @(Get-ADComputer -Filter "OperatingSystem -like '*Server*' -and (Name -like '*print*' -or Name -like '*prn*' -or Name -like '*queue*' -or Name -like '*ps-*' -or Description -like '*print*' -or Description -like '*printer*')" -Properties DNSHostName,Description,OperatingSystem -ErrorAction Stop | Select-Object -First 25)
             foreach($server in $adCandidates){
                 $name = if($server.DNSHostName){ [string]$server.DNSHostName }else{ [string]$server.Name }
-                if($name -and $name.Trim() -and !$candidates.Contains($name.Trim())){
-                    [void]$candidates.Add($name.Trim())
-                }
+                & $addCandidate $name
             }
         }
     }
@@ -3503,9 +3510,38 @@ function Get-GUIPrintQueueServerCandidates {
         Write-GUIPrintQueueLog "Print server AD discovery skipped: $($_.Exception.Message)"
     }
 
-    if($env:COMPUTERNAME -and !$candidates.Contains($env:COMPUTERNAME.Trim())){
-        [void]$candidates.Add($env:COMPUTERNAME.Trim())
+    try {
+        foreach($printer in @(Get-Printer -ErrorAction SilentlyContinue)){
+            foreach($value in @($printer.Name,$printer.ComputerName,$printer.PortName)){
+                if($value -and [string]$value -match '^\\\\([^\\]+)\\'){
+                    & $addCandidate $matches[1]
+                }
+            }
+        }
     }
+    catch {
+        Write-GUIPrintQueueLog "Local printer discovery skipped: $($_.Exception.Message)"
+    }
+
+    try {
+        $searcher = New-Object DirectoryServices.DirectorySearcher
+        $searcher.Filter = '(&(objectCategory=printQueue)(uNCName=*))'
+        $searcher.PageSize = 50
+        [void]$searcher.PropertiesToLoad.Add('uNCName')
+        [void]$searcher.PropertiesToLoad.Add('serverName')
+        foreach($result in @($searcher.FindAll() | Select-Object -First 50)){
+            foreach($prop in @('servername','uncname')){
+                if($result.Properties[$prop] -and $result.Properties[$prop].Count -gt 0){
+                    & $addCandidate ([string]$result.Properties[$prop][0])
+                }
+            }
+        }
+    }
+    catch {
+        Write-GUIPrintQueueLog "Directory print queue discovery skipped: $($_.Exception.Message)"
+    }
+
+    & $addCandidate $env:COMPUTERNAME
 
     return @($candidates)
 }
@@ -3648,7 +3684,8 @@ function Connect-GUIPrintQueueServer {
 
 function Start-GUIPrintQueueDiscovery {
     Set-GUIPrintQueueStatus "Finding likely print servers..."
-    foreach($candidate in @(Get-GUIPrintQueueServerCandidates)){
+    $discovered = @(Get-GUIPrintQueueServerCandidates)
+    foreach($candidate in $discovered){
         Add-GUIPrintQueueServerCandidate -ComputerName $candidate
     }
 
@@ -3662,6 +3699,7 @@ function Start-GUIPrintQueueDiscovery {
         if(Connect-GUIPrintQueueServer -ComputerName $candidate -SaveTarget:$false){
             if($script:PrintQueuePrinterCache.Count -gt 0){
                 Save-GUIPrintQueueConfig
+                Set-GUIPrintQueueStatus "Found print server $script:PrintQueueConnectedComputer with $($script:PrintQueuePrinterCache.Count) queue(s)." ([System.Drawing.Color]::ForestGreen)
                 return
             }
             Write-GUIPrintQueueLog "Print server candidate $candidate was reachable but no shared queues were found."
@@ -3669,7 +3707,7 @@ function Start-GUIPrintQueueDiscovery {
     }
 
     $script:PrintQueueComputerBox.Text = $candidates[0]
-    Set-GUIPrintQueueStatus "No accessible print server found automatically. Select or type a server and click Connect." ([System.Drawing.Color]::DarkGoldenrod)
+    Set-GUIPrintQueueStatus "Found $($candidates.Count) possible server(s), but none exposed shared queues automatically. Pick one from the server box or type a name, then click Connect." ([System.Drawing.Color]::DarkGoldenrod)
 }
 
 function Clear-GUIPrintQueueSelected {
@@ -8877,12 +8915,12 @@ function Get-GUISettingsPath {
 }
 
 function Get-GUIDefaultSettings {
-    $defaultTheme = Get-GUIColorTheme -Name "Modern Glass"
+    $defaultTheme = Get-GUIColorTheme -Name "Terminal Green"
 
     [pscustomobject]@{
         tabOrder = @(Get-GUIDefaultTabOrder)
         startupTab = "Quick Diagnosis"
-        colorTheme = "Modern Glass"
+        colorTheme = "Terminal Green"
         customTheme = ConvertTo-GUICustomThemeSettings $defaultTheme
         autoOpenQuickDiagnosisReport = $false
         refreshPublicIPOnLaunch = $true
@@ -9069,9 +9107,9 @@ function New-GUIButton {
     $button = New-Object System.Windows.Forms.Button
     $button.Text = $Text
     $button.Tag = $Action
-    $button.Width = 132
-    $button.Height = 30
-    $button.Margin = New-Object System.Windows.Forms.Padding(4)
+    $button.Width = 154
+    $button.Height = 34
+    $button.Margin = New-Object System.Windows.Forms.Padding(5,4,5,4)
     $button.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $button
     $button.Add_Click({
@@ -11542,9 +11580,17 @@ function Build-ChocolateyPage {
     $ChocoStatusLabel.TextAlign = "MiddleLeft"
     $ChocoStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     [void]$topPanel.Controls.Add($ChocoStatusLabel,0,0)
-    [void]$topPanel.Controls.Add((New-GUIButton "Refresh" { Refresh-GUIChocoStatus }),1,0)
-    [void]$topPanel.Controls.Add((New-GUIButton "Install Choco" { Start-GUIChocolateyInstall }),2,0)
-    [void]$topPanel.Controls.Add((New-GUIButton "Scan Installed" { Refresh-GUIChocoInstalledPackages }),3,0)
+    $chocoRefreshButton = New-GUIButton "Refresh" { Refresh-GUIChocoStatus }
+    $chocoInstallButton = New-GUIButton "Install Choco" { Start-GUIChocolateyInstall }
+    $chocoScanButton = New-GUIButton "Scan Installed" { Refresh-GUIChocoInstalledPackages }
+    foreach($button in @($chocoRefreshButton,$chocoInstallButton,$chocoScanButton)){
+        $button.Dock = "Fill"
+        $button.Width = 0
+        $button.Margin = New-Object System.Windows.Forms.Padding(5,10,5,10)
+    }
+    [void]$topPanel.Controls.Add($chocoRefreshButton,1,0)
+    [void]$topPanel.Controls.Add($chocoInstallButton,2,0)
+    [void]$topPanel.Controls.Add($chocoScanButton,3,0)
     $layout.SetColumnSpan($chocoTop,2)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
@@ -12080,7 +12126,7 @@ function Save-GUISettingsFromPage {
         [string]$script:SettingsThemeCombo.SelectedItem
     }
     else{
-        "Modern Glass"
+        "Terminal Green"
     }
 
     $customTheme = if($script:PendingCustomTheme){
@@ -12918,7 +12964,7 @@ function Build-SettingsPage {
     foreach($themeName in (Get-GUIColorThemeNames)){
         [void]$SettingsThemeCombo.Items.Add($themeName)
     }
-    $selectedTheme = if($settings.colorTheme -and (Get-GUIColorThemeNames) -contains $settings.colorTheme){$settings.colorTheme}else{"Modern Glass"}
+    $selectedTheme = if($settings.colorTheme -and (Get-GUIColorThemeNames) -contains $settings.colorTheme){$settings.colorTheme}else{"Terminal Green"}
     $SettingsThemeCombo.SelectedItem = $selectedTheme
     $script:SettingsPreviousTheme = $selectedTheme
     $SettingsThemeCombo.Add_SelectedIndexChanged({
@@ -12935,7 +12981,7 @@ function Build-SettingsPage {
                 Add-GUILog "Custom theme colors selected. Click Apply Settings to save them."
             }
             else{
-                $fallback = if($script:SettingsPreviousTheme){$script:SettingsPreviousTheme}else{"Modern Glass"}
+                $fallback = if($script:SettingsPreviousTheme){$script:SettingsPreviousTheme}else{"Terminal Green"}
                 $script:SettingsThemeCombo.SelectedItem = $fallback
                 Add-GUILog "Custom theme selection cancelled."
             }

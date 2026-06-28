@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260627212206,
-    "SourceUpdatedAt":  "2026-06-27T21:22:06.5595438-05:00",
-    "ReleaseNotes":  "Added typed fresh-deployment destinations, remembered deployment targets, a Modern Glass default theme, new dark/command themes, softer rounded controls, and a subtle textured GUI surface."
+    "Build":  20260627220513,
+    "SourceUpdatedAt":  "2026-06-27T22:05:13.0135866-05:00",
+    "ReleaseNotes":  "Shifted the GUI toward a sharper terminal-style default theme, tightened button sizing/chrome to prevent clipped labels, improved Chocolatey action alignment, and expanded print server discovery."
 }
