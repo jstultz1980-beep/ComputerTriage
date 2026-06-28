@@ -1,7 +1,7 @@
-{
+﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260626152209,
-    "SourceUpdatedAt":  "2026-06-26T15:22:09.2607372-05:00",
-    "ReleaseNotes":  "Removed CSI naming from toolkit folders, launcher, script symbols, documentation, and output path references; renamed backend to NetworkToolkit."
+    "Build":  20260627204511,
+    "SourceUpdatedAt":  "2026-06-27T20:45:11.2536344-05:00",
+    "ReleaseNotes":  "Refined Quick Diagnosis layout and header health status, hardened computer profile opening, cleaned Chocolatey and Reports pages, expanded PsExec presets, adjusted RoboCopy builder, and exposed bundled Sysinternals help files."
 }

@@ -2209,14 +2209,32 @@ function Get-GUIQuickDiagnosisSummaryValue {
 }
 
 function Update-GUIComputerHealthLight {
-    if(!$script:HealthStatusLight -or !$script:HealthStatusLabel){
-        return
-    }
-
     $summary = Get-GUIComputerHealthSummary -Profile (Get-GUILatestComputerProfile)
 
-    $script:HealthStatusLight.BackColor = $summary.Color
-    $script:HealthStatusLabel.Text = $summary.Text
+    if($script:HealthStatusLight -and !$script:HealthStatusLight.IsDisposed){
+        $script:HealthStatusLight.BackColor = $summary.Color
+    }
+
+    if($script:HealthStatusLabel -and !$script:HealthStatusLabel.IsDisposed){
+        $script:HealthStatusLabel.Text = $summary.Text
+    }
+
+    if($script:HeaderHealthStatusLabel -and !$script:HeaderHealthStatusLabel.IsDisposed){
+        $level = switch($summary.Level){
+            "Healthy" { "Healthy" }
+            "Unknown" { "Unknown" }
+            "Review" { "Warning" }
+            "Needs Attention" { "Critical" }
+            default { [string]$summary.Level }
+        }
+        $script:HeaderHealthStatusLabel.Text = $level
+        $script:HeaderHealthStatusLabel.ForeColor = $summary.Color
+        $script:HeaderHealthStatusLabel.BackColor = [System.Drawing.Color]::FromArgb(38,$summary.Color)
+        $script:HeaderHealthStatusLabel.Tag = [pscustomobject]@{ ToolTip = $summary.Text }
+        if($script:ToolTip){
+            $script:ToolTip.SetToolTip($script:HeaderHealthStatusLabel,$summary.Text)
+        }
+    }
 }
 
 function Invoke-GUIQuickPing {
@@ -4982,15 +5000,42 @@ function Refresh-Fingerprints {
 }
 
 function Open-SelectedFingerprintReport {
-    $fingerprint = Get-SelectedFingerprint
+    try {
+        $fingerprint = Get-SelectedFingerprint
 
-    if(!$fingerprint){
-        Add-GUILog "Select a computer profile first."
+        if(!$fingerprint){
+            Add-GUILog "Select a computer profile first."
+            return
+        }
+
+        if(!$fingerprint.Path -or !(Test-Path -LiteralPath $fingerprint.Path)){
+            throw "The selected computer profile backing file was not found."
+        }
+
+        Open-NTKComputerFingerprintReport -Path $fingerprint.Path
+        Add-GUILog "Opened computer profile report: $($fingerprint.ComputerName)"
+    }
+    catch {
+        Add-GUILog "Could not open computer profile: $($_.Exception.Message)"
+        [System.Windows.Forms.MessageBox]::Show(
+            "Could not open the selected computer profile.`r`n`r`n$($_.Exception.Message)",
+            "Computer Profile",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        ) | Out-Null
+    }
+}
+
+function Open-GUISysinternalsHelp {
+    $root = Get-GUISysinternalsRoot
+    if($root -and (Test-Path -LiteralPath $root)){
+        Open-GUIFolder $root
+        Add-GUILog "Opened Sysinternals help folder."
         return
     }
 
-    Open-NTKComputerFingerprintReport -Path $fingerprint.Path
-    Add-GUILog "Opened computer profile report: $($fingerprint.ComputerName)"
+    Start-NTKToolProcess -FilePath "https://learn.microsoft.com/sysinternals/" | Out-Null
+    Add-GUILog "Opened Microsoft Sysinternals documentation."
 }
 
 function Delete-SelectedFingerprint {
@@ -7510,7 +7555,7 @@ function Build-QuickTriagePage {
     $layout.ColumnCount = 1
     $layout.RowCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(16)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,116))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -7527,9 +7572,9 @@ function Build-QuickTriagePage {
     $runPanel.RowCount = 2
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,138))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,230))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,190))) | Out-Null
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,4))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
@@ -7549,7 +7594,7 @@ function Build-QuickTriagePage {
     $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,7,10,5)
     [void]$runPanel.Controls.Add($QuickTargetBox,1,0)
 
-    $script:QuickRunButton = New-GUIButton "Quick Diagnosis" { Start-GUIQuickDiagnosis }
+    $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
     $QuickRunButton.Dock = "Fill"
     [void]$runPanel.Controls.Add($QuickRunButton,2,0)
 
@@ -7557,28 +7602,9 @@ function Build-QuickTriagePage {
     $reportButton.Dock = "Fill"
     [void]$runPanel.Controls.Add($reportButton,3,0)
 
-    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $healthPanel.Dock = "None"
-    $healthPanel.Width = 224
-    $healthPanel.Height = 40
-    $healthPanel.FlowDirection = "LeftToRight"
-    $healthPanel.WrapContents = $false
-    $healthPanel.Margin = New-Object System.Windows.Forms.Padding(8,4,4,3)
-    [void]$runPanel.Controls.Add($healthPanel,4,0)
-
-    $script:HealthStatusLight = New-Object System.Windows.Forms.Panel
-    $HealthStatusLight.Width = 22
-    $HealthStatusLight.Height = 22
-    $HealthStatusLight.Margin = New-Object System.Windows.Forms.Padding(4,8,8,4)
-    [void]$healthPanel.Controls.Add($HealthStatusLight)
-
-    $script:HealthStatusLabel = New-Object System.Windows.Forms.Label
-    $HealthStatusLabel.Width = 188
-    $HealthStatusLabel.Height = 34
-    $HealthStatusLabel.TextAlign = "MiddleLeft"
-    $HealthStatusLabel.AutoEllipsis = $true
-    $HealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    [void]$healthPanel.Controls.Add($HealthStatusLabel)
+    $script:DismRepairButton = New-GUIButton "DISM/SFC Repair" { Start-GUIDismSfcRepairPath }
+    $DismRepairButton.Dock = "Fill"
+    [void]$runPanel.Controls.Add($DismRepairButton,4,0)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
     $QuickLastDiagnosisLabel.Dock = "Fill"
@@ -7595,8 +7621,8 @@ function Build-QuickTriagePage {
     $lowerLayout.Dock = "Fill"
     $lowerLayout.ColumnCount = 2
     $lowerLayout.RowCount = 1
-    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,58))) | Out-Null
-    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,42))) | Out-Null
+    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,64))) | Out-Null
+    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,36))) | Out-Null
     $lowerLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($lowerLayout,0,1)
 
@@ -7697,7 +7723,7 @@ function Build-QuickTriagePage {
     $statusLayout.Controls.Add($QuickOutputBox,0,2)
 
     $repairGroup = New-Object System.Windows.Forms.GroupBox
-    $repairGroup.Text = "Repair After Review"
+    $repairGroup.Text = "Review And Shortcuts"
     $repairGroup.Dock = "Fill"
     $repairGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $lowerLayout.Controls.Add($repairGroup,1,0)
@@ -7706,9 +7732,8 @@ function Build-QuickTriagePage {
     $repairPanel.Dock = "Fill"
     $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10,4,10,8)
     $repairPanel.ColumnCount = 1
-    $repairPanel.RowCount = 3
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
+    $repairPanel.RowCount = 2
+    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,62))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $repairGroup.Controls.Add($repairPanel)
 
@@ -7720,15 +7745,11 @@ function Build-QuickTriagePage {
     $repairNote.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     [void]$repairPanel.Controls.Add($repairNote,0,0)
 
-    $script:DismRepairButton = New-GUIButton "Run DISM/SFC Repair Path" { Start-GUIDismSfcRepairPath }
-    $DismRepairButton.Dock = "Fill"
-    [void]$repairPanel.Controls.Add($DismRepairButton,0,1)
-
     $hardwareShortcuts = New-Object System.Windows.Forms.GroupBox
     $hardwareShortcuts.Text = "Hardware Shortcuts"
     $hardwareShortcuts.Dock = "Fill"
     $hardwareShortcuts.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
-    $repairPanel.Controls.Add($hardwareShortcuts,0,2)
+    $repairPanel.Controls.Add($hardwareShortcuts,0,1)
 
     $hardwareShortcutPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $hardwareShortcutPanel.Dock = "Top"
@@ -7742,7 +7763,7 @@ function Build-QuickTriagePage {
         @{ Text="CPU-Z"; Action={ Start-GUICustomToolByName -Name "CPU-Z" }; Tip="Open CPU-Z for CPU, memory, motherboard, and platform details." },
         @{ Text="GPU-Z"; Action={ Start-GUICustomToolByName -Name "GPU-Z" }; Tip="Open GPU-Z for graphics adapter, driver, and sensor details." },
         @{ Text="HWMonitor"; Action={ Start-GUICustomToolByName -Name "HWMonitor" }; Tip="Open HWMonitor for temperatures, voltage, and fan sensor checks." },
-        @{ Text="CrystalDiskInfo"; Action={ Start-GUIExternalToolById -Id "CrystalDiskInfo" }; Tip="Open CrystalDiskInfo for SMART and drive health details." },
+        @{ Text="CrystalDiskInfo"; Action={ Start-GUIExternalToolById -Id "CrystalDiskInfo" }; Tip="Open CrystalDiskInfo for SMART and drive health details. Some virtual machines do not expose SMART data." },
         @{ Text="HWiNFO"; Action={ Start-GUIExternalToolById -Id "HWiNFO" }; Tip="Open HWiNFO for detailed hardware inventory and sensor review." }
     )
 
@@ -7804,6 +7825,40 @@ function Add-GUIHeaderComputerSummary {
         @{R=1;C=2;Text="Public IP";Bold=$true;Key="PublicIPLabel"},
         @{R=1;C=3;Text=$dashboard.PublicIP;Key="PublicIP"}
     )){
+        if($cell.Key -eq "ComputerName"){
+            $namePanel = New-Object System.Windows.Forms.FlowLayoutPanel
+            $namePanel.Dock = "Fill"
+            $namePanel.FlowDirection = "LeftToRight"
+            $namePanel.WrapContents = $false
+            $namePanel.BackColor = [System.Drawing.Color]::Transparent
+            $namePanel.Margin = New-Object System.Windows.Forms.Padding(0)
+            $summary.Controls.Add($namePanel,$cell.C,$cell.R)
+
+            $nameLabel = New-Object System.Windows.Forms.Label
+            $nameLabel.Text = $cell.Text
+            $nameLabel.Width = 136
+            $nameLabel.Height = 26
+            $nameLabel.TextAlign = "MiddleLeft"
+            $nameLabel.AutoEllipsis = $true
+            $nameLabel.ForeColor = [System.Drawing.Color]::White
+            $nameLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+            [void]$namePanel.Controls.Add($nameLabel)
+            $script:DashboardLabels[$cell.Key] = $nameLabel
+
+            $script:HeaderHealthStatusLabel = New-Object System.Windows.Forms.Label
+            $HeaderHealthStatusLabel.Width = 86
+            $HeaderHealthStatusLabel.Height = 22
+            $HeaderHealthStatusLabel.Margin = New-Object System.Windows.Forms.Padding(6,2,0,0)
+            $HeaderHealthStatusLabel.TextAlign = "MiddleCenter"
+            $HeaderHealthStatusLabel.AutoEllipsis = $true
+            $HeaderHealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9,[System.Drawing.FontStyle]::Bold)
+            $HeaderHealthStatusLabel.Text = "Unknown"
+            $HeaderHealthStatusLabel.ForeColor = [System.Drawing.Color]::FromArgb(170,178,186)
+            $HeaderHealthStatusLabel.BackColor = [System.Drawing.Color]::FromArgb(35,255,255,255)
+            [void]$namePanel.Controls.Add($HeaderHealthStatusLabel)
+            continue
+        }
+
         $label = New-Object System.Windows.Forms.Label
         $label.Text = $cell.Text
         $label.Dock = "Fill"
@@ -7849,6 +7904,8 @@ function Add-GUIHeaderComputerSummary {
     if($refreshPublicIPOnLaunch -and !$SmokeTest -and !$ButtonSmokeTest){
         Update-GUIPublicIPSummaryAsync -Quiet
     }
+
+    Update-GUIComputerHealthLight
 }
 
 function Update-GUIHeaderLayout {
@@ -9495,7 +9552,7 @@ function Build-WindowsUpdatePage {
     $pendingGroup.Controls.Add($WUPendingGrid)
 
     $installedGroup = New-Object System.Windows.Forms.GroupBox
-    $installedGroup.Text = "Installed Updates Windows Reports As Removable"
+    $installedGroup.Text = "Removable Windows Updates"
     $installedGroup.Dock = "Fill"
     $installedGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($installedGroup,1,1)
@@ -9850,7 +9907,8 @@ function Build-ReportsPage {
     $layout.Controls.Add($buttons,0,2)
 
     [void]$buttons.Controls.Add((New-GUIButton "Open Selected" { Open-SelectedGUIReport }))
-    [void]$buttons.Controls.Add((New-GUIButton "Bundle Latest To Send" { New-GUIChatGPTBundle }))
+    [void]$buttons.Controls.Add((New-GUIButton "Bundle For AI" { New-GUIChatGPTBundle }))
+    [void]$buttons.Controls.Add((New-GUIButton "AI Bundles" { Open-GUIAIBundleFolder }))
     [void]$buttons.Controls.Add((New-GUIButton "Import AI Analysis" { Import-GUIAIAnalysis }))
     [void]$buttons.Controls.Add((New-GUIButton "Generate Final Report" { Export-GUIFinalComputerReport }))
     [void]$buttons.Controls.Add((New-GUIButton "Delete Selected" { Delete-SelectedGUIReport }))
@@ -9873,7 +9931,6 @@ function Get-GUIReportItems {
         @{ Type="Discovery Exports"; Path=$NTKPaths.Exports; Pattern="*network*.csv" },
         @{ Type="Discovery Exports"; Path=$NTKPaths.Exports; Pattern="*discovery*.txt" },
         @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="full-triage*.txt" },
-        @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="full-triage*.json" },
         @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="dism*.log" },
         @{ Type="Repair And Triage"; Path=$NTKPaths.Exports; Pattern="sfc*.log" }
     )
@@ -9961,6 +10018,14 @@ function Open-SelectedGUIReportLocation {
 
     $location = if($report.IsDirectory){$report.Path}else{Split-Path -Parent $report.Path}
     Open-GUIFolder $location
+}
+
+function Open-GUIAIBundleFolder {
+    $bundleRoot = Join-Path $NTKPaths.Exports "AI-Bundles"
+    if(!(Test-Path -LiteralPath $bundleRoot)){
+        New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
+    }
+    Open-GUIFolder $bundleRoot
 }
 
 function Delete-SelectedGUIReport {
@@ -10067,7 +10132,7 @@ function New-GUIChatGPTBundle {
         }
     }
     if($reports.Count -eq 0){
-        [System.Windows.Forms.MessageBox]::Show("There are no report files available to bundle for this computer.","Bundle Latest To Send",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        [System.Windows.Forms.MessageBox]::Show("There are no report files available to bundle for this computer.","Bundle For AI",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
         return
     }
 
@@ -10076,7 +10141,7 @@ function New-GUIChatGPTBundle {
     if($reports.Count -gt 8){ $preview += "`r`n- Plus $($reports.Count - 8) more visible report file(s)." }
     $confirm = [System.Windows.Forms.MessageBox]::Show(
         "Create a ZIP for manual upload to ChatGPT?`r`n`r`nThis bundle automatically uses the latest available report from each category for $computerName. It does not include minidumps, portable apps, browser data, or toolkit logs.`r`n`r`nFiles: $($reports.Count)`r`nSize: $([math]::Round($totalBytes / 1MB,2)) MB`r`n`r`n$preview`r`n`r`nReview the ZIP before uploading it. Continue?",
-        "Bundle Latest To Send",
+        "Bundle For AI",
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Warning
     )
@@ -10253,6 +10318,13 @@ function Build-SysinternalsPage {
 
     $mappedCategories = @("Process And Startup","System Inspection","Network","PsTools","Active Directory","Disk And File","Security And Registry")
     $tools = @(Get-GUISysinternalsTools | Where-Object { $catalogSysinternalsBases -notcontains $_.Name.ToLowerInvariant() -and $mappedCategories -notcontains $_.Category })
+    $tools = @(
+        New-GUIToolItem `
+            -Text "Sysinternals Help" `
+            -Description "Open the bundled official Sysinternals CHM help files and readme. Use this when a tool needs launch arguments or clarification." `
+            -Section "Help And References" `
+            -Action { Open-GUISysinternalsHelp }
+    ) + $tools
 
     if($tools.Count -eq 0){
         $note = New-Object System.Windows.Forms.Label
@@ -10325,8 +10397,8 @@ function Build-RobocopyPage {
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
-    $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $builder.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $robocopyGroup.Controls.Add($builder)
 
     $script:RobocopySourceBox = New-GUITextBox
@@ -10406,16 +10478,16 @@ function Build-RobocopyPage {
 
     $actions = New-Object System.Windows.Forms.FlowLayoutPanel
     $actions.Dock = "Fill"
-    $actions.FlowDirection = "LeftToRight"
+    $actions.FlowDirection = "RightToLeft"
     $actions.Padding = New-Object System.Windows.Forms.Padding(0,8,0,0)
     $builder.SetColumnSpan($actions,4)
-    $builder.Controls.Add($actions,0,6)
+    $builder.Controls.Add($actions,0,7)
 
     foreach($button in @(
-        (New-GUIButton "Build" { Update-GUIRobocopyCommand | Out-Null }),
-        (New-GUIButton "Copy" { Copy-GUIRobocopyCommand }),
+        (New-GUIButton "Run" { Start-GUIRobocopyCommand }),
         (New-GUIButton "Preview" { Start-GUIRobocopyCommand -Preview }),
-        (New-GUIButton "Run" { Start-GUIRobocopyCommand })
+        (New-GUIButton "Copy" { Copy-GUIRobocopyCommand }),
+        (New-GUIButton "Build" { Update-GUIRobocopyCommand | Out-Null })
     )){
         $button.Width = 118
         [void]$actions.Controls.Add($button)
@@ -10428,7 +10500,7 @@ function Build-RobocopyPage {
     $RobocopyCommandBox.ScrollBars = "Vertical"
     $RobocopyCommandBox.Font = New-Object System.Drawing.Font("Consolas",9)
     $builder.SetColumnSpan($RobocopyCommandBox,4)
-    $builder.Controls.Add($RobocopyCommandBox,0,7)
+    $builder.Controls.Add($RobocopyCommandBox,0,6)
 }
 
 function Build-PsExecPage {
@@ -10493,6 +10565,15 @@ function Build-PsExecPage {
         "PowerShell prompt",
         "Computer name and user",
         "IP configuration",
+        "Network adapters",
+        "DNS cache flush",
+        "List local admins",
+        "Running services",
+        "Recent system errors",
+        "Recent app errors",
+        "GPResult HTML",
+        "Restart WinRM",
+        "Uptime",
         "Group Policy update",
         "Restart remote computer",
         "List sessions"
@@ -10503,6 +10584,15 @@ function Build-PsExecPage {
             "PowerShell prompt" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -NoExit"; $script:PsExecInteractiveCheck.Checked = $true }
             "Computer name and user" { $script:PsExecCommandBox.Text = "cmd.exe /c hostname && whoami" }
             "IP configuration" { $script:PsExecCommandBox.Text = "cmd.exe /c ipconfig /all" }
+            "Network adapters" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"Get-NetAdapter | Sort-Object Status,Name | Format-Table -Auto Name,Status,LinkSpeed,MacAddress`"" }
+            "DNS cache flush" { $script:PsExecCommandBox.Text = "cmd.exe /c ipconfig /flushdns" }
+            "List local admins" { $script:PsExecCommandBox.Text = "cmd.exe /c net localgroup administrators" }
+            "Running services" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"Get-Service | Where-Object Status -eq Running | Sort-Object Name | Format-Table -Auto Name,DisplayName,Status`"" }
+            "Recent system errors" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"Get-WinEvent -FilterHashtable @{LogName='System';Level=1,2;StartTime=(Get-Date).AddDays(-3)} -MaxEvents 25 | Select-Object TimeCreated,Id,ProviderName,Message | Format-List`"" }
+            "Recent app errors" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"Get-WinEvent -FilterHashtable @{LogName='Application';Level=1,2;StartTime=(Get-Date).AddDays(-3)} -MaxEvents 25 | Select-Object TimeCreated,Id,ProviderName,Message | Format-List`"" }
+            "GPResult HTML" { $script:PsExecCommandBox.Text = "cmd.exe /c gpresult /h %TEMP%\gpresult.html /f && echo Report: %TEMP%\gpresult.html" }
+            "Restart WinRM" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"Restart-Service WinRM -Force; Get-Service WinRM`"" }
+            "Uptime" { $script:PsExecCommandBox.Text = "powershell.exe -NoLogo -NoProfile -Command `"$os=Get-CimInstance Win32_OperatingSystem; 'Last boot: {0}; Uptime days: {1:n2}' -f $os.LastBootUpTime,((Get-Date)-$os.LastBootUpTime).TotalDays`"" }
             "Group Policy update" { $script:PsExecCommandBox.Text = "cmd.exe /c gpupdate /force" }
             "Restart remote computer" { $script:PsExecCommandBox.Text = "shutdown.exe /r /t 0" }
             "List sessions" { $script:PsExecCommandBox.Text = "query.exe session" }
@@ -10624,7 +10714,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,78))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -10638,14 +10728,14 @@ function Build-ChocolateyPage {
 
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
-    $topPanel.Padding = New-Object System.Windows.Forms.Padding(10)
-    $topPanel.ColumnCount = 3
-    $topPanel.RowCount = 2
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
+    $topPanel.Padding = New-Object System.Windows.Forms.Padding(8)
+    $topPanel.ColumnCount = 4
+    $topPanel.RowCount = 1
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,140))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $chocoTop.Controls.Add($topPanel)
 
     $script:ChocoStatusLabel = New-Object System.Windows.Forms.Label
@@ -10653,28 +10743,10 @@ function Build-ChocolateyPage {
     $ChocoStatusLabel.TextAlign = "MiddleLeft"
     $ChocoStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     [void]$topPanel.Controls.Add($ChocoStatusLabel,0,0)
-    $topPanel.SetColumnSpan($ChocoStatusLabel,3)
-
-    [void]$topPanel.Controls.Add((New-GUIButton "Refresh Status" { Refresh-GUIChocoStatus }),0,1)
-    [void]$topPanel.Controls.Add((New-GUIButton "Install Chocolatey" { Start-GUIChocolateyInstall }),1,1)
-    [void]$topPanel.Controls.Add((New-GUIButton "Scan Installed" { Refresh-GUIChocoInstalledPackages }),2,1)
-
-    $guidanceGroup = New-Object System.Windows.Forms.GroupBox
-    $guidanceGroup.Text = "Portable Toolkit Packages"
-    $guidanceGroup.Dock = "Fill"
-    $guidanceGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $layout.Controls.Add($guidanceGroup,1,0)
-
-    $toolboxLayout = New-Object System.Windows.Forms.TableLayoutPanel
-    $toolboxLayout.Dock = 'Fill'; $toolboxLayout.Padding = New-Object System.Windows.Forms.Padding(10); $toolboxLayout.RowCount = 2; $toolboxLayout.ColumnCount = 1
-    $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $toolboxLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $guidanceGroup.Controls.Add($toolboxLayout)
-    $guidance = New-GUILabel 'Add a package from the search results, then manage every toolkit app from one list in Settings. Update actions only apply to Chocolatey-backed portable copies.'
-    $guidance.ForeColor = $script:GUITheme.MutedText; $toolboxLayout.Controls.Add($guidance,0,0)
-    $toolboxManagerButton = New-GUIButton 'Open Toolkit App Manager' { Show-GUIChocoToolboxManager }
-    $toolboxManagerButton.Dock = 'Fill'; $toolboxManagerButton.Width = 0
-    $toolboxLayout.Controls.Add($toolboxManagerButton,0,1)
+    [void]$topPanel.Controls.Add((New-GUIButton "Refresh" { Refresh-GUIChocoStatus }),1,0)
+    [void]$topPanel.Controls.Add((New-GUIButton "Install Choco" { Start-GUIChocolateyInstall }),2,0)
+    [void]$topPanel.Controls.Add((New-GUIButton "Scan Installed" { Refresh-GUIChocoInstalledPackages }),3,0)
+    $layout.SetColumnSpan($chocoTop,2)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
     $searchGroup.Text = "Install Chocolatey Packages"
@@ -10687,8 +10759,8 @@ function Build-ChocolateyPage {
     $searchLayout.RowCount = 3
     $searchLayout.ColumnCount = 1
     $searchLayout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $searchLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
     $searchLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $searchLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
     $searchLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $searchGroup.Controls.Add($searchLayout)
 
@@ -10699,7 +10771,7 @@ function Build-ChocolateyPage {
     $searchPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,82))) | Out-Null
     $searchPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $searchPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
-    $searchLayout.Controls.Add($searchPanel,0,0)
+    $searchLayout.Controls.Add($searchPanel,0,1)
 
     $searchLabel = New-GUILabel "Search term"
     $searchLabel.Dock = "None"
@@ -10728,7 +10800,7 @@ function Build-ChocolateyPage {
     $ChocoGrid.BackgroundColor = [System.Drawing.Color]::White
     [void]$ChocoGrid.Columns.Add("Name","Package")
     [void]$ChocoGrid.Columns.Add("Version","Version")
-    $searchLayout.Controls.Add($ChocoGrid,0,1)
+    $searchLayout.Controls.Add($ChocoGrid,0,0)
 
     $installPanel = New-Object System.Windows.Forms.FlowLayoutPanel
     $installPanel.Dock = "Fill"
@@ -10740,7 +10812,7 @@ function Build-ChocolateyPage {
     [void]$installPanel.Controls.Add($addToolboxButton)
 
     $installedGroup = New-Object System.Windows.Forms.GroupBox
-    $installedGroup.Text = "Computer Installed Chocolatey Packages"
+    $installedGroup.Text = "Installed Chocolatey Packages"
     $installedGroup.Dock = "Fill"
     $installedGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($installedGroup,1,1)
@@ -10802,7 +10874,7 @@ function Build-ChocolateyPage {
     $uninstallComputerButton.Width = 0
     [void]$installedButtons.Controls.Add($uninstallComputerButton,1,1)
 
-    $checkComputerUpdatesButton = New-GUIButton "Check For Updates" { Check-GUIChocoInstalledPackageUpdates }
+    $checkComputerUpdatesButton = New-GUIButton "Check for Choco Updates" { Check-GUIChocoInstalledPackageUpdates }
     $checkComputerUpdatesButton.Dock = "Fill"
     $checkComputerUpdatesButton.Width = 0
     [void]$installedButtons.Controls.Add($checkComputerUpdatesButton,0,2)
@@ -10943,9 +11015,14 @@ function Build-SoftwareKeyFinderPage {
     $toolbar.Dock = "Fill"
     $toolbar.Padding = New-Object System.Windows.Forms.Padding(4,8,4,4)
     $layout.Controls.Add($toolbar,0,0)
-    [void]$toolbar.Controls.Add((New-GUIButton "Scan This Computer" { Start-GUISoftwareKeyFinderScan }))
-    [void]$toolbar.Controls.Add((New-GUIButton "Copy Selected Key" { Copy-GUISelectedSoftwareKey }))
-    [void]$toolbar.Controls.Add((New-GUIButton "Open Latest Report" { Open-GUISoftwareKeyReport }))
+    foreach($button in @(
+        (New-GUIButton "Scan Computer" { Start-GUISoftwareKeyFinderScan }),
+        (New-GUIButton "Copy Key" { Copy-GUISelectedSoftwareKey }),
+        (New-GUIButton "Key Report" { Open-GUISoftwareKeyReport })
+    )){
+        $button.Width = 150
+        [void]$toolbar.Controls.Add($button)
+    }
 
     $keysGroup = New-Object System.Windows.Forms.GroupBox
     $keysGroup.Text = "Recovered License And Registration Entries"
@@ -12147,9 +12224,9 @@ function Set-GUIFallbackButtonToolTips {
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
         "Refresh Size" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
-        "Scan This Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
-        "Copy Selected Key" = "Copy the selected license or registration value to the clipboard."
-        "Open Latest Report" = "Open the latest confidential Software Key Finder HTML report."
+        "Scan Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
+        "Copy Key" = "Copy the selected license or registration value to the clipboard."
+        "Key Report" = "Open the latest confidential Software Key Finder HTML report."
         "Update Toolkit" = "Select a current working toolkit and destination folder, then update the destination while preserving its client data by default."
         "Deploy Fresh Toolkit" = "Create a clean portable deployment on a USB drive or new folder, including toolkit apps but excluding client data and logs."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
