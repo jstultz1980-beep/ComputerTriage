@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260627210301,
-    "SourceUpdatedAt":  "2026-06-27T21:03:01.1343225-05:00",
-    "ReleaseNotes":  "Embedded Print Queue Maintenance directly on the Print tab, added native print queue connection, refresh, clear, restart, reset, server discovery, and logging actions, and made GUI smoke tests bypass the single-instance guard."
+    "Build":  20260627210856,
+    "SourceUpdatedAt":  "2026-06-27T21:08:56.7081395-05:00",
+    "ReleaseNotes":  "Added Sysinternals endpoint-protection compatibility detection, Sophos-specific launch warnings for driver-backed tools, clearer tooltips, and detailed Sysinternals launch/failure logging."
 }

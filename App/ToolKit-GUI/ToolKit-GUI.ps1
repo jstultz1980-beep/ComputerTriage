@@ -95,6 +95,8 @@ $script:ToolTip = $null
 $script:DashboardLabels = @{}
 $script:ExternalToolCache = @{}
 $script:GuiSysinternalsToolsCache = $null
+$script:EndpointSecurityProductsCache = @()
+$script:EndpointSecurityProductsCacheTime = [datetime]::MinValue
 $script:GuiCustomToolsCache = $null
 $script:TabButtons = @{}
 $script:TabBuilders = @{}
@@ -3758,6 +3760,99 @@ function Test-GUISysinternalsRiskyTool {
     return @("notmyfault","notmyfaultc","testlimit","cpustres","sdelete","psshutdown","pskill","pssuspend","shellrunas","ctrl2cap","volumeid","movefile","sysmon","pspasswd") -contains $BaseName.ToLowerInvariant()
 }
 
+function Test-GUISysinternalsDriverBackedTool {
+    param([string]$BaseName)
+
+    return @(
+        "procexp",
+        "procmon",
+        "rammap",
+        "vmmap",
+        "tcpview",
+        "tcpvcon",
+        "handle",
+        "livekd",
+        "diskmon",
+        "diskview",
+        "notmyfault",
+        "notmyfaultc",
+        "sysmon",
+        "winobj"
+    ) -contains $BaseName.ToLowerInvariant()
+}
+
+function Get-GUIEndpointSecurityProducts {
+    if($script:EndpointSecurityProductsCache -and ((Get-Date) - $script:EndpointSecurityProductsCacheTime).TotalMinutes -lt 10){
+        return @($script:EndpointSecurityProductsCache)
+    }
+
+    $patterns = @("Sophos","Defender","CrowdStrike","SentinelOne","Carbon Black","Bitdefender","Webroot","Malwarebytes","Cisco Secure","Huntress")
+    $products = New-Object System.Collections.ArrayList
+
+    try {
+        foreach($service in @(Get-Service -ErrorAction SilentlyContinue)){
+            $serviceText = "$($service.Name) $($service.DisplayName)"
+            $vendor = @($patterns | Where-Object { $serviceText -match [regex]::Escape($_) } | Select-Object -First 1)
+            if($vendor.Count -gt 0){
+                [void]$products.Add([pscustomobject]@{
+                    Vendor = [string]$vendor[0]
+                    Source = "Service"
+                    Name = $service.DisplayName
+                    Status = [string]$service.Status
+                })
+            }
+        }
+    }
+    catch {}
+
+    try {
+        foreach($process in @(Get-Process -ErrorAction SilentlyContinue)){
+            $vendor = @($patterns | Where-Object { $process.Name -match [regex]::Escape($_) } | Select-Object -First 1)
+            if($vendor.Count -gt 0){
+                [void]$products.Add([pscustomobject]@{
+                    Vendor = [string]$vendor[0]
+                    Source = "Process"
+                    Name = $process.Name
+                    Status = "Running"
+                })
+            }
+        }
+    }
+    catch {}
+
+    $script:EndpointSecurityProductsCache = @($products | Sort-Object Vendor,Source,Name -Unique)
+    $script:EndpointSecurityProductsCacheTime = Get-Date
+    return @($script:EndpointSecurityProductsCache)
+}
+
+function Test-GUISophosDetected {
+    return (@(Get-GUIEndpointSecurityProducts | Where-Object { $_.Vendor -match "Sophos" -or $_.Name -match "Sophos" }).Count -gt 0)
+}
+
+function Get-GUISysinternalsEndpointCompatibilityText {
+    param([string]$BaseName)
+
+    $products = @(Get-GUIEndpointSecurityProducts)
+    if($products.Count -eq 0){
+        return ""
+    }
+
+    $vendors = @($products | ForEach-Object { $_.Vendor } | Where-Object { $_ } | Sort-Object -Unique)
+    if($vendors.Count -eq 0){
+        $vendors = @($products | ForEach-Object { $_.Name } | Where-Object { $_ } | Sort-Object -Unique)
+    }
+
+    if((Test-GUISysinternalsDriverBackedTool -BaseName $BaseName) -and (Test-GUISophosDetected)){
+        return "Endpoint note: Sophos appears to be running. This Sysinternals tool may load a temporary driver and Sophos may block it with a vulnerable-driver or exploit-protection warning. Use Usage / Help first if you are unsure."
+    }
+
+    if(Test-GUISysinternalsDriverBackedTool -BaseName $BaseName){
+        return "Endpoint note: detected security product(s): $($vendors -join ', '). This tool may load a temporary Sysinternals driver, so endpoint protection may block or alert on launch."
+    }
+
+    return "Endpoint note: detected security product(s): $($vendors -join ', ')."
+}
+
 function Get-GUISysinternalsDescription {
     param(
         [string]$BaseName,
@@ -3863,6 +3958,10 @@ function Get-GUISysinternalsDescription {
 
     if($Risky){
         $description += " Caution: this can change state, stress the computer, delete data, or reboot/shut down systems."
+    }
+
+    if(Test-GUISysinternalsDriverBackedTool -BaseName $BaseName){
+        $description += " This tool may load a temporary Sysinternals driver and can be blocked by endpoint protection."
     }
 
     return $description
@@ -4141,6 +4240,14 @@ function Show-GUISysinternalsLaunchHelper {
     else{
         $notes.ForeColor = $script:GUITheme.MutedText
     }
+
+    $endpointNote = Get-GUISysinternalsEndpointCompatibilityText -BaseName $BaseName
+    if($endpointNote){
+        $notes.Text += "`r`n$endpointNote"
+        if(Test-GUISysinternalsDriverBackedTool -BaseName $BaseName){
+            $notes.ForeColor = $script:GUITheme.Warning
+        }
+    }
     $layout.Controls.Add($notes,0,3)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
@@ -4244,6 +4351,27 @@ function Start-GUISysinternalsTool {
             }
         }
 
+        if($launchPlan.Mode -eq "Launch" -and (Test-GUISysinternalsDriverBackedTool -BaseName $baseName) -and (Test-GUISophosDetected)){
+            Write-GUIToolUsageLog -Tool "Sysinternals" -Action "SophosCompatibilityPrompt" -Detail $DisplayName -Level "WARN"
+            $choice = [System.Windows.Forms.MessageBox]::Show(
+                "Sophos appears to be running on this computer.`r`n`r`n$DisplayName may load a temporary Sysinternals driver. Sophos Home can block this with a vulnerable-driver or exploit-protection alert, especially for tools like Process Explorer, Process Monitor, TCPView, RAMMap, VMMap, Handle, LiveKD, and Sysmon.`r`n`r`nClick Yes to launch anyway, No to open Usage / Help instead, or Cancel to stop.",
+                "Sysinternals / Sophos Compatibility",
+                [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
+                [System.Windows.Forms.MessageBoxIcon]::Warning
+            )
+
+            if($choice -eq [System.Windows.Forms.DialogResult]::Cancel){
+                Add-GUILog "Cancelled Sysinternals tool due to Sophos compatibility warning: $DisplayName"
+                Write-GUIToolUsageLog -Tool "Sysinternals" -Action "SophosCompatibilityCancelled" -Detail $DisplayName -Level "WARN"
+                return
+            }
+
+            if($choice -eq [System.Windows.Forms.DialogResult]::No){
+                $launchPlan.Mode = "Help"
+                $args = @()
+            }
+        }
+
         if($Console -or $launchPlan.Mode -eq "Help"){
             $commandParts = @((ConvertTo-GUICommandToken $Path))
             if($args.Count -gt 0){
@@ -4257,9 +4385,22 @@ function Start-GUISysinternalsTool {
         }
 
         Add-GUILog "Launched Sysinternals: $DisplayName"
+        $detail = "Path=$Path; Args=$($args -join ' '); Console=$Console; Risky=$Risky; DriverBacked=$(Test-GUISysinternalsDriverBackedTool -BaseName $baseName); Sophos=$(Test-GUISophosDetected)"
+        Write-GUIToolUsageLog -Tool "Sysinternals" -Action "Launch" -Detail $detail
     }
     catch {
         Add-GUILog "Failed to launch Sysinternals ${DisplayName}: $($_.Exception.Message)"
+        $detail = "Tool=$DisplayName; Path=$Path; Error=$($_.Exception.Message)"
+        if($baseName){
+            $detail += "; DriverBacked=$(Test-GUISysinternalsDriverBackedTool -BaseName $baseName); Sophos=$(Test-GUISophosDetected)"
+        }
+        Write-GUIToolUsageLog -Tool "Sysinternals" -Action "LaunchFailed" -Detail $detail -Level "ERROR"
+        [System.Windows.Forms.MessageBox]::Show(
+            "Sysinternals launch failed for $DisplayName.`r`n`r`n$($_.Exception.Message)`r`n`r`nIf Sophos or another endpoint product is running, check its security history for blocked driver, exploit-protection, or controlled-access events.",
+            "Sysinternals Launch Failed",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
     }
 }
 
