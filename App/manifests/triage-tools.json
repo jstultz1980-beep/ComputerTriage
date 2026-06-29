@@ -374,7 +374,7 @@
                   },
                   {
                       "source":  "Parmavex",
-                      "downloadUrl":  "https://www.parmavex.co.uk/winaudit.html",
+                      "downloadUrl":  "http://parmavex.co.uk/winaudit.html",
                       "id":  "winaudit",
                       "category":  "Triage",
                       "localPath":  ".\\Triage\\Tools\\WinAudit",
@@ -390,7 +390,8 @@
                                               "captureStdout":  false
                                           }
                                       ],
-                      "required":  false
+                      "required":  false,
+                      "notes":  "Legacy optional inventory collector. Parmavex HTTPS certificate validation may fail; HTTP download page is currently reachable."
                   },
                   {
                       "source":  "MiTeC",
@@ -438,7 +439,7 @@
                       "id":  "wireshark",
                       "category":  "Triage",
                       "notes":  "Packet captures are large and sensitive.",
-                      "localPath":  ".\\Triage\\Tools\\Wireshark",
+                      "localPath":  ".\\NetworkToolkit\\ExternalTools\\WiresharkPortable64",
                       "name":  "Wireshark Portable",
                       "portable":  true,
                       "executables":  [
@@ -446,7 +447,7 @@
                                               "name":  "Wireshark",
                                               "arguments":  "",
                                               "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\Wireshark\\WiresharkPortable.exe",
+                                              "path":  ".\\NetworkToolkit\\ExternalTools\\WiresharkPortable64\\WiresharkPortable64.exe",
                                               "outputFile":  "ToolOutput\\wireshark.txt",
                                               "captureStdout":  false,
                                               "requiresConsent":  true

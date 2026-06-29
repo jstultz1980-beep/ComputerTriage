@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260629093051,
-    "SourceUpdatedAt":  "2026-06-29T09:30:51.3928080-05:00",
-    "ReleaseNotes":  "Imported staged 20260629 diagnostic tools into logical toolkit folders, enabled triage manifest discovery for the new collectors, and exposed JRT and Registrar Registry Manager in their appropriate GUI categories."
+    "Build":  20260629161551,
+    "SourceUpdatedAt":  "2026-06-29T16:15:51.9753321-05:00",
+    "ReleaseNotes":  "Added live toolkit activity tracking, made triage tools directly launchable from the Triage page, fixed Chocolatey status controls, and corrected triage manifest paths for Wireshark, WinAudit, and LatencyMon."
 }

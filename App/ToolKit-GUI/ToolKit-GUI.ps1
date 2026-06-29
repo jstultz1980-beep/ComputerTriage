@@ -136,6 +136,9 @@ $script:TriageLogBox = $null
 $script:TriageLatestRunPath = $null
 $script:TriageLatestBundlePath = $null
 $script:TriageStatusRefreshTimer = $null
+$script:ActivityGrid = $null
+$script:ActivityStatusLabel = $null
+$script:ActivityRefreshTimer = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -5096,7 +5099,7 @@ function Set-SelectedGUICustomToolTab {
         return
     }
 
-    $tabs = @("Auto") + @("Analyze","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Triage","Wi-Fi","Windows Update" | Sort-Object)
+    $tabs = @("Auto") + @("Activity","Analyze","Choco","Clean Up","Computer Info","Crash","Directory","Discovery","Files","Hardware","Infrastructure","Network","Print","Processes","PsExec","Quick Diagnosis","Remote","Repair","Reports","Robocopy","Security","Software","Sysinternals","Triage","Wi-Fi","Windows Update" | Sort-Object)
 
     $dialog = New-Object System.Windows.Forms.Form
     $dialog.Text = "Set Custom Tool Tab Placement"
@@ -8898,6 +8901,7 @@ function Get-GUIDefaultTabOrder {
     return @(
         "Quick Diagnosis",
         "Triage",
+        "Activity",
         "Analyze",
         "Windows Update",
         "Hardware",
@@ -11637,6 +11641,138 @@ function Get-GUITriageSelectedToolIds {
     return @($ids | Where-Object { $_ } | Select-Object -Unique)
 }
 
+function Get-GUITriageSelectedTools {
+    $tools = @()
+    if(!$script:TriageToolGrid){ return $tools }
+    foreach($row in @($script:TriageToolGrid.SelectedRows)){
+        if($row.Tag){
+            $tools += $row.Tag
+        }
+    }
+    return @($tools | Where-Object { $_ })
+}
+
+function Start-GUITriageExecutable {
+    param(
+        [Parameter(Mandatory=$true)]$Tool,
+        [Parameter(Mandatory=$true)]$Executable
+    )
+
+    $path = [string]$Executable.resolvedPath
+    if([string]::IsNullOrWhiteSpace($path) -or !(Test-Path -LiteralPath $path)){
+        [System.Windows.Forms.MessageBox]::Show(
+            "The selected triage executable is not available yet.`r`n`r`nTool: $($Tool.name)`r`nExecutable: $($Executable.name)",
+            "Triage Tool Missing",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
+        return
+    }
+
+    if($Executable.requiresConsent -or $Tool.id -in @("frst","tss","wireshark")){
+        $confirm = [System.Windows.Forms.MessageBox]::Show(
+            "$($Tool.name) can collect sensitive system or network evidence.`r`n`r`nLaunch it now?",
+            "Launch Triage Tool",
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Question
+        )
+        if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){
+            Add-GUITriageLogLine "Launch cancelled: $($Tool.name)"
+            return
+        }
+    }
+
+    $folder = Split-Path -Parent $path
+    $extension = [IO.Path]::GetExtension($path).ToLowerInvariant()
+    if($extension -eq ".ps1"){
+        Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File",$path) -WorkingDirectory $folder -WindowStyle Normal | Out-Null
+    }
+    else {
+        Start-NTKToolProcess -FilePath $path -WorkingDirectory $folder -WindowStyle Normal | Out-Null
+    }
+    Add-GUITriageLogLine "Launched triage tool: $($Tool.name) - $($Executable.name)"
+}
+
+function Start-GUITriageSelectedToolLaunch {
+    $tools = @(Get-GUITriageSelectedTools)
+    if($tools.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("Select a triage tool first.","Open Selected Tool",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    if($tools.Count -gt 1){
+        [System.Windows.Forms.MessageBox]::Show("Select one triage tool at a time when opening a tool directly. Use Collect Selected when you want evidence from multiple tools.","Open Selected Tool",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $tool = $tools[0]
+    $presentExecutables = @($tool.executables | Where-Object { $_.present -and $_.resolvedPath })
+    if($presentExecutables.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show(
+            "$($tool.name) is not installed in the toolkit yet.`r`n`r`nStatus: $($tool.status)",
+            "Triage Tool Missing",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
+        return
+    }
+
+    if($presentExecutables.Count -eq 1){
+        Start-GUITriageExecutable -Tool $tool -Executable $presentExecutables[0]
+        return
+    }
+
+    $picker = New-Object System.Windows.Forms.Form
+    $picker.Text = "Open $($tool.name)"
+    $picker.StartPosition = "CenterParent"
+    $picker.Size = New-Object System.Drawing.Size(520,340)
+    $picker.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.RowCount = 3
+    $layout.ColumnCount = 1
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $picker.Controls.Add($layout)
+
+    $label = New-GUILabel "Choose which executable to open."
+    $layout.Controls.Add($label,0,0)
+
+    $list = New-Object System.Windows.Forms.ListBox
+    $list.Dock = "Fill"
+    $list.DisplayMember = "Display"
+    foreach($exe in $presentExecutables){
+        [void]$list.Items.Add([pscustomobject]@{Display=("{0} - {1}" -f $exe.name,$exe.resolvedPath);Executable=$exe})
+    }
+    if($list.Items.Count -gt 0){ $list.SelectedIndex = 0 }
+    $layout.Controls.Add($list,0,1)
+
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons.Dock = "Fill"
+    $buttons.FlowDirection = "RightToLeft"
+    $open = New-GUIButton "Open" {
+        if($list.SelectedItem){
+            $picker.Tag = $list.SelectedItem.Executable
+            $picker.DialogResult = [System.Windows.Forms.DialogResult]::OK
+            $picker.Close()
+        }
+    }
+    $cancel = New-GUIButton "Cancel" {
+        $picker.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+        $picker.Close()
+    }
+    [void]$buttons.Controls.Add($open)
+    [void]$buttons.Controls.Add($cancel)
+    $layout.Controls.Add($buttons,0,2)
+
+    if($picker.ShowDialog($script:Form) -eq [System.Windows.Forms.DialogResult]::OK -and $picker.Tag){
+        Start-GUITriageExecutable -Tool $tool -Executable $picker.Tag
+    }
+}
+
 function Start-GUITriageRun {
     param(
         [ValidateSet("Quick","Full","Crash")][string]$Profile = "Quick",
@@ -11849,7 +11985,8 @@ function Build-TriagePage {
         (New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }),
         (New-GUIButton "Full Triage" { Start-GUITriageRun -Profile "Full" }),
         (New-GUIButton "Crash Triage" { Start-GUITriageRun -Profile "Crash" }),
-        (New-GUIButton "Run Selected" { Start-GUITriageSelectedToolsRun }),
+        (New-GUIButton "Collect Selected" { Start-GUITriageSelectedToolsRun }),
+        (New-GUIButton "Open Selected" { Start-GUITriageSelectedToolLaunch }),
         (New-GUIButton "Cancel" { Stop-GUITriageRun }),
         (New-GUIButton "Open Latest Run" { Open-GUITriageLatestRun }),
         (New-GUIButton "Open Bundle" { Open-GUITriageBundleFolder }),
@@ -11928,7 +12065,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,78))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -11943,12 +12080,11 @@ function Build-ChocolateyPage {
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
     $topPanel.Padding = New-Object System.Windows.Forms.Padding(8)
-    $topPanel.ColumnCount = 4
+    $topPanel.ColumnCount = 3
     $topPanel.RowCount = 1
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,140))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
     $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $chocoTop.Controls.Add($topPanel)
 
@@ -11957,17 +12093,14 @@ function Build-ChocolateyPage {
     $ChocoStatusLabel.TextAlign = "MiddleLeft"
     $ChocoStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     [void]$topPanel.Controls.Add($ChocoStatusLabel,0,0)
-    $chocoRefreshButton = New-GUIButton "Refresh" { Refresh-GUIChocoStatus }
-    $chocoInstallButton = New-GUIButton "Install Choco" { Start-GUIChocolateyInstall }
-    $chocoScanButton = New-GUIButton "Scan Installed" { Refresh-GUIChocoInstalledPackages }
-    foreach($button in @($chocoRefreshButton,$chocoInstallButton,$chocoScanButton)){
+    $chocoRefreshButton = New-GUIButton "Refresh Status" { Refresh-GUIChocoStatus }
+    $chocoInstallButton = New-GUIButton "Install Chocolatey" { Start-GUIChocolateyInstall }
+    foreach($button in @($chocoRefreshButton,$chocoInstallButton)){
         $button.Dock = "Fill"
-        $button.Width = 0
-        $button.Margin = New-Object System.Windows.Forms.Padding(5,10,5,10)
+        $button.Margin = New-Object System.Windows.Forms.Padding(6,8,6,8)
     }
     [void]$topPanel.Controls.Add($chocoRefreshButton,1,0)
     [void]$topPanel.Controls.Add($chocoInstallButton,2,0)
-    [void]$topPanel.Controls.Add($chocoScanButton,3,0)
     $layout.SetColumnSpan($chocoTop,2)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
@@ -12418,6 +12551,169 @@ function Build-LiveLogPage {
 
     [void]$buttons.Controls.Add((New-GUIButton "Clear Log" { if($script:LogLines){ $script:LogLines.Clear() }; if($script:LogBox -and !$script:LogBox.IsDisposed){ $script:LogBox.Clear() }; Add-GUILog "Live log cleared." }))
     [void]$buttons.Controls.Add((New-GUIButton "Copy Log" { if($script:LogBox){ [System.Windows.Forms.Clipboard]::SetText($script:LogBox.Text); Add-GUILog "Live log copied to clipboard." } }))
+}
+
+function Get-GUIToolkitActivityProcesses {
+    $root = [string](Split-Path -Parent $SharedToolkitRoot)
+    $escapedRoot = [regex]::Escape($root)
+    $currentPid = [System.Diagnostics.Process]::GetCurrentProcess().Id
+    $now = Get-Date
+
+    $processes = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+        $_.ProcessId -ne $currentPid -and (
+            ([string]$_.ExecutablePath -match $escapedRoot) -or
+            ([string]$_.CommandLine -match $escapedRoot)
+        )
+    })
+
+    foreach($process in $processes){
+        $started = $null
+        try {
+            if($process.CreationDate){ $started = [System.Management.ManagementDateTimeConverter]::ToDateTime($process.CreationDate) }
+        }
+        catch {}
+
+        $age = if($started){ [int][Math]::Max(0,($now - $started).TotalSeconds) }else{ 0 }
+        $memoryMb = if($process.WorkingSetSize){ [Math]::Round(([double]$process.WorkingSetSize / 1MB),1) }else{ 0 }
+        [pscustomobject]@{
+            Name = $process.Name
+            PID = [int]$process.ProcessId
+            AgeSeconds = $age
+            MemoryMB = $memoryMb
+            Path = [string]$process.ExecutablePath
+            CommandLine = [string]$process.CommandLine
+        }
+    }
+}
+
+function Refresh-GUIToolkitActivity {
+    if(!$script:ActivityGrid -or $script:ActivityGrid.IsDisposed){ return }
+
+    try {
+        $selectedPid = $null
+        if($script:ActivityGrid.SelectedRows.Count -gt 0){
+            $selectedPid = $script:ActivityGrid.SelectedRows[0].Tag
+        }
+
+        $script:ActivityGrid.SuspendLayout()
+        $script:ActivityGrid.Rows.Clear()
+        $items = @(Get-GUIToolkitActivityProcesses | Sort-Object Name,PID)
+        foreach($item in $items){
+            $ageText = if($item.AgeSeconds -ge 3600){
+                "{0:n1} hr" -f ($item.AgeSeconds / 3600)
+            }
+            elseif($item.AgeSeconds -ge 60){
+                "{0:n1} min" -f ($item.AgeSeconds / 60)
+            }
+            else {
+                "$($item.AgeSeconds) sec"
+            }
+            $row = $script:ActivityGrid.Rows.Add($item.Name,$item.PID,$ageText,$item.MemoryMB,$item.Path,$item.CommandLine)
+            $script:ActivityGrid.Rows[$row].Tag = $item.PID
+            if($selectedPid -and $selectedPid -eq $item.PID){
+                $script:ActivityGrid.Rows[$row].Selected = $true
+            }
+        }
+
+        if($script:ActivityStatusLabel){
+            $totalMemory = [Math]::Round((($items | Measure-Object -Property MemoryMB -Sum).Sum),1)
+            $script:ActivityStatusLabel.Text = "Toolkit-related processes: $($items.Count)    Memory: $totalMemory MB    Last refresh: $(Get-Date -Format HH:mm:ss)"
+        }
+    }
+    catch {
+        if($script:ActivityStatusLabel){ $script:ActivityStatusLabel.Text = "Activity refresh failed: $($_.Exception.Message)" }
+        Add-GUILog "Activity refresh failed: $($_.Exception.Message)"
+    }
+    finally {
+        try { if($script:ActivityGrid -and !$script:ActivityGrid.IsDisposed){ $script:ActivityGrid.ResumeLayout($true) } } catch {}
+    }
+}
+
+function Stop-GUISelectedToolkitActivityProcess {
+    if(!$script:ActivityGrid -or $script:ActivityGrid.SelectedRows.Count -eq 0){
+        [System.Windows.Forms.MessageBox]::Show("Select a running toolkit process first.","Toolkit Activity",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        return
+    }
+
+    $processId = [int]$script:ActivityGrid.SelectedRows[0].Tag
+    $name = [string]$script:ActivityGrid.SelectedRows[0].Cells["Name"].Value
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "Stop this toolkit-related process?`r`n`r`n$name ($processId)",
+        "Stop Toolkit Process",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){ return }
+
+    try {
+        Stop-Process -Id $processId -Force -ErrorAction Stop
+        Add-GUILog "Stopped toolkit process: $name ($processId)"
+        Start-Sleep -Milliseconds 300
+        Refresh-GUIToolkitActivity
+    }
+    catch {
+        Add-GUILog "Failed to stop toolkit process $processId`: $($_.Exception.Message)"
+        [System.Windows.Forms.MessageBox]::Show("Could not stop process $processId.`r`n`r`n$($_.Exception.Message)","Toolkit Activity",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    }
+}
+
+function Build-ToolkitActivityPage {
+    param([System.Windows.Forms.TabPage]$Page)
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.RowCount = 3
+    $layout.ColumnCount = 1
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,52))) | Out-Null
+    $Page.Controls.Add($layout)
+
+    $script:ActivityStatusLabel = New-GUILabel "Loading toolkit activity..."
+    $ActivityStatusLabel.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($ActivityStatusLabel,0,0)
+
+    $script:ActivityGrid = New-Object System.Windows.Forms.DataGridView
+    $ActivityGrid.Dock = "Fill"
+    $ActivityGrid.ReadOnly = $true
+    $ActivityGrid.AllowUserToAddRows = $false
+    $ActivityGrid.AllowUserToDeleteRows = $false
+    $ActivityGrid.RowHeadersVisible = $false
+    $ActivityGrid.SelectionMode = "FullRowSelect"
+    $ActivityGrid.MultiSelect = $false
+    $ActivityGrid.AutoSizeColumnsMode = "Fill"
+    $ActivityGrid.BackgroundColor = [System.Drawing.Color]::White
+    [void]$ActivityGrid.Columns.Add("Name","Process")
+    [void]$ActivityGrid.Columns.Add("PID","PID")
+    [void]$ActivityGrid.Columns.Add("Age","Age")
+    [void]$ActivityGrid.Columns.Add("Memory","Memory MB")
+    [void]$ActivityGrid.Columns.Add("Path","Path")
+    [void]$ActivityGrid.Columns.Add("CommandLine","Command Line")
+    $ActivityGrid.Columns["Name"].FillWeight = 15
+    $ActivityGrid.Columns["PID"].FillWeight = 8
+    $ActivityGrid.Columns["Age"].FillWeight = 8
+    $ActivityGrid.Columns["Memory"].FillWeight = 10
+    $ActivityGrid.Columns["Path"].FillWeight = 26
+    $ActivityGrid.Columns["CommandLine"].FillWeight = 33
+    $layout.Controls.Add($ActivityGrid,0,1)
+
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons.Dock = "Fill"
+    $buttons.Padding = New-Object System.Windows.Forms.Padding(8)
+    $layout.Controls.Add($buttons,0,2)
+    [void]$buttons.Controls.Add((New-GUIButton "Refresh Now" { Refresh-GUIToolkitActivity }))
+    [void]$buttons.Controls.Add((New-GUIButton "Stop Selected" { Stop-GUISelectedToolkitActivityProcess }))
+
+    Refresh-GUIToolkitActivity
+    if($script:ActivityRefreshTimer){
+        try { $script:ActivityRefreshTimer.Stop(); $script:ActivityRefreshTimer.Dispose() } catch {}
+    }
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 3000
+    $timer.Add_Tick({ Refresh-GUIToolkitActivity })
+    $script:ActivityRefreshTimer = $timer
+    $timer.Start()
 }
 
 function Show-GUILiveLogWindow {
@@ -13769,6 +14065,10 @@ function Build-Form {
     $triagePage.Text = "Triage"
     $tabs.TabPages.Add($triagePage) | Out-Null
 
+    $activityPage = New-Object System.Windows.Forms.TabPage
+    $activityPage.Text = "Activity"
+    $tabs.TabPages.Add($activityPage) | Out-Null
+
     $analyzePage = New-Object System.Windows.Forms.TabPage
     $analyzePage.Text = "Analyze"
     $tabs.TabPages.Add($analyzePage) | Out-Null
@@ -13930,6 +14230,7 @@ function Build-Form {
 
     Register-GUITabBuilder -Page $quickPage -Builder { param($Page) Build-QuickTriagePage -Page $Page }
     Register-GUITabBuilder -Page $triagePage -Builder { param($Page) Build-TriagePage -Page $Page }
+    Register-GUITabBuilder -Page $activityPage -Builder { param($Page) Build-ToolkitActivityPage -Page $Page }
     Register-GUITabBuilder -Page $analyzePage -Builder { param($Page) Build-WindowsToolsPage -Page $Page }
     Register-GUITabBuilder -Page $windowsUpdatePage -Builder { param($Page) Build-WindowsUpdatePage -Page $Page }
     Register-GUITabBuilder -Page $hardwarePage -Builder { param($Page) Build-HardwareToolsPage -Page $Page }
@@ -14038,7 +14339,7 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    foreach($tabName in @("Quick Diagnosis","Triage","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Choco","Sysinternals","Computer Info","Reports","Settings")){
+    foreach($tabName in @("Quick Diagnosis","Triage","Activity","Analyze","Windows Update","Hardware","Crash","Processes","Network","Remote","PsExec","Infrastructure","Repair","Directory","Security","Wi-Fi","Print","Files","Discovery","Robocopy","Software","Software Keys","Clean Up","Choco","Sysinternals","Computer Info","Reports","Settings")){
         $tab = $script:MainTabs.TabPages | Where-Object {$_.Text -eq $tabName} | Select-Object -First 1
 
         if(!$tab){
