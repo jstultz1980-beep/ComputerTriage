@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0004
+HANDOFF-0005
 
 ## Current Task
-`docs/TASKS/TASK-0002-Fix-Choco-Status-Controls.md`
+`docs/TASKS/TASK-0003-Remove-Unsafe-FRST.md`
 
 ## Current Owner
 Codex
@@ -13,33 +13,35 @@ Codex
 Codex
 
 ## Objective
-TASK-0002 is complete.
+Remove the unsafe FRST triage tool artifact and prevent the toolkit from
+presenting FRST as an installed or runnable bundled tool.
 
 ## Current State
-The Chocolatey tab status-frame rendering defect has been fixed by replacing
-the clipped custom buttons with lightweight link labels. No implementation work
-is authorized after this task unless a new active task document is created under
-`docs/TASKS` and referenced here.
+The user confirmed `App/Triage/Tools/FRST/FRST64.exe` contained a Trojan. The
+file is already deleted in the working tree. TASK-0003 authorizes cleanup of
+FRST triage metadata and intentional handling of the deleted artifact.
 
 ## Completed Work
-- Created TASK-0002.
-- Updated the Chocolatey status frame in `App/ToolKit-GUI/ToolKit-GUI.ps1`.
-- Preserved `Refresh Status` and `Install Chocolatey` actions as link labels.
-- Updated TASK-0002 completion notes.
+- Read `PROJECT.md` and required startup documents.
+- Created TASK-0003.
+- Updated this handoff to make TASK-0003 active.
 
-## Validation Completed
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1`.
-- GUI button smoke test passed.
+## Validation Required
+- Confirm triage manifest parses.
+- Run toolkit smoke test.
+- Run GUI button smoke test.
+- Update TASK-0003 completion notes.
+- Commit with a message that references `TASK-0003`.
 
 ## Next Action
-Create or assign a new task document before additional implementation work.
+Remove FRST from triage metadata and commit the known-bad executable deletion
+intentionally.
 
 ## Blockers
-No active implementation task exists after TASK-0002.
+None for TASK-0003.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. Ignore unrelated working-tree noise unless a task
-explicitly handles it:
-- `App/Triage/Tools/FRST/FRST64.exe` deleted
+Start with `PROJECT.md`. Keep scope limited to FRST safety cleanup. Ignore
+unrelated working-tree noise unless a task explicitly handles it:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
