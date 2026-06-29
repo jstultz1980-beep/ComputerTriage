@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0006
+HANDOFF-0008
 
 ## Current Task
 None.
@@ -10,29 +10,30 @@ None.
 Codex
 
 ## Next Owner
-Codex
+Codex or another bot using the prompt below.
 
 ## Objective
-TASK-0003 is complete. FRST has been removed from triage metadata and the
-known-bad bundled executable deletion is intentional.
+TASK-0004 is complete. `docs/HANDOFF.md` is now the single source of truth for
+the prompt that should be given to another bot.
 
 ## Current State
-The toolkit no longer presents FRST as an installed or runnable triage tool.
-`App/Triage/Tools/FRST/FRST64.exe` was already deleted after the user reported
-it contained a Trojan, and that deletion is part of TASK-0003.
+The project governance now requires every completed task to update this file
+with a `Next Bot Prompt` section. There should be no separate ChatGPT task
+packet file used as a source of truth. If work needs to be offloaded to another
+bot, copy the prompt from this handoff.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
-- Completed `docs/TASKS/TASK-0003-Remove-Unsafe-FRST.md`.
-- Removed FRST from `App/manifests/triage-tools.json`.
-- Removed FRST from `App/NetworkToolkit/Utilities/TriageService.ps1`.
-- Removed the empty `App/Triage/Tools/FRST` folder.
-- Validated the triage manifest and smoke tests.
+- Created and completed
+  `docs/TASKS/TASK-0004-Handoff-Bot-Prompt-Source-Of-Truth.md`.
+- Updated `PROJECT.md` with the handoff prompt rule.
+- Updated this handoff with the canonical next-bot prompt.
 
 ## Validation Completed
-- Parsed `App/manifests/triage-tools.json` with `ConvertFrom-Json`.
-- Ran `App/NetworkToolkit/Tests/Test-ToolkitSmoke.ps1`; passed.
-- Ran `App/ToolKit-GUI/ToolKit-GUI.ps1 -ButtonSmokeTest`; passed.
+- Confirmed `PROJECT.md` and `docs/HANDOFF.md` contain `Next Bot Prompt`.
+- Confirmed `PROJECT.md` states the repository is the single source of truth.
+- Confirmed `PROJECT.md` prohibits a separate ChatGPT task packet as a source
+  of truth.
 
 ## Next Action
 Create a new task under `docs/TASKS` before doing any further implementation
@@ -45,6 +46,39 @@ None.
 Start with `PROJECT.md`. Do not implement without a new active task document.
 
 Unrelated working-tree noise remains and was intentionally not included in
-TASK-0003:
+TASK-0004:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
+
+## Next Bot Prompt
+Copy and paste the following prompt into another bot when offloading reasoning
+or review work. Do not create a separate task packet file.
+
+```text
+You are assisting with the Computer Triage Toolkit repository.
+
+The repository is the single source of truth. Chat history is not the source of
+truth. Do not rely on a separate ChatGPT task packet file.
+
+Read these repository files in order:
+1. PROJECT.md
+2. docs/PROJECT-CHARTER.md
+3. docs/ARCHITECTURE.md
+4. docs/ROADMAP.md
+5. docs/HANDOFF.md
+6. The active task document listed in docs/HANDOFF.md, if one exists.
+
+Current task state:
+- docs/HANDOFF.md currently lists no active task.
+- Before implementation work begins, create or request a focused task document
+  under docs/TASKS and make it active in docs/HANDOFF.md.
+- Keep all recommendations and changes scoped to that active task.
+
+Rules:
+- Treat repository files as authoritative.
+- Do not use chat history as source of truth unless the same information exists
+  in the repository.
+- Do not create a separate ChatGPT task packet as source of truth.
+- When a task is completed, update docs/HANDOFF.md with the next task state and
+  a fresh Next Bot Prompt for the next bot.
+```

@@ -3,6 +3,16 @@
 ## Source of Truth
 The repository is the source of truth. Chat history is not the source of truth.
 
+## Handoff Prompt Rule
+`docs/HANDOFF.md` is the single source of truth for the prompt that should be
+given to another bot. Do not create or rely on a separate ChatGPT task packet as
+a source of truth.
+
+Every completed task must update `docs/HANDOFF.md` with a `Next Bot Prompt`
+section. That prompt must tell the next bot to read repository files in the
+required startup order, follow the active task listed in `docs/HANDOFF.md`, and
+ignore chat history unless the same information exists in the repository.
+
 ## Required Startup Sequence
 1. Read this file.
 2. Read `docs/PROJECT-CHARTER.md`.
@@ -13,7 +23,8 @@ The repository is the source of truth. Chat history is not the source of truth.
 7. Perform only the work assigned in the active task.
 8. Validate the work.
 9. Update the active task document.
-10. Update `docs/HANDOFF.md`.
+10. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
+    task or for creating the next task from the user's next request.
 11. Commit all related changes.
 
 ## Core Rule
