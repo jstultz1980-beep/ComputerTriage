@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260628005008,
-    "SourceUpdatedAt":  "2026-06-28T00:50:08.6361667-05:00",
-    "ReleaseNotes":  "Fixed One-Click Triage reliability by keeping Quick runs lightweight, skipping optional portable/Sysinternals auto-runs, avoiding recursive dump/log scans, and correcting result count handling that caused post-collection failures."
+    "Build":  20260629090136,
+    "SourceUpdatedAt":  "2026-06-29T09:01:36.6992110-05:00",
+    "ReleaseNotes":  "Fixed Quick Diagnosis action button clipping and hardened Quick Triage completion handling so successful runs do not throw null-object errors while the GUI timer cleans up."
 }

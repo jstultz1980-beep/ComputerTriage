@@ -8276,21 +8276,20 @@ function Build-QuickTriagePage {
     $runPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $runPanel.Dock = "Fill"
     $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,6)
-    $runPanel.ColumnCount = 6
+    $runPanel.ColumnCount = 5
     $runPanel.RowCount = 2
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
     $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,190))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,4))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,116))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
+    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,142))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet test target"
     $targetLabel.Dock = "None"
-    $targetLabel.Width = 130
+    $targetLabel.Width = 118
     $targetLabel.Height = 30
     $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,6,3)
     [void]$runPanel.Controls.Add($targetLabel,0,0)
@@ -8304,14 +8303,23 @@ function Build-QuickTriagePage {
 
     $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
     $QuickRunButton.Dock = "Fill"
+    Set-GUIButtonChrome -Button $QuickRunButton -Compact
+    $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickRunButton,"Run Quick Diagnosis for the target computer and create the current health report.") }
     [void]$runPanel.Controls.Add($QuickRunButton,2,0)
 
-    $reportButton = New-GUIButton "Latest Report" { Open-GUILatestQuickDiagnosisReport }
+    $reportButton = New-GUIButton "Report" { Open-GUILatestQuickDiagnosisReport }
     $reportButton.Dock = "Fill"
+    Set-GUIButtonChrome -Button $reportButton -Compact
+    $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($reportButton,"Open the latest Quick Diagnosis HTML report.") }
     [void]$runPanel.Controls.Add($reportButton,3,0)
 
-    $script:DismRepairButton = New-GUIButton "DISM/SFC Repair" { Start-GUIDismSfcRepairPath }
+    $script:DismRepairButton = New-GUIButton "DISM/SFC" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
+    Set-GUIButtonChrome -Button $DismRepairButton -Compact
+    $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($DismRepairButton,"Run the DISM/SFC repair path after reviewing Quick Diagnosis results. Override is available when needed.") }
     [void]$runPanel.Controls.Add($DismRepairButton,4,0)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
@@ -11560,7 +11568,7 @@ function Build-FileToolsPage {
 }
 
 function Refresh-GUITriageStatus {
-    if(!$script:TriageToolGrid){ return }
+    if(!$script:TriageToolGrid -or $script:TriageToolGrid.IsDisposed){ return }
     try {
         $timer = [System.Diagnostics.Stopwatch]::StartNew()
         Initialize-NTKTriageStructure | Out-Null
@@ -11587,7 +11595,7 @@ function Refresh-GUITriageStatus {
         Add-GUILog "Triage status refresh failed: $($_.Exception.Message)"
     }
     finally {
-        try { $script:TriageToolGrid.ResumeLayout($true) } catch {}
+        try { if($script:TriageToolGrid -and !$script:TriageToolGrid.IsDisposed){ $script:TriageToolGrid.ResumeLayout($true) } } catch {}
     }
 }
 
@@ -11600,8 +11608,9 @@ function Start-GUITriageStatusRefresh {
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 250
     $timer.Add_Tick({
-        $script:TriageStatusRefreshTimer.Stop()
-        $script:TriageStatusRefreshTimer.Dispose()
+        if($script:TriageStatusRefreshTimer){
+            try { $script:TriageStatusRefreshTimer.Stop(); $script:TriageStatusRefreshTimer.Dispose() } catch {}
+        }
         $script:TriageStatusRefreshTimer = $null
         Refresh-GUITriageStatus
     })
@@ -11689,16 +11698,28 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 1500
     $timer.Add_Tick({
-        if($script:TriageProcess -and !$script:TriageProcess.HasExited){
+        $activeProcess = $script:TriageProcess
+        if($activeProcess -and !$activeProcess.HasExited){
             $elapsed = [int]((Get-Date) - $script:TriageRunStartedAt).TotalSeconds
             if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage running... ${elapsed}s elapsed" }
             return
         }
-        $timer.Stop(); $timer.Dispose(); $script:TriageTimer = $null
+        $resultPath = $script:TriageResultPath
+        try { $timer.Stop(); $timer.Dispose() } catch {}
+        $script:TriageTimer = $null
         Stop-GUIBusyIndicator
         if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
         try {
-            $result = Get-Content -LiteralPath $script:TriageResultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+            if([string]::IsNullOrWhiteSpace($resultPath)){
+                throw "The triage runner ended before a result path was registered."
+            }
+            if(!(Test-Path -LiteralPath $resultPath)){
+                throw "The triage runner ended but did not write a result file: $resultPath"
+            }
+            $result = Get-Content -LiteralPath $resultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+            if(!$result){
+                throw "The triage result file was empty or invalid: $resultPath"
+            }
             $script:TriageLatestRunPath = $result.runPath
             $script:TriageLatestBundlePath = $result.bundlePath
             if($result.status -eq "Completed"){
@@ -11720,7 +11741,6 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
         finally {
             $script:TriageProcess = $null
             $script:TriageResultPath = $null
-            Refresh-GUITriageStatus
         }
     })
     $script:TriageTimer = $timer
