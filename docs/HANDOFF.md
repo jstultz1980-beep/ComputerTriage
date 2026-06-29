@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0002
+HANDOFF-0004
 
 ## Current Task
-`docs/TASKS/TASK-0001-Foundation-Zero.md`
+`docs/TASKS/TASK-0002-Fix-Choco-Status-Controls.md`
 
 ## Current Owner
 Codex
@@ -13,35 +13,33 @@ Codex
 Codex
 
 ## Objective
-Foundation Zero governance verification is complete.
+TASK-0002 is complete.
 
 ## Current State
-Repository-tracked project controls are in place and verified. The repository is
-the source of truth. No implementation work is authorized unless a new active
-task document exists under `docs/TASKS`.
+The Chocolatey tab status-frame rendering defect has been fixed by replacing
+the clipped custom buttons with lightweight link labels. No implementation work
+is authorized after this task unless a new active task document is created under
+`docs/TASKS` and referenced here.
 
 ## Completed Work
-- Read `PROJECT.md` and the required startup documents.
-- Verified all TASK-0001 required files exist.
-- Corrected `docs/ARCHITECTURE.md` to match the current repository layout.
-- Updated `docs/TASKS/TASK-0001-Foundation-Zero.md` completion notes.
+- Created TASK-0002.
+- Updated the Chocolatey status frame in `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- Preserved `Refresh Status` and `Install Chocolatey` actions as link labels.
+- Updated TASK-0002 completion notes.
 
 ## Validation Completed
-- Confirmed required files exist with the task validation commands.
-- Confirmed Markdown files are readable.
-- Confirmed current architecture documentation does not describe AI Builder or
-  unrelated projects.
-- Confirmed no implementation work was performed under TASK-0001.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- GUI button smoke test passed.
 
 ## Next Action
-Create or assign a new task document under `docs/TASKS` before any
-implementation work begins. The next logical task should be scoped to Phase 01
-or another explicit roadmap item.
+Create or assign a new task document before additional implementation work.
 
 ## Blockers
-No active implementation task exists after TASK-0001.
+No active implementation task exists after TASK-0002.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. Do not act from chat history alone. Do not implement
-ARGUS, HEPHAESTUS, UI, collectors, or reporting changes until a matching active
-task document is created and referenced here.
+Start with `PROJECT.md`. Ignore unrelated working-tree noise unless a task
+explicitly handles it:
+- `App/Triage/Tools/FRST/FRST64.exe` deleted
+- `App/manifests/custom-tools.json` modified
+- `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
