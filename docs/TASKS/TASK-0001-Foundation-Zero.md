@@ -1,7 +1,7 @@
 # TASK-0001 - Foundation Zero
 
 ## Status
-Assigned
+Completed
 
 ## Owner
 Codex
@@ -60,4 +60,18 @@ Summary: Defined Foundation Zero structure, handoff protocol, and initial docume
 Instructions for Codex: Apply or verify these files, update this task with completion notes, update `docs/HANDOFF.md`, then commit.
 
 ## Completion Notes
-Codex must append completion notes here.
+### Completion 001
+Author: Codex
+Date: 2026-06-29
+Summary: Verified the Foundation Zero governance documents, templates, ADRs,
+and active handoff structure. Corrected `docs/ARCHITECTURE.md` so it is
+readable and reflects the current repository layout under `C:\computer_toolkit`.
+Validation Performed:
+- Confirmed required control files exist with the task validation commands.
+- Read `PROJECT.md`, `docs/PROJECT-CHARTER.md`, `docs/ARCHITECTURE.md`,
+  `docs/ROADMAP.md`, `docs/HANDOFF.md`, and this task file.
+- Confirmed documents remain scoped to Computer Triage Toolkit and do not
+  authorize AI Builder, SIEM, RMM, asset inventory, or whole-network work.
+Notes:
+- No implementation work was performed.
+- Future implementation requires a new active task document under `docs/TASKS`.

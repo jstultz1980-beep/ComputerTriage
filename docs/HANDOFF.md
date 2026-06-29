@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0001
+HANDOFF-0002
 
 ## Current Task
 `docs/TASKS/TASK-0001-Foundation-Zero.md`
@@ -13,28 +13,35 @@ Codex
 Codex
 
 ## Objective
-Implement Foundation Zero documentation and tracking structure.
+Foundation Zero governance verification is complete.
 
 ## Current State
-The project needs repository-tracked controls so ChatGPT and Codex can pass work back and forth without relying on chat history.
+Repository-tracked project controls are in place and verified. The repository is
+the source of truth. No implementation work is authorized unless a new active
+task document exists under `docs/TASKS`.
 
 ## Completed Work
-ChatGPT defined the required governance structure and prepared the initial document set.
+- Read `PROJECT.md` and the required startup documents.
+- Verified all TASK-0001 required files exist.
+- Corrected `docs/ARCHITECTURE.md` to match the current repository layout.
+- Updated `docs/TASKS/TASK-0001-Foundation-Zero.md` completion notes.
 
-## Validation Required
-Codex must verify:
-- All expected files exist.
-- Markdown files are readable.
-- Paths match current repository layout.
-- Documents do not instruct work on AI Builder or unrelated projects.
-- Active task completion notes are updated.
-- This handoff is updated with the next step.
+## Validation Completed
+- Confirmed required files exist with the task validation commands.
+- Confirmed Markdown files are readable.
+- Confirmed current architecture documentation does not describe AI Builder or
+  unrelated projects.
+- Confirmed no implementation work was performed under TASK-0001.
 
 ## Next Action
-Codex should apply or verify these files, update the task completion notes, update this handoff, and commit.
+Create or assign a new task document under `docs/TASKS` before any
+implementation work begins. The next logical task should be scoped to Phase 01
+or another explicit roadmap item.
 
 ## Blockers
-None known.
+No active implementation task exists after TASK-0001.
 
 ## Notes for Next AI
-Do not implement ARGUS code during Foundation Zero unless a separate ARGUS task document is created and assigned.
+Start with `PROJECT.md`. Do not act from chat history alone. Do not implement
+ARGUS, HEPHAESTUS, UI, collectors, or reporting changes until a matching active
+task document is created and referenced here.
