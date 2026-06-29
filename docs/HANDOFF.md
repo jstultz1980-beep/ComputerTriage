@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0005
+HANDOFF-0006
 
 ## Current Task
-`docs/TASKS/TASK-0003-Remove-Unsafe-FRST.md`
+None.
 
 ## Current Owner
 Codex
@@ -13,35 +13,38 @@ Codex
 Codex
 
 ## Objective
-Remove the unsafe FRST triage tool artifact and prevent the toolkit from
-presenting FRST as an installed or runnable bundled tool.
+TASK-0003 is complete. FRST has been removed from triage metadata and the
+known-bad bundled executable deletion is intentional.
 
 ## Current State
-The user confirmed `App/Triage/Tools/FRST/FRST64.exe` contained a Trojan. The
-file is already deleted in the working tree. TASK-0003 authorizes cleanup of
-FRST triage metadata and intentional handling of the deleted artifact.
+The toolkit no longer presents FRST as an installed or runnable triage tool.
+`App/Triage/Tools/FRST/FRST64.exe` was already deleted after the user reported
+it contained a Trojan, and that deletion is part of TASK-0003.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
-- Created TASK-0003.
-- Updated this handoff to make TASK-0003 active.
+- Completed `docs/TASKS/TASK-0003-Remove-Unsafe-FRST.md`.
+- Removed FRST from `App/manifests/triage-tools.json`.
+- Removed FRST from `App/NetworkToolkit/Utilities/TriageService.ps1`.
+- Removed the empty `App/Triage/Tools/FRST` folder.
+- Validated the triage manifest and smoke tests.
 
-## Validation Required
-- Confirm triage manifest parses.
-- Run toolkit smoke test.
-- Run GUI button smoke test.
-- Update TASK-0003 completion notes.
-- Commit with a message that references `TASK-0003`.
+## Validation Completed
+- Parsed `App/manifests/triage-tools.json` with `ConvertFrom-Json`.
+- Ran `App/NetworkToolkit/Tests/Test-ToolkitSmoke.ps1`; passed.
+- Ran `App/ToolKit-GUI/ToolKit-GUI.ps1 -ButtonSmokeTest`; passed.
 
 ## Next Action
-Remove FRST from triage metadata and commit the known-bad executable deletion
-intentionally.
+Create a new task under `docs/TASKS` before doing any further implementation
+work.
 
 ## Blockers
-None for TASK-0003.
+None.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. Keep scope limited to FRST safety cleanup. Ignore
-unrelated working-tree noise unless a task explicitly handles it:
+Start with `PROJECT.md`. Do not implement without a new active task document.
+
+Unrelated working-tree noise remains and was intentionally not included in
+TASK-0003:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked

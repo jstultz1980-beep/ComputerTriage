@@ -311,28 +311,6 @@
                       "required":  false
                   },
                   {
-                      "source":  "BleepingComputer",
-                      "downloadUrl":  "https://www.bleepingcomputer.com/download/farbar-recovery-scan-tool/",
-                      "id":  "frst",
-                      "category":  "Triage",
-                      "notes":  "Security-sensitive. Requires explicit consent.",
-                      "localPath":  ".\\Triage\\Tools\\FRST",
-                      "name":  "FRST",
-                      "portable":  true,
-                      "executables":  [
-                                          {
-                                              "name":  "FRST",
-                                              "arguments":  "",
-                                              "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\FRST\\FRST64.exe",
-                                              "outputFile":  "ToolOutput\\FRST.txt",
-                                              "captureStdout":  false,
-                                              "requiresConsent":  true
-                                          }
-                                      ],
-                      "required":  false
-                  },
-                  {
                       "source":  "HWiNFO",
                       "downloadUrl":  "https://www.hwinfo.com/download/",
                       "id":  "hwinfo",

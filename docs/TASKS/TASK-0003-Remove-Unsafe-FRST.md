@@ -1,7 +1,7 @@
 # TASK-0003 - Remove Unsafe FRST Triage Tool
 
 ## Status
-Assigned
+Completed
 
 ## Owner
 Codex
@@ -31,14 +31,14 @@ toolkit.
 - `docs/TASKS/TASK-0003-Remove-Unsafe-FRST.md`
 
 ## Acceptance Criteria
-- [ ] FRST is no longer listed as a runnable triage tool.
-- [ ] The missing/deleted `FRST64.exe` is not staged as an accidental deletion
+- [x] FRST is no longer listed as a runnable triage tool.
+- [x] The missing/deleted `FRST64.exe` is not staged as an accidental deletion
       unless the task explicitly confirms it is already absent and should stay
       absent.
-- [ ] Triage manifest parsing still works.
-- [ ] Toolkit smoke test passes.
-- [ ] GUI button smoke test passes.
-- [ ] Task completion notes are updated.
+- [x] Triage manifest parsing still works.
+- [x] Toolkit smoke test passes.
+- [x] GUI button smoke test passes.
+- [x] Task completion notes are updated.
 
 ## Validation Steps
 ```powershell
@@ -76,4 +76,25 @@ Instructions for Next Owner:
 - Remove FRST from triage metadata and commit the deletion intentionally.
 
 ## Completion Notes
-Codex must append completion notes here before commit.
+Completed on 2026-06-29 by Codex.
+
+Changes:
+- Removed FRST from `App/manifests/triage-tools.json`.
+- Removed FRST from the default triage manifest in
+  `App/NetworkToolkit/Utilities/TriageService.ps1`.
+- Confirmed `App/Triage/Tools/FRST/FRST64.exe` was intentionally removed after
+  the user reported it was malicious.
+- Removed the now-empty `App/Triage/Tools/FRST` folder from the working tree.
+
+Validation performed:
+- Parsed `App/manifests/triage-tools.json` with `ConvertFrom-Json`.
+- Ran `App/NetworkToolkit/Tests/Test-ToolkitSmoke.ps1`; passed.
+- Ran `App/ToolKit-GUI/ToolKit-GUI.ps1 -ButtonSmokeTest`; passed.
+
+Notes:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1` still contains `frst` in a generic consent
+  guard list, but no manifest/tool surface now presents FRST as installed or
+  runnable.
+- Unrelated working-tree drift remains outside this task:
+  `App/manifests/custom-tools.json` and
+  `App/Triage/Tools/ServiWin/ServiWin.cfg`.
