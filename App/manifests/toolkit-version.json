@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260629161551,
-    "SourceUpdatedAt":  "2026-06-29T16:15:51.9753321-05:00",
-    "ReleaseNotes":  "Added live toolkit activity tracking, made triage tools directly launchable from the Triage page, fixed Chocolatey status controls, and corrected triage manifest paths for Wireshark, WinAudit, and LatencyMon."
+    "Build":  20260629163424,
+    "SourceUpdatedAt":  "2026-06-29T16:34:24.4444864-05:00",
+    "ReleaseNotes":  "Expanded the AI diagnostic bundle collector with modular read-only crash, driver, filter, network, process, service/startup, event timeline, domain, DFSR, Group Policy, security product, and manifest evidence collection; strengthened the bundled analysis prompt."
 }
