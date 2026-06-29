@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260629090136,
-    "SourceUpdatedAt":  "2026-06-29T09:01:36.6992110-05:00",
-    "ReleaseNotes":  "Fixed Quick Diagnosis action button clipping and hardened Quick Triage completion handling so successful runs do not throw null-object errors while the GUI timer cleans up."
+    "Build":  20260629093051,
+    "SourceUpdatedAt":  "2026-06-29T09:30:51.3928080-05:00",
+    "ReleaseNotes":  "Imported staged 20260629 diagnostic tools into logical toolkit folders, enabled triage manifest discovery for the new collectors, and exposed JRT and Registrar Registry Manager in their appropriate GUI categories."
 }

@@ -281,6 +281,16 @@ function Global:Get-NTKExternalToolCatalog {
             Notes = "Portable antivirus scanner for manual file and folder scans."
         }
         [pscustomobject]@{
+            Id = "JRT"
+            Name = "Junkware Removal Tool"
+            Group = "Security"
+            Paths = @("JRT\JRT.exe")
+            Arguments = @()
+            RequiresAdmin = $true
+            Console = $false
+            Notes = "Legacy Malwarebytes junkware/adware cleanup utility. Use only after review."
+        }
+        [pscustomobject]@{
             Id = "TCPView"
             Name = "TCPView"
             Group = "Connectivity"
@@ -449,6 +459,16 @@ function Global:Get-NTKExternalToolCatalog {
             RequiresAdmin = $false
             Console = $false
             Notes = "Portable file manager for browsing and working with local files."
+        }
+        [pscustomobject]@{
+            Id = "RegistrarRegistryManager"
+            Name = "Registrar Registry Manager"
+            Group = "Repair"
+            Paths = @("RegistrarRegistryManager\RegistrarHomeV9.exe")
+            Arguments = @()
+            RequiresAdmin = $true
+            Console = $false
+            Notes = "Advanced registry editor. Use carefully and only with a known remediation plan."
         }
         [pscustomobject]@{
             Id = "NotepadPlusPlus"

@@ -303,7 +303,7 @@
                                               "name":  "ESET SysInspector",
                                               "arguments":  "/gen ToolOutput\\eset-sysinspector.xml",
                                               "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\ESET SysInspector\\SysInspector.exe",
+                                              "path":  ".\\Triage\\Tools\\ESET SysInspector\\sysinspector_nt64.exe",
                                               "outputFile":  "ToolOutput\\eset-sysinspector.xml",
                                               "captureStdout":  false
                                           }
@@ -467,7 +467,7 @@
                                               "name":  "LatencyMon",
                                               "arguments":  "",
                                               "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\LatencyMon\\LatMon.exe",
+                                              "path":  ".\\Triage\\Tools\\LatencyMon\\LatencyMon.exe",
                                               "outputFile":  "ToolOutput\\latencymon.txt",
                                               "captureStdout":  false
                                           }
