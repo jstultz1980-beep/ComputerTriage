@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0013 header tool search.
+- Added GUI header autocomplete search that jumps to the proper tool tab.
 - Completed TASK-0012 phase-transition readiness.
 - Marked Phase 00 Foundation Zero complete and Phase 01 HEPHAESTUS Collection Baseline active.
 - Updated handoff direction for the next implementation task.

@@ -19,3 +19,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0009 | 2026-06-30 | TASK-0012 | Task System | +1 | Created and completed phase-transition readiness task after the foundation audit. |
 | CHG-0010 | 2026-06-30 | TASK-0012 | Roadmap/Backlog | +1 | Marked Phase 00 complete and Phase 01 HEPHAESTUS Collection Baseline active. |
 | CHG-0011 | 2026-06-30 | TASK-0012 | Documentation | +1 | Refreshed handoff and changelog for post-foundation transition state. |
+| CHG-0012 | 2026-06-30 | TASK-0013 | UI | +1 | Added header autocomplete tool search that navigates to the selected tool's tab. |
+| CHG-0013 | 2026-06-30 | TASK-0013 | Task System | +1 | Created and completed the header tool search task. |
+| CHG-0014 | 2026-06-30 | TASK-0013 | Documentation | +1 | Updated handoff, changelog, and task completion notes for header tool search. |

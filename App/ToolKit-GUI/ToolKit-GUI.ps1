@@ -201,6 +201,9 @@ $script:HeaderSummaryPanel = $null
 $script:HeaderToolsPanel = $null
 $script:HeaderTitleLabel = $null
 $script:HeaderSubtitleLabel = $null
+$script:HeaderToolSearchBox = $null
+$script:HeaderToolSearchIndex = $null
+$script:HeaderToolSearchLookup = @{}
 $script:AdminStatusLabel = $null
 $script:SettingsGearButton = $null
 $script:HelpButton = $null
@@ -4887,6 +4890,7 @@ function Refresh-GUICustomTools {
     }
 
     $script:GuiCustomToolsCache = $null
+    Reset-GUIToolSearchIndex
     $script:CustomTools = @(Get-GUICustomTools -Detailed)
     $script:CustomGrid.Rows.Clear()
 
@@ -8628,6 +8632,212 @@ function Add-GUIHeaderComputerSummary {
     Update-GUIComputerHealthLight
 }
 
+function Reset-GUIToolSearchIndex {
+    $script:HeaderToolSearchIndex = $null
+    $script:HeaderToolSearchLookup = @{}
+    if($script:HeaderToolSearchBox -and !$script:HeaderToolSearchBox.IsDisposed){
+        Initialize-GUIHeaderToolSearchItems
+    }
+}
+
+function New-GUIToolSearchEntry {
+    param(
+        [string]$Name,
+        [string]$Tab,
+        [string]$Source = "Toolkit",
+        [string]$Description = ""
+    )
+
+    if([string]::IsNullOrWhiteSpace($Name) -or [string]::IsNullOrWhiteSpace($Tab)){
+        return $null
+    }
+
+    return [pscustomobject]@{
+        Name = $Name.Trim()
+        Tab = $Tab.Trim()
+        Source = $Source
+        Description = $Description
+        Display = ("{0}  -  {1}" -f $Name.Trim(),$Tab.Trim())
+    }
+}
+
+function Get-GUISysinternalsSearchTab {
+    param([pscustomobject]$Tool)
+
+    switch([string]$Tool.Category){
+        "Process And Startup" { return "Processes" }
+        "Network" { return "Network" }
+        "Active Directory" { return "Directory" }
+        default { return "Sysinternals" }
+    }
+}
+
+function Get-GUIHeaderToolSearchIndex {
+    if($script:HeaderToolSearchIndex){
+        return @($script:HeaderToolSearchIndex)
+    }
+
+    $entries = New-Object System.Collections.ArrayList
+
+    if(Get-Command Get-NTKToolCatalog -ErrorAction SilentlyContinue){
+        foreach($tool in @(Get-NTKToolCatalog)){
+            $entry = New-GUIToolSearchEntry -Name $tool.Text -Tab $tool.Tab -Source "Tool Catalog" -Description $tool.Description
+            if($entry){ [void]$entries.Add($entry) }
+        }
+    }
+
+    if(Get-Command Get-GUISysinternalsTools -ErrorAction SilentlyContinue){
+        foreach($tool in @(Get-GUISysinternalsTools)){
+            $tab = Get-GUISysinternalsSearchTab -Tool $tool
+            $entry = New-GUIToolSearchEntry -Name $tool.DisplayName -Tab $tab -Source "Sysinternals" -Description (Get-GUISysinternalsDescription -BaseName $tool.Name -FileName $tool.FileName -Category $tool.Category -Console $tool.Console -Risky $tool.Risky)
+            if($entry){ [void]$entries.Add($entry) }
+        }
+    }
+
+    foreach($tool in @(Get-GUICustomTools | Where-Object { $_.Status -eq "Ready" })){
+        $placement = Get-GUICustomToolPlacement -Tool $tool
+        $entry = New-GUIToolSearchEntry -Name $tool.Name -Tab $placement.Tab -Source "Toolkit App" -Description $placement.Description
+        if($entry){ [void]$entries.Add($entry) }
+    }
+
+    $seen = @{}
+    $script:HeaderToolSearchIndex = @($entries |
+        Where-Object {
+            $key = ("{0}|{1}" -f $_.Name,$_.Tab).ToLowerInvariant()
+            if($seen.ContainsKey($key)){ return $false }
+            $seen[$key] = $true
+            return $true
+        } |
+        Sort-Object Name,Tab)
+
+    return @($script:HeaderToolSearchIndex)
+}
+
+function Initialize-GUIHeaderToolSearchItems {
+    if(!$script:HeaderToolSearchBox -or $script:HeaderToolSearchBox.IsDisposed){
+        return
+    }
+
+    $combo = $script:HeaderToolSearchBox
+    $combo.BeginUpdate()
+    try {
+        $combo.Items.Clear()
+        $source = New-Object System.Windows.Forms.AutoCompleteStringCollection
+        $lookup = @{}
+
+        foreach($entry in @(Get-GUIHeaderToolSearchIndex)){
+            [void]$combo.Items.Add($entry.Display)
+            [void]$source.Add($entry.Display)
+            $lookup[$entry.Display.ToLowerInvariant()] = $entry
+            if(!$lookup.ContainsKey($entry.Name.ToLowerInvariant())){
+                $lookup[$entry.Name.ToLowerInvariant()] = $entry
+            }
+        }
+
+        $combo.AutoCompleteCustomSource = $source
+        $script:HeaderToolSearchLookup = $lookup
+    }
+    finally {
+        $combo.EndUpdate()
+    }
+}
+
+function Find-GUIHeaderToolSearchMatch {
+    param([string]$Text)
+
+    if([string]::IsNullOrWhiteSpace($Text)){
+        return $null
+    }
+
+    $query = $Text.Trim()
+    $lookupKey = $query.ToLowerInvariant()
+    if(!$script:HeaderToolSearchIndex){
+        [void](Get-GUIHeaderToolSearchIndex)
+    }
+
+    if($script:HeaderToolSearchLookup -and $script:HeaderToolSearchLookup.ContainsKey($lookupKey)){
+        return $script:HeaderToolSearchLookup[$lookupKey]
+    }
+
+    $matches = @(Get-GUIHeaderToolSearchIndex | Where-Object { $_.Name -like "$query*" -or $_.Display -like "$query*" })
+    if($matches.Count -eq 0){
+        $matches = @(Get-GUIHeaderToolSearchIndex | Where-Object { $_.Name -like "*$query*" -or $_.Display -like "*$query*" })
+    }
+
+    return @($matches | Select-Object -First 1)[0]
+}
+
+function Select-GUIToolSearchEntry {
+    param([pscustomobject]$Entry)
+
+    if(!$Entry -or !$script:MainTabs){
+        return
+    }
+
+    $tab = $script:MainTabs.TabPages | Where-Object { $_.Text -eq $Entry.Tab } | Select-Object -First 1
+    if(!$tab){
+        Add-GUILog "Tool search could not find tab for $($Entry.Name): $($Entry.Tab)"
+        return
+    }
+
+    Select-GUITabPage -Page $tab
+    Add-GUILog ("Tool search: {0} -> {1}" -f $Entry.Name,$Entry.Tab)
+}
+
+function Invoke-GUIHeaderToolSearch {
+    if(!$script:HeaderToolSearchBox -or $script:HeaderToolSearchBox.IsDisposed){
+        return
+    }
+
+    $entry = Find-GUIHeaderToolSearchMatch -Text $script:HeaderToolSearchBox.Text
+    if($entry){
+        Select-GUIToolSearchEntry -Entry $entry
+        $script:HeaderToolSearchBox.Text = ""
+    }
+    else{
+        Add-GUILog "Tool search found no match for: $($script:HeaderToolSearchBox.Text)"
+    }
+}
+
+function Add-GUIHeaderToolSearch {
+    param([System.Windows.Forms.Panel]$Header)
+
+    $search = New-Object System.Windows.Forms.ComboBox
+    $search.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDown
+    $search.AutoCompleteMode = [System.Windows.Forms.AutoCompleteMode]::SuggestAppend
+    $search.AutoCompleteSource = [System.Windows.Forms.AutoCompleteSource]::CustomSource
+    $search.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $search.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $search.Size = New-Object System.Drawing.Size(270,28)
+    $search.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
+    $search.BackColor = [System.Drawing.Color]::White
+    $search.ForeColor = $script:GUITheme.Text
+    $search.IntegralHeight = $false
+    $search.MaxDropDownItems = 12
+    $search.Tag = "HeaderToolSearch"
+    $search.Add_SelectedIndexChanged({
+        param($sender,$eventArgs)
+        if($sender.SelectedItem){
+            Select-GUIToolSearchEntry -Entry (Find-GUIHeaderToolSearchMatch -Text ([string]$sender.SelectedItem))
+            $sender.SelectedIndex = -1
+            $sender.Text = ""
+        }
+    })
+    $search.Add_KeyDown({
+        param($sender,$eventArgs)
+        if($eventArgs.KeyCode -eq [System.Windows.Forms.Keys]::Enter){
+            $eventArgs.SuppressKeyPress = $true
+            Invoke-GUIHeaderToolSearch
+        }
+    })
+    $Header.Controls.Add($search)
+    $script:HeaderToolSearchBox = $search
+    if($script:ToolTip){
+        $script:ToolTip.SetToolTip($search,"Search for a tool by name. Select a result or press Enter to jump to its tab.")
+    }
+    Initialize-GUIHeaderToolSearchItems
+}
+
 function Update-GUIHeaderLayout {
     if(!$script:HeaderPanel -or $script:HeaderPanel.IsDisposed){
         return
@@ -8645,9 +8855,19 @@ function Update-GUIHeaderLayout {
         )
     }
 
+    $searchLeft = $null
+    if($script:HeaderToolSearchBox -and !$script:HeaderToolSearchBox.IsDisposed -and $script:HeaderToolsPanel){
+        $searchWidth = 270
+        $searchLeft = [Math]::Max(360, $script:HeaderToolsPanel.Left - $searchWidth - 14)
+        $script:HeaderToolSearchBox.Location = New-Object System.Drawing.Point($searchLeft,22)
+        $script:HeaderToolSearchBox.Size = New-Object System.Drawing.Size($searchWidth,28)
+        $script:HeaderToolSearchBox.Visible = ($script:HeaderToolsPanel.Left - $searchLeft - 10) -ge 230
+    }
+
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
         $summaryLeft = 360
-        $summaryWidth = [Math]::Max(500, $script:HeaderToolsPanel.Left - $summaryLeft - 16)
+        $summaryRight = if($searchLeft){ $searchLeft - 16 }else{ $script:HeaderToolsPanel.Left - 16 }
+        $summaryWidth = [Math]::Max(380, $summaryRight - $summaryLeft)
         $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
         $script:HeaderSummaryPanel.Location = New-Object System.Drawing.Point($summaryLeft,10)
         $script:HeaderSummaryPanel.Size = New-Object System.Drawing.Size($summaryWidth,58)
@@ -8824,6 +9044,8 @@ function Refresh-GUICustomToolTabs {
     if(!$script:MainTabs){
         return
     }
+
+    Reset-GUIToolSearchIndex
 
     foreach($tabName in $customToolTabs){
         if(!$script:BuiltTabs.ContainsKey($tabName)){
@@ -14209,6 +14431,7 @@ function Build-Form {
     if($script:ToolTip){ $script:ToolTip.SetToolTip($helpButton,"Open the Network Toolkit help guide.") }
 
     Add-GUIHeaderComputerSummary -Header $header
+    Add-GUIHeaderToolSearch -Header $header
     $header.Add_Resize({ Update-GUIHeaderLayout })
     Update-GUIHeaderLayout
 
@@ -14480,6 +14703,23 @@ if($ButtonSmokeTest){
 
     if(!$script:QuickRunButton){
         Write-Host "Quick Diagnosis button missing."
+        exit 1
+    }
+
+    if(!$script:HeaderToolSearchBox){
+        Write-Host "Header tool search box missing."
+        exit 1
+    }
+
+    $searchIndex = @(Get-GUIHeaderToolSearchIndex)
+    if($searchIndex.Count -lt 1){
+        Write-Host "Header tool search index is empty."
+        exit 1
+    }
+
+    $searchTest = Find-GUIHeaderToolSearchMatch -Text "Test-NetConnection"
+    if(!$searchTest -or $searchTest.Tab -ne "Analyze"){
+        Write-Host "Header tool search did not resolve Test-NetConnection to Analyze."
         exit 1
     }
 
