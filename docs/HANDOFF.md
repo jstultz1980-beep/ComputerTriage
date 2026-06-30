@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0020
+HANDOFF-0021
 
 ## Current Task
 None
@@ -34,8 +34,8 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0011 foundation audit is complete. The repository is ready for the next
-focused task.
+TASK-0012 phase-transition readiness is complete. Foundation Zero is closed and
+the project is ready to begin HEPHAESTUS collection baseline work.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -56,8 +56,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 0 / 10 | No |
-| Task System | 0 / 10 | No |
+| Documentation | 1 / 10 | No |
+| Task System | 1 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -65,15 +65,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 0 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 0 / 10 | No |
-| Roadmap/Backlog | 0 / 10 | No |
+| Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-TASK-0011 completed the foundation audit. Runtime-only custom tool manifest
-drift was reset, generated third-party `.cfg` files are now ignored broadly,
-task status wording was normalized, and stale architecture root path casing was
-corrected.
+TASK-0011 completed the foundation audit. TASK-0012 completed the phase
+transition readiness pass. Runtime-only custom tool manifest drift was reset,
+generated third-party `.cfg` files are ignored broadly, task status wording was
+normalized, stale architecture root path casing was corrected, and the roadmap
+now marks Phase 00 complete with Phase 01 active.
 
 No implementation task is active. Create the next focused task before changing
 toolkit behavior.
@@ -90,6 +91,11 @@ toolkit behavior.
 - Broadened generated third-party tool config ignore coverage.
 - Normalized TASK-0009 status wording.
 - Corrected stale architecture root path casing.
+- Completed TASK-0012 phase-transition readiness.
+- Marked Phase 00 Foundation Zero complete and Phase 01 HEPHAESTUS Collection
+  Baseline active.
+- Updated audit counters for TASK-0012 documentation, task system, and roadmap
+  changes.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
@@ -100,10 +106,12 @@ toolkit behavior.
 - Reviewed `docs/TASKS/TASK-*.md` status values.
 - Reviewed `docs/HISTORY/CHANGE-LEDGER.md` against handoff counters.
 - Reviewed `.gitignore` generated/runtime coverage.
+- Confirmed task list ended at TASK-0011 before creating TASK-0012.
+- Searched live docs for phase-transition references.
 
 ## Next Action
 Create the next focused task before implementation. Recommended next task:
-`TASK-0012-HEPHAESTUS-Collection-Baseline-Audit`.
+`TASK-0013-HEPHAESTUS-Collection-Baseline-Audit`.
 
 ## Blockers
 None.
@@ -113,7 +121,7 @@ Start with `PROJECT.md`. If no task is active, create a task under
 `docs/TASKS` and update this handoff before implementation.
 
 Known working-tree noise:
-- None expected after TASK-0011 commit.
+- None expected after TASK-0012 commit.
 
 ## Next Bot Prompt
 Copy and paste the following prompt into another bot when offloading reasoning or review work. Do not create a separate task packet file.
@@ -135,8 +143,9 @@ Current task state:
 - docs/HANDOFF.md lists no active implementation task.
 - Audit state tracking is active.
 - TASK-0011 foundation audit is complete.
+- TASK-0012 phase-transition readiness is complete.
 - Create the next focused task before implementation. Recommended next task:
-  TASK-0012-HEPHAESTUS-Collection-Baseline-Audit.
+  TASK-0013-HEPHAESTUS-Collection-Baseline-Audit.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.

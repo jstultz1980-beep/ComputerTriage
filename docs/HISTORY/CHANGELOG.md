@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0012 phase-transition readiness.
+- Marked Phase 00 Foundation Zero complete and Phase 01 HEPHAESTUS Collection Baseline active.
+- Updated handoff direction for the next implementation task.
 - Completed TASK-0011 foundation audit.
 - Broadened generated third-party tool configuration ignores.
 - Reset runtime-only custom tool manifest drift.

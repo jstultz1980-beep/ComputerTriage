@@ -124,8 +124,8 @@ Actions Applied:
 - Updated changelog, change ledger, task completion notes, and handoff.
 
 Recommendations:
-- Start the next focused task before implementation. Recommended next task:
-  `TASK-0012-HEPHAESTUS-Collection-Baseline-Audit`, because the quick
+- Start the next focused task before implementation. Recommended follow-up:
+  `TASK-0013-HEPHAESTUS-Collection-Baseline-Audit`, because the quick
   diagnosis and computer profile outputs are the core product path and should
   be stabilized before ARGUS consumes their evidence.
 - Keep portable application binaries and generated runtime files out of routine
