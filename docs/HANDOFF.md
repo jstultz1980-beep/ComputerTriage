@@ -1,16 +1,16 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0017
+HANDOFF-0018
 
 ## Current Task
 None.
 
 ## Current Owner
-ChatGPT
+Codex
 
 ## Next Owner
-ChatGPT
+Codex or another bot using the prompt below.
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
@@ -34,7 +34,7 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0009 is complete. Audit state tracking has been added to the project control model.
+TASK-0010 is complete. Runtime drift was classified and cleaned, and the generated ServiWin config is now ignored.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -53,9 +53,9 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 1 / 10 | No |
+| Repository Governance | 2 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 1 / 10 | No |
+| Documentation | 2 / 10 | No |
 | Task System | 1 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
@@ -69,21 +69,24 @@ docs/HISTORY/CHANGE-LEDGER.md
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-TASK-0009 added the audit counter rule and change ledger. No implementation task is currently active.
+`App/manifests/custom-tools.json` was reset to the repository version because its dirty state was runtime/toolbox state. `App/Triage/Tools/ServiWin/ServiWin.cfg` was generated NirSoft UI/config state; it was deleted and added to `.gitignore`.
+
+No implementation task is currently active.
 
 ## Completed Work
-- Read `PROJECT.md` and `docs/HANDOFF.md`.
-- Created and completed `docs/TASKS/TASK-0009-Audit-State-Tracking.md`.
-- Updated `PROJECT.md` with the Audit State Tracking Rule.
-- Created `docs/HISTORY/CHANGE-LEDGER.md`.
-- Updated `docs/HISTORY/CHANGELOG.md`.
-- Updated this handoff with audit counters and the next prompt.
+- Read `PROJECT.md` and required startup documents.
+- Integrated upstream TASK-0009 audit-state tracking changes before pushing.
+- Renumbered the runtime drift cleanup task to `docs/TASKS/TASK-0010-Classify-Drift-And-Status-Report.md` to avoid colliding with upstream TASK-0009.
+- Reset runtime drift in `App/manifests/custom-tools.json`.
+- Deleted generated `App/Triage/Tools/ServiWin/ServiWin.cfg`.
+- Added `.gitignore` entry for the generated ServiWin config.
+- Updated `docs/HISTORY/CHANGE-LEDGER.md` for TASK-0010.
 
 ## Validation Completed
-- Confirmed `PROJECT.md` contains the audit trigger rule.
-- Confirmed `docs/HANDOFF.md` now includes subsystem counters.
-- Confirmed `docs/HISTORY/CHANGE-LEDGER.md` exists and records the initial subsystem counter changes.
-- Confirmed no ARGUS implementation or application code was modified as part of TASK-0009.
+- Confirmed `App/manifests/custom-tools.json` has no remaining diff.
+- Confirmed `App/Triage/Tools/ServiWin/ServiWin.cfg` is absent.
+- Ran `git status --short --branch`, `git log --oneline -5`, and `git remote -v`.
+- Integrated remote `origin/master` without force pushing.
 
 ## Next Action
 Create a new focused task under `docs/TASKS` before doing any further implementation work.
@@ -91,7 +94,7 @@ Create a new focused task under `docs/TASKS` before doing any further implementa
 Recommended next task:
 
 ```text
-docs/TASKS/TASK-0010-Foundation-Audit.md
+docs/TASKS/TASK-0011-Foundation-Audit.md
 ```
 
 Purpose: perform a full repository foundation audit before ARGUS implementation continues.
@@ -102,9 +105,8 @@ None.
 ## Notes for Next AI
 Start with `PROJECT.md`. Do not implement without a new active task document.
 
-Unrelated working-tree noise previously noted and intentionally not included in TASK-0009:
-- `App/manifests/custom-tools.json` modified
-- `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
+Known working-tree noise:
+- None expected.
 
 ## Next Bot Prompt
 Copy and paste the following prompt into another bot when offloading reasoning or review work. Do not create a separate task packet file.
@@ -124,10 +126,10 @@ Read these repository files in order:
 
 Current task state:
 - docs/HANDOFF.md currently lists no active task.
-- TASK-0009 is complete.
-- Audit state tracking is now active.
+- TASK-0010 is complete.
+- Audit state tracking is active.
 - Before implementation work begins, create or request a focused task document under docs/TASKS and make it active in docs/HANDOFF.md.
-- Recommended next task: TASK-0010-Foundation-Audit.md.
+- Recommended next task: TASK-0011-Foundation-Audit.md.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.
