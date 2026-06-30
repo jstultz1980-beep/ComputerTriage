@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0008
+HANDOFF-0010
 
 ## Current Task
 None.
@@ -13,31 +13,32 @@ Codex
 Codex or another bot using the prompt below.
 
 ## Objective
-TASK-0004 is complete. `docs/HANDOFF.md` is now the single source of truth for
-the prompt that should be given to another bot.
+TASK-0005 is complete. The local `C:\Computer_Toolkit` repository is connected
+to `https://github.com/jstultz1980-beep/ComputerTriage.git` as `origin`.
 
 ## Current State
-The project governance now requires every completed task to update this file
-with a `Next Bot Prompt` section. There should be no separate ChatGPT task
-packet file used as a source of truth. If work needs to be offloaded to another
-bot, copy the prompt from this handoff.
+The repository now has an `origin` remote for fetch and push. The GitHub
+repository is reachable and currently appears to have no refs.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
-- Created and completed
-  `docs/TASKS/TASK-0004-Handoff-Bot-Prompt-Source-Of-Truth.md`.
-- Updated `PROJECT.md` with the handoff prompt rule.
-- Updated this handoff with the canonical next-bot prompt.
+- Created and completed `docs/TASKS/TASK-0005-Connect-GitHub-Remote.md`.
+- Confirmed the repo root resolves to `C:\Computer_Toolkit`.
+- Added `origin` as
+  `https://github.com/jstultz1980-beep/ComputerTriage.git`.
+- Verified remote connectivity.
 
 ## Validation Completed
-- Confirmed `PROJECT.md` and `docs/HANDOFF.md` contain `Next Bot Prompt`.
-- Confirmed `PROJECT.md` states the repository is the single source of truth.
-- Confirmed `PROJECT.md` prohibits a separate ChatGPT task packet as a source
-  of truth.
+- `git remote -v` shows the requested GitHub repository for fetch and push.
+- `git remote get-url origin` returns
+  `https://github.com/jstultz1980-beep/ComputerTriage.git`.
+- `git ls-remote origin` exits successfully and returns no refs, consistent
+  with an empty remote repository.
 
 ## Next Action
 Create a new task under `docs/TASKS` before doing any further implementation
-work.
+work. A future task can explicitly push the local repository to GitHub if
+desired.
 
 ## Blockers
 None.
@@ -46,7 +47,7 @@ None.
 Start with `PROJECT.md`. Do not implement without a new active task document.
 
 Unrelated working-tree noise remains and was intentionally not included in
-TASK-0004:
+TASK-0005:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
 
@@ -73,6 +74,10 @@ Current task state:
 - Before implementation work begins, create or request a focused task document
   under docs/TASKS and make it active in docs/HANDOFF.md.
 - Keep all recommendations and changes scoped to that active task.
+
+Repository remote:
+- origin is https://github.com/jstultz1980-beep/ComputerTriage.git.
+- Do not push unless explicitly asked.
 
 Rules:
 - Treat repository files as authoritative.
