@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0016 tool source-of-truth correction.
+- Centralized visible GUI tab tools and header search entries through `Get-GUIToolRegistry`.
+- Added duplicate registry/search detection to button smoke validation.
+- Hardened triage completion and cancellation so one triage run cannot repeatedly show completion or result-read dialogs.
 - Completed TASK-0015 header search tab mapping correction.
 - Rebuilt GUI header search results from the same tool placement path used by the visible tabs.
 - Corrected `PsExec Helper` search placement to the dedicated `PsExec` tab.

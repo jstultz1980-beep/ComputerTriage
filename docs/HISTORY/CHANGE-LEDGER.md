@@ -29,3 +29,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0019 | 2026-06-30 | TASK-0015 | UI | +1 | Rebuilt header search tab mapping from the same tool placement path used by visible tab pages. |
 | CHG-0020 | 2026-06-30 | TASK-0015 | Task System | +1 | Created and completed the header search tab mapping correction task. |
 | CHG-0021 | 2026-06-30 | TASK-0015 | Documentation | +1 | Updated task, handoff, and changelog records for search tab mapping correction. |
+| CHG-0022 | 2026-06-30 | TASK-0016 | UI | +1 | Centralized visible GUI tab tools and header search entries through one normalized tool registry path and hardened triage completion handling. |
+| CHG-0023 | 2026-06-30 | TASK-0016 | Validation/Test Framework | +1 | Added button smoke-test checks for duplicate GUI registry and header search entries. |
+| CHG-0024 | 2026-06-30 | TASK-0016 | Task System | +1 | Created and completed the tool source-of-truth correction task. |
+| CHG-0025 | 2026-06-30 | TASK-0016 | Documentation | +1 | Updated task, handoff, and changelog records for tool source-of-truth correction. |

@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0025
+HANDOFF-0027
 
 ## Current Task
 None
@@ -34,8 +34,8 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0015 header search tab mapping correction is complete. The project is
-ready for the next focused task.
+TASK-0016 tool source-of-truth correction is complete. The project is ready for
+the next focused task.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -56,15 +56,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 4 / 10 | No |
-| Task System | 4 / 10 | No |
+| Documentation | 5 / 10 | No |
+| Task System | 5 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 3 / 10 | No |
+| UI | 4 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
-| Validation/Test Framework | 0 / 10 | No |
+| Validation/Test Framework | 1 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
@@ -97,8 +97,11 @@ same `Get-GUIToolsForTab` path used by visible tab pages, and the standalone
 Sysinternals search entries share the Sysinternals page filter. `PsExec Helper`
 now maps to the dedicated `PsExec` tab instead of `Remote`.
 
-No implementation task is active. Create the next focused task before changing
-toolkit behavior.
+TASK-0016 completed the GUI tool source-of-truth correction. Visible tab
+rendering and header search now read from `Get-GUIToolRegistry`, duplicate
+registry/search entries are checked during button smoke validation, and triage
+completion handling is single-shot so one completed run cannot produce repeated
+completion or result-read dialogs.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
@@ -135,6 +138,14 @@ toolkit behavior.
 - Rebuilt header search indexing from visible tab tool placement.
 - Corrected `PsExec Helper` catalog placement to `PsExec`.
 - Added button smoke-test assertions for representative header search mappings.
+- Created TASK-0016 for tool source-of-truth correction.
+- Completed TASK-0016 tool source-of-truth correction.
+- Added `Get-GUIToolRegistry` as the normalized GUI registry path for rendered
+  tab tools and header search.
+- Added button smoke-test duplicate detection for GUI registry and search
+  entries.
+- Hardened triage completion/cancellation timer handling to prevent repeated
+  modal dialogs or repeated result-read log spam from one run.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
@@ -162,10 +173,13 @@ toolkit behavior.
 - Queried the header search index and confirmed `Test-NetConnection`,
   `PsExec Helper`, `DHCP Sleuth`, `Autoruns`, and `Process Explorer` resolve to
   their expected tabs.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Reset runtime-only `App/manifests/custom-tools.json` drift after validation.
 
 ## Next Action
 Create the next focused task before implementation. Recommended next task:
-`TASK-0016-HEPHAESTUS-Collection-Baseline-Audit`.
+`TASK-0017-Triage-Manual-Run-Validation`.
 
 ## Blockers
 None.
@@ -204,8 +218,9 @@ Current task state:
 - TASK-0013 header tool search is complete.
 - TASK-0014 DHCP Sleuth restoration is complete.
 - TASK-0015 header search tab mapping correction is complete.
+- TASK-0016 tool source-of-truth correction is complete.
 - Create the next focused task before implementation. Recommended next task:
-  TASK-0016-HEPHAESTUS-Collection-Baseline-Audit.
+  TASK-0017-Triage-Manual-Run-Validation.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.
@@ -219,8 +234,7 @@ Repository remote:
 
 Rules:
 - Treat repository files as authoritative.
-- Do not implement changes until a task file exists and docs/HANDOFF.md lists
-  it as active.
+- Do not implement changes until a task file exists and docs/HANDOFF.md lists it as active.
 - Do not use chat history as source of truth unless the same information exists in the repository.
 - Do not create a separate ChatGPT task packet as source of truth.
 - When a task is completed, update docs/HANDOFF.md with the next task state and a fresh Next Bot Prompt for the next bot.

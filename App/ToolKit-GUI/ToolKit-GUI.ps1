@@ -129,6 +129,7 @@ $script:TriageProcess = $null
 $script:TriageTimer = $null
 $script:TriageResultPath = $null
 $script:TriageRunStartedAt = $null
+$script:TriageCompletionHandled = $false
 $script:TriageToolGrid = $null
 $script:TriageStatusLabel = $null
 $script:TriageProgressBar = $null
@@ -8701,6 +8702,57 @@ function Get-GUIHeaderToolSearchTabs {
     )
 }
 
+function Add-GUIToolRegistryMetadata {
+    param(
+        [pscustomobject]$Tool,
+        [string]$Tab,
+        [string]$Source
+    )
+
+    if(!$Tool){
+        return $null
+    }
+
+    if($Tool.PSObject.Properties["RegistryTab"]){
+        $Tool.RegistryTab = $Tab
+    }
+    else {
+        $Tool | Add-Member -NotePropertyName RegistryTab -NotePropertyValue $Tab -Force
+    }
+
+    if($Tool.PSObject.Properties["RegistrySource"]){
+        $Tool.RegistrySource = $Source
+    }
+    else {
+        $Tool | Add-Member -NotePropertyName RegistrySource -NotePropertyValue $Source -Force
+    }
+
+    return $Tool
+}
+
+function Get-GUIToolRegistry {
+    $items = New-Object System.Collections.ArrayList
+
+    foreach($tab in @(Get-GUIHeaderToolSearchTabs)){
+        $catalogTools = @(Get-GUICatalogTools -Tab $tab)
+        foreach($tool in $catalogTools){
+            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Tool Catalog"))
+        }
+
+        $sysinternalsTools = @(Get-GUIMappedSysinternalsItems -Tab $tab)
+        foreach($tool in $sysinternalsTools){
+            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Sysinternals"))
+        }
+
+        $existingTools = @($catalogTools + $sysinternalsTools)
+        foreach($tool in @(Get-GUICustomTabItems -Tab $tab -ExistingTools $existingTools)){
+            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Toolkit App"))
+        }
+    }
+
+    return @($items)
+}
+
 function Get-GUIHeaderToolSearchIndex {
     if($script:HeaderToolSearchIndex){
         return @($script:HeaderToolSearchIndex)
@@ -8708,11 +8760,9 @@ function Get-GUIHeaderToolSearchIndex {
 
     $entries = New-Object System.Collections.ArrayList
 
-    foreach($tab in @(Get-GUIHeaderToolSearchTabs)){
-        foreach($tool in @(Get-GUIToolsForTab -Tab $tab)){
-            $entry = New-GUIToolSearchEntry -Name $tool.Text -Tab $tab -Source "Tool Catalog" -Description $tool.Description
-            if($entry){ [void]$entries.Add($entry) }
-        }
+    foreach($tool in @(Get-GUIToolRegistry)){
+        $entry = New-GUIToolSearchEntry -Name $tool.Text -Tab $tool.RegistryTab -Source $tool.RegistrySource -Description $tool.Description
+        if($entry){ [void]$entries.Add($entry) }
     }
 
     if(Get-Command Get-GUISysinternalsStandaloneTools -ErrorAction SilentlyContinue){
@@ -9619,19 +9669,14 @@ function Build-GUICatalogToolsPage {
         [string]$Title
     )
 
-    $tools = @(Get-GUICatalogTools -Tab $Tab)
-    $tools += @(Get-GUIMappedSysinternalsItems -Tab $Tab)
-    $tools += @(Get-GUICustomTabItems -Tab $Tab -ExistingTools $tools)
+    $tools = @(Get-GUIToolsForTab -Tab $Tab)
     Add-GUICompactToolGrid -Page $Page -Title $Title -Tools $tools -Columns 4
 }
 
 function Get-GUIToolsForTab {
     param([string]$Tab)
 
-    $tools = @(Get-GUICatalogTools -Tab $Tab)
-    $tools += @(Get-GUIMappedSysinternalsItems -Tab $Tab)
-    $tools += @(Get-GUICustomTabItems -Tab $Tab -ExistingTools $tools)
-    return @($tools)
+    return @(Get-GUIToolRegistry | Where-Object { $_.RegistryTab -eq $Tab })
 }
 
 function Set-GUIToolSection {
@@ -12073,6 +12118,12 @@ function Start-GUITriageRun {
     )
     if($privacy -ne [System.Windows.Forms.DialogResult]::Yes){ return }
 
+    if($script:TriageTimer){
+        try { $script:TriageTimer.Stop(); $script:TriageTimer.Dispose() } catch {}
+        $script:TriageTimer = $null
+    }
+    $script:TriageCompletionHandled = $false
+
     $paths = Initialize-NTKTriageStructure
     $resultPath = Join-Path $paths.Cache ("triage-result-{0}.json" -f [guid]::NewGuid().ToString("N"))
     $runner = Join-Path $paths.Cache ("run-triage-{0}.ps1" -f [guid]::NewGuid().ToString("N"))
@@ -12108,15 +12159,27 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 1500
     $timer.Add_Tick({
+        if($script:TriageCompletionHandled){
+            try { $timer.Stop(); $timer.Dispose() } catch {}
+            if($script:TriageTimer -eq $timer){
+                $script:TriageTimer = $null
+            }
+            return
+        }
+
         $activeProcess = $script:TriageProcess
         if($activeProcess -and !$activeProcess.HasExited){
             $elapsed = [int]((Get-Date) - $script:TriageRunStartedAt).TotalSeconds
             if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage running... ${elapsed}s elapsed" }
             return
         }
+
+        $script:TriageCompletionHandled = $true
         $resultPath = $script:TriageResultPath
         try { $timer.Stop(); $timer.Dispose() } catch {}
         $script:TriageTimer = $null
+        $script:TriageProcess = $null
+        $script:TriageResultPath = $null
         Stop-GUIBusyIndicator
         if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
         try {
@@ -12145,8 +12208,10 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
             }
         }
         catch {
-            Add-GUITriageLogLine "Triage result could not be read: $($_.Exception.Message)"
-            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage result could not be read." }
+            $readError = $_.Exception.Message
+            Add-GUITriageLogLine "Triage result could not be read: $readError"
+            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage result could not be read. See live log." }
+            [System.Windows.Forms.MessageBox]::Show("Triage ended, but the GUI could not read the result file.`r`n`r`n$readError","Triage Result Problem",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
         }
         finally {
             $script:TriageProcess = $null
@@ -12158,6 +12223,12 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
 }
 
 function Stop-GUITriageRun {
+    $script:TriageCompletionHandled = $true
+    if($script:TriageTimer){
+        try { $script:TriageTimer.Stop(); $script:TriageTimer.Dispose() } catch {}
+        $script:TriageTimer = $null
+    }
+
     if($script:TriageProcess -and !$script:TriageProcess.HasExited){
         try {
             $script:TriageProcess.Kill()
@@ -12168,6 +12239,10 @@ function Stop-GUITriageRun {
             Add-GUITriageLogLine "Triage cancel failed: $($_.Exception.Message)"
         }
     }
+    $script:TriageProcess = $null
+    $script:TriageResultPath = $null
+    Stop-GUIBusyIndicator
+    if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
 }
 
 function Start-GUITriageSelectedToolsRun {
@@ -14777,6 +14852,32 @@ if($ButtonSmokeTest){
             Write-Host ("Header tool search did not resolve {0} to {1}." -f $searchName,$expectedSearchTabs[$searchName])
             exit 1
         }
+    }
+
+    $toolRegistry = @(Get-GUIToolRegistry)
+    if($toolRegistry.Count -lt 1){
+        Write-Host "GUI tool registry is empty."
+        exit 1
+    }
+
+    $duplicateRegistryTools = @(
+        $toolRegistry |
+            Group-Object { ("{0}|{1}" -f $_.RegistryTab,$_.Text).ToLowerInvariant() } |
+            Where-Object { $_.Count -gt 1 }
+    )
+    if($duplicateRegistryTools.Count -gt 0){
+        Write-Host ("Duplicate GUI registry tools: {0}" -f (($duplicateRegistryTools | Select-Object -ExpandProperty Name) -join ", "))
+        exit 1
+    }
+
+    $duplicateSearchEntries = @(
+        $searchIndex |
+            Group-Object { ("{0}|{1}" -f $_.Tab,$_.Name).ToLowerInvariant() } |
+            Where-Object { $_.Count -gt 1 }
+    )
+    if($duplicateSearchEntries.Count -gt 0){
+        Write-Host ("Duplicate header search entries: {0}" -f (($duplicateSearchEntries | Select-Object -ExpandProperty Name) -join ", "))
+        exit 1
     }
 
     $knownGuiActions = @(
