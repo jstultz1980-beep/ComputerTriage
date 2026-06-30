@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0014
+HANDOFF-0015
 
 ## Current Task
-None.
+`docs/TASKS/TASK-0008-Push-To-GitHub.md`
 
 ## Current Owner
 Codex
@@ -43,38 +43,33 @@ prompt must be rewritten so the next bot starts from the repository state, not
 from chat history.
 
 ## Objective
-TASK-0007 is complete. The Activity page now has compact speedometer-style CPU,
-RAM, and disk usage gauges above the toolkit process table.
+Push the local `C:\Computer_Toolkit` repository history to the configured
+GitHub remote.
 
 ## Current State
-The Activity page keeps its existing toolkit process tracking and now refreshes
-CPU, RAM, and disk active-time gauges on the same timer. There is no active
-task. A new task must be created before implementation work begins.
+TASK-0008 is active. `origin` is configured as
+`https://github.com/jstultz1980-beep/ComputerTriage.git`, and the current
+branch is `master`.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
-- Created and completed `docs/TASKS/TASK-0007-Activity-Resource-Gauges.md`.
-- Added Activity page CPU, RAM, and disk gauges.
-- Preserved the existing Activity process table and process stop/refresh
-  actions.
+- Created `docs/TASKS/TASK-0008-Push-To-GitHub.md`.
+- Confirmed `origin` points to the requested GitHub repository.
 
 ## Validation Completed
-- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
-- Ran `App/ToolKit-GUI/ToolKit-GUI.ps1 -ButtonSmokeTest`; passed.
-- Confirmed Activity gauge functions and labels exist in the GUI script.
+- Pending for TASK-0008.
 
 ## Next Action
-Create a new task under `docs/TASKS` before doing any further implementation
-work.
+Commit TASK-0008 documentation and push `master` to `origin`.
 
 ## Blockers
-None.
+None for TASK-0008.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. Do not implement without a new active task document.
+Start with `PROJECT.md`. Keep scope limited to TASK-0008.
 
 Unrelated working-tree noise remains and was intentionally not included in
-TASK-0007:
+TASK-0008:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
 
@@ -94,20 +89,21 @@ Read these repository files in order:
 3. docs/ARCHITECTURE.md
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
-6. The active task document listed in docs/HANDOFF.md, if one exists.
+6. The active task document listed in docs/HANDOFF.md.
 
-Current task state:
-- docs/HANDOFF.md currently lists no active task.
-- Before implementation work begins, create or request a focused task document
-  under docs/TASKS and make it active in docs/HANDOFF.md.
-- Keep all recommendations and changes scoped to that active task.
+Active task:
+docs/TASKS/TASK-0008-Push-To-GitHub.md
+
+Goal:
+Push the local master branch to origin.
 
 Repository remote:
 - origin is https://github.com/jstultz1980-beep/ComputerTriage.git.
-- Do not push unless explicitly asked.
+- The user explicitly asked to push the toolkit to GitHub.
 
 Rules:
 - Treat repository files as authoritative.
+- Keep changes scoped to TASK-0008.
 - Do not use chat history as source of truth unless the same information exists
   in the repository.
 - Do not create a separate ChatGPT task packet as source of truth.
