@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0015 header search tab mapping correction.
+- Rebuilt GUI header search results from the same tool placement path used by the visible tabs.
+- Corrected `PsExec Helper` search placement to the dedicated `PsExec` tab.
 - Completed TASK-0014 DHCP Sleuth restoration.
 - Restored DHCP Sleuth as a tracked standalone toolkit app on the Infrastructure tab.
 - Kept DHCP Sleuth runtime settings ignored and fixed smoke-test validation while another toolkit window is open.

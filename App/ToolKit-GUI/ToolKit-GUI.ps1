@@ -8673,6 +8673,34 @@ function Get-GUISysinternalsSearchTab {
     }
 }
 
+function Get-GUIHeaderToolSearchTabs {
+    return @(
+        "Analyze",
+        "Windows Update",
+        "Hardware",
+        "Crash",
+        "Processes",
+        "Network",
+        "Remote",
+        "PsExec",
+        "Infrastructure",
+        "Repair",
+        "Directory",
+        "Security",
+        "Wi-Fi",
+        "Print",
+        "Files",
+        "Discovery",
+        "Robocopy",
+        "Software",
+        "Software Keys",
+        "Clean Up",
+        "Choco",
+        "Computer Info",
+        "Reports"
+    )
+}
+
 function Get-GUIHeaderToolSearchIndex {
     if($script:HeaderToolSearchIndex){
         return @($script:HeaderToolSearchIndex)
@@ -8680,25 +8708,18 @@ function Get-GUIHeaderToolSearchIndex {
 
     $entries = New-Object System.Collections.ArrayList
 
-    if(Get-Command Get-NTKToolCatalog -ErrorAction SilentlyContinue){
-        foreach($tool in @(Get-NTKToolCatalog)){
-            $entry = New-GUIToolSearchEntry -Name $tool.Text -Tab $tool.Tab -Source "Tool Catalog" -Description $tool.Description
+    foreach($tab in @(Get-GUIHeaderToolSearchTabs)){
+        foreach($tool in @(Get-GUIToolsForTab -Tab $tab)){
+            $entry = New-GUIToolSearchEntry -Name $tool.Text -Tab $tab -Source "Tool Catalog" -Description $tool.Description
             if($entry){ [void]$entries.Add($entry) }
         }
     }
 
-    if(Get-Command Get-GUISysinternalsTools -ErrorAction SilentlyContinue){
-        foreach($tool in @(Get-GUISysinternalsTools)){
-            $tab = Get-GUISysinternalsSearchTab -Tool $tool
-            $entry = New-GUIToolSearchEntry -Name $tool.DisplayName -Tab $tab -Source "Sysinternals" -Description (Get-GUISysinternalsDescription -BaseName $tool.Name -FileName $tool.FileName -Category $tool.Category -Console $tool.Console -Risky $tool.Risky)
+    if(Get-Command Get-GUISysinternalsStandaloneTools -ErrorAction SilentlyContinue){
+        foreach($tool in @(Get-GUISysinternalsStandaloneTools)){
+            $entry = New-GUIToolSearchEntry -Name $tool.DisplayName -Tab "Sysinternals" -Source "Sysinternals" -Description (Get-GUISysinternalsDescription -BaseName $tool.Name -FileName $tool.FileName -Category $tool.Category -Console $tool.Console -Risky $tool.Risky)
             if($entry){ [void]$entries.Add($entry) }
         }
-    }
-
-    foreach($tool in @(Get-GUICustomTools | Where-Object { $_.Status -eq "Ready" })){
-        $placement = Get-GUICustomToolPlacement -Tool $tool
-        $entry = New-GUIToolSearchEntry -Name $tool.Name -Tab $placement.Tab -Source "Toolkit App" -Description $placement.Description
-        if($entry){ [void]$entries.Add($entry) }
     }
 
     $seen = @{}
@@ -9690,6 +9711,42 @@ function Get-GUIMappedSysinternalsItems {
     }
 
     return $items
+}
+
+function Get-GUISysinternalsCatalogedBaseNames {
+    return @(
+        "procexp",
+        "procmon",
+        "autoruns",
+        "rammap",
+        "tcpview",
+        "psping",
+        "psexec",
+        "handle",
+        "sigcheck"
+    )
+}
+
+function Get-GUISysinternalsMappedCategories {
+    return @(
+        "Process And Startup",
+        "System Inspection",
+        "Network",
+        "PsTools",
+        "Active Directory",
+        "Disk And File",
+        "Security And Registry"
+    )
+}
+
+function Get-GUISysinternalsStandaloneTools {
+    $catalogSysinternalsBases = @(Get-GUISysinternalsCatalogedBaseNames)
+    $mappedCategories = @(Get-GUISysinternalsMappedCategories)
+
+    return @(Get-GUISysinternalsTools | Where-Object {
+        $catalogSysinternalsBases -notcontains $_.Name.ToLowerInvariant() -and
+        $mappedCategories -notcontains $_.Category
+    })
 }
 
 function New-GUICompactToolControl {
@@ -11399,20 +11456,7 @@ function Build-SysinternalsPage {
         [int]$Columns = 3
     )
 
-    $catalogSysinternalsBases = @(
-        "procexp",
-        "procmon",
-        "autoruns",
-        "rammap",
-        "tcpview",
-        "psping",
-        "psexec",
-        "handle",
-        "sigcheck"
-    )
-
-    $mappedCategories = @("Process And Startup","System Inspection","Network","PsTools","Active Directory","Disk And File","Security And Registry")
-    $tools = @(Get-GUISysinternalsTools | Where-Object { $catalogSysinternalsBases -notcontains $_.Name.ToLowerInvariant() -and $mappedCategories -notcontains $_.Category })
+    $tools = @(Get-GUISysinternalsStandaloneTools)
     $tools = @(
         New-GUIToolItem `
             -Text "Sysinternals Help" `
@@ -14720,10 +14764,19 @@ if($ButtonSmokeTest){
         exit 1
     }
 
-    $searchTest = Find-GUIHeaderToolSearchMatch -Text "Test-NetConnection"
-    if(!$searchTest -or $searchTest.Tab -ne "Analyze"){
-        Write-Host "Header tool search did not resolve Test-NetConnection to Analyze."
-        exit 1
+    $expectedSearchTabs = @{
+        "Test-NetConnection" = "Analyze"
+        "PsExec Helper" = "PsExec"
+        "DHCP Sleuth" = "Infrastructure"
+        "Autoruns" = "Security"
+    }
+
+    foreach($searchName in $expectedSearchTabs.Keys){
+        $searchTest = Find-GUIHeaderToolSearchMatch -Text $searchName
+        if(!$searchTest -or $searchTest.Tab -ne $expectedSearchTabs[$searchName]){
+            Write-Host ("Header tool search did not resolve {0} to {1}." -f $searchName,$expectedSearchTabs[$searchName])
+            exit 1
+        }
     }
 
     $knownGuiActions = @(

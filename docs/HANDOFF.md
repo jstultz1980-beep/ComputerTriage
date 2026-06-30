@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0024
+HANDOFF-0025
 
 ## Current Task
 None
@@ -34,8 +34,8 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0014 DHCP Sleuth restoration is complete. The project is ready for the
-next focused task.
+TASK-0015 header search tab mapping correction is complete. The project is
+ready for the next focused task.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -56,12 +56,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 3 / 10 | No |
-| Task System | 3 / 10 | No |
+| Documentation | 4 / 10 | No |
+| Task System | 4 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 2 / 10 | No |
+| UI | 3 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 0 / 10 | No |
@@ -91,6 +91,11 @@ TASK-0014 also hardened validation-only launch behavior: `App/NetworkToolkit.ps1
 now bypasses the single-instance mutex for `-SmokeTest` and `-ButtonSmokeTest`,
 and `App/ToolKit-GUI/ToolKit-GUI.ps1` disposes the test form and stops all
 known GUI timers during smoke-test cleanup.
+
+TASK-0015 corrected header search tab mapping. Search results now come from the
+same `Get-GUIToolsForTab` path used by visible tab pages, and the standalone
+Sysinternals search entries share the Sysinternals page filter. `PsExec Helper`
+now maps to the dedicated `PsExec` tab instead of `Remote`.
 
 No implementation task is active. Create the next focused task before changing
 toolkit behavior.
@@ -125,6 +130,11 @@ toolkit behavior.
 - Added `App/.gitignore` exceptions for DHCP Sleuth while keeping
   `DHCP-Sleuth.settings.json` ignored.
 - Hardened smoke-test lifecycle cleanup and test-mode singleton bypass.
+- Created TASK-0015 for header search tab mapping correction.
+- Completed TASK-0015 header search tab mapping correction.
+- Rebuilt header search indexing from visible tab tool placement.
+- Corrected `PsExec Helper` catalog placement to `PsExec`.
+- Added button smoke-test assertions for representative header search mappings.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
@@ -145,10 +155,17 @@ toolkit behavior.
 - Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1`.
 - Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
 - Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Parsed `App/NetworkToolkit/Config/ToolCatalog.ps1`.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Queried the header search index and confirmed `Test-NetConnection`,
+  `PsExec Helper`, `DHCP Sleuth`, `Autoruns`, and `Process Explorer` resolve to
+  their expected tabs.
 
 ## Next Action
 Create the next focused task before implementation. Recommended next task:
-`TASK-0015-HEPHAESTUS-Collection-Baseline-Audit`.
+`TASK-0016-HEPHAESTUS-Collection-Baseline-Audit`.
 
 ## Blockers
 None.
@@ -186,8 +203,9 @@ Current task state:
 - TASK-0012 phase-transition readiness is complete.
 - TASK-0013 header tool search is complete.
 - TASK-0014 DHCP Sleuth restoration is complete.
+- TASK-0015 header search tab mapping correction is complete.
 - Create the next focused task before implementation. Recommended next task:
-  TASK-0015-HEPHAESTUS-Collection-Baseline-Audit.
+  TASK-0016-HEPHAESTUS-Collection-Baseline-Audit.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.

@@ -26,3 +26,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0016 | 2026-06-30 | TASK-0014 | UI | +1 | Hardened GUI smoke-test cleanup and launcher test-mode singleton handling so validation works while the toolkit is open. |
 | CHG-0017 | 2026-06-30 | TASK-0014 | Task System | +1 | Created and completed the DHCP Sleuth restore task. |
 | CHG-0018 | 2026-06-30 | TASK-0014 | Documentation | +1 | Updated task, handoff, and changelog records for DHCP Sleuth restoration. |
+| CHG-0019 | 2026-06-30 | TASK-0015 | UI | +1 | Rebuilt header search tab mapping from the same tool placement path used by visible tab pages. |
+| CHG-0020 | 2026-06-30 | TASK-0015 | Task System | +1 | Created and completed the header search tab mapping correction task. |
+| CHG-0021 | 2026-06-30 | TASK-0015 | Documentation | +1 | Updated task, handoff, and changelog records for search tab mapping correction. |
