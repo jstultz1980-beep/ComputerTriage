@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0012
+HANDOFF-0014
 
 ## Current Task
 None.
@@ -43,26 +43,25 @@ prompt must be rewritten so the next bot starts from the repository state, not
 from chat history.
 
 ## Objective
-TASK-0006 is complete. `docs/HANDOFF.md` now explains how the handoff process
-works so ChatGPT or another bot can understand the workflow from repository
-files alone.
+TASK-0007 is complete. The Activity page now has compact speedometer-style CPU,
+RAM, and disk usage gauges above the toolkit process table.
 
 ## Current State
-The handoff now contains a `How The Handoff Process Works` section and a
-`Next Bot Prompt`. There is no active task. A new task must be created before
-implementation work begins.
+The Activity page keeps its existing toolkit process tracking and now refreshes
+CPU, RAM, and disk active-time gauges on the same timer. There is no active
+task. A new task must be created before implementation work begins.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
-- Created and completed `docs/TASKS/TASK-0006-Document-Handoff-Process.md`.
-- Added `How The Handoff Process Works` to this handoff.
-- Updated the `Next Bot Prompt` model to reinforce the repository source of
-  truth.
+- Created and completed `docs/TASKS/TASK-0007-Activity-Resource-Gauges.md`.
+- Added Activity page CPU, RAM, and disk gauges.
+- Preserved the existing Activity process table and process stop/refresh
+  actions.
 
 ## Validation Completed
-- Confirmed `docs/HANDOFF.md` contains `How The Handoff Process Works`.
-- Confirmed `docs/HANDOFF.md` contains `Next Bot Prompt`.
-- Confirmed `docs/HANDOFF.md` mentions `active task` and `source of truth`.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `App/ToolKit-GUI/ToolKit-GUI.ps1 -ButtonSmokeTest`; passed.
+- Confirmed Activity gauge functions and labels exist in the GUI script.
 
 ## Next Action
 Create a new task under `docs/TASKS` before doing any further implementation
@@ -75,7 +74,7 @@ None.
 Start with `PROJECT.md`. Do not implement without a new active task document.
 
 Unrelated working-tree noise remains and was intentionally not included in
-TASK-0006:
+TASK-0007:
 - `App/manifests/custom-tools.json` modified
 - `App/Triage/Tools/ServiWin/ServiWin.cfg` untracked
 

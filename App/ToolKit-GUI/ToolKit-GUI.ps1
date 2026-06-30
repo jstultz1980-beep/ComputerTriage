@@ -139,6 +139,7 @@ $script:TriageStatusRefreshTimer = $null
 $script:ActivityGrid = $null
 $script:ActivityStatusLabel = $null
 $script:ActivityRefreshTimer = $null
+$script:ActivityGaugePanels = @{}
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -12609,10 +12610,146 @@ function Get-GUIToolkitActivityProcesses {
     }
 }
 
+function New-GUIActivityGauge {
+    param(
+        [string]$Title,
+        [string]$Key
+    )
+
+    $panel = New-Object System.Windows.Forms.Panel
+    $panel.Dock = "Fill"
+    $panel.Margin = New-Object System.Windows.Forms.Padding(8,6,8,6)
+    $panel.MinimumSize = New-Object System.Drawing.Size(160,104)
+    $panel.Tag = [pscustomobject]@{
+        Title = $Title
+        Value = $null
+        Detail = "Waiting..."
+    }
+    $panel.Add_Paint({
+        param($sender,$eventArgs)
+
+        $g = $eventArgs.Graphics
+        $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+        $rect = New-Object System.Drawing.Rectangle(1,1,($sender.Width - 3),($sender.Height - 3))
+        if($rect.Width -lt 20 -or $rect.Height -lt 20){ return }
+
+        $cardPath = New-Object System.Drawing.Drawing2D.GraphicsPath
+        $diameter = 24
+        $cardPath.AddArc($rect.X,$rect.Y,$diameter,$diameter,180,90)
+        $cardPath.AddArc(($rect.Right - $diameter),$rect.Y,$diameter,$diameter,270,90)
+        $cardPath.AddArc(($rect.Right - $diameter),($rect.Bottom - $diameter),$diameter,$diameter,0,90)
+        $cardPath.AddArc($rect.X,($rect.Bottom - $diameter),$diameter,$diameter,90,90)
+        $cardPath.CloseFigure()
+        $cardBrush = New-Object System.Drawing.SolidBrush($script:GUITheme.Shell)
+        $borderPen = New-Object System.Drawing.Pen($script:GUITheme.Border,1)
+        $g.FillPath($cardBrush,$cardPath)
+        $g.DrawPath($borderPen,$cardPath)
+
+        $data = $sender.Tag
+        $value = $data.Value
+        $hasValue = ($null -ne $value)
+        $clamped = if($hasValue){ [Math]::Max(0,[Math]::Min(100,[double]$value)) }else{ 0 }
+        $arcColor = if(!$hasValue){ $script:GUITheme.MutedText }
+            elseif($clamped -ge 90){ $script:GUITheme.Danger }
+            elseif($clamped -ge 75){ $script:GUITheme.Warning }
+            else { $script:GUITheme.Success }
+
+        $titleFont = New-Object System.Drawing.Font("Segoe UI Semibold",9)
+        $valueFont = New-Object System.Drawing.Font("Segoe UI Semibold",18)
+        $detailFont = New-Object System.Drawing.Font("Segoe UI",8)
+        $titleBrush = New-Object System.Drawing.SolidBrush($script:GUITheme.Text)
+        $mutedBrush = New-Object System.Drawing.SolidBrush($script:GUITheme.MutedText)
+        $valueBrush = New-Object System.Drawing.SolidBrush($arcColor)
+
+        $titleFormat = New-Object System.Drawing.StringFormat
+        $titleFormat.Alignment = [System.Drawing.StringAlignment]::Center
+        $titleFormat.LineAlignment = [System.Drawing.StringAlignment]::Center
+        $g.DrawString([string]$data.Title,$titleFont,$titleBrush,(New-Object System.Drawing.RectangleF(8,8,($sender.Width - 16),20)),$titleFormat)
+
+        $diameter = [Math]::Min(($sender.Width - 40),($sender.Height - 46))
+        $arcRect = New-Object System.Drawing.Rectangle(([int](($sender.Width - $diameter) / 2)),32,[int]$diameter,[int]$diameter)
+        $basePen = New-Object System.Drawing.Pen($script:GUITheme.Border,10)
+        $basePen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $basePen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $valuePen = New-Object System.Drawing.Pen($arcColor,10)
+        $valuePen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $valuePen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+        $g.DrawArc($basePen,$arcRect,180,180)
+        if($hasValue -and $clamped -gt 0){
+            $g.DrawArc($valuePen,$arcRect,180,([float](180 * ($clamped / 100))))
+        }
+
+        $valueText = if($hasValue){ "{0:n0}%" -f $clamped }else{ "N/A" }
+        $g.DrawString($valueText,$valueFont,$valueBrush,(New-Object System.Drawing.RectangleF(8,50,($sender.Width - 16),34)),$titleFormat)
+        $g.DrawString([string]$data.Detail,$detailFont,$mutedBrush,(New-Object System.Drawing.RectangleF(8,86,($sender.Width - 16),20)),$titleFormat)
+
+        $cardBrush.Dispose(); $borderPen.Dispose(); $titleFont.Dispose(); $valueFont.Dispose(); $detailFont.Dispose()
+        $titleBrush.Dispose(); $mutedBrush.Dispose(); $valueBrush.Dispose(); $basePen.Dispose(); $valuePen.Dispose()
+        $titleFormat.Dispose(); $cardPath.Dispose()
+    })
+
+    $script:ActivityGaugePanels[$Key] = $panel
+    return $panel
+}
+
+function Set-GUIActivityGaugeValue {
+    param(
+        [string]$Key,
+        [object]$Value,
+        [string]$Detail
+    )
+    if(!$script:ActivityGaugePanels.ContainsKey($Key)){ return }
+    $panel = $script:ActivityGaugePanels[$Key]
+    if(!$panel -or $panel.IsDisposed){ return }
+    $panel.Tag = [pscustomobject]@{
+        Title = $panel.Tag.Title
+        Value = $Value
+        Detail = $Detail
+    }
+    $panel.Invalidate()
+}
+
+function Get-GUIActivityResourceSnapshot {
+    $cpu = $null
+    $memory = $null
+    $disk = $null
+
+    try {
+        $cpuCounter = Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'" -ErrorAction Stop
+        $cpu = [Math]::Round([double]$cpuCounter.PercentProcessorTime,0)
+    }
+    catch {}
+
+    try {
+        $os = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop
+        if($os.TotalVisibleMemorySize -gt 0){
+            $memory = [Math]::Round(((($os.TotalVisibleMemorySize - $os.FreePhysicalMemory) / $os.TotalVisibleMemorySize) * 100),0)
+        }
+    }
+    catch {}
+
+    try {
+        $diskCounter = Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk -Filter "Name='_Total'" -ErrorAction Stop
+        $disk = [Math]::Round([Math]::Min(100,[double]$diskCounter.PercentDiskTime),0)
+    }
+    catch {}
+
+    [pscustomobject]@{
+        CPU = $cpu
+        Memory = $memory
+        Disk = $disk
+    }
+}
+
 function Refresh-GUIToolkitActivity {
     if(!$script:ActivityGrid -or $script:ActivityGrid.IsDisposed){ return }
 
     try {
+        $snapshot = Get-GUIActivityResourceSnapshot
+        Set-GUIActivityGaugeValue -Key "CPU" -Value $snapshot.CPU -Detail "Processor load"
+        Set-GUIActivityGaugeValue -Key "Memory" -Value $snapshot.Memory -Detail "Physical RAM used"
+        Set-GUIActivityGaugeValue -Key "Disk" -Value $snapshot.Disk -Detail "Disk active time"
+
         $selectedPid = $null
         if($script:ActivityGrid.SelectedRows.Count -gt 0){
             $selectedPid = $script:ActivityGrid.SelectedRows[0].Tag
@@ -12685,17 +12822,30 @@ function Build-ToolkitActivityPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.RowCount = 3
+    $layout.RowCount = 4
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,52))) | Out-Null
     $Page.Controls.Add($layout)
 
+    $gaugeLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $gaugeLayout.Dock = "Fill"
+    $gaugeLayout.ColumnCount = 3
+    $gaugeLayout.RowCount = 1
+    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
+    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
+    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.34))) | Out-Null
+    $layout.Controls.Add($gaugeLayout,0,0)
+    [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "CPU" -Key "CPU"),0,0)
+    [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "RAM" -Key "Memory"),1,0)
+    [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "DISK" -Key "Disk"),2,0)
+
     $script:ActivityStatusLabel = New-GUILabel "Loading toolkit activity..."
     $ActivityStatusLabel.ForeColor = $script:GUITheme.MutedText
-    $layout.Controls.Add($ActivityStatusLabel,0,0)
+    $layout.Controls.Add($ActivityStatusLabel,0,1)
 
     $script:ActivityGrid = New-Object System.Windows.Forms.DataGridView
     $ActivityGrid.Dock = "Fill"
@@ -12719,12 +12869,12 @@ function Build-ToolkitActivityPage {
     $ActivityGrid.Columns["Memory"].FillWeight = 10
     $ActivityGrid.Columns["Path"].FillWeight = 26
     $ActivityGrid.Columns["CommandLine"].FillWeight = 33
-    $layout.Controls.Add($ActivityGrid,0,1)
+    $layout.Controls.Add($ActivityGrid,0,2)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttons.Dock = "Fill"
     $buttons.Padding = New-Object System.Windows.Forms.Padding(8)
-    $layout.Controls.Add($buttons,0,2)
+    $layout.Controls.Add($buttons,0,3)
     [void]$buttons.Controls.Add((New-GUIButton "Refresh Now" { Refresh-GUIToolkitActivity }))
     [void]$buttons.Controls.Add((New-GUIButton "Stop Selected" { Stop-GUISelectedToolkitActivityProcess }))
 
