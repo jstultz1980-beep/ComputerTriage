@@ -2802,7 +2802,8 @@ function Stop-GUIAsyncWorkers {
 
     foreach($timerName in @(
         "QuickDiagnosisTimer","ToolkitSizeTimer","ToolkitUpdateTimer","ToolkitDeploymentTimer",
-        "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer","GUIBusyTimer"
+        "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer",
+        "ActivityRefreshTimer","TriageTimer","TriageStatusRefreshTimer","GUIBusyTimer"
     )){
         try {
             $timer = Get-Variable -Name $timerName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
@@ -8978,8 +8979,9 @@ function Select-GUITabPage {
         Update-GUIStaticTabStripSelection
     }
     finally {
-        [array]::Reverse($layoutControls)
-        foreach($control in $layoutControls){
+        $resumeControls = @($layoutControls)
+        [array]::Reverse($resumeControls)
+        foreach($control in $resumeControls){
             try { $control.ResumeLayout($false) } catch {}
         }
         try { $script:StaticTabStrip.Invalidate() } catch {}
@@ -14692,6 +14694,7 @@ if($SmokeTest){
     Write-Host "Network Toolkit GUI loaded successfully."
     Write-Host "Commands:" $script:Commands.Count
     Stop-GUIAsyncWorkers
+    if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
     return
 }
 
@@ -14765,6 +14768,7 @@ if($ButtonSmokeTest){
     Write-Host "Button smoke test completed."
     Write-Host "Quick tab: OK"
     Stop-GUIAsyncWorkers
+    if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
     return
 }
 

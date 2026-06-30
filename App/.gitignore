@@ -18,6 +18,9 @@ NetworkToolkit/Data/ComputerState/*
 NetworkToolkit/ExternalTools/*
 NetworkToolkit/_Downloads/*
 Custom/*
+!Custom/DHCPSleuth/
+!Custom/DHCPSleuth/**
+Custom/DHCPSleuth/DHCP-Sleuth.settings.json
 manifests/custom-tools.json.bak
 manifests/gui-settings.json
 NetworkToolkit/Plugins/PrintQueues/Logs/*

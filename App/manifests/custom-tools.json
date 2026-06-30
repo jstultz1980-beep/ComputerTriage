@@ -28,6 +28,16 @@
                       "tabOverride":  ""
                   },
                   {
+                      "name":  "DHCP Sleuth",
+                      "source":  "Toolkit Standalone App",
+                      "version":  "1.0.0",
+                      "launchPath":  ".\\Custom\\DHCPSleuth\\DHCP-Sleuth.ps1",
+                      "installPath":  ".\\Custom\\DHCPSleuth",
+                      "arguments":  "",
+                      "tabOverride":  "Infrastructure",
+                      "launchMode":  "StandaloneGui"
+                  },
+                  {
                       "name":  "CPU-Z",
                       "source":  "Chocolatey Toolbox",
                       "version":  "2.20.2.20260604",

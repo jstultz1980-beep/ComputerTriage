@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0014 DHCP Sleuth restoration.
+- Restored DHCP Sleuth as a tracked standalone toolkit app on the Infrastructure tab.
+- Kept DHCP Sleuth runtime settings ignored and fixed smoke-test validation while another toolkit window is open.
 - Completed TASK-0013 header tool search.
 - Added GUI header autocomplete search that jumps to the proper tool tab.
 - Completed TASK-0012 phase-transition readiness.

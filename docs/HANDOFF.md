@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0023
+HANDOFF-0024
 
 ## Current Task
 None
@@ -34,8 +34,8 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0013 header tool search is complete. The project is ready for the next
-focused task.
+TASK-0014 DHCP Sleuth restoration is complete. The project is ready for the
+next focused task.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -56,13 +56,13 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 2 / 10 | No |
-| Task System | 2 / 10 | No |
+| Documentation | 3 / 10 | No |
+| Task System | 3 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 1 / 10 | No |
-| Plugin Framework | 0 / 10 | No |
+| UI | 2 / 10 | No |
+| Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 0 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
@@ -80,6 +80,17 @@ TASK-0013 added a GUI header search box. It autocompletes tool names from the
 catalog, mapped Sysinternals tools, and ready custom/toolbox apps. Selecting a
 result or pressing Enter navigates to the matching tab without launching the
 tool.
+
+TASK-0014 restored DHCP Sleuth. The tool had disappeared because `App/Custom/*`
+ignored the standalone app folder and the tracked custom tools manifest did not
+register it. DHCP Sleuth is now tracked under `App/Custom/DHCPSleuth`, its
+mutable `DHCP-Sleuth.settings.json` remains ignored, and the manifest registers
+it as a standalone GUI app on the Infrastructure tab.
+
+TASK-0014 also hardened validation-only launch behavior: `App/NetworkToolkit.ps1`
+now bypasses the single-instance mutex for `-SmokeTest` and `-ButtonSmokeTest`,
+and `App/ToolKit-GUI/ToolKit-GUI.ps1` disposes the test form and stops all
+known GUI timers during smoke-test cleanup.
 
 No implementation task is active. Create the next focused task before changing
 toolkit behavior.
@@ -106,6 +117,14 @@ toolkit behavior.
 - Added header autocomplete search to `App/ToolKit-GUI/ToolKit-GUI.ps1`.
 - Added smoke-test coverage that confirms the search box exists and resolves
   `Test-NetConnection` to the Analyze tab.
+- Created TASK-0014 for DHCP Sleuth restoration.
+- Completed TASK-0014 DHCP Sleuth restoration.
+- Added tracked DHCP Sleuth standalone app files under `App/Custom/DHCPSleuth`.
+- Registered DHCP Sleuth in `App/manifests/custom-tools.json` for the
+  Infrastructure tab with standalone GUI launch behavior.
+- Added `App/.gitignore` exceptions for DHCP Sleuth while keeping
+  `DHCP-Sleuth.settings.json` ignored.
+- Hardened smoke-test lifecycle cleanup and test-mode singleton bypass.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
@@ -121,10 +140,15 @@ toolkit behavior.
 - Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with `PSParser`.
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Confirmed `App/Custom/DHCPSleuth/DHCP-Sleuth.settings.json` is ignored.
+- Parsed `App/NetworkToolkit.ps1`.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
 
 ## Next Action
 Create the next focused task before implementation. Recommended next task:
-`TASK-0014-HEPHAESTUS-Collection-Baseline-Audit`.
+`TASK-0015-HEPHAESTUS-Collection-Baseline-Audit`.
 
 ## Blockers
 None.
@@ -134,7 +158,10 @@ Start with `PROJECT.md`. If no task is active, create a task under
 `docs/TASKS` and update this handoff before implementation.
 
 Known working-tree noise:
-- None expected after TASK-0013 commit.
+- Runtime custom-tool provenance migration can add timestamp and package
+  metadata drift to `App/manifests/custom-tools.json` during GUI validation.
+  Reset that runtime drift before committing unless the active task explicitly
+  changes the shipped manifest.
 
 ## Next Bot Prompt
 Copy and paste the following prompt into another bot when offloading reasoning or review work. Do not create a separate task packet file.
@@ -158,8 +185,9 @@ Current task state:
 - TASK-0011 foundation audit is complete.
 - TASK-0012 phase-transition readiness is complete.
 - TASK-0013 header tool search is complete.
+- TASK-0014 DHCP Sleuth restoration is complete.
 - Create the next focused task before implementation. Recommended next task:
-  TASK-0014-HEPHAESTUS-Collection-Baseline-Audit.
+  TASK-0015-HEPHAESTUS-Collection-Baseline-Audit.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.
