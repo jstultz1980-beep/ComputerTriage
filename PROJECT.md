@@ -33,6 +33,23 @@ No implementation work may begin unless there is an active task document under `
 ## No Patch Stacking Rule
 If a script or implementation develops structural errors, stop patching it. Roll back to the last known-good state and rebuild cleanly from the current repository layout.
 
+## Audit State Tracking Rule
+Each subsystem has its own audit change counter in `docs/HANDOFF.md`.
+
+A subsystem change is an accepted engineering change that materially affects that subsystem's behavior, structure, responsibility, interface, documentation, or validation model.
+
+When any subsystem counter reaches `10 / 10`, no new implementation work may begin until a new audit task is completed.
+
+After the audit is completed:
+1. The audited subsystem counter resets to `0 / 10`.
+2. `docs/HANDOFF.md` is updated.
+3. `docs/HISTORY/CHANGE-LEDGER.md` records the audit completion.
+4. Normal task work may resume.
+
+Every completed task must update:
+- `docs/HANDOFF.md`
+- `docs/HISTORY/CHANGE-LEDGER.md` when it records a subsystem change
+
 ## Product
 Computer Triage Toolkit.
 
