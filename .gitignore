@@ -1,4 +1,4 @@
 App/cache/
 App/logs/
 App/Triage/Runs/
-App/Triage/Tools/ServiWin/ServiWin.cfg
+App/Triage/Tools/**/*.cfg

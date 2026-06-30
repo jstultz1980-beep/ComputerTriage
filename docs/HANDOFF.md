@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0019
+HANDOFF-0020
 
 ## Current Task
-`docs/TASKS/TASK-0011-Foundation-Audit.md`
+None
 
 ## Current Owner
 Codex
@@ -34,8 +34,8 @@ Work should move through this sequence:
 The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 ## Objective
-TASK-0011 is active. Perform a full repository foundation audit before
-additional feature implementation continues.
+TASK-0011 foundation audit is complete. The repository is ready for the next
+focused task.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -54,10 +54,10 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 2 / 10 | No |
+| Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 2 / 10 | No |
-| Task System | 1 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 0 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -70,37 +70,50 @@ docs/HISTORY/CHANGE-LEDGER.md
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-TASK-0011 should audit repository foundation, task flow, handoff accuracy,
-audit counters, generated/runtime drift, GitHub sync, and readiness for the
-next implementation task.
+TASK-0011 completed the foundation audit. Runtime-only custom tool manifest
+drift was reset, generated third-party `.cfg` files are now ignored broadly,
+task status wording was normalized, and stale architecture root path casing was
+corrected.
+
+No implementation task is active. Create the next focused task before changing
+toolkit behavior.
 
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
 - Created `docs/TASKS/TASK-0011-Foundation-Audit.md`.
 - Updated this handoff to make TASK-0011 active.
+- Completed TASK-0011 foundation audit.
+- Verified GitHub remote and branch tracking.
+- Reviewed required startup docs and task list.
+- Compared audit counters against `docs/HISTORY/CHANGE-LEDGER.md`.
+- Reset runtime-only `App/manifests/custom-tools.json` drift.
+- Broadened generated third-party tool config ignore coverage.
+- Normalized TASK-0009 status wording.
+- Corrected stale architecture root path casing.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
 - Confirmed existing task list ended at TASK-0010 before creating TASK-0011.
+- Ran `git status --short --branch`.
+- Ran `git remote -v`.
+- Ran `git log --oneline -12`.
+- Reviewed `docs/TASKS/TASK-*.md` status values.
+- Reviewed `docs/HISTORY/CHANGE-LEDGER.md` against handoff counters.
+- Reviewed `.gitignore` generated/runtime coverage.
 
 ## Next Action
-Complete `docs/TASKS/TASK-0011-Foundation-Audit.md`.
+Create the next focused task before implementation. Recommended next task:
+`TASK-0012-HEPHAESTUS-Collection-Baseline-Audit`.
 
 ## Blockers
-None for TASK-0011.
+None.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. Keep scope limited to TASK-0011.
+Start with `PROJECT.md`. If no task is active, create a task under
+`docs/TASKS` and update this handoff before implementation.
 
 Known working-tree noise:
-- `App/manifests/custom-tools.json` modified
-- `App/Triage/Tools/AppCrashView/AppCrashView.cfg` untracked
-- `App/Triage/Tools/CurrPorts/cports.cfg` untracked
-- `App/Triage/Tools/DriverView/DriverView.cfg` untracked
-- `App/Triage/Tools/EventLogChannelsView/EventLogChannelsView.cfg` untracked
-- `App/Triage/Tools/FullEventLogView/FullEventLogView.cfg` untracked
-- `App/Triage/Tools/NetworkInterfacesView/NetworkInterfacesView.cfg` untracked
-- `App/Triage/Tools/USBDeview/USBDeview.cfg` untracked
+- None expected after TASK-0011 commit.
 
 ## Next Bot Prompt
 Copy and paste the following prompt into another bot when offloading reasoning or review work. Do not create a separate task packet file.
@@ -119,9 +132,11 @@ Read these repository files in order:
 6. The active task document listed in docs/HANDOFF.md.
 
 Current task state:
-- docs/HANDOFF.md lists TASK-0011 as active.
+- docs/HANDOFF.md lists no active implementation task.
 - Audit state tracking is active.
-- Complete TASK-0011 before additional feature implementation.
+- TASK-0011 foundation audit is complete.
+- Create the next focused task before implementation. Recommended next task:
+  TASK-0012-HEPHAESTUS-Collection-Baseline-Audit.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.
@@ -135,7 +150,8 @@ Repository remote:
 
 Rules:
 - Treat repository files as authoritative.
-- Keep changes scoped to TASK-0011.
+- Do not implement changes until a task file exists and docs/HANDOFF.md lists
+  it as active.
 - Do not use chat history as source of truth unless the same information exists in the repository.
 - Do not create a separate ChatGPT task packet as source of truth.
 - When a task is completed, update docs/HANDOFF.md with the next task state and a fresh Next Bot Prompt for the next bot.

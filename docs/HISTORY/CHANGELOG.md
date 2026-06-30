@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-06-30
+- Completed TASK-0011 foundation audit.
+- Broadened generated third-party tool configuration ignores.
+- Reset runtime-only custom tool manifest drift.
+- Normalized task status wording and corrected stale architecture root path casing.
 - Added audit state tracking rule.
 - Added subsystem change counters to `docs/HANDOFF.md`.
 - Added `docs/HISTORY/CHANGE-LEDGER.md`.

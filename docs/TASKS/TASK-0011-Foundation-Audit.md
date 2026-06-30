@@ -1,7 +1,7 @@
 # TASK-0011 - Foundation Audit
 
 ## Status
-Assigned
+Completed
 
 ## Owner
 Codex
@@ -43,18 +43,18 @@ The audit should verify:
 - Possibly other documentation files if the audit finds stale governance text.
 
 ## Acceptance Criteria
-- [ ] Repository status and GitHub tracking are verified.
-- [ ] Required startup documents are present and internally consistent.
-- [ ] `docs/HANDOFF.md` accurately describes the current state and next bot
+- [x] Repository status and GitHub tracking are verified.
+- [x] Required startup documents are present and internally consistent.
+- [x] `docs/HANDOFF.md` accurately describes the current state and next bot
       prompt.
-- [ ] Task list is reviewed for numbering collisions, stale statuses, and
+- [x] Task list is reviewed for numbering collisions, stale statuses, and
       incomplete completion notes.
-- [ ] Audit counters in `docs/HANDOFF.md` are compared against
+- [x] Audit counters in `docs/HANDOFF.md` are compared against
       `docs/HISTORY/CHANGE-LEDGER.md`.
-- [ ] Runtime/generated drift is classified with specific recommendations.
-- [ ] `.gitignore` recommendations are documented or applied if clearly safe.
-- [ ] Audit findings are recorded in completion notes.
-- [ ] Handoff is updated with post-audit state and next recommended task.
+- [x] Runtime/generated drift is classified with specific recommendations.
+- [x] `.gitignore` recommendations are documented or applied if clearly safe.
+- [x] Audit findings are recorded in completion notes.
+- [x] Handoff is updated with post-audit state and next recommended task.
 
 ## Validation Steps
 ```powershell
@@ -92,4 +92,41 @@ Instructions for Next Owner:
 - Complete the foundation audit before additional feature implementation.
 
 ## Completion Notes
-Append completion notes here.
+TASK-0011 foundation audit completed on 2026-06-30.
+
+Findings:
+- Repository remote is configured as
+  `https://github.com/jstultz1980-beep/ComputerTriage.git`; local `master`
+  tracks `origin/master`.
+- Required startup documents are present and usable:
+  `PROJECT.md`, `docs/PROJECT-CHARTER.md`, `docs/ARCHITECTURE.md`,
+  `docs/ROADMAP.md`, and `docs/HANDOFF.md`.
+- `docs/HANDOFF.md` correctly explains the handoff process and now records
+  post-audit state with no active implementation task.
+- Task numbering is sequential through TASK-0011. TASK-0009 used `Complete`
+  instead of the standard `Completed`; this was normalized.
+- Audit counters matched the ledger before completion:
+  Repository Governance `2 / 10`, Documentation `2 / 10`, and Task System
+  `1 / 10`. TASK-0011 completed the audit and reset those audited subsystem
+  counters to `0 / 10`.
+- `App/manifests/custom-tools.json` was runtime drift and was reset to the
+  tracked repository version.
+- Third-party tool `.cfg` files under `App/Triage/Tools` are generated runtime
+  settings. `.gitignore` now ignores `App/Triage/Tools/**/*.cfg`.
+- `docs/ARCHITECTURE.md` had stale root path casing. It now uses
+  `C:\Computer_Toolkit`.
+
+Actions Applied:
+- Reset runtime-only custom tools manifest drift.
+- Broadened `.gitignore` coverage for generated third-party tool configs.
+- Normalized TASK-0009 status wording.
+- Updated architecture documentation root path casing.
+- Updated changelog, change ledger, task completion notes, and handoff.
+
+Recommendations:
+- Start the next focused task before implementation. Recommended next task:
+  `TASK-0012-HEPHAESTUS-Collection-Baseline-Audit`, because the quick
+  diagnosis and computer profile outputs are the core product path and should
+  be stabilized before ARGUS consumes their evidence.
+- Keep portable application binaries and generated runtime files out of routine
+  implementation commits unless a task explicitly changes shipped tool state.

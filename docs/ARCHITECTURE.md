@@ -5,7 +5,7 @@ Computer Triage Toolkit is a single-computer diagnostic product.
 
 ## Current Repository Layout
 ```text
-C:\computer_toolkit
+C:\Computer_Toolkit
 |-- PROJECT.md
 |-- README.md
 |-- NetworkToolkit.vbs
