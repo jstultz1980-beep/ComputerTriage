@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0027
+HANDOFF-0028
 
 ## Current Task
 None
@@ -36,6 +36,13 @@ The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. I
 ## Objective
 TASK-0016 tool source-of-truth correction is complete. The project is ready for
 the next focused task.
+
+An accepted HEPHAESTUS direction update is now captured in this handoff:
+HEPHAESTUS should evolve from a collector-first bundle builder into a
+collector plus deterministic local analysis platform. The next major HEPHAESTUS
+milestone should be a focused Local Analysis Engine v1 task, but no
+implementation should start until a task file exists and this handoff lists that
+task as active.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -103,6 +110,113 @@ registry/search entries are checked during button smoke validation, and triage
 completion handling is single-shot so one completed run cannot produce repeated
 completion or result-read dialogs.
 
+## Accepted HEPHAESTUS Direction Update
+
+The accepted product direction is to transition HEPHAESTUS from a diagnostic
+evidence collector into a collector plus deterministic local analysis platform.
+
+The intended pipeline is:
+
+```text
+Collect
+  ↓
+Analyze locally with deterministic rules
+  ↓
+Generate structured findings
+  ↓
+Generate a local executive report
+  ↓
+Package bundle
+  ↓
+ARGUS / AI interpretation
+```
+
+HEPHAESTUS should perform the first-pass deterministic analysis. ARGUS should
+consume the resulting structured findings, timelines, evidence scores, and
+normalized JSON artifacts, then provide higher-level interpretation,
+prioritization, and recommendations.
+
+The next major HEPHAESTUS milestone should be:
+
+```text
+Local Analysis Engine v1
+```
+
+No implementation for this milestone should begin until a focused task exists
+under `docs/TASKS` and `docs/HANDOFF.md` lists that task as active.
+
+### Approved Local Analysis Engine Scope
+
+When a task is created for Local Analysis Engine v1, it should cover these
+approved capabilities unless the task intentionally narrows scope:
+
+- Deterministic rule engine.
+- Structured findings with severity, confidence, evidence, recommendations,
+  category, source files, and related tags.
+- Event correlation and timeline generation.
+- Machine profile generation.
+- Evidence quality and completeness scoring.
+- Security product inventory.
+- Driver intelligence.
+- Storage analysis.
+- Windows Update and servicing analysis.
+- AD, DFSR, SYSVOL, and Group Policy interpretation when applicable.
+- Network intelligence.
+- Process pressure and leak candidate detection.
+- Local HTML executive report generation.
+- Normalized JSON outputs for major collector categories.
+- Bundle capability and schema version metadata.
+- Portable tool orchestrator framework with absent tools marked as skipped, not
+  failed.
+
+### Approved Normalized Output Direction
+
+Future HEPHAESTUS work should preserve existing human-readable TXT/CSV outputs
+while adding normalized JSON for analysis. Target artifacts include:
+
+```text
+Analysis/findings.json
+Analysis/timeline.json
+Analysis/evidence-score.json
+Analysis/normalized/machine-profile.json
+Analysis/normalized/services.json
+Analysis/normalized/processes.json
+Analysis/normalized/drivers.json
+Analysis/normalized/network.json
+Analysis/normalized/security-products.json
+Analysis/normalized/storage.json
+Analysis/normalized/updates.json
+Analysis/normalized/domain-health.json
+Analysis/normalized/gpo.json
+Analysis/normalized/hyperv.json
+Metadata/bundle-capabilities.json
+Metadata/schema-version.json
+```
+
+### HEPHAESTUS / ARGUS Responsibility Boundary
+
+HEPHAESTUS responsibilities:
+
+- Collect evidence.
+- Normalize evidence.
+- Run deterministic checks.
+- Produce local findings.
+- Produce local timeline.
+- Produce evidence score.
+- Produce local HTML report.
+- Package the bundle and embedded AI prompt.
+
+ARGUS responsibilities:
+
+- Read machine profile, findings, timeline, evidence score, and normalized JSON
+  first.
+- Use raw evidence to verify or deepen findings.
+- Distinguish deterministic findings from AI inference.
+- Explain likely root cause candidates.
+- Prioritize next actions.
+- Identify missing evidence.
+- Avoid unsupported conclusions.
+
 ## Completed Work
 - Read `PROJECT.md` and required startup documents.
 - Created `docs/TASKS/TASK-0011-Foundation-Audit.md`.
@@ -146,6 +260,8 @@ completion or result-read dialogs.
   entries.
 - Hardened triage completion/cancellation timer handling to prevent repeated
   modal dialogs or repeated result-read log spam from one run.
+- Captured the accepted HEPHAESTUS Local Analysis Engine direction in this
+  handoff for future task creation.
 
 ## Validation Completed
 - Confirmed `master` is aligned with `origin/master` before task creation.
@@ -176,10 +292,20 @@ completion or result-read dialogs.
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Reset runtime-only `App/manifests/custom-tools.json` drift after validation.
+- GitHub update only: fetched and updated `docs/HANDOFF.md` to record accepted
+  HEPHAESTUS Local Analysis Engine direction. No local validation was run by
+  ChatGPT for this documentation-only update.
 
 ## Next Action
 Create the next focused task before implementation. Recommended next task:
 `TASK-0017-Triage-Manual-Run-Validation`.
+
+The accepted HEPHAESTUS Local Analysis Engine v1 work is approved direction, but
+should be started only after a focused task is created and activated. If the
+project owner chooses to prioritize HEPHAESTUS analysis work next instead of the
+manual run validation task, create a focused task such as
+`TASK-0017-HEPHAESTUS-Local-Analysis-Engine-v1` and make it active in this
+handoff before implementation.
 
 ## Blockers
 None.
@@ -221,6 +347,22 @@ Current task state:
 - TASK-0016 tool source-of-truth correction is complete.
 - Create the next focused task before implementation. Recommended next task:
   TASK-0017-Triage-Manual-Run-Validation.
+
+Accepted HEPHAESTUS direction:
+- HEPHAESTUS should evolve from a collector-first bundle builder into a
+  collector plus deterministic local analysis platform.
+- The approved pipeline is Collect -> Analyze locally -> Generate structured
+  findings -> Generate local executive report -> Package bundle -> ARGUS / AI
+  interpretation.
+- The next major HEPHAESTUS milestone should be Local Analysis Engine v1.
+- Local Analysis Engine v1 should include deterministic findings, a rule engine,
+  event correlation/timeline generation, machine profile, evidence scoring,
+  security inventory, driver intelligence, storage analysis, Windows Update
+  analysis, AD/DFSR/GPO interpretation where applicable, network intelligence,
+  normalized JSON outputs, bundle capability/schema metadata, and a local HTML
+  executive report.
+- Do not implement this work until a focused task file exists and
+  docs/HANDOFF.md lists that task as active.
 
 Audit counter rule:
 - Each subsystem has a change counter in docs/HANDOFF.md.
