@@ -1,13 +1,13 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0032
+HANDOFF-0033
 
 ## Current Task
-TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation
+TASK-0020-ARGUS-Input-Contract-ADR
 
 ## Current Owner
-Codex
+ChatGPT
 
 ## Next Owner
 Codex
@@ -26,9 +26,10 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0019 has started but is not complete. A first implementation slice was pushed to GitHub and now needs local validation/correction by Codex.
+TASK-0019 is complete. ChatGPT should now execute TASK-0020 and finalize the ARGUS input contract and evidence trust model before any ARGUS implementation begins.
 
 Do not implement ARGUS.
+Do not modify HEPHAESTUS code.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,15 +51,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 3 / 10 | No |
-| Task System | 2 / 10 | No |
-| HEPHAESTUS | 2 / 10 | No |
+| Documentation | 4 / 10 | No |
+| Task System | 3 / 10 | No |
+| HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
 | UI | 4 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
-| Validation/Test Framework | 2 / 10 | No |
+| Validation/Test Framework | 3 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
@@ -66,57 +67,55 @@ The GitHub remote is configured as `https://github.com/jstultz1980-beep/Computer
 
 Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one active task.
 
-TASK-0017 completed validation-only work:
-- Smoke validation passed.
-- Button-smoke validation passed.
-- Runtime `App/manifests/custom-tools.json` drift was reset before commit.
-- Untracked `App/NetworkToolkit/LatencyMon/` remained untouched.
+Completed work:
+- TASK-0017 completed validation-only work.
+- TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
+- TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
 
-TASK-0018 completed design-only work:
-- Created Local Analysis Engine v1 design.
-- Created ADRs for HEPHAESTUS local analysis boundary and schema versioning.
-- Created proposed ARGUS input contract/trust-model ADR.
-- Created TASK-0019 implementation task.
-
-TASK-0019 implementation has started:
-- Created `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1`.
-- Registered command: `Run Local Analysis`.
-- The module creates `Analysis/`, `Analysis/normalized/`, and `Metadata/` under the selected bundle/output root.
-- The module writes `findings.json`, `timeline.json`, `evidence-score.json`, `machine-profile.json`, `report.html`, `bundle-capabilities.json`, and `schema-version.json`.
-- TASK-0019 remains active because local PowerShell validation has not been run by ChatGPT.
+TASK-0019 validation evidence:
+- `Run Local Analysis` completed successfully.
+- Bundle root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
+- Analysis root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles\Analysis`.
+- Findings: `6`.
+- EvidenceScore: `50`.
+- Required files existed:
+  - `Analysis/findings.json`
+  - `Analysis/timeline.json`
+  - `Analysis/evidence-score.json`
+  - `Analysis/normalized/machine-profile.json`
+  - `Analysis/report.html`
+  - `Metadata/bundle-capabilities.json`
+  - `Metadata/schema-version.json`
+- JSON parse checks passed for findings, evidence score, and bundle capabilities.
+- Smoke test passed: `Network Toolkit GUI loaded successfully. Commands: 18`.
+- Button smoke test passed: `Button smoke test completed. Quick tab: OK`.
 
 ## Active Task
-`TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation`
+`TASK-0020-ARGUS-Input-Contract-ADR`
 
-Immediate next work:
-1. Pull from `origin/master`.
-2. Validate the new Core module parses and loads.
-3. Run the existing smoke and button-smoke tests.
-4. Run the safe invocation path:
-   ```powershell
-   powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -CLI -RunCommand "Run Local Analysis"
-   ```
-5. Validate generated JSON artifacts parse successfully.
-6. Fix any defects found within TASK-0019 scope.
-7. Complete TASK-0019 only after validation passes.
+Scope summary:
+- Finalize the ARGUS input contract and evidence trust model.
+- Review HEPHAESTUS Local Analysis Engine v1 outputs and existing design/ADR docs.
+- Accept, revise, or supersede `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`.
+- Define ARGUS input artifact priority order.
+- Define deterministic evidence versus ARGUS inference trust rules.
+- Define missing, partial, and low-quality evidence behavior.
+- Create focused follow-on Codex implementation task for ARGUS foundation if appropriate.
 
 ## Queued Work
-- `TASK-0020-ARGUS-Input-Contract-ADR` owned by ChatGPT.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
+- `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0020 completes and activates a specific scope.
 
 ## Validation Completed For This Update
-- Read required startup documents from GitHub `master`.
-- Confirmed TASK-0019 was active before implementation start.
-- Added a new Core module only.
-- Did not implement ARGUS.
-- Did not download or install tools.
-- Did not touch untracked `App/NetworkToolkit/LatencyMon/`.
-
-Local PowerShell validation was not run by ChatGPT for this GitHub update.
+- Applied user-provided TASK-0019 validation results to the repository.
+- Marked TASK-0019 complete.
+- Created and activated TASK-0020.
+- Updated queue and handoff so they agree on exactly one active task.
+- Updated roadmap, changelog, and change ledger.
 
 ## Blockers
-- Local validation is still required.
+None.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -125,11 +124,11 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0019: Implement HEPHAESTUS Local Analysis Engine v1 slice
+TASK-0019: Complete HEPHAESTUS Local Analysis Engine v1 implementation
 ```
 
 ## Next Bot Prompt
-Copy and paste the following prompt into Codex. Do not create a separate task packet file.
+Copy and paste the following prompt into ChatGPT. Do not create a separate task packet file.
 
 ```text
 You are assisting with the Computer Triage Toolkit repository.
@@ -143,7 +142,7 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md
+7. docs/TASKS/TASK-0020-ARGUS-Input-Contract-ADR.md
 8. docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md
 9. docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md
 10. docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md
@@ -151,44 +150,47 @@ Read these repository files in order:
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.
-- Owner: Codex.
-- A first implementation slice was pushed, but local validation has not been run.
+- Active task: TASK-0020-ARGUS-Input-Contract-ADR.
+- Owner: ChatGPT.
+- Next owner: Codex.
+- TASK-0019 is complete and validated.
+- HEPHAESTUS Local Analysis Engine v1 now produces validated Analysis and Metadata artifacts.
 
 Your job:
-Continue and complete TASK-0019 only.
+Complete TASK-0020 ADR/design work only.
 
 Scope:
-- Pull the latest `origin/master` changes.
-- Validate and correct `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1` if needed.
-- Run existing smoke and button-smoke validation.
-- Run `Run Local Analysis` through the CLI path.
-- Validate generated JSON artifacts parse successfully.
-- Confirm Analysis and Metadata outputs are created in the bundle/output root.
-- Ensure analysis failure does not break collection.
-- Update TASK-0019, QUEUE, HANDOFF, CHANGE-LEDGER, and CHANGELOG when TASK-0019 is complete.
+- Finalize the ARGUS input contract and evidence trust model.
+- Review HEPHAESTUS Local Analysis Engine v1 outputs and existing design/ADR docs.
+- Accept, revise, or supersede ADR-0003.
+- Define the exact ARGUS input artifact priority order.
+- Define deterministic evidence versus ARGUS inference trust rules.
+- Define missing, partial, low-quality, and parser-warning evidence behavior.
+- Define the first focused ARGUS foundation implementation task for Codex.
+- Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
+- Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
 - Implement ARGUS.
+- Modify HEPHAESTUS code.
+- Modify application code.
 - Download or install tools.
+- Clean unrelated files.
 - Import, delete, or modify untracked App/NetworkToolkit/LatencyMon/ unless a future task explicitly handles it.
-- Build a full rule catalog.
-- Refactor broad collector or GUI code.
-- Perform whole-network analysis.
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Existing smoke test passes.
-- Button-smoke test passes or any blocker is documented.
-- Generated JSON artifacts parse successfully.
-- A test bundle contains the required Analysis and Metadata outputs.
-- Analysis failure does not break collection.
-- No ARGUS implementation is added.
+- ADR-0003 is accepted or superseded.
+- ARGUS input priority order is explicit.
+- Deterministic-vs-inference trust rules are explicit.
+- Missing, partial, and low-quality evidence behavior is explicit.
+- Follow-on Codex implementation task is specific and small enough to execute safely.
+- No ARGUS code is implemented.
+- No HEPHAESTUS code is modified.
 
 When done, provide:
-- Concise summary of implementation performed.
+- Concise summary of ADR/design work performed.
 - Exact files changed.
-- Validation performed.
 - Current active task.
 - Current owner and next owner.
 - Recommended commit message.
