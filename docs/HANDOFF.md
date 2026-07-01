@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0031
+HANDOFF-0032
 
 ## Current Task
 TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation
@@ -10,7 +10,7 @@ TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation
 Codex
 
 ## Next Owner
-Codex or ChatGPT depending on TASK-0019 findings
+Codex
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
@@ -23,19 +23,10 @@ The handoff process has four core files:
 - `docs/TASKS/QUEUE.md` defines the official task queue and lifecycle.
 - The active task file under `docs/TASKS` defines the only work that may be performed.
 
-Work should move through this sequence:
-1. Read `PROJECT.md`, the project docs, this handoff, the task queue, and the active task.
-2. Perform only the work described by the active task. Do not clean up unrelated files or expand scope unless a task explicitly says to do so.
-3. Validate the work using the validation steps in the task.
-4. Update the active task file with completion notes and checked acceptance criteria.
-5. Update `docs/TASKS/QUEUE.md` if task state changes.
-6. Update this handoff with the new project state, validation results, known unrelated working-tree drift, and a fresh `Next Bot Prompt`.
-7. Commit the related changes with a commit message that references the task.
-
-The official task lifecycle is `Backlog -> Queued -> Assigned -> Active -> Validation -> Complete -> Archived`. Only one task may be `Active`.
+Only one task may be `Active`.
 
 ## Objective
-TASK-0018 design work is complete. Codex should now implement the focused TASK-0019 minimal vertical slice for HEPHAESTUS Local Analysis Engine v1.
+TASK-0019 has started but is not complete. A first implementation slice was pushed to GitHub and now needs local validation/correction by Codex.
 
 Do not implement ARGUS.
 Do not download or install tools.
@@ -46,8 +37,6 @@ Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unle
 Each subsystem has its own change counter.
 
 When any subsystem reaches `10 / 10` recorded subsystem changes, work must pause and a new audit task must be completed before further implementation work continues.
-
-After the audit is completed, the audited subsystem counter resets to `0 / 10` and starts counting again from zero.
 
 Change records are tracked in:
 
@@ -61,9 +50,9 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 2 / 10 | No |
+| Documentation | 3 / 10 | No |
 | Task System | 2 / 10 | No |
-| HEPHAESTUS | 1 / 10 | No |
+| HEPHAESTUS | 2 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
 | UI | 4 / 10 | No |
@@ -84,52 +73,50 @@ TASK-0017 completed validation-only work:
 - Untracked `App/NetworkToolkit/LatencyMon/` remained untouched.
 
 TASK-0018 completed design-only work:
-- Created `docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md`.
-- Created `docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md`.
-- Created `docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md`.
-- Created `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` as proposed future ARGUS contract direction.
-- Created `docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md`.
-- Updated roadmap, queue, ledger, changelog, and this handoff.
+- Created Local Analysis Engine v1 design.
+- Created ADRs for HEPHAESTUS local analysis boundary and schema versioning.
+- Created proposed ARGUS input contract/trust-model ADR.
+- Created TASK-0019 implementation task.
+
+TASK-0019 implementation has started:
+- Created `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1`.
+- Registered command: `Run Local Analysis`.
+- The module creates `Analysis/`, `Analysis/normalized/`, and `Metadata/` under the selected bundle/output root.
+- The module writes `findings.json`, `timeline.json`, `evidence-score.json`, `machine-profile.json`, `report.html`, `bundle-capabilities.json`, and `schema-version.json`.
+- TASK-0019 remains active because local PowerShell validation has not been run by ChatGPT.
 
 ## Active Task
 `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation`
 
-Scope summary:
-- Implement the first minimal HEPHAESTUS local analysis vertical slice.
-- Create `Analysis/`, `Analysis/normalized/`, and `Metadata/` output folders in the bundle/output root.
-- Generate schema/version metadata and bundle capability metadata.
-- Generate findings, timeline, evidence score, machine-profile JSON, and local HTML report.
-- Add a starter deterministic rule runner and evidence-quality handling.
-- Ensure missing optional evidence/tools are marked missing/skipped, not fatal.
-- Ensure analysis failure does not break collection.
+Immediate next work:
+1. Pull from `origin/master`.
+2. Validate the new Core module parses and loads.
+3. Run the existing smoke and button-smoke tests.
+4. Run the safe invocation path:
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -CLI -RunCommand "Run Local Analysis"
+   ```
+5. Validate generated JSON artifacts parse successfully.
+6. Fix any defects found within TASK-0019 scope.
+7. Complete TASK-0019 only after validation passes.
 
 ## Queued Work
 - `TASK-0020-ARGUS-Input-Contract-ADR` owned by ChatGPT.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
 
-## Completed Work
-- Completed TASK-0017 validation.
-- Completed TASK-0018 design.
-- Created TASK-0019 implementation task and made it active.
-
-## Validation Completed For TASK-0018
+## Validation Completed For This Update
 - Read required startup documents from GitHub `master`.
-- Confirmed `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` listed TASK-0018 active before execution.
-- Completed design/ADR/task documentation only.
-- Did not modify application code.
-- Did not modify HEPHAESTUS collector code.
+- Confirmed TASK-0019 was active before implementation start.
+- Added a new Core module only.
 - Did not implement ARGUS.
 - Did not download or install tools.
-- Did not clean unrelated files.
+- Did not touch untracked `App/NetworkToolkit/LatencyMon/`.
 
-Local PowerShell validation was not run by ChatGPT for this design-only GitHub update.
-
-## Next Action
-Codex executes TASK-0019 implementation using the TASK-0018 design and ADRs.
+Local PowerShell validation was not run by ChatGPT for this GitHub update.
 
 ## Blockers
-None.
+- Local validation is still required.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -138,7 +125,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0018: Design HEPHAESTUS Local Analysis Engine v1
+TASK-0019: Implement HEPHAESTUS Local Analysis Engine v1 slice
 ```
 
 ## Next Bot Prompt
@@ -166,23 +153,20 @@ Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
 - Active task: TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.
 - Owner: Codex.
-- TASK-0018 design is complete.
-- HEPHAESTUS Local Analysis Engine v1 implementation is now active only for the minimal vertical slice described in TASK-0019.
+- A first implementation slice was pushed, but local validation has not been run.
 
 Your job:
-Complete TASK-0019 implementation only.
+Continue and complete TASK-0019 only.
 
 Scope:
-- Implement the minimal Local Analysis Engine v1 vertical slice.
-- Create Analysis, Analysis/normalized, and Metadata output folders in the bundle/output root.
-- Generate Metadata/schema-version.json and Metadata/bundle-capabilities.json.
-- Generate Analysis/findings.json, Analysis/timeline.json, Analysis/evidence-score.json, Analysis/normalized/machine-profile.json, and Analysis/report.html.
-- Implement a starter deterministic rule runner and evidence-quality handling.
-- Ensure missing optional evidence/tools are recorded as missing/skipped and do not fail collection.
+- Pull the latest `origin/master` changes.
+- Validate and correct `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1` if needed.
+- Run existing smoke and button-smoke validation.
+- Run `Run Local Analysis` through the CLI path.
+- Validate generated JSON artifacts parse successfully.
+- Confirm Analysis and Metadata outputs are created in the bundle/output root.
 - Ensure analysis failure does not break collection.
-- Update docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md with work log and completion notes.
-- Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
-- Update docs/HISTORY/CHANGE-LEDGER.md for accepted subsystem changes.
+- Update TASK-0019, QUEUE, HANDOFF, CHANGE-LEDGER, and CHANGELOG when TASK-0019 is complete.
 
 Do not:
 - Implement ARGUS.
