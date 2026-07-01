@@ -7,32 +7,23 @@
 #              or output folder without requiring ARGUS or internet access.
 # =====================================================================
 
-function New-HEPAnalysisTimestamp {
+function Global:New-HEPAnalysisTimestamp {
     return (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 }
 
-function New-HEPSourceBundleInfo {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$BundleRoot
-    )
-
-    $computerName = $null
-    try { $computerName = $env:COMPUTERNAME } catch {}
+function Global:New-HEPSourceBundleInfo {
+    param([Parameter(Mandatory=$true)][string]$BundleRoot)
 
     return [ordered]@{
-        computerName = $computerName
+        computerName = $env:COMPUTERNAME
         collectionStartedUtc = $null
         collectionCompletedUtc = $null
         bundleRoot = $BundleRoot
     }
 }
 
-function New-HEPBaseArtifact {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$BundleRoot
-    )
+function Global:New-HEPBaseArtifact {
+    param([Parameter(Mandatory=$true)][string]$BundleRoot)
 
     return [ordered]@{
         schemaVersion = "1.0"
@@ -42,13 +33,10 @@ function New-HEPBaseArtifact {
     }
 }
 
-function Write-HEPJsonFile {
+function Global:Write-HEPJsonFile {
     param(
-        [Parameter(Mandatory=$true)]
-        [string]$Path,
-
-        [Parameter(Mandatory=$true)]
-        [object]$InputObject
+        [Parameter(Mandatory=$true)][string]$Path,
+        [Parameter(Mandatory=$true)][object]$InputObject
     )
 
     $parent = Split-Path -Parent $Path
@@ -60,7 +48,7 @@ function Write-HEPJsonFile {
     Set-Content -Path $Path -Value $json -Encoding UTF8
 }
 
-function Get-HEPDefaultBundleRoot {
+function Global:Get-HEPDefaultBundleRoot {
     if($Global:NTKPaths -and $Global:NTKPaths.Exports){
         if(!(Test-Path $Global:NTKPaths.Exports)){
             New-Item -ItemType Directory -Path $Global:NTKPaths.Exports -Force | Out-Null
@@ -84,11 +72,8 @@ function Get-HEPDefaultBundleRoot {
     return $fallback
 }
 
-function Get-HEPEvidenceInventory {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$BundleRoot
-    )
+function Global:Get-HEPEvidenceInventory {
+    param([Parameter(Mandatory=$true)][string]$BundleRoot)
 
     if(!(Test-Path $BundleRoot)){
         return @()
@@ -106,7 +91,7 @@ function Get-HEPEvidenceInventory {
     })
 }
 
-function Test-HEPEvidenceMatch {
+function Global:Test-HEPEvidenceMatch {
     param(
         [object[]]$Inventory,
         [string[]]$Patterns
@@ -120,16 +105,14 @@ function Test-HEPEvidenceMatch {
     return $null
 }
 
-function New-HEPFinding {
+function Global:New-HEPFinding {
     param(
-        [Parameter(Mandatory=$true)] [string]$Id,
-        [Parameter(Mandatory=$true)] [string]$RuleId,
-        [Parameter(Mandatory=$true)] [string]$Title,
-        [Parameter(Mandatory=$true)] [string]$Summary,
-        [ValidateSet("critical","high","medium","low","informational")]
-        [string]$Severity = "informational",
-        [ValidateSet("confirmed","high","medium","low")]
-        [string]$Confidence = "medium",
+        [Parameter(Mandatory=$true)][string]$Id,
+        [Parameter(Mandatory=$true)][string]$RuleId,
+        [Parameter(Mandatory=$true)][string]$Title,
+        [Parameter(Mandatory=$true)][string]$Summary,
+        [ValidateSet("critical","high","medium","low","informational")][string]$Severity = "informational",
+        [ValidateSet("confirmed","high","medium","low")][string]$Confidence = "medium",
         [string]$Category = "evidence",
         [object[]]$Evidence = @(),
         [string[]]$Recommendations = @(),
@@ -153,16 +136,16 @@ function New-HEPFinding {
     }
 }
 
-function New-HEPMachineProfile {
+function Global:New-HEPMachineProfile {
     param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot,
+        [Parameter(Mandatory=$true)][string]$BundleRoot,
         [object[]]$Inventory
     )
 
     $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
     $systemEvidence = Test-HEPEvidenceMatch -Inventory $Inventory -Patterns @("systeminfo", "computer.?info", "machine.?profile", "os.?info")
 
-    $artifact.machine = [ordered]@{
+    $machine = [ordered]@{
         computerName = $env:COMPUTERNAME
         userName = $env:USERNAME
         domain = $env:USERDOMAIN
@@ -176,21 +159,22 @@ function New-HEPMachineProfile {
     try {
         $os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
         $cs = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop
-        $artifact.machine.osCaption = $os.Caption
-        $artifact.machine.osVersion = $os.Version
-        $artifact.machine.manufacturer = $cs.Manufacturer
-        $artifact.machine.model = $cs.Model
+        $machine.osCaption = $os.Caption
+        $machine.osVersion = $os.Version
+        $machine.manufacturer = $cs.Manufacturer
+        $machine.model = $cs.Model
     }
     catch {
-        $artifact.machine.warning = "Runtime CIM machine profile collection failed: $($_.Exception.Message)"
+        $machine.warning = "Runtime CIM machine profile collection failed: $($_.Exception.Message)"
     }
 
+    $artifact["machine"] = $machine
     return $artifact
 }
 
-function New-HEPEvidenceScore {
+function Global:New-HEPEvidenceScore {
     param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot,
+        [Parameter(Mandatory=$true)][string]$BundleRoot,
         [object[]]$Inventory,
         [object[]]$Warnings
     )
@@ -228,17 +212,17 @@ function New-HEPEvidenceScore {
     $overall = [int][Math]::Round(($completeness + $quality) / 2)
 
     $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
-    $artifact.overallScore = $overall
-    $artifact.completenessScore = $completeness
-    $artifact.qualityScore = $quality
-    $artifact.categories = @($categoryResults)
-    $artifact.warnings = @($Warnings)
+    $artifact["overallScore"] = $overall
+    $artifact["completenessScore"] = $completeness
+    $artifact["qualityScore"] = $quality
+    $artifact["categories"] = @($categoryResults)
+    $artifact["warnings"] = @($Warnings)
     return $artifact
 }
 
-function New-HEPTimeline {
+function Global:New-HEPTimeline {
     param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot,
+        [Parameter(Mandatory=$true)][string]$BundleRoot,
         [object[]]$Inventory
     )
 
@@ -256,13 +240,13 @@ function New-HEPTimeline {
         }
     }
 
-    $artifact.events = @($events)
+    $artifact["events"] = @($events)
     return $artifact
 }
 
-function New-HEPFindings {
+function Global:New-HEPFindings {
     param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot,
+        [Parameter(Mandatory=$true)][string]$BundleRoot,
         [object[]]$Inventory,
         [object]$EvidenceScore
     )
@@ -324,16 +308,14 @@ function New-HEPFindings {
             -Tags @("parser-warning", "storage")
     }
 
-    $artifact.findings = @($findings)
+    $artifact["findings"] = @($findings)
     return $artifact
 }
 
-function New-HEPBundleCapabilities {
-    param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot
-    )
+function Global:New-HEPBundleCapabilities {
+    param([Parameter(Mandatory=$true)][string]$BundleRoot)
 
-    $artifact = [ordered]@{
+    return [ordered]@{
         schemaVersion = "1.0"
         generatedAtUtc = New-HEPAnalysisTimestamp
         analysisEngineVersion = "1.0.0"
@@ -353,14 +335,10 @@ function New-HEPBundleCapabilities {
         }
         tools = @()
     }
-
-    return $artifact
 }
 
-function New-HEPSchemaVersionArtifact {
-    param(
-        [Parameter(Mandatory=$true)] [string]$BundleRoot
-    )
+function Global:New-HEPSchemaVersionArtifact {
+    param([Parameter(Mandatory=$true)][string]$BundleRoot)
 
     return [ordered]@{
         schemaVersion = "1.0"
@@ -380,22 +358,33 @@ function New-HEPSchemaVersionArtifact {
     }
 }
 
-function Write-HEPHtmlReport {
+function Global:ConvertTo-HEPHtmlText {
+    param([object]$Value)
+
+    if($null -eq $Value){ return "" }
+    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+}
+
+function Global:Write-HEPHtmlReport {
     param(
-        [Parameter(Mandatory=$true)] [string]$Path,
-        [Parameter(Mandatory=$true)] [object]$Findings,
-        [Parameter(Mandatory=$true)] [object]$EvidenceScore,
-        [Parameter(Mandatory=$true)] [object]$MachineProfile
+        [Parameter(Mandatory=$true)][string]$Path,
+        [Parameter(Mandatory=$true)][object]$Findings,
+        [Parameter(Mandatory=$true)][object]$EvidenceScore,
+        [Parameter(Mandatory=$true)][object]$MachineProfile
     )
 
     $findingRows = ""
     foreach($finding in @($Findings.findings)){
-        $findingRows += "<tr><td>$([System.Web.HttpUtility]::HtmlEncode($finding.severity))</td><td>$([System.Web.HttpUtility]::HtmlEncode($finding.confidence))</td><td>$([System.Web.HttpUtility]::HtmlEncode($finding.title))</td><td>$([System.Web.HttpUtility]::HtmlEncode($finding.summary))</td></tr>"
+        $findingRows += "<tr><td>$(ConvertTo-HEPHtmlText $finding.severity)</td><td>$(ConvertTo-HEPHtmlText $finding.confidence)</td><td>$(ConvertTo-HEPHtmlText $finding.title)</td><td>$(ConvertTo-HEPHtmlText $finding.summary)</td></tr>"
     }
 
     if(!$findingRows){
         $findingRows = "<tr><td colspan='4'>No deterministic findings were produced.</td></tr>"
     }
+
+    $computerName = ConvertTo-HEPHtmlText $MachineProfile.machine.computerName
+    $osCaption = ConvertTo-HEPHtmlText $MachineProfile.machine.osCaption
+    $osVersion = ConvertTo-HEPHtmlText $MachineProfile.machine.osVersion
 
     $html = @"
 <!doctype html>
@@ -416,8 +405,8 @@ th { background: #f2f2f2; }
 <h1>HEPHAESTUS Local Analysis Report</h1>
 <p class="small">Generated $($Findings.generatedAtUtc)</p>
 <h2>Machine Profile</h2>
-<p><strong>Computer:</strong> $([System.Web.HttpUtility]::HtmlEncode($MachineProfile.machine.computerName))</p>
-<p><strong>OS:</strong> $([System.Web.HttpUtility]::HtmlEncode($MachineProfile.machine.osCaption)) $([System.Web.HttpUtility]::HtmlEncode($MachineProfile.machine.osVersion))</p>
+<p><strong>Computer:</strong> $computerName</p>
+<p><strong>OS:</strong> $osCaption $osVersion</p>
 <h2>Evidence Score</h2>
 <p><strong>Overall:</strong> $($EvidenceScore.overallScore) / 100</p>
 <p><strong>Completeness:</strong> $($EvidenceScore.completenessScore) / 100</p>
@@ -441,11 +430,9 @@ th { background: #f2f2f2; }
     Set-Content -Path $Path -Value $html -Encoding UTF8
 }
 
-function Invoke-HEPHAESTUSLocalAnalysis {
+function Global:Invoke-HEPHAESTUSLocalAnalysis {
     [CmdletBinding()]
-    param(
-        [string]$BundleRoot
-    )
+    param([string]$BundleRoot)
 
     if(!$BundleRoot){
         $BundleRoot = Get-HEPDefaultBundleRoot
@@ -465,9 +452,8 @@ function Invoke-HEPHAESTUSLocalAnalysis {
         }
     }
 
-    $warnings = @()
-
     try {
+        $warnings = @()
         $inventory = Get-HEPEvidenceInventory -BundleRoot $BundleRoot
         $machineProfile = New-HEPMachineProfile -BundleRoot $BundleRoot -Inventory $inventory
         $evidenceScore = New-HEPEvidenceScore -BundleRoot $BundleRoot -Inventory $inventory -Warnings $warnings
@@ -484,18 +470,17 @@ function Invoke-HEPHAESTUSLocalAnalysis {
         Write-HEPJsonFile -Path (Join-Path $metadataRoot "schema-version.json") -InputObject $schemaVersion
         Write-HEPHtmlReport -Path (Join-Path $analysisRoot "report.html") -Findings $findings -EvidenceScore $evidenceScore -MachineProfile $machineProfile
 
-        $result = [pscustomobject]@{
+        Write-Host "HEPHAESTUS Local Analysis completed." -ForegroundColor Green
+        Write-Host "Bundle root: $BundleRoot"
+        Write-Host "Analysis root: $analysisRoot"
+
+        return [pscustomobject]@{
             Status = "Completed"
             BundleRoot = $BundleRoot
             AnalysisRoot = $analysisRoot
             Findings = @($findings.findings).Count
             EvidenceScore = $evidenceScore.overallScore
         }
-
-        Write-Host "HEPHAESTUS Local Analysis completed." -ForegroundColor Green
-        Write-Host "Bundle root: $BundleRoot"
-        Write-Host "Analysis root: $analysisRoot"
-        return $result
     }
     catch {
         $warning = [ordered]@{
@@ -505,14 +490,14 @@ function Invoke-HEPHAESTUSLocalAnalysis {
             message = $_.Exception.Message
         }
 
-        $base = New-HEPBaseArtifact -BundleRoot $BundleRoot
-        $base.overallScore = 0
-        $base.completenessScore = 0
-        $base.qualityScore = 0
-        $base.categories = @()
-        $base.warnings = @($warning)
+        $failure = New-HEPBaseArtifact -BundleRoot $BundleRoot
+        $failure["overallScore"] = 0
+        $failure["completenessScore"] = 0
+        $failure["qualityScore"] = 0
+        $failure["categories"] = @()
+        $failure["warnings"] = @($warning)
+        Write-HEPJsonFile -Path (Join-Path $analysisRoot "evidence-score.json") -InputObject $failure
 
-        Write-HEPJsonFile -Path (Join-Path $analysisRoot "evidence-score.json") -InputObject $base
         Write-Warning "HEPHAESTUS Local Analysis failed but collection should continue: $($_.Exception.Message)"
         return [pscustomobject]@{
             Status = "FailedNonFatal"
