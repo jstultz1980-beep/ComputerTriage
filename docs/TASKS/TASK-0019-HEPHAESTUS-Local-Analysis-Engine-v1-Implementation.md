@@ -113,6 +113,12 @@ Get-Content "$bundle\Analysis\evidence-score.json" -Raw | ConvertFrom-Json | Out
 Get-Content "$bundle\Metadata\bundle-capabilities.json" -Raw | ConvertFrom-Json | Out-Null
 ```
 
+Implementation-start validation command:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -CLI -RunCommand "Run Local Analysis"
+```
+
 ## Rollback Plan
 Revert TASK-0019 implementation changes and related documentation updates. Preserve TASK-0018 design and ADRs unless they are proven incorrect by implementation.
 
@@ -130,3 +136,22 @@ Issues:
 - Implementation must discover the existing collection output root before wiring analysis execution.
 Instructions for Next Owner:
 - Codex should implement only the minimal vertical slice described here and should not implement ARGUS or broad collector refactoring.
+
+### Entry 002
+Author: ChatGPT
+Date: 2026-07-01
+Summary: Began TASK-0019 with a new Core module that registers a safe CLI invocation path for HEPHAESTUS Local Analysis Engine v1.
+Files Changed:
+- `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1`
+- `docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/HANDOFF.md`
+Validation Performed:
+- Repository files were read through GitHub `master`.
+- Local PowerShell validation was not run from ChatGPT.
+Issues:
+- TASK-0019 remains active and requires local validation after pulling from `origin/master`.
+- The implementation currently provides a safe command path: `Run Local Analysis`.
+Instructions for Next Owner:
+- Pull the remote changes locally, run the smoke tests, run `Run Local Analysis`, validate generated JSON artifacts, and then complete or correct TASK-0019.
