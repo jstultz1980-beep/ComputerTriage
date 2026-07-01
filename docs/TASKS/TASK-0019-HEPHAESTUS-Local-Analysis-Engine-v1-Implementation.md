@@ -1,7 +1,7 @@
 # TASK-0019 - HEPHAESTUS Local Analysis Engine v1 Implementation
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -60,47 +60,26 @@ Implement a minimal v1 vertical slice only:
 - Whole-network analysis.
 - UI feature changes unless strictly required to call the local analysis step after existing collection.
 
-## Files Expected To Change
-Codex must inspect the repository before deciding exact files. Expected implementation areas may include:
-
-- Existing HEPHAESTUS collection/orchestration script files needed to call analysis after collection.
-- New local analysis engine files under the appropriate existing HEPHAESTUS/App/Core location.
-- Validation/test files if existing patterns support them.
-- `docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md`
-- `docs/HANDOFF.md`
-- `docs/TASKS/QUEUE.md`
-- `docs/HISTORY/CHANGE-LEDGER.md`
-- `docs/HISTORY/CHANGELOG.md`
-
-Do not move large code areas or rename architecture roots unless a separate task explicitly authorizes that work.
-
 ## Acceptance Criteria
-- [ ] Local analysis runs after evidence collection or through an existing safe invocation path.
-- [ ] Analysis creates `Analysis/`, `Analysis/normalized/`, and `Metadata/` in the bundle/output root.
-- [ ] Required JSON artifacts are generated and parse successfully.
-- [ ] JSON artifacts include `schemaVersion`, `generatedAtUtc`, `generator`, and source-bundle metadata where applicable.
-- [ ] Starter deterministic rules produce findings when supported by evidence.
-- [ ] Missing optional evidence is recorded as missing/skipped and does not fail collection.
-- [ ] Parser failures become warnings and do not stop the engine.
-- [ ] Local HTML report is generated from structured outputs.
-- [ ] Existing smoke test still passes.
-- [ ] Button-smoke test still passes or any blocker is documented.
-- [ ] No ARGUS implementation is added.
-- [ ] Untracked `App/NetworkToolkit/LatencyMon/` remains untouched unless a new task explicitly handles it.
-- [ ] Handoff and queue are updated with the next task state.
+- [x] Local analysis runs after evidence collection or through an existing safe invocation path.
+- [x] Analysis creates `Analysis/`, `Analysis/normalized/`, and `Metadata/` in the bundle/output root.
+- [x] Required JSON artifacts are generated and parse successfully.
+- [x] JSON artifacts include `schemaVersion`, `generatedAtUtc`, `generator`, and source-bundle metadata where applicable.
+- [x] Starter deterministic rules produce findings when supported by evidence.
+- [x] Missing optional evidence is recorded as missing/skipped and does not fail collection.
+- [x] Parser failures become warnings and do not stop the engine.
+- [x] Local HTML report is generated from structured outputs.
+- [x] Existing smoke test still passes.
+- [x] Button-smoke test still passes.
+- [x] No ARGUS implementation is added.
+- [x] Untracked `App/NetworkToolkit/LatencyMon/` remains untouched unless a new task explicitly handles it.
+- [x] Handoff and queue are updated with the next task state.
 
-## Suggested Validation Steps
-```powershell
-git status --short --branch
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest
-Get-ChildItem -Recurse C:\Computer_Toolkit -Filter *.json | Select-Object -First 1 | Out-Null
-```
-
-After generating a test bundle, validate expected outputs:
+## Validation Performed
+User-provided local validation on 2026-07-01:
 
 ```powershell
-$bundle = '<path-to-test-bundle>'
+$bundle = "C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles"
 Test-Path "$bundle\Analysis\findings.json"
 Test-Path "$bundle\Analysis\timeline.json"
 Test-Path "$bundle\Analysis\evidence-score.json"
@@ -111,13 +90,20 @@ Test-Path "$bundle\Metadata\schema-version.json"
 Get-Content "$bundle\Analysis\findings.json" -Raw | ConvertFrom-Json | Out-Null
 Get-Content "$bundle\Analysis\evidence-score.json" -Raw | ConvertFrom-Json | Out-Null
 Get-Content "$bundle\Metadata\bundle-capabilities.json" -Raw | ConvertFrom-Json | Out-Null
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest
 ```
 
-Implementation-start validation command:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -CLI -RunCommand "Run Local Analysis"
-```
+Observed validation results:
+- `Run Local Analysis` completed successfully.
+- Bundle root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
+- Analysis root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles\Analysis`.
+- Findings: `6`.
+- EvidenceScore: `50`.
+- All required `Analysis` and `Metadata` artifacts existed.
+- JSON parse checks completed without error.
+- Smoke test passed: `Network Toolkit GUI loaded successfully. Commands: 18`.
+- Button smoke test passed: `Button smoke test completed. Quick tab: OK`.
 
 ## Rollback Plan
 Revert TASK-0019 implementation changes and related documentation updates. Preserve TASK-0018 design and ADRs unless they are proven incorrect by implementation.
@@ -151,7 +137,43 @@ Validation Performed:
 - Repository files were read through GitHub `master`.
 - Local PowerShell validation was not run from ChatGPT.
 Issues:
-- TASK-0019 remains active and requires local validation after pulling from `origin/master`.
-- The implementation currently provides a safe command path: `Run Local Analysis`.
+- First run failed because the command registered but the implementation function was scoped away after module import.
 Instructions for Next Owner:
-- Pull the remote changes locally, run the smoke tests, run `Run Local Analysis`, validate generated JSON artifacts, and then complete or correct TASK-0019.
+- Patch function scope and validate locally.
+
+### Entry 003
+Author: ChatGPT
+Date: 2026-07-01
+Summary: Patched `LocalAnalysisEngine.ps1` so engine functions are globally visible after module import and replaced report encoding with `System.Net.WebUtility`.
+Files Changed:
+- `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1`
+Validation Performed:
+- User ran `Run Local Analysis` locally after pulling the fix.
+Issues:
+- None after patch.
+Instructions for Next Owner:
+- Complete validation and close TASK-0019 if outputs and smoke tests pass.
+
+### Entry 004
+Author: ChatGPT
+Date: 2026-07-01
+Summary: Closed TASK-0019 based on user-provided local validation evidence.
+Files Changed:
+- `docs/TASKS/TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation.md`
+- `docs/TASKS/TASK-0020-ARGUS-Input-Contract-ADR.md`
+- `docs/TASKS/QUEUE.md`
+- `docs/ROADMAP.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/HANDOFF.md`
+Validation Performed:
+- Local Analysis Engine completed successfully.
+- Required artifacts existed and JSON parsed successfully.
+- Smoke and button-smoke tests passed.
+Issues:
+- None for TASK-0019 closure.
+Instructions for Next Owner:
+- ChatGPT should execute TASK-0020 design/ADR work only. Do not implement ARGUS.
+
+## Completion Notes
+TASK-0019 is complete. The minimal HEPHAESTUS Local Analysis Engine v1 vertical slice is implemented and validated through the safe CLI command path `Run Local Analysis`.
