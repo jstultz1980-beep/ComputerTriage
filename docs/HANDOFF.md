@@ -1,29 +1,16 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0029
+HANDOFF-0030
 
 ## Current Task
-TASK-0017-Triage-Manual-Run-Validation
+TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design
 
 ## Current Owner
-Codex
+ChatGPT
 
 ## Next Owner
 Codex
-
-## Governance Reconciliation Status
-Foundation governance has been reconciled.
-
-`TASK-0010-Foundation-Audit` is not valid active task state because `TASK-0010` is already used by completed historical task `TASK-0010-Classify-Drift-And-Status-Report`. The actual tracked Foundation Audit is `TASK-0011-Foundation-Audit`, and it is completed. The duplicate local `TASK-0010-Foundation-Audit.md` task file is archived for traceability.
-
-`docs/TASKS/QUEUE.md` now exists and agrees with this handoff. Exactly one task is active:
-
-```text
-TASK-0017-Triage-Manual-Run-Validation
-```
-
-No application code changed. No HEPHAESTUS collector code changed. No ARGUS implementation was added. No unrelated files were cleaned.
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
@@ -48,7 +35,14 @@ Work should move through this sequence:
 The official task lifecycle is `Backlog -> Queued -> Assigned -> Active -> Validation -> Complete -> Archived`. Only one task may be `Active`.
 
 ## Objective
-TASK-0017 is active. Codex should validate the existing toolkit workflow from the current repository state without adding features, refactoring code, implementing ARGUS, or modifying HEPHAESTUS collectors.
+TASK-0018 is active. ChatGPT should design HEPHAESTUS Local Analysis Engine v1 before Codex implements anything.
+
+Do not implement application code.
+Do not implement ARGUS.
+Do not modify HEPHAESTUS collectors.
+Do not refactor existing code.
+Do not download or install tools.
+Do not clean unrelated files.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -69,83 +63,74 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 0 / 10 | No |
-| Task System | 0 / 10 | No |
+| Documentation | 1 / 10 | No |
+| Task System | 1 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
 | UI | 4 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
-| Validation/Test Framework | 1 / 10 | No |
+| Validation/Test Framework | 2 / 10 | No |
 | Roadmap/Backlog | 0 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-TASK-0011 completed the valid tracked Foundation Audit. REVIEW-0001 reconciled later task-state drift and reset audited governance, documentation, task-system, and roadmap/backlog counters.
+Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one active task.
 
-TASK-0016 completed the GUI tool source-of-truth correction. Visible tab rendering and header search now read from `Get-GUIToolRegistry`, duplicate registry/search entries are checked during button smoke validation, and triage completion handling is single-shot so one completed run cannot produce repeated completion or result-read dialogs.
+TASK-0017 completed validation-only work:
+- `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest` passed.
+- `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest` passed.
+- Strict active-task check found only `TASK-0017` active during validation.
+- `App/manifests/custom-tools.json` runtime provenance drift occurred during validation and was reset before commit.
+- `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder. It was not staged, deleted, imported, or modified.
 
-The accepted HEPHAESTUS Local Analysis Engine v1 work is approved direction, but it is not the active implementation task. HEPHAESTUS analysis implementation must wait until TASK-0018 design/ADR work is complete and a focused implementation task is activated.
+The accepted HEPHAESTUS Local Analysis Engine v1 work is approved direction, but implementation is not active. TASK-0018 must define the design, ADR needs, output contracts, and follow-on implementation tasks before Codex changes code.
 
 ## Active Task
-`TASK-0017-Triage-Manual-Run-Validation`
+`TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design`
 
 Scope:
-- Validate the existing startup, smoke, and manual validation paths already present.
-- Confirm runtime/generated drift is classified and not committed unless required.
-- Record defects and next recommended tasks.
-- Do not implement new features.
+- Define deterministic local analysis pipeline.
+- Define rule-engine responsibilities and initial rules.
+- Define normalized JSON, findings, timeline, evidence score, local HTML report, and bundle metadata expectations.
+- Define portable-tool orchestration boundaries without downloading or requiring tools.
+- Identify required ADRs or create ADR follow-on tasks.
+- Produce focused Codex implementation tasks.
 
 ## Queued Work
-- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` owned by ChatGPT.
 - `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` owned by Codex, blocked until TASK-0018 is complete and activated.
 - `TASK-0020-ARGUS-Input-Contract-ADR` owned by ChatGPT.
 
 ## Completed Work
-- Created `docs/TASKS/QUEUE.md`.
-- Created and activated `docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md`.
-- Created `docs/REVIEWS/REVIEW-0001-Foundation-Audit.md`.
-- Created `docs/REVIEWS/EXECUTIVE-PROJECT-STATUS.md`.
-- Updated `docs/ROADMAP.md` with the validation-first and design-before-implementation sequence.
-- Archived the duplicate local `docs/TASKS/TASK-0010-Foundation-Audit.md`.
-- Updated `docs/HISTORY/CHANGE-LEDGER.md` with audited counter resets.
+- Completed TASK-0017 validation.
+- Created and activated `docs/TASKS/TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design.md`.
+- Updated `docs/TASKS/QUEUE.md`.
+- Updated `docs/HISTORY/CHANGE-LEDGER.md`.
 - Updated `docs/HISTORY/CHANGELOG.md`.
-- Reconciled this handoff with `docs/TASKS/QUEUE.md`.
+- Updated this handoff with the next ChatGPT-owned design task.
 
 ## Validation Completed
-- Confirmed `PROJECT.md` still defines startup rules.
-- Confirmed `docs/TASKS/QUEUE.md` exists.
-- Confirmed `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree.
-- Confirmed exactly one task is Active: `TASK-0017-Triage-Manual-Run-Validation`.
-- Confirmed Foundation Audit review exists.
-- Confirmed roadmap/backlog reflects the next task sequence.
-- Confirmed no application code changed.
-- Confirmed no HEPHAESTUS code changed.
-- Confirmed no ARGUS implementation was added.
-- Confirmed no unrelated files were cleaned.
+- Read required startup documents.
+- Confirmed handoff and queue agreed on TASK-0017 before validation.
+- Ran smoke validation successfully.
+- Ran button-smoke validation successfully.
+- Ran broad task-reference search.
+- Ran strict active-task count check.
+- Reset generated `App/manifests/custom-tools.json` drift after validation.
+- Confirmed no application code was staged for TASK-0017.
+- Confirmed untracked `App/NetworkToolkit/LatencyMon/` remains local drift and was not modified.
 
 ## Next Action
-Codex should complete `TASK-0017-Triage-Manual-Run-Validation` next. This is validation work only.
-
-Do not implement application code.
-Do not implement ARGUS.
-Do not modify HEPHAESTUS collectors.
-Do not refactor code.
-Do not clean unrelated files.
-
-Recommended commit message for this reconciliation:
-
-```text
-TASK-0010: Reconcile governance and complete Foundation Audit
-```
+ChatGPT executes TASK-0018 design work.
 
 ## Blockers
 None.
 
 ## Notes for Next AI
 Known working-tree noise:
+- `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder and should not be deleted, imported, or committed unless a future task explicitly handles it.
 - Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
 
 ## Next Bot Prompt
@@ -163,45 +148,37 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md
+7. docs/TASKS/TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0017-Triage-Manual-Run-Validation.
-- Owner: Codex.
-- Audit state tracking is active.
-- TASK-0010-Foundation-Audit is not valid active tracked state. TASK-0010 is already used by completed historical task TASK-0010-Classify-Drift-And-Status-Report.
-- Foundation Audit is complete as TASK-0011-Foundation-Audit and REVIEW-0001-Foundation-Audit.
-- TASK-0012 phase-transition readiness is complete.
-- TASK-0013 header tool search is complete.
-- TASK-0014 DHCP Sleuth restoration is complete.
-- TASK-0015 header search tab mapping correction is complete.
-- TASK-0016 tool source-of-truth correction is complete.
+- Active task: TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design.
+- Owner: ChatGPT.
+- Next owner: Codex.
+- TASK-0017 validation is complete.
+- Smoke and button-smoke validation passed.
+- HEPHAESTUS Local Analysis Engine v1 is approved direction, but implementation is not active yet.
 
 Your job:
-Complete TASK-0017-Triage-Manual-Run-Validation only.
+Complete TASK-0018 design work only.
 
 Scope:
-- Validate the existing toolkit workflow from the current repository state.
-- Run existing startup/smoke/manual validation paths already present in the repo.
-- Record validation results, defects, and runtime/generated drift.
-- Update docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md with work log and completion notes.
+- Design the deterministic HEPHAESTUS Local Analysis Engine v1 pipeline.
+- Define rule-engine responsibilities, initial rules, output schemas, evidence scoring, timeline, findings, local HTML report, and bundle metadata.
+- Define portable-tool orchestration boundaries without downloading or requiring tools.
+- Identify ADRs required before implementation.
+- Create focused follow-on implementation tasks for Codex.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
-- Update docs/HISTORY/CHANGE-LEDGER.md only if an accepted subsystem change occurs.
-
-Accepted HEPHAESTUS direction:
-- HEPHAESTUS should evolve from a collector-first bundle builder into a collector + deterministic local analysis platform.
-- That implementation is not active yet.
-- TASK-0018 should design the Local Analysis Engine before Codex implements it.
 
 Rules:
 - Treat repository files as authoritative.
-- Do not implement application code during TASK-0017.
+- Do not implement application code.
 - Do not implement ARGUS.
 - Do not modify HEPHAESTUS collectors.
 - Do not refactor existing code.
+- Do not download or install tools.
 - Do not clean unrelated files.
 - Do not use chat history as source of truth unless the same information exists in the repository.
 - Do not create a separate ChatGPT task packet as source of truth.
-- When a task is completed, update docs/HANDOFF.md with the next task state and a fresh Next Bot Prompt for the next bot.
+- When the task is completed, update docs/HANDOFF.md with the next task state and a fresh Next Bot Prompt for Codex.
 ```

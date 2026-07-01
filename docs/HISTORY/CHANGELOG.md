@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0017 triage manual run validation.
+- Confirmed smoke and button-smoke validation pass from the current repository state.
+- Documented runtime drift: `custom-tools.json` provenance migration was reset, and untracked `App/NetworkToolkit/LatencyMon/` was left untouched.
+- Activated TASK-0018 HEPHAESTUS Local Analysis Engine v1 Design for ChatGPT.
 - Reconciled TASK-0010 governance drift and completed `REVIEW-0001-Foundation-Audit`.
 - Archived the invalid duplicate `TASK-0010-Foundation-Audit` active-state reference.
 - Activated `TASK-0017-Triage-Manual-Run-Validation` as the only active task.

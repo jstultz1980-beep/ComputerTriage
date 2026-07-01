@@ -41,3 +41,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0031 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Task System | reset to 0 / 10 | Established exactly one active task in the queue and handoff: `TASK-0017-Triage-Manual-Run-Validation`. |
 | CHG-0032 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Documentation | reset to 0 / 10 | Created `REVIEW-0001-Foundation-Audit` and executive project status report; refreshed handoff. |
 | CHG-0033 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Roadmap/Backlog | reset to 0 / 10 | Updated roadmap and backlog/task sequence for validation, HEPHAESTUS Local Analysis Engine design, and later implementation. |
+| CHG-0034 | 2026-07-01 | TASK-0017 | Validation/Test Framework | +1 | Ran existing smoke and button-smoke validation paths and recorded runtime drift without application-code changes. |
+| CHG-0035 | 2026-07-01 | TASK-0017 | Task System | +1 | Completed TASK-0017 and activated TASK-0018 as the next design gate. |
+| CHG-0036 | 2026-07-01 | TASK-0017 | Documentation | +1 | Updated task, queue, handoff, and changelog records for validation completion and next-task handoff. |
