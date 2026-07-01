@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0020-ARGUS-Input-Contract-ADR` | ChatGPT | Active | Finalize the ARGUS input contract and evidence trust model before ARGUS implementation begins. |
+| `TASK-0035-Documentation-Task-System-Audit` | ChatGPT | Active | Complete the required audit gate because Documentation reached `10 / 10` during TASK-0020. |
 
 ## Queued
 
@@ -17,7 +17,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Queued | Implement only after TASK-0020 finalizes the ARGUS input contract and activates a specific implementation scope. |
+| `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Queued | Implement ARGUS foundation only after TASK-0035 clears the audit gate and this task becomes active. |
 | `TASK-0028-Quick-Dx-Compact-Run-Panel` | Codex | Queued | Remove visible internet target list from Quick Dx and compact the run block. |
 | `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Queued | Make the Choco status area compact and improve the Choco page layout. |
 | `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Queued | Remove the print data-folder path display and reclaim the space. |
@@ -41,6 +41,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0017-Triage-Manual-Run-Validation` | Completed | Existing smoke and button-smoke validation passed; runtime drift was documented and excluded. |
 | `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` | Completed | Design, ADRs, and focused TASK-0019 implementation scope completed. |
 | `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` | Completed | Minimal vertical slice implemented and validated locally; required artifacts generated and smoke tests passed. |
+| `TASK-0020-ARGUS-Input-Contract-ADR` | Completed | ADR-0003 accepted; ARGUS input contract, trust model, and focused TASK-0023 implementation scope finalized. |
 | `TASK-0024-Quick-Dx-Layout-Adjustment` | Completed | Adjusted Quick Diagnosis tab layout so Quick Target Checks owns the full left column and Quick Diagnosis controls are compacted into the right column. |
 | `TASK-0025-Quick-Dx-Last-Scan-Label-Fix` | Completed | Fixed the clipped Last Quick Diagnosis label in the compact right-column Quick Diagnosis block. |
 | `TASK-0026-Quick-Dx-Fixed-Internet-Targets` | Completed | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain. |
@@ -53,4 +54,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active design gate is TASK-0020.
+- Current active audit gate is TASK-0035.
