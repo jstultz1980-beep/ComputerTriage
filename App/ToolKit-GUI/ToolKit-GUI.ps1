@@ -232,7 +232,7 @@ $script:GUITheme = @{
 $script:GUITextureHooks = New-Object 'System.Collections.Generic.HashSet[string]'
 
 function Get-GUIColorThemeNames {
-    return @("Modern Glass","Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Obsidian Blue","Carbon Fiber","Aurora Dark","Command Center","Custom Theme")
+    return @("Modern Glass","Bright Blue","Ocean Teal","Clean Slate","Warm Purple","Fresh Mint","Solar Blue","Soft Graphite","Rosewood","Midnight Cyan","Spring Meadow","Terminal Green","Terminal Dark","Arctic Lime","Electric Indigo","Copper Harbor","Night Ops","Obsidian Blue","Carbon Fiber","Aurora Dark","Command Center","Custom Theme")
 }
 
 function ConvertTo-GUIColorHex {
@@ -745,6 +745,11 @@ function Get-GUIColorTheme {
                 Header=[System.Drawing.Color]::FromArgb(8,42,29); HeaderPanel=[System.Drawing.Color]::FromArgb(13,58,40); HeaderMuted=[System.Drawing.Color]::FromArgb(184,244,207); Accent=[System.Drawing.Color]::FromArgb(43,218,116); AccentDark=[System.Drawing.Color]::FromArgb(16,120,68); AccentSoft=[System.Drawing.Color]::FromArgb(224,250,234); Page=[System.Drawing.Color]::FromArgb(247,253,249); Shell=[System.Drawing.Color]::FromArgb(235,247,239); Strip=[System.Drawing.Color]::FromArgb(218,239,225); Text=[System.Drawing.Color]::FromArgb(20,39,29); MutedText=[System.Drawing.Color]::FromArgb(71,104,84); Border=[System.Drawing.Color]::FromArgb(137,190,154); Success=[System.Drawing.Color]::FromArgb(44,191,111); Warning=[System.Drawing.Color]::FromArgb(224,166,51); Danger=[System.Drawing.Color]::FromArgb(211,76,68); Disabled=[System.Drawing.Color]::FromArgb(208,225,214); LogBack=[System.Drawing.Color]::FromArgb(5,17,13); LogFore=[System.Drawing.Color]::FromArgb(105,255,164)
             }
         }
+        "Terminal Dark" {
+            return @{
+                Header=[System.Drawing.Color]::FromArgb(4,26,19); HeaderPanel=[System.Drawing.Color]::FromArgb(8,38,28); HeaderMuted=[System.Drawing.Color]::FromArgb(153,255,194); Accent=[System.Drawing.Color]::FromArgb(25,230,112); AccentDark=[System.Drawing.Color]::FromArgb(12,126,64); AccentSoft=[System.Drawing.Color]::FromArgb(16,54,35); Page=[System.Drawing.Color]::FromArgb(8,18,14); Shell=[System.Drawing.Color]::FromArgb(5,12,10); Strip=[System.Drawing.Color]::FromArgb(11,30,22); Text=[System.Drawing.Color]::FromArgb(210,247,224); MutedText=[System.Drawing.Color]::FromArgb(125,178,146); Border=[System.Drawing.Color]::FromArgb(35,103,62); Success=[System.Drawing.Color]::FromArgb(46,226,118); Warning=[System.Drawing.Color]::FromArgb(234,185,72); Danger=[System.Drawing.Color]::FromArgb(226,88,82); Disabled=[System.Drawing.Color]::FromArgb(34,49,41); LogBack=[System.Drawing.Color]::FromArgb(2,8,6); LogFore=[System.Drawing.Color]::FromArgb(105,255,164)
+            }
+        }
         "Arctic Lime" {
             return @{
                 Header=[System.Drawing.Color]::FromArgb(18,103,132); HeaderPanel=[System.Drawing.Color]::FromArgb(31,128,158); HeaderMuted=[System.Drawing.Color]::FromArgb(226,250,255); Accent=[System.Drawing.Color]::FromArgb(132,204,22); AccentDark=[System.Drawing.Color]::FromArgb(72,136,15); AccentSoft=[System.Drawing.Color]::FromArgb(241,252,222); Page=[System.Drawing.Color]::FromArgb(253,255,250); Shell=[System.Drawing.Color]::FromArgb(238,250,251); Strip=[System.Drawing.Color]::FromArgb(224,243,244); Text=[System.Drawing.Color]::FromArgb(26,50,58); MutedText=[System.Drawing.Color]::FromArgb(77,105,113); Border=[System.Drawing.Color]::FromArgb(166,210,214); Success=[System.Drawing.Color]::FromArgb(49,151,91); Warning=[System.Drawing.Color]::FromArgb(221,157,38); Danger=[System.Drawing.Color]::FromArgb(205,75,65); Disabled=[System.Drawing.Color]::FromArgb(214,226,226); LogBack=[System.Drawing.Color]::FromArgb(12,31,38); LogFore=[System.Drawing.Color]::FromArgb(220,247,232)
@@ -1064,6 +1069,17 @@ function Enable-GUISubtleSurfaceTexture {
             $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
 
             $isDarkTheme = (($script:GUITheme.Page.R + $script:GUITheme.Page.G + $script:GUITheme.Page.B) -lt 390)
+            $gradientStart = if($isDarkTheme){$script:GUITheme.Shell}else{$script:GUITheme.Page}
+            $gradientEnd = if($isDarkTheme){
+                Mix-GUIColor -A $script:GUITheme.Shell -B $script:GUITheme.AccentDark -WeightB 0.28
+            }
+            else{
+                Mix-GUIColor -A $script:GUITheme.Page -B $script:GUITheme.AccentSoft -WeightB 0.42
+            }
+            $gradient = New-Object System.Drawing.Drawing2D.LinearGradientBrush($rect,$gradientStart,$gradientEnd,[System.Drawing.Drawing2D.LinearGradientMode]::ForwardDiagonal)
+            try { $graphics.FillRectangle($gradient,$rect) }
+            finally { $gradient.Dispose() }
+
             $tint = if($isDarkTheme){
                 [System.Drawing.Color]::FromArgb(16,255,255,255)
             }
@@ -8331,7 +8347,7 @@ function Build-QuickTriagePage {
     $rightLayout.RowCount = 2
     $rightLayout.Margin = New-Object System.Windows.Forms.Padding(10,0,0,0)
     $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,154))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($rightLayout,1,0)
 
@@ -8343,20 +8359,20 @@ function Build-QuickTriagePage {
 
     $runPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $runPanel.Dock = "Fill"
-    $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,6)
+    $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,4,10,4)
     $runPanel.ColumnCount = 3
     $runPanel.RowCount = 3
     for($i = 0; $i -lt 3; $i++){
         $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 3)))) | Out-Null
     }
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet targets"
     $targetLabel.Dock = "Fill"
-    $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,6,3)
+    $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,6,2)
     [void]$runPanel.Controls.Add($targetLabel,0,0)
 
     $script:QuickInternetTargetsLabel = New-Object System.Windows.Forms.Label
@@ -8366,7 +8382,7 @@ function Build-QuickTriagePage {
     $QuickInternetTargetsLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickInternetTargetsLabel.ForeColor = $script:GUITheme.MutedText
     $QuickInternetTargetsLabel.Text = (Get-GUIQuickDiagnosisTargets) -join "  ->  "
-    $QuickInternetTargetsLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,3,5)
+    $QuickInternetTargetsLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,3,2)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickInternetTargetsLabel,"Quick Diagnosis tests these targets in order and stops at the first successful HTTPS connection.") }
     $runPanel.SetColumnSpan($QuickInternetTargetsLabel,2)
     [void]$runPanel.Controls.Add($QuickInternetTargetsLabel,1,0)
@@ -8374,21 +8390,21 @@ function Build-QuickTriagePage {
     $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
     $QuickRunButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $QuickRunButton -Compact
-    $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickRunButton,"Run Quick Diagnosis for the target computer and create the current health report.") }
     [void]$runPanel.Controls.Add($QuickRunButton,0,1)
 
     $reportButton = New-GUIButton "Report" { Open-GUILatestQuickDiagnosisReport }
     $reportButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $reportButton -Compact
-    $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($reportButton,"Open the latest Quick Diagnosis HTML report.") }
     [void]$runPanel.Controls.Add($reportButton,1,1)
 
     $script:DismRepairButton = New-GUIButton "DISM/SFC" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $DismRepairButton -Compact
-    $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
+    $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($DismRepairButton,"Run the DISM/SFC repair path after reviewing Quick Diagnosis results. Override is available when needed.") }
     [void]$runPanel.Controls.Add($DismRepairButton,2,1)
 
@@ -8399,7 +8415,7 @@ function Build-QuickTriagePage {
     $QuickLastDiagnosisLabel.AutoEllipsis = $true
     $QuickLastDiagnosisLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
-    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,3,2)
+    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,2,3,1)
     $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,3)
     [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,2)
     Refresh-GUILastQuickDiagnosisLabel
@@ -8511,7 +8527,7 @@ function Build-QuickTriagePage {
     $repairPanel.Padding = New-Object System.Windows.Forms.Padding(10,4,10,8)
     $repairPanel.ColumnCount = 1
     $repairPanel.RowCount = 2
-    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,62))) | Out-Null
+    $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $repairPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $repairGroup.Controls.Add($repairPanel)
 
@@ -8534,7 +8550,7 @@ function Build-QuickTriagePage {
     $hardwareShortcutPanel.AutoSize = $true
     $hardwareShortcutPanel.ColumnCount = 3
     $hardwareShortcutPanel.RowCount = 0
-    $hardwareShortcutPanel.Padding = New-Object System.Windows.Forms.Padding(8)
+    $hardwareShortcutPanel.Padding = New-Object System.Windows.Forms.Padding(8,4,8,4)
     $hardwareShortcuts.Controls.Add($hardwareShortcutPanel)
 
     $quickHardwareTools = @(
@@ -8554,7 +8570,7 @@ function Build-QuickTriagePage {
     foreach($toolDef in $quickHardwareTools){
         if($shortcutCol -eq 0){
             $hardwareShortcutPanel.RowCount = $hardwareShortcutPanel.RowCount + 1
-            $hardwareShortcutPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+            $hardwareShortcutPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
         }
 
         $button = New-GUIButton $toolDef.Text $toolDef.Action
@@ -8578,8 +8594,8 @@ function Add-GUIHeaderComputerSummary {
     $dashboard = Get-GUIDashboardInfo
 
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
-    $summary.Location = New-Object System.Drawing.Point(360,10)
-    $summary.Size = New-Object System.Drawing.Size(670,58)
+    $summary.Location = New-Object System.Drawing.Point(330,10)
+    $summary.Size = New-Object System.Drawing.Size(710,58)
     $summary.Anchor = "Top,Left,Right"
     $summary.ColumnCount = 4
     $summary.RowCount = 2
@@ -8587,10 +8603,10 @@ function Add-GUIHeaderComputerSummary {
     $script:HeaderSummaryPanel = $summary
     $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,88))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,78))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,60))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,40))) | Out-Null
     $Header.Controls.Add($summary)
 
     foreach($cell in @(
@@ -8614,7 +8630,7 @@ function Add-GUIHeaderComputerSummary {
 
             $nameLabel = New-Object System.Windows.Forms.Label
             $nameLabel.Text = $cell.Text
-            $nameLabel.Width = 136
+            $nameLabel.Width = 86
             $nameLabel.Height = 26
             $nameLabel.TextAlign = "MiddleLeft"
             $nameLabel.AutoEllipsis = $true
@@ -8624,12 +8640,12 @@ function Add-GUIHeaderComputerSummary {
             $script:DashboardLabels[$cell.Key] = $nameLabel
 
             $script:HeaderHealthStatusLabel = New-Object System.Windows.Forms.Label
-            $HeaderHealthStatusLabel.Width = 86
+            $HeaderHealthStatusLabel.Width = 78
             $HeaderHealthStatusLabel.Height = 22
             $HeaderHealthStatusLabel.Margin = New-Object System.Windows.Forms.Padding(6,2,0,0)
             $HeaderHealthStatusLabel.TextAlign = "MiddleCenter"
             $HeaderHealthStatusLabel.AutoEllipsis = $true
-            $HeaderHealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9,[System.Drawing.FontStyle]::Bold)
+            $HeaderHealthStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",8.5,[System.Drawing.FontStyle]::Bold)
             $HeaderHealthStatusLabel.Text = "Unknown"
             $HeaderHealthStatusLabel.ForeColor = [System.Drawing.Color]::FromArgb(170,178,186)
             $HeaderHealthStatusLabel.BackColor = [System.Drawing.Color]::FromArgb(35,255,255,255)
@@ -8989,9 +9005,9 @@ function Update-GUIHeaderLayout {
     }
 
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
-        $summaryLeft = 360
+        $summaryLeft = 330
         $summaryRight = if($searchLeft){ $searchLeft - 16 }else{ $script:HeaderToolsPanel.Left - 16 }
-        $summaryWidth = [Math]::Max(380, $summaryRight - $summaryLeft)
+        $summaryWidth = [Math]::Max(430, $summaryRight - $summaryLeft)
         $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
         $script:HeaderSummaryPanel.Location = New-Object System.Drawing.Point($summaryLeft,10)
         $script:HeaderSummaryPanel.Size = New-Object System.Drawing.Size($summaryWidth,58)
@@ -12466,7 +12482,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -12480,11 +12496,11 @@ function Build-ChocolateyPage {
 
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
-    $topPanel.Padding = New-Object System.Windows.Forms.Padding(8)
+    $topPanel.Padding = New-Object System.Windows.Forms.Padding(8,4,8,4)
     $topPanel.ColumnCount = 2
     $topPanel.RowCount = 1
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,280))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,210))) | Out-Null
     $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $chocoTop.Controls.Add($topPanel)
 
@@ -12499,7 +12515,7 @@ function Build-ChocolateyPage {
     $statusActions.FlowDirection = "RightToLeft"
     $statusActions.WrapContents = $false
     $statusActions.Margin = New-Object System.Windows.Forms.Padding(0)
-    $statusActions.Padding = New-Object System.Windows.Forms.Padding(0,16,8,0)
+    $statusActions.Padding = New-Object System.Windows.Forms.Padding(0,8,4,0)
 
     $installChocoLink = New-Object System.Windows.Forms.LinkLabel
     $installChocoLink.Text = "Install Chocolatey"
@@ -12520,7 +12536,6 @@ function Build-ChocolateyPage {
     [void]$statusActions.Controls.Add($installChocoLink)
     [void]$statusActions.Controls.Add($refreshChocoLink)
     [void]$topPanel.Controls.Add($statusActions,1,0)
-    $layout.SetColumnSpan($chocoTop,2)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
     $searchGroup.Text = "Install Chocolatey Packages"
@@ -12589,7 +12604,8 @@ function Build-ChocolateyPage {
     $installedGroup.Text = "Installed Chocolatey Packages"
     $installedGroup.Dock = "Fill"
     $installedGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $layout.Controls.Add($installedGroup,1,1)
+    $layout.Controls.Add($installedGroup,1,0)
+    $layout.SetRowSpan($installedGroup,2)
 
     $installedLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $installedLayout.Dock = "Fill"

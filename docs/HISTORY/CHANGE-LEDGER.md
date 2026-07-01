@@ -64,3 +64,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0054 | 2026-07-01 | TASK-0026 | UI | +1 | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain and static display label. |
 | CHG-0055 | 2026-07-01 | TASK-0026 | Task System | +1 | Created and completed a focused Quick Dx fixed-target task without changing the active TASK-0020 design-gate scope. |
 | CHG-0056 | 2026-07-01 | TASK-0026 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the fixed Quick Diagnosis internet target chain. |
+| CHG-0057 | 2026-07-01 | TASK-0027 | UI | +1 | Polished Quick Dx spacing, restored header health badge room, added Terminal Dark, expanded texture with a gradient, and compacted Choco status placement. |
+| CHG-0058 | 2026-07-01 | TASK-0027 | Task System | +1 | Created and completed a focused GUI polish task without changing the active TASK-0020 design-gate scope. |
+| CHG-0059 | 2026-07-01 | TASK-0027 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the GUI polish pass. |

@@ -37,6 +37,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0024-Quick-Dx-Layout-Adjustment` | Completed | Adjusted Quick Diagnosis tab layout so Quick Target Checks owns the full left column and Quick Diagnosis controls are compacted into the right column. |
 | `TASK-0025-Quick-Dx-Last-Scan-Label-Fix` | Completed | Fixed the clipped Last Quick Diagnosis label in the compact right-column Quick Diagnosis block. |
 | `TASK-0026-Quick-Dx-Fixed-Internet-Targets` | Completed | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain. |
+| `TASK-0027-GUI-Polish-QuickDx-Header-Choco-Theme` | Completed | Polished Quick Dx spacing, header health badge space, Choco layout, surface gradient/texture, and added Terminal Dark. |
 
 ## Reconciliation Decision
 

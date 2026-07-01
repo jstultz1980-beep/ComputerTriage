@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0027 GUI polish pass.
+- Tightened the Quick Dx right column so Hardware Shortcuts retain vertical room, widened the header summary path for the computer health badge, added `Terminal Dark`, expanded textured surfaces with a subtle gradient, and compacted the Chocolatey status block.
 - Completed TASK-0026 Quick Dx fixed internet targets.
 - Removed the editable Quick Diagnosis internet target and added a fixed target chain: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
 - Quick Diagnosis now pre-checks the fixed targets in order and stops at the first successful HTTPS connection before running the report.
