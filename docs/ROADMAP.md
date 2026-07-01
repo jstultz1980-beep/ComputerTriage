@@ -40,20 +40,26 @@ Delivered capabilities:
 - Local HTML report generated from structured outputs.
 
 ## Phase 03 - ARGUS Input Contract
-Status: Active
+Status: Completed
 
 Goal: finalize the contract ARGUS will use to consume HEPHAESTUS deterministic outputs before ARGUS implementation begins.
 
+Completion basis:
+- `TASK-0020-ARGUS-Input-Contract-ADR` completed.
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` is accepted.
+- `TASK-0023-ARGUS-Foundation-Implementation` exists as a focused queued implementation task.
+
+## Phase 04 - Documentation and Task System Audit Gate
+Status: Active
+
+Goal: complete the required audit because Documentation reached `10 / 10` during TASK-0020.
+
 Current active task:
-- `TASK-0020-ARGUS-Input-Contract-ADR`
+- `TASK-0035-Documentation-Task-System-Audit`
 
-TASK-0020 must finalize:
-- ARGUS input artifact priority order.
-- Deterministic evidence versus ARGUS inference trust rules.
-- Missing, partial, and low-quality evidence behavior.
-- Follow-on ARGUS foundation implementation task.
+Implementation work must not begin until the audit gate clears.
 
-## Phase 04 - HEPHAESTUS Rule Catalog Expansion
+## Phase 05 - HEPHAESTUS Rule Catalog Expansion
 Status: Planned
 
 Expand deterministic rule coverage after the v1 vertical slice exists and validates.
@@ -63,27 +69,27 @@ Planned future capabilities:
 - Additional normalized JSON outputs.
 - More robust timeline correlation.
 
-## Phase 05 - ARGUS Foundation
+## Phase 06 - ARGUS Foundation
 Status: Planned
 
-Build ARGUS only after HEPHAESTUS produces stable normalized outputs and the ARGUS input contract is finalized.
+Build ARGUS only after HEPHAESTUS produces stable normalized outputs, the ARGUS input contract is finalized, and the required audit gate clears.
 
-## Phase 06 - ARGUS Evidence Normalization
+## Phase 07 - ARGUS Evidence Normalization
 Status: Planned
 
-Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the input contract is approved.
+Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the input contract is approved and implementation is active.
 
-## Phase 07 - Reporting
+## Phase 08 - Reporting
 Status: Planned
 
 Improve technician and executive reporting after deterministic findings and normalized outputs exist.
 
-## Phase 08 - UI Integration
+## Phase 09 - UI Integration
 Status: Planned
 
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
-## Phase 09 - Release Hardening
+## Phase 10 - Release Hardening
 Status: Planned
 
 Validation, packaging, documentation, and release preparation.
