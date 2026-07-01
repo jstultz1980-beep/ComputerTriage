@@ -44,3 +44,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0034 | 2026-07-01 | TASK-0017 | Validation/Test Framework | +1 | Ran existing smoke and button-smoke validation paths and recorded runtime drift without application-code changes. |
 | CHG-0035 | 2026-07-01 | TASK-0017 | Task System | +1 | Completed TASK-0017 and activated TASK-0018 as the next design gate. |
 | CHG-0036 | 2026-07-01 | TASK-0017 | Documentation | +1 | Updated task, queue, handoff, and changelog records for validation completion and next-task handoff. |
+| CHG-0037 | 2026-07-01 | TASK-0018 | Architecture | +1 | Defined HEPHAESTUS Local Analysis Engine v1 pipeline, responsibility boundaries, output artifacts, rule engine, and parser failure behavior. |
+| CHG-0038 | 2026-07-01 | TASK-0018 | HEPHAESTUS | +1 | Accepted deterministic local analysis as a HEPHAESTUS responsibility before ARGUS interpretation. |
+| CHG-0039 | 2026-07-01 | TASK-0018 | Documentation | +1 | Created Local Analysis Engine design document and ADRs. |
+| CHG-0040 | 2026-07-01 | TASK-0018 | Task System | +1 | Completed TASK-0018 and activated focused TASK-0019 implementation work for Codex. |
+| CHG-0041 | 2026-07-01 | TASK-0018 | Roadmap/Backlog | +1 | Updated roadmap and queued follow-on tasks for implementation, ARGUS contract, rule expansion, and portable-tool classification. |
