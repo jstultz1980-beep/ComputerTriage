@@ -11,55 +11,70 @@ Foundation Audit status:
 - `TASK-0010-Foundation-Audit` is not valid active tracked state because TASK-0010 is already used by the completed drift/status task.
 
 ## Phase 01 - HEPHAESTUS Collection Baseline
-Status: Active
+Status: Completed
 
 Goal: ensure the collection workflow is stable, portable, predictable, and validation-ready before local analysis work begins.
 
-Current active task:
-- `TASK-0017-Triage-Manual-Run-Validation`
-
-Immediate sequence:
-1. Codex completes `TASK-0017-Triage-Manual-Run-Validation` without adding features.
-2. ChatGPT creates/designs `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` with ADR coverage.
-3. Codex implements only the activated, approved next task after design is complete.
+Completion basis:
+- `TASK-0017-Triage-Manual-Run-Validation` passed smoke and button-smoke validation.
+- Runtime drift was documented and excluded from commits.
 
 ## Phase 02 - HEPHAESTUS Local Analysis Engine v1
-Status: Planned
+Status: Active
 
 Goal: add deterministic local analysis after collection baseline validation.
 
-Planned capabilities:
-- Rule engine.
-- Structured findings.
-- Event correlation and timeline generation.
-- Machine profile generation.
-- Evidence quality scoring.
-- Security product inventory.
-- Driver, storage, Windows Update, network, and domain-health interpretation where evidence exists.
-- Local HTML executive report.
-- Normalized JSON outputs and schema/capability metadata.
+Design status:
+- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` is complete.
+- Design document: `docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md`.
+- Accepted ADRs:
+  - `docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md`
+  - `docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md`
+- Proposed follow-on ADR:
+  - `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`
 
-## Phase 03 - ARGUS Foundation
+Current active task:
+- `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation`
+
+TASK-0019 minimal vertical slice:
+- Analysis output folders.
+- Schema and bundle capability metadata.
+- Findings, timeline, evidence score, and machine-profile JSON outputs.
+- Starter deterministic rule runner.
+- Evidence-quality handling for missing or failed evidence.
+- Local HTML report generated from structured outputs.
+
+## Phase 03 - HEPHAESTUS Rule Catalog Expansion
 Status: Planned
 
-Build ARGUS only after HEPHAESTUS produces stable normalized outputs and an ADR defines the ARGUS input contract.
+Expand deterministic rule coverage after the v1 vertical slice exists and validates.
 
-## Phase 04 - ARGUS Evidence Normalization
+Planned future capabilities:
+- Broader service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
+- Additional normalized JSON outputs.
+- More robust timeline correlation.
+
+## Phase 04 - ARGUS Foundation
+Status: Planned
+
+Build ARGUS only after HEPHAESTUS produces stable normalized outputs and the ARGUS input contract is finalized.
+
+## Phase 05 - ARGUS Evidence Normalization
 Status: Planned
 
 Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the input contract is approved.
 
-## Phase 05 - Reporting
+## Phase 06 - Reporting
 Status: Planned
 
 Improve technician and executive reporting after deterministic findings and normalized outputs exist.
 
-## Phase 06 - UI Integration
+## Phase 07 - UI Integration
 Status: Planned
 
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
-## Phase 07 - Release Hardening
+## Phase 08 - Release Hardening
 Status: Planned
 
 Validation, packaging, documentation, and release preparation.
