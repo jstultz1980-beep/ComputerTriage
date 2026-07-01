@@ -18,6 +18,13 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
 | `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Queued | Implement only after TASK-0020 finalizes the ARGUS input contract and activates a specific implementation scope. |
+| `TASK-0028-Quick-Dx-Compact-Run-Panel` | Codex | Queued | Remove visible internet target list from Quick Dx and compact the run block. |
+| `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Queued | Make the Choco status area compact and improve the Choco page layout. |
+| `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Queued | Remove the print data-folder path display and reclaim the space. |
+| `TASK-0031-Triage-Page-Simplification` | Codex | Queued | Reduce Triage primary actions to Quick Triage and Full Triage and revisit live log visibility. |
+| `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Queued | Replace the computer profile list with a richer current-computer summary and LED status indicators. |
+| `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
+| `TASK-0034-Embedded-Tool-Experience-Roadmap` | ChatGPT | Queued | Prioritize launch-only tools that should become embedded tab experiences. |
 
 ## Completed / Historical
 

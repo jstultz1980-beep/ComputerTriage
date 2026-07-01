@@ -67,3 +67,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0057 | 2026-07-01 | TASK-0027 | UI | +1 | Polished Quick Dx spacing, restored header health badge room, added Terminal Dark, expanded texture with a gradient, and compacted Choco status placement. |
 | CHG-0058 | 2026-07-01 | TASK-0027 | Task System | +1 | Created and completed a focused GUI polish task without changing the active TASK-0020 design-gate scope. |
 | CHG-0059 | 2026-07-01 | TASK-0027 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the GUI polish pass. |
+| CHG-0060 | 2026-07-01 | TASK-0028..TASK-0034 | Task System | +1 | Created queued tasks for Quick Dx, Choco, Print, Triage, Computer, Directory, and embedded-tool follow-up work without changing the active TASK-0020 gate. |
+| CHG-0061 | 2026-07-01 | TASK-0028..TASK-0034 | Documentation | +1 | Documented requested UI/workflow changes as focused task files and refreshed handoff/changelog records. |
+| CHG-0062 | 2026-07-01 | TASK-0028..TASK-0034 | Roadmap/Backlog | +1 | Added a prioritized queued backlog for the newly requested UI cleanup and embedded-tool planning work. |

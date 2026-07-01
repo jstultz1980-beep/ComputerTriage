@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0037
+HANDOFF-0038
 
 ## Current Task
 TASK-0020-ARGUS-Input-Contract-ADR
@@ -51,8 +51,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 8 / 10 | No |
-| Task System | 7 / 10 | No |
+| Documentation | 9 / 10 | No |
+| Task System | 8 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -60,7 +60,7 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 1 / 10 | No |
+| Roadmap/Backlog | 2 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -75,6 +75,7 @@ Completed work:
 - TASK-0025 fixed the clipped Last Quick Diagnosis label inside the compact right-column Quick Diagnosis block.
 - TASK-0026 removed the editable Quick Diagnosis internet target and replaced it with a fixed primary/backup target chain: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
 - TASK-0027 completed a focused GUI polish pass for Quick Dx right-column spacing, header health badge space, Terminal Dark theme, gradient/texture surfaces, and compact Choco status placement.
+- TASK-0028 through TASK-0034 were created as queued follow-up tasks for the project owner's newly requested UI/workflow cleanup items. No application code was changed in that task-creation update.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -110,15 +111,21 @@ Scope summary:
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
 - `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0020 completes and activates a specific scope.
+- `TASK-0028-Quick-Dx-Compact-Run-Panel` owned by Codex.
+- `TASK-0029-Choco-Page-Layout-Refinement` owned by Codex.
+- `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
+- `TASK-0031-Triage-Page-Simplification` owned by Codex.
+- `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
+- `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
+- `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
 
 ## Validation Completed For This Update
 - Completed TASK-0024 without changing the active TASK-0020 ChatGPT design gate.
 - Completed TASK-0025 without changing the active TASK-0020 ChatGPT design gate.
 - Completed TASK-0026 without changing the active TASK-0020 ChatGPT design gate.
 - Completed TASK-0027 without changing the active TASK-0020 ChatGPT design gate.
-- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` successfully with `System.Management.Automation.PSParser`.
-- Ran smoke validation: `Network Toolkit GUI loaded successfully. Commands: 18`.
-- Ran button-smoke validation: `Button smoke test completed. Quick tab: OK`.
+- Created queued TASK-0028 through TASK-0034 without changing the active TASK-0020 ChatGPT design gate.
+- Verified no application code changed in the task-creation update.
 - Reset runtime `App/manifests/custom-tools.json` drift after validation.
 - Left untracked `App/NetworkToolkit/LatencyMon/` untouched.
 - Updated queue, handoff, changelog, and change ledger.
@@ -133,7 +140,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0027: Polish Quick Dx header Choco and theme
+TASK-0028-0034: Queue UI cleanup and embedded tool planning
 ```
 
 ## Next Bot Prompt

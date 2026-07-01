@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-01
+- Added queued tasks TASK-0028 through TASK-0034 for the requested next UI/workflow cleanup pass.
+- New queued work covers Quick Dx compacting, Choco layout refinement, Print path cleanup, Triage simplification, Computer tab summary redesign, Directory tab direction, and embedded-tool roadmap planning.
 - Completed TASK-0027 GUI polish pass.
 - Tightened the Quick Dx right column so Hardware Shortcuts retain vertical room, widened the header summary path for the computer health badge, added `Terminal Dark`, expanded textured surfaces with a subtle gradient, and compacted the Chocolatey status block.
 - Completed TASK-0026 Quick Dx fixed internet targets.
