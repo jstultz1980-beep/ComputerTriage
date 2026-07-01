@@ -13,6 +13,8 @@ Create a prioritized roadmap for turning more launch-only tools into embedded ta
 - Inventory launch-only tools that would benefit from embedded UI.
 - Identify tools that should get their own tab versus live inside an existing tab.
 - Rank candidates by troubleshooting value, implementation risk, and expected technician benefit.
+- Prefer embedded tab experiences for tools where the technician needs to read, filter, compare, or act on structured output.
+- Keep simple external app launchers as launchers when embedding does not reduce effort or uncertainty.
 - Define small Codex implementation tasks for the highest-value candidates.
 
 ## Candidate Areas
@@ -33,5 +35,6 @@ Create a prioritized roadmap for turning more launch-only tools into embedded ta
 ## Acceptance Criteria
 - [ ] Embedded-tool candidates are prioritized.
 - [ ] Each recommendation states why embedded UI is better than a launcher.
+- [ ] Each recommendation states whether the tool belongs on an existing tab or should get a dedicated tab.
 - [ ] Each accepted candidate has a small follow-on Codex task.
 - [ ] Tasks avoid overloading any single tab.

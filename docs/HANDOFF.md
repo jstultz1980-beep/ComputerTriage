@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0038
+HANDOFF-0039
 
 ## Current Task
-TASK-0020-ARGUS-Input-Contract-ADR
+TASK-0035-Documentation-Task-System-Audit
 
 ## Current Owner
 ChatGPT
@@ -26,7 +26,7 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0019 is complete. ChatGPT should now execute TASK-0020 and finalize the ARGUS input contract and evidence trust model before any ARGUS implementation begins.
+TASK-0020 completed the ARGUS input contract ADR/design gate. TASK-0035 is now the active audit gate because documentation/task-state work pushed the Documentation counter to `10 / 10`.
 
 Do not implement ARGUS.
 Do not modify HEPHAESTUS code.
@@ -51,8 +51,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 9 / 10 | No |
-| Task System | 8 / 10 | No |
+| Documentation | 10 / 10 | Yes |
+| Task System | 9 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -60,7 +60,7 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 2 / 10 | No |
+| Roadmap/Backlog | 3 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -76,6 +76,9 @@ Completed work:
 - TASK-0026 removed the editable Quick Diagnosis internet target and replaced it with a fixed primary/backup target chain: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
 - TASK-0027 completed a focused GUI polish pass for Quick Dx right-column spacing, header health badge space, Terminal Dark theme, gradient/texture surfaces, and compact Choco status placement.
 - TASK-0028 through TASK-0034 were created as queued follow-up tasks for the project owner's newly requested UI/workflow cleanup items. No application code was changed in that task-creation update.
+- TASK-0020 completed the ARGUS input contract ADR/design gate and created the focused TASK-0023 ARGUS foundation implementation task.
+- TASK-0035 is active because the Documentation counter reached `10 / 10`.
+- TASK-0036 through TASK-0040 were created as queued follow-up tasks for page health indicators, Activity page tracking, modern utility-button styling, and Software tab launchable/installable separation.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -96,21 +99,19 @@ TASK-0019 validation evidence:
 - Button smoke test passed: `Button smoke test completed. Quick tab: OK`.
 
 ## Active Task
-`TASK-0020-ARGUS-Input-Contract-ADR`
+`TASK-0035-Documentation-Task-System-Audit`
 
 Scope summary:
-- Finalize the ARGUS input contract and evidence trust model.
-- Review HEPHAESTUS Local Analysis Engine v1 outputs and existing design/ADR docs.
-- Accept, revise, or supersede `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`.
-- Define ARGUS input artifact priority order.
-- Define deterministic evidence versus ARGUS inference trust rules.
-- Define missing, partial, and low-quality evidence behavior.
-- Create focused follow-on Codex implementation task for ARGUS foundation if appropriate.
+- Audit documentation and task-state consistency after the Documentation counter reached `10 / 10`.
+- Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree.
+- Verify exactly one task is Active.
+- Verify TASK-0020 is complete and TASK-0023 remains queued.
+- Reset audited counters only after audit completion and ledger entry.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0020 completes and activates a specific scope.
+- `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0035 audit completes and activates a specific scope.
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` owned by Codex.
 - `TASK-0029-Choco-Page-Layout-Refinement` owned by Codex.
 - `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
@@ -118,6 +119,11 @@ Scope summary:
 - `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
+- `TASK-0036-Page-Health-Indicators` owned by Codex.
+- `TASK-0037-Activity-Page-Running-Tool-Tracking` owned by Codex.
+- `TASK-0038-Modern-Control-Style-System` owned by Codex.
+- `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` owned by ChatGPT.
+- `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
 - Completed TASK-0024 without changing the active TASK-0020 ChatGPT design gate.
@@ -125,13 +131,15 @@ Scope summary:
 - Completed TASK-0026 without changing the active TASK-0020 ChatGPT design gate.
 - Completed TASK-0027 without changing the active TASK-0020 ChatGPT design gate.
 - Created queued TASK-0028 through TASK-0034 without changing the active TASK-0020 ChatGPT design gate.
+- Reconciled TASK-0020/TASK-0035 state so `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and task files agree that TASK-0035 is Active.
+- Created queued TASK-0036 through TASK-0040 for the newly requested page indicators, Activity page, button style, and Software tab inventory/implementation work.
 - Verified no application code changed in the task-creation update.
 - Reset runtime `App/manifests/custom-tools.json` drift after validation.
 - Left untracked `App/NetworkToolkit/LatencyMon/` untouched.
 - Updated queue, handoff, changelog, and change ledger.
 
 ## Blockers
-None.
+Documentation counter is at `10 / 10`. No new implementation work should begin until `TASK-0035-Documentation-Task-System-Audit` is completed and the audited counter reset is recorded.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -140,7 +148,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0028-0034: Queue UI cleanup and embedded tool planning
+TASK-0036-0040: Queue indicators activity and software tasks
 ```
 
 ## Next Bot Prompt
@@ -158,31 +166,35 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0020-ARGUS-Input-Contract-ADR.md
-8. docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md
-9. docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md
-10. docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md
-11. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
+7. docs/TASKS/TASK-0035-Documentation-Task-System-Audit.md
+8. docs/TASKS/TASK-0020-ARGUS-Input-Contract-ADR.md
+9. docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md
+10. docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md
+11. docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md
+12. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0020-ARGUS-Input-Contract-ADR.
+- Active task: TASK-0035-Documentation-Task-System-Audit.
 - Owner: ChatGPT.
 - Next owner: Codex.
 - TASK-0019 is complete and validated.
 - HEPHAESTUS Local Analysis Engine v1 now produces validated Analysis and Metadata artifacts.
+- TASK-0020 ARGUS input contract ADR/design work is complete.
+- Documentation counter is at 10/10, so implementation work is blocked until TASK-0035 completes.
+- TASK-0036 through TASK-0040 are queued for follow-up UI/workflow refinements requested by the project owner.
 
 Your job:
-Complete TASK-0020 ADR/design work only.
+Complete TASK-0035 audit/governance work only.
 
 Scope:
-- Finalize the ARGUS input contract and evidence trust model.
-- Review HEPHAESTUS Local Analysis Engine v1 outputs and existing design/ADR docs.
-- Accept, revise, or supersede ADR-0003.
-- Define the exact ARGUS input artifact priority order.
-- Define deterministic evidence versus ARGUS inference trust rules.
-- Define missing, partial, low-quality, and parser-warning evidence behavior.
-- Define the first focused ARGUS foundation implementation task for Codex.
+- Audit current documentation and task-state consistency.
+- Verify docs/HANDOFF.md and docs/TASKS/QUEUE.md agree.
+- Verify exactly one task is Active.
+- Verify TASK-0020 is complete and TASK-0023 remains queued.
+- Verify no ARGUS implementation was added by TASK-0020.
+- Verify no HEPHAESTUS code was modified by TASK-0020.
+- Reset audited counters only after audit completion and ledger entry.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
@@ -196,11 +208,12 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- ADR-0003 is accepted or superseded.
-- ARGUS input priority order is explicit.
-- Deterministic-vs-inference trust rules are explicit.
-- Missing, partial, and low-quality evidence behavior is explicit.
-- Follow-on Codex implementation task is specific and small enough to execute safely.
+- Documentation/task-state source of truth is consistent.
+- Exactly one task is Active.
+- TASK-0020 is complete.
+- TASK-0023 remains queued and is not implemented.
+- Audit findings are recorded.
+- Required counters are reset only if audited.
 - No ARGUS code is implemented.
 - No HEPHAESTUS code is modified.
 

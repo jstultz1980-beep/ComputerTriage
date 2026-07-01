@@ -15,6 +15,8 @@ Rework the Chocolatey tab so the status detail is compact, readable, and no long
 - Keep installed-package management visible and usable.
 - Keep package search/install workflow clear.
 - Preserve existing Choco actions: install, refresh status, search, install selected, add to toolbox, refresh installed, upgrade all, upgrade selected, uninstall, and check updates.
+- Restore action controls if theme/layout changes have made them look like empty lines or non-obvious buttons.
+- Keep the Chocolatey status block much smaller than the package-management sections.
 
 ## Out of Scope
 - Changing package installation semantics.
@@ -26,6 +28,7 @@ Rework the Chocolatey tab so the status detail is compact, readable, and no long
 ## Acceptance Criteria
 - [ ] Chocolatey status no longer consumes a large empty top block.
 - [ ] Status text and actions are readable.
+- [ ] Choco status actions are clearly buttons, not thin unlabeled lines.
 - [ ] Installed-package grid and actions remain visible without awkward crowding.
 - [ ] Search/install area remains clear.
 - [ ] PowerShell parse, smoke, and button-smoke validation pass.

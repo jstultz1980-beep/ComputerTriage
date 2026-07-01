@@ -14,6 +14,7 @@ Redesign the Computer tab around a useful current-computer summary instead of a 
 - Give the Current Computer Summary most of the tab.
 - Keep a small, obvious button to view/open the latest HTML computer profile report.
 - Add more high-value computer details to the summary.
+- Leave only a small amount of space for profile report actions; the summary should be the main experience.
 - Add small LED-style indicators beside status-bearing fields:
   - Green for healthy/OK.
   - Yellow for warning/review.
@@ -49,6 +50,7 @@ Redesign the Computer tab around a useful current-computer summary instead of a 
 - [ ] Computer profile list is removed from the Computer tab.
 - [ ] Current Computer Summary uses the available tab space well.
 - [ ] Latest HTML profile report is still reachable from a small button.
+- [ ] The Computer tab shows more useful current-machine detail than the old profile list view.
 - [ ] Status-bearing fields have LED-style indicators.
 - [ ] Unknown/unscanned indicators render as unlit/off.
 - [ ] PowerShell parse, smoke, and button-smoke validation pass.

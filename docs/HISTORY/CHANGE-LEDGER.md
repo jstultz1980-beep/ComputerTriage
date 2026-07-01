@@ -70,3 +70,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0060 | 2026-07-01 | TASK-0028..TASK-0034 | Task System | +1 | Created queued tasks for Quick Dx, Choco, Print, Triage, Computer, Directory, and embedded-tool follow-up work without changing the active TASK-0020 gate. |
 | CHG-0061 | 2026-07-01 | TASK-0028..TASK-0034 | Documentation | +1 | Documented requested UI/workflow changes as focused task files and refreshed handoff/changelog records. |
 | CHG-0062 | 2026-07-01 | TASK-0028..TASK-0034 | Roadmap/Backlog | +1 | Added a prioritized queued backlog for the newly requested UI cleanup and embedded-tool planning work. |
+| CHG-0063 | 2026-07-01 | TASK-0036..TASK-0040 | Task System | +1 | Created queued tasks for page indicators, Activity tracking, modern utility controls, and Software tab inventory/implementation while reconciling TASK-0035 as the active audit gate. |
+| CHG-0064 | 2026-07-01 | TASK-0036..TASK-0040 | Documentation | +1 | Documented the newest requested UI/workflow changes and recorded that the Documentation counter is at 10/10. |
+| CHG-0065 | 2026-07-01 | TASK-0036..TASK-0040 | Roadmap/Backlog | +1 | Added the newest requested UI/workflow refinements to the queued backlog behind the required audit gate. |

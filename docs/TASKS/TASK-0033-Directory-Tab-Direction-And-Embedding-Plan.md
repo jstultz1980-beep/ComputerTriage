@@ -12,6 +12,7 @@ Decide whether the Directory tab should remain a tool launcher or become a riche
 ## Scope
 - Review current Directory tab tools and adjacent Network/Infrastructure tools.
 - Decide whether to add useful domain/network discovery information directly on the Directory tab.
+- Decide whether network context belongs on Directory or whether Directory should stay focused on AD/domain identity.
 - Identify which tools should remain launch buttons versus embedded tab experiences.
 - Recommend candidate embedded tools or dedicated tabs.
 - Produce focused Codex implementation tasks.
@@ -30,6 +31,7 @@ Decide whether the Directory tab should remain a tool launcher or become a riche
 
 ## Acceptance Criteria
 - [ ] Directory tab direction is explicitly decided.
+- [ ] The recommendation answers whether network information belongs on Directory or should stay on Network/Infrastructure.
 - [ ] Recommendations avoid duplicating Network and Infrastructure tabs.
 - [ ] Embedded-tool candidates are listed and prioritized.
 - [ ] Follow-on Codex implementation tasks are created if changes are accepted.

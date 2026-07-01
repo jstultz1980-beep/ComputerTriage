@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-01
+- Reconciled TASK-0020/TASK-0035 governance state so `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and task files agree that TASK-0035 is the active audit gate.
+- Added queued tasks TASK-0036 through TASK-0040 for page health indicators, Activity page tracking, modern utility controls, Software tab app/installable classification, and Software tab implementation.
+- Enriched existing queued tasks for Choco layout, Triage simplification, Computer tab summary redesign, Directory tab direction, and embedded-tool planning with the latest requested details.
+- Documentation counter is at `10 / 10`; implementation work should pause until TASK-0035 resolves the audit requirement.
 - Added queued tasks TASK-0028 through TASK-0034 for the requested next UI/workflow cleanup pass.
 - New queued work covers Quick Dx compacting, Choco layout refinement, Print path cleanup, Triage simplification, Computer tab summary redesign, Directory tab direction, and embedded-tool roadmap planning.
 - Completed TASK-0027 GUI polish pass.
