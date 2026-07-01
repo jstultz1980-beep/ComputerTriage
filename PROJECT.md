@@ -30,6 +30,32 @@ ignore chat history unless the same information exists in the repository.
 ## Core Rule
 No implementation work may begin unless there is an active task document under `docs/TASKS`.
 
+## Task Queue Rule
+`docs/TASKS/QUEUE.md` is the official task queue.
+
+The official task lifecycle is:
+
+```text
+Backlog
+↓
+Queued
+↓
+Assigned
+↓
+Active
+↓
+Validation
+↓
+Complete
+↓
+Archived
+```
+
+Only one task may be `Active` at a time.
+
+`docs/HANDOFF.md` must identify the active task and must agree with
+`docs/TASKS/QUEUE.md`.
+
 ## No Patch Stacking Rule
 If a script or implementation develops structural errors, stop patching it. Roll back to the last known-good state and rebuild cleanly from the current repository layout.
 

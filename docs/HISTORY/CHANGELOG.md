@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-01
+- Prepared the repository for ChatGPT to execute TASK-0010 Foundation Audit.
+- Added `docs/TASKS/QUEUE.md` with the official task lifecycle and one-active-task rule.
+- Created and activated `docs/TASKS/TASK-0010-Foundation-Audit.md`.
+- Added the Prime Directive and governance responsibilities to `docs/PROJECT-CHARTER.md`.
+- Updated `PROJECT.md` and `docs/HANDOFF.md` to reference the task queue and active ChatGPT-owned audit.
+- Recorded governance, documentation, task system, and roadmap/backlog counter increments.
+
 ## 2026-06-30
 - Completed TASK-0016 tool source-of-truth correction.
 - Centralized visible GUI tab tools and header search entries through `Get-GUIToolRegistry`.
