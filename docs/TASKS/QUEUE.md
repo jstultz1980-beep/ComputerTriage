@@ -9,15 +9,15 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` | Codex | Active | Implement the minimal Local Analysis Engine v1 vertical slice defined by TASK-0018. |
+| `TASK-0020-ARGUS-Input-Contract-ADR` | ChatGPT | Active | Finalize the ARGUS input contract and evidence trust model before ARGUS implementation begins. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0020-ARGUS-Input-Contract-ADR` | ChatGPT | Queued | Finalize the ARGUS contract after enough HEPHAESTUS outputs exist to validate the proposed trust model. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
+| `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Queued | Implement only after TASK-0020 finalizes the ARGUS input contract and activates a specific implementation scope. |
 
 ## Completed / Historical
 
@@ -33,6 +33,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0016-Tool-Source-Of-Truth-Correction` | Completed | GUI tool registry/source-of-truth correction per handoff history. |
 | `TASK-0017-Triage-Manual-Run-Validation` | Completed | Existing smoke and button-smoke validation passed; runtime drift was documented and excluded. |
 | `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` | Completed | Design, ADRs, and focused TASK-0019 implementation scope completed. |
+| `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` | Completed | Minimal vertical slice implemented and validated locally; required artifacts generated and smoke tests passed. |
 
 ## Reconciliation Decision
 
@@ -41,4 +42,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active implementation gate is TASK-0019.
+- Current active design gate is TASK-0020.
