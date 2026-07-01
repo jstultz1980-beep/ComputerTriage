@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0024 Quick Dx layout adjustment.
+- Reworked the Quick Diagnosis tab so Quick Target Checks owns the full left column, while the Internet target, Quick Dx, Report, DISM/SFC, and last-scan controls are compacted into the right column.
+- Left TASK-0020 active after the focused UI correction so the ARGUS input contract design gate can continue.
 - Completed TASK-0019 HEPHAESTUS Local Analysis Engine v1 implementation.
 - Validated `Run Local Analysis` successfully against `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
 - Confirmed required `Analysis` and `Metadata` artifacts exist and JSON artifacts parse successfully.

@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0033
+HANDOFF-0034
 
 ## Current Task
 TASK-0020-ARGUS-Input-Contract-ADR
@@ -51,12 +51,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 4 / 10 | No |
-| Task System | 3 / 10 | No |
+| Documentation | 5 / 10 | No |
+| Task System | 4 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 4 / 10 | No |
+| UI | 5 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -71,6 +71,7 @@ Completed work:
 - TASK-0017 completed validation-only work.
 - TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
 - TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
+- TASK-0024 completed a focused Quick Dx layout correction requested by the project owner. Quick Target Checks now owns the full left column, while Quick Diagnosis run controls and Review/Shortcuts are stacked in the right column.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -108,11 +109,13 @@ Scope summary:
 - `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0020 completes and activates a specific scope.
 
 ## Validation Completed For This Update
-- Applied user-provided TASK-0019 validation results to the repository.
-- Marked TASK-0019 complete.
-- Created and activated TASK-0020.
-- Updated queue and handoff so they agree on exactly one active task.
-- Updated roadmap, changelog, and change ledger.
+- Completed TASK-0024 without changing the active TASK-0020 ChatGPT design gate.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` successfully with `System.Management.Automation.PSParser`.
+- Ran smoke validation: `Network Toolkit GUI loaded successfully. Commands: 18`.
+- Ran button-smoke validation: `Button smoke test completed. Quick tab: OK`.
+- Reset runtime `App/manifests/custom-tools.json` drift after validation.
+- Left untracked `App/NetworkToolkit/LatencyMon/` untouched.
+- Updated queue, handoff, changelog, and change ledger.
 
 ## Blockers
 None.
@@ -124,7 +127,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0019: Complete HEPHAESTUS Local Analysis Engine v1 implementation
+TASK-0024: Adjust Quick Dx layout
 ```
 
 ## Next Bot Prompt

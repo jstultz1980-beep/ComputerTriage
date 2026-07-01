@@ -8270,37 +8270,45 @@ function Build-QuickTriagePage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.ColumnCount = 1
-    $layout.RowCount = 2
+    $layout.ColumnCount = 2
+    $layout.RowCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(16)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,116))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,64))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,36))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
+
+    $rightLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $rightLayout.Dock = "Fill"
+    $rightLayout.ColumnCount = 1
+    $rightLayout.RowCount = 2
+    $rightLayout.Margin = New-Object System.Windows.Forms.Padding(10,0,0,0)
+    $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.Controls.Add($rightLayout,1,0)
 
     $runGroup = New-Object System.Windows.Forms.GroupBox
     $runGroup.Text = "Quick Diagnosis"
     $runGroup.Dock = "Fill"
     $runGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $layout.Controls.Add($runGroup,0,0)
+    $rightLayout.Controls.Add($runGroup,0,0)
 
     $runPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $runPanel.Dock = "Fill"
     $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,6)
-    $runPanel.ColumnCount = 5
-    $runPanel.RowCount = 2
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,116))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
-    $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,142))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
+    $runPanel.ColumnCount = 3
+    $runPanel.RowCount = 3
+    for($i = 0; $i -lt 3; $i++){
+        $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 3)))) | Out-Null
+    }
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet test target"
-    $targetLabel.Dock = "None"
-    $targetLabel.Width = 118
-    $targetLabel.Height = 30
+    $targetLabel.Dock = "Fill"
     $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,6,3)
     [void]$runPanel.Controls.Add($targetLabel,0,0)
 
@@ -8308,7 +8316,8 @@ function Build-QuickTriagePage {
     $QuickTargetBox.Dock = "Fill"
     $QuickTargetBox.Width = 0
     $QuickTargetBox.Height = 26
-    $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,7,10,5)
+    $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,7,3,5)
+    $runPanel.SetColumnSpan($QuickTargetBox,2)
     [void]$runPanel.Controls.Add($QuickTargetBox,1,0)
 
     $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
@@ -8316,21 +8325,21 @@ function Build-QuickTriagePage {
     Set-GUIButtonChrome -Button $QuickRunButton -Compact
     $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickRunButton,"Run Quick Diagnosis for the target computer and create the current health report.") }
-    [void]$runPanel.Controls.Add($QuickRunButton,2,0)
+    [void]$runPanel.Controls.Add($QuickRunButton,0,1)
 
     $reportButton = New-GUIButton "Report" { Open-GUILatestQuickDiagnosisReport }
     $reportButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $reportButton -Compact
     $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($reportButton,"Open the latest Quick Diagnosis HTML report.") }
-    [void]$runPanel.Controls.Add($reportButton,3,0)
+    [void]$runPanel.Controls.Add($reportButton,1,1)
 
     $script:DismRepairButton = New-GUIButton "DISM/SFC" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $DismRepairButton -Compact
     $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,5,5,5)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($DismRepairButton,"Run the DISM/SFC repair path after reviewing Quick Diagnosis results. Override is available when needed.") }
-    [void]$runPanel.Controls.Add($DismRepairButton,4,0)
+    [void]$runPanel.Controls.Add($DismRepairButton,2,1)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
     $QuickLastDiagnosisLabel.Dock = "Fill"
@@ -8339,24 +8348,15 @@ function Build-QuickTriagePage {
     $QuickLastDiagnosisLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
     $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,2,3,2)
-    $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,5)
-    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,1)
+    $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,3)
+    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,2)
     Refresh-GUILastQuickDiagnosisLabel
-
-    $lowerLayout = New-Object System.Windows.Forms.TableLayoutPanel
-    $lowerLayout.Dock = "Fill"
-    $lowerLayout.ColumnCount = 2
-    $lowerLayout.RowCount = 1
-    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,64))) | Out-Null
-    $lowerLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,36))) | Out-Null
-    $lowerLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.Controls.Add($lowerLayout,0,1)
 
     $statusGroup = New-Object System.Windows.Forms.GroupBox
     $statusGroup.Text = "Quick Target Checks"
     $statusGroup.Dock = "Fill"
     $statusGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $lowerLayout.Controls.Add($statusGroup,0,0)
+    $layout.Controls.Add($statusGroup,0,0)
 
     $statusLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $statusLayout.Dock = "Fill"
@@ -8452,7 +8452,7 @@ function Build-QuickTriagePage {
     $repairGroup.Text = "Review And Shortcuts"
     $repairGroup.Dock = "Fill"
     $repairGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $lowerLayout.Controls.Add($repairGroup,1,0)
+    $rightLayout.Controls.Add($repairGroup,0,1)
 
     $repairPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $repairPanel.Dock = "Fill"
