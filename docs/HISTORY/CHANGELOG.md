@@ -1,10 +1,14 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0019 HEPHAESTUS Local Analysis Engine v1 implementation.
+- Validated `Run Local Analysis` successfully against `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
+- Confirmed required `Analysis` and `Metadata` artifacts exist and JSON artifacts parse successfully.
+- Confirmed smoke and button-smoke tests pass after TASK-0019 implementation.
+- Activated TASK-0020 ARGUS Input Contract ADR for ChatGPT.
 - Began TASK-0019 HEPHAESTUS Local Analysis Engine v1 implementation.
 - Added `App/NetworkToolkit/Core/LocalAnalysisEngine.ps1` with a safe CLI command path: `Run Local Analysis`.
 - The initial implementation creates `Analysis/`, `Analysis/normalized/`, and `Metadata/` outputs and writes findings, timeline, evidence score, machine profile, report, schema-version, and bundle-capability artifacts.
-- TASK-0019 remains active pending local validation after pulling from `origin/master`.
 - Completed TASK-0018 HEPHAESTUS Local Analysis Engine v1 design.
 - Created `docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md`.
 - Created ADRs for HEPHAESTUS local analysis boundary, normalized output schema versioning, and proposed ARGUS input trust model.
