@@ -8284,7 +8284,7 @@ function Build-QuickTriagePage {
     $rightLayout.RowCount = 2
     $rightLayout.Margin = New-Object System.Windows.Forms.Padding(10,0,0,0)
     $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,154))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($rightLayout,1,0)
 
@@ -8304,7 +8304,7 @@ function Build-QuickTriagePage {
     }
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
     $targetLabel = New-GUILabel "Internet test target"
@@ -8345,9 +8345,10 @@ function Build-QuickTriagePage {
     $QuickLastDiagnosisLabel.Dock = "Fill"
     $QuickLastDiagnosisLabel.Height = 30
     $QuickLastDiagnosisLabel.TextAlign = "MiddleLeft"
+    $QuickLastDiagnosisLabel.AutoEllipsis = $true
     $QuickLastDiagnosisLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
-    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,2,3,2)
+    $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,3,2)
     $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,3)
     [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,2)
     Refresh-GUILastQuickDiagnosisLabel

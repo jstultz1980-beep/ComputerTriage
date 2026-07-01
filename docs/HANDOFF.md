@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0034
+HANDOFF-0035
 
 ## Current Task
 TASK-0020-ARGUS-Input-Contract-ADR
@@ -51,12 +51,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 5 / 10 | No |
-| Task System | 4 / 10 | No |
+| Documentation | 6 / 10 | No |
+| Task System | 5 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 5 / 10 | No |
+| UI | 6 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -72,6 +72,7 @@ Completed work:
 - TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
 - TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
 - TASK-0024 completed a focused Quick Dx layout correction requested by the project owner. Quick Target Checks now owns the full left column, while Quick Diagnosis run controls and Review/Shortcuts are stacked in the right column.
+- TASK-0025 fixed the clipped Last Quick Diagnosis label inside the compact right-column Quick Diagnosis block.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -110,6 +111,7 @@ Scope summary:
 
 ## Validation Completed For This Update
 - Completed TASK-0024 without changing the active TASK-0020 ChatGPT design gate.
+- Completed TASK-0025 without changing the active TASK-0020 ChatGPT design gate.
 - Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` successfully with `System.Management.Automation.PSParser`.
 - Ran smoke validation: `Network Toolkit GUI loaded successfully. Commands: 18`.
 - Ran button-smoke validation: `Button smoke test completed. Quick tab: OK`.
@@ -127,7 +129,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0024: Adjust Quick Dx layout
+TASK-0025: Fix Quick Dx last-scan label clipping
 ```
 
 ## Next Bot Prompt

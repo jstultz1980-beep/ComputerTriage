@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0025 Quick Dx last-scan label fix.
+- Increased the compact Quick Diagnosis block height and gave the Last Quick Diagnosis label a fixed visible row with ellipsis behavior.
 - Completed TASK-0024 Quick Dx layout adjustment.
 - Reworked the Quick Diagnosis tab so Quick Target Checks owns the full left column, while the Internet target, Quick Dx, Report, DISM/SFC, and last-scan controls are compacted into the right column.
 - Left TASK-0020 active after the focused UI correction so the ARGUS input contract design gate can continue.

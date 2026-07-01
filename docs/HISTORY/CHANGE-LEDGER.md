@@ -58,3 +58,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0048 | 2026-07-01 | TASK-0024 | UI | +1 | Reworked the Quick Diagnosis tab layout so Quick Target Checks owns the full left column and run controls are compacted into the right column. |
 | CHG-0049 | 2026-07-01 | TASK-0024 | Task System | +1 | Created and completed a focused Quick Dx layout correction task without changing the active TASK-0020 design-gate scope. |
 | CHG-0050 | 2026-07-01 | TASK-0024 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the Quick Dx layout correction. |
+| CHG-0051 | 2026-07-01 | TASK-0025 | UI | +1 | Fixed the clipped Last Quick Diagnosis label in the compact Quick Diagnosis block by giving it a stable visible row. |
+| CHG-0052 | 2026-07-01 | TASK-0025 | Task System | +1 | Created and completed a focused Quick Dx last-scan label bugfix task without changing the active TASK-0020 design-gate scope. |
+| CHG-0053 | 2026-07-01 | TASK-0025 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the Quick Dx label clipping fix. |
