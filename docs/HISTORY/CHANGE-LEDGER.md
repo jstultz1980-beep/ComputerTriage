@@ -51,3 +51,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0041 | 2026-07-01 | TASK-0018 | Roadmap/Backlog | +1 | Updated roadmap and queued follow-on tasks for implementation, ARGUS contract, rule expansion, and portable-tool classification. |
 | CHG-0042 | 2026-07-01 | TASK-0019 | HEPHAESTUS | +1 | Began Local Analysis Engine v1 implementation with a Core module that generates Analysis and Metadata artifacts through a safe CLI command path. |
 | CHG-0043 | 2026-07-01 | TASK-0019 | Documentation | +1 | Updated TASK-0019 work log, handoff, changelog, and ledger for implementation-start state and validation requirements. |
+| CHG-0044 | 2026-07-01 | TASK-0019 | HEPHAESTUS | +1 | Patched Local Analysis Engine function scope so the registered command remains callable after module import. |
+| CHG-0045 | 2026-07-01 | TASK-0019 | Validation/Test Framework | +1 | Validated Local Analysis output artifacts, JSON parse behavior, smoke test, and button-smoke test. |
+| CHG-0046 | 2026-07-01 | TASK-0019 | Task System | +1 | Completed TASK-0019 and activated TASK-0020 as the next ChatGPT-owned ADR task. |
+| CHG-0047 | 2026-07-01 | TASK-0019 | Documentation | +1 | Recorded TASK-0019 completion, validation evidence, queue state, roadmap state, changelog, and handoff updates. |
