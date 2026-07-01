@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-01
+- Reconciled TASK-0010 governance drift and completed `REVIEW-0001-Foundation-Audit`.
+- Archived the invalid duplicate `TASK-0010-Foundation-Audit` active-state reference.
+- Activated `TASK-0017-Triage-Manual-Run-Validation` as the only active task.
+- Updated the roadmap sequence to validate first, then design HEPHAESTUS Local Analysis Engine v1 before implementation.
+- Added the executive project status report and reset audited governance/task/documentation/roadmap counters.
 - Prepared the repository for ChatGPT to execute TASK-0010 Foundation Audit.
 - Added `docs/TASKS/QUEUE.md` with the official task lifecycle and one-active-task rule.
 - Created and activated `docs/TASKS/TASK-0010-Foundation-Audit.md`.

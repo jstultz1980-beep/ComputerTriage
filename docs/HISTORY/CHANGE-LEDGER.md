@@ -37,3 +37,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0027 | 2026-07-01 | TASK-0010 | Documentation | +1 | Added the Prime Directive, governance responsibilities, and handoff updates for the foundation audit. |
 | CHG-0028 | 2026-07-01 | TASK-0010 | Task System | +1 | Created `docs/TASKS/QUEUE.md` and activated `TASK-0010-Foundation-Audit` for ChatGPT. |
 | CHG-0029 | 2026-07-01 | TASK-0010 | Roadmap/Backlog | +1 | Established the queued-task structure that ChatGPT will use to update the backlog during the foundation audit. |
+| CHG-0030 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Repository Governance | reset to 0 / 10 | Reconciled governance source of truth, aligned `docs/TASKS/QUEUE.md` and `docs/HANDOFF.md`, and resolved the invalid duplicate `TASK-0010-Foundation-Audit` active-state reference. |
+| CHG-0031 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Task System | reset to 0 / 10 | Established exactly one active task in the queue and handoff: `TASK-0017-Triage-Manual-Run-Validation`. |
+| CHG-0032 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Documentation | reset to 0 / 10 | Created `REVIEW-0001-Foundation-Audit` and executive project status report; refreshed handoff. |
+| CHG-0033 | 2026-07-01 | TASK-0010 / REVIEW-0001 | Roadmap/Backlog | reset to 0 / 10 | Updated roadmap and backlog/task sequence for validation, HEPHAESTUS Local Analysis Engine design, and later implementation. |

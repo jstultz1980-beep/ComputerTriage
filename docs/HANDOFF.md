@@ -1,46 +1,54 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0028
+HANDOFF-0029
 
 ## Current Task
-TASK-0010-Foundation-Audit
+TASK-0017-Triage-Manual-Run-Validation
 
 ## Current Owner
-ChatGPT
+Codex
 
 ## Next Owner
 Codex
+
+## Governance Reconciliation Status
+Foundation governance has been reconciled.
+
+`TASK-0010-Foundation-Audit` is not valid active task state because `TASK-0010` is already used by completed historical task `TASK-0010-Classify-Drift-And-Status-Report`. The actual tracked Foundation Audit is `TASK-0011-Foundation-Audit`, and it is completed. The duplicate local `TASK-0010-Foundation-Audit.md` task file is archived for traceability.
+
+`docs/TASKS/QUEUE.md` now exists and agrees with this handoff. Exactly one task is active:
+
+```text
+TASK-0017-Triage-Manual-Run-Validation
+```
+
+No application code changed. No HEPHAESTUS collector code changed. No ARGUS implementation was added. No unrelated files were cleaned.
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
 
 Another bot should not rely on memory, screenshots, or prior conversation unless those details are captured in tracked project files.
 
-The handoff process has three core files:
+The handoff process has four core files:
 - `PROJECT.md` defines the rules every bot must follow.
 - `docs/HANDOFF.md` explains the current project state and contains the exact `Next Bot Prompt` to give another bot.
 - `docs/TASKS/QUEUE.md` defines the official task queue and lifecycle.
 - The active task file under `docs/TASKS` defines the only work that may be performed.
 
 Work should move through this sequence:
-1. Read `PROJECT.md`, the project docs, this handoff, and the active task.
-2. If no active task exists, create a focused task under `docs/TASKS` and make it active in this handoff before implementation begins.
-3. Perform only the work described by the active task. Do not clean up unrelated files or expand scope unless a task explicitly says to do so.
-4. Validate the work using the validation steps in the task.
-5. Update the task file with completion notes and checked acceptance criteria.
+1. Read `PROJECT.md`, the project docs, this handoff, the task queue, and the active task.
+2. Perform only the work described by the active task. Do not clean up unrelated files or expand scope unless a task explicitly says to do so.
+3. Validate the work using the validation steps in the task.
+4. Update the active task file with completion notes and checked acceptance criteria.
+5. Update `docs/TASKS/QUEUE.md` if task state changes.
 6. Update this handoff with the new project state, validation results, known unrelated working-tree drift, and a fresh `Next Bot Prompt`.
 7. Commit the related changes with a commit message that references the task.
-
-The `Next Bot Prompt` section is the text to copy into ChatGPT or another bot. It replaces any separate ChatGPT task packet. After every completed task, that prompt must be rewritten so the next bot starts from the repository state, not from chat history.
 
 The official task lifecycle is `Backlog -> Queued -> Assigned -> Active -> Validation -> Complete -> Archived`. Only one task may be `Active`.
 
 ## Objective
-TASK-0010-Foundation-Audit is active. ChatGPT owns the foundation audit and
-must prepare the repository for follow-on Codex implementation tasks without
-modifying application code, implementing ARGUS, modifying HEPHAESTUS, refactoring
-existing code, or cleaning unrelated files.
+TASK-0017 is active. Codex should validate the existing toolkit workflow from the current repository state without adding features, refactoring code, implementing ARGUS, or modifying HEPHAESTUS collectors.
 
 ## Audit State Tracking
 Each subsystem has its own change counter.
@@ -59,10 +67,10 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 1 / 10 | No |
+| Repository Governance | 0 / 10 | No |
 | Architecture | 0 / 10 | No |
-| Documentation | 6 / 10 | No |
-| Task System | 6 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 0 / 10 | No |
 | HEPHAESTUS | 0 / 10 | No |
 | ARGUS | 0 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -70,156 +78,75 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 1 / 10 | No |
-| Roadmap/Backlog | 2 / 10 | No |
+| Roadmap/Backlog | 0 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-TASK-0011 completed the foundation audit. TASK-0012 completed the phase
-transition readiness pass. Runtime-only custom tool manifest drift was reset,
-generated third-party `.cfg` files are ignored broadly, task status wording was
-normalized, stale architecture root path casing was corrected, and the roadmap
-now marks Phase 00 complete with Phase 01 active.
+TASK-0011 completed the valid tracked Foundation Audit. REVIEW-0001 reconciled later task-state drift and reset audited governance, documentation, task-system, and roadmap/backlog counters.
 
-TASK-0013 added a GUI header search box. It autocompletes tool names from the
-catalog, mapped Sysinternals tools, and ready custom/toolbox apps. Selecting a
-result or pressing Enter navigates to the matching tab without launching the
-tool.
+TASK-0016 completed the GUI tool source-of-truth correction. Visible tab rendering and header search now read from `Get-GUIToolRegistry`, duplicate registry/search entries are checked during button smoke validation, and triage completion handling is single-shot so one completed run cannot produce repeated completion or result-read dialogs.
 
-TASK-0014 restored DHCP Sleuth. The tool had disappeared because `App/Custom/*`
-ignored the standalone app folder and the tracked custom tools manifest did not
-register it. DHCP Sleuth is now tracked under `App/Custom/DHCPSleuth`, its
-mutable `DHCP-Sleuth.settings.json` remains ignored, and the manifest registers
-it as a standalone GUI app on the Infrastructure tab.
+The accepted HEPHAESTUS Local Analysis Engine v1 work is approved direction, but it is not the active implementation task. HEPHAESTUS analysis implementation must wait until TASK-0018 design/ADR work is complete and a focused implementation task is activated.
 
-TASK-0014 also hardened validation-only launch behavior: `App/NetworkToolkit.ps1`
-now bypasses the single-instance mutex for `-SmokeTest` and `-ButtonSmokeTest`,
-and `App/ToolKit-GUI/ToolKit-GUI.ps1` disposes the test form and stops all
-known GUI timers during smoke-test cleanup.
+## Active Task
+`TASK-0017-Triage-Manual-Run-Validation`
 
-TASK-0015 corrected header search tab mapping. Search results now come from the
-same `Get-GUIToolsForTab` path used by visible tab pages, and the standalone
-Sysinternals search entries share the Sysinternals page filter. `PsExec Helper`
-now maps to the dedicated `PsExec` tab instead of `Remote`.
+Scope:
+- Validate the existing startup, smoke, and manual validation paths already present.
+- Confirm runtime/generated drift is classified and not committed unless required.
+- Record defects and next recommended tasks.
+- Do not implement new features.
 
-TASK-0016 completed the GUI tool source-of-truth correction. Visible tab
-rendering and header search now read from `Get-GUIToolRegistry`, duplicate
-registry/search entries are checked during button smoke validation, and triage
-completion handling is single-shot so one completed run cannot produce repeated
-completion or result-read dialogs.
-
-TASK-0010-Foundation-Audit is now active for ChatGPT. This is a governance-only
-audit task. `docs/TASKS/QUEUE.md` is the official task queue, and
-`docs/HANDOFF.md` must stay aligned with it. Historical task numbering already
-contains `TASK-0010-Classify-Drift-And-Status-Report.md`; the active
-`TASK-0010-Foundation-Audit.md` was created exactly as requested for the
-governance handoff.
+## Queued Work
+- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` owned by ChatGPT.
+- `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` owned by Codex, blocked until TASK-0018 is complete and activated.
+- `TASK-0020-ARGUS-Input-Contract-ADR` owned by ChatGPT.
 
 ## Completed Work
-- Read `PROJECT.md` and required startup documents.
-- Created `docs/TASKS/TASK-0011-Foundation-Audit.md`.
-- Updated this handoff to make TASK-0011 active.
-- Completed TASK-0011 foundation audit.
-- Verified GitHub remote and branch tracking.
-- Reviewed required startup docs and task list.
-- Compared audit counters against `docs/HISTORY/CHANGE-LEDGER.md`.
-- Reset runtime-only `App/manifests/custom-tools.json` drift.
-- Broadened generated third-party tool config ignore coverage.
-- Normalized TASK-0009 status wording.
-- Corrected stale architecture root path casing.
-- Completed TASK-0012 phase-transition readiness.
-- Marked Phase 00 Foundation Zero complete and Phase 01 HEPHAESTUS Collection
-  Baseline active.
-- Updated audit counters for TASK-0012 documentation, task system, and roadmap
-  changes.
-- Created TASK-0013 for header tool search.
-- Completed TASK-0013 header tool search.
-- Added header autocomplete search to `App/ToolKit-GUI/ToolKit-GUI.ps1`.
-- Added smoke-test coverage that confirms the search box exists and resolves
-  `Test-NetConnection` to the Analyze tab.
-- Created TASK-0014 for DHCP Sleuth restoration.
-- Completed TASK-0014 DHCP Sleuth restoration.
-- Added tracked DHCP Sleuth standalone app files under `App/Custom/DHCPSleuth`.
-- Registered DHCP Sleuth in `App/manifests/custom-tools.json` for the
-  Infrastructure tab with standalone GUI launch behavior.
-- Added `App/.gitignore` exceptions for DHCP Sleuth while keeping
-  `DHCP-Sleuth.settings.json` ignored.
-- Hardened smoke-test lifecycle cleanup and test-mode singleton bypass.
-- Created TASK-0015 for header search tab mapping correction.
-- Completed TASK-0015 header search tab mapping correction.
-- Rebuilt header search indexing from visible tab tool placement.
-- Corrected `PsExec Helper` catalog placement to `PsExec`.
-- Added button smoke-test assertions for representative header search mappings.
-- Created TASK-0016 for tool source-of-truth correction.
-- Completed TASK-0016 tool source-of-truth correction.
-- Added `Get-GUIToolRegistry` as the normalized GUI registry path for rendered
-  tab tools and header search.
-- Added button smoke-test duplicate detection for GUI registry and search
-  entries.
-- Hardened triage completion/cancellation timer handling to prevent repeated
-  modal dialogs or repeated result-read log spam from one run.
-- Created `docs/TASKS/QUEUE.md` with the official lifecycle and one-active-task
-  rule.
-- Created and activated `docs/TASKS/TASK-0010-Foundation-Audit.md` for ChatGPT.
-- Added the Prime Directive and governance responsibilities to
-  `docs/PROJECT-CHARTER.md`.
-- Updated `PROJECT.md` to reference the task queue and lifecycle.
+- Created `docs/TASKS/QUEUE.md`.
+- Created and activated `docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md`.
+- Created `docs/REVIEWS/REVIEW-0001-Foundation-Audit.md`.
+- Created `docs/REVIEWS/EXECUTIVE-PROJECT-STATUS.md`.
+- Updated `docs/ROADMAP.md` with the validation-first and design-before-implementation sequence.
+- Archived the duplicate local `docs/TASKS/TASK-0010-Foundation-Audit.md`.
+- Updated `docs/HISTORY/CHANGE-LEDGER.md` with audited counter resets.
+- Updated `docs/HISTORY/CHANGELOG.md`.
+- Reconciled this handoff with `docs/TASKS/QUEUE.md`.
 
 ## Validation Completed
-- Confirmed `master` is aligned with `origin/master` before task creation.
-- Confirmed existing task list ended at TASK-0010 before creating TASK-0011.
-- Ran `git status --short --branch`.
-- Ran `git remote -v`.
-- Ran `git log --oneline -12`.
-- Reviewed `docs/TASKS/TASK-*.md` status values.
-- Reviewed `docs/HISTORY/CHANGE-LEDGER.md` against handoff counters.
-- Reviewed `.gitignore` generated/runtime coverage.
-- Confirmed task list ended at TASK-0011 before creating TASK-0012.
-- Searched live docs for phase-transition references.
-- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with `PSParser`.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Confirmed `App/Custom/DHCPSleuth/DHCP-Sleuth.settings.json` is ignored.
-- Parsed `App/NetworkToolkit.ps1`.
-- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1`.
-- Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
-- Re-ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Parsed `App/NetworkToolkit/Config/ToolCatalog.ps1`.
-- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1`.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Queried the header search index and confirmed `Test-NetConnection`,
-  `PsExec Helper`, `DHCP Sleuth`, `Autoruns`, and `Process Explorer` resolve to
-  their expected tabs.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
-- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Reset runtime-only `App/manifests/custom-tools.json` drift after validation.
-- Verified `PROJECT.md` references `docs/TASKS/QUEUE.md`.
-- Verified `docs/PROJECT-CHARTER.md` contains the Prime Directive and
-  governance responsibilities.
-- Verified `docs/TASKS/QUEUE.md` exists and lists only
-  `TASK-0010-Foundation-Audit` as Active.
-- Verified `docs/TASKS/TASK-0010-Foundation-Audit.md` exists.
-- Verified this handoff points to TASK-0010 with ChatGPT as current owner and
-  Codex as next owner.
-- Verified no application code, ARGUS, or HEPHAESTUS files were staged for this
-  governance task.
+- Confirmed `PROJECT.md` still defines startup rules.
+- Confirmed `docs/TASKS/QUEUE.md` exists.
+- Confirmed `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree.
+- Confirmed exactly one task is Active: `TASK-0017-Triage-Manual-Run-Validation`.
+- Confirmed Foundation Audit review exists.
+- Confirmed roadmap/backlog reflects the next task sequence.
+- Confirmed no application code changed.
+- Confirmed no HEPHAESTUS code changed.
+- Confirmed no ARGUS implementation was added.
+- Confirmed no unrelated files were cleaned.
 
 ## Next Action
-ChatGPT executes TASK-0010.
+Codex should complete `TASK-0017-Triage-Manual-Run-Validation` next. This is validation work only.
+
+Do not implement application code.
+Do not implement ARGUS.
+Do not modify HEPHAESTUS collectors.
+Do not refactor code.
+Do not clean unrelated files.
+
+Recommended commit message for this reconciliation:
+
+```text
+TASK-0010: Reconcile governance and complete Foundation Audit
+```
 
 ## Blockers
 None.
 
 ## Notes for Next AI
-Start with `PROJECT.md`. If no task is active, create a task under
-`docs/TASKS` and update this handoff before implementation.
-
 Known working-tree noise:
-- Runtime custom-tool provenance migration can add timestamp and package
-  metadata drift to `App/manifests/custom-tools.json` during GUI validation.
-  Reset that runtime drift before committing unless the active task explicitly
-  changes the shipped manifest.
+- Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
 
 ## Next Bot Prompt
 Copy and paste the following prompt into another bot when offloading reasoning or review work. Do not create a separate task packet file.
@@ -235,39 +162,43 @@ Read these repository files in order:
 3. docs/ARCHITECTURE.md
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
-6. The active task document listed in docs/HANDOFF.md.
+6. docs/TASKS/QUEUE.md
+7. docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md
 
 Current task state:
-- docs/HANDOFF.md lists TASK-0010-Foundation-Audit as the active governance task.
-- docs/TASKS/QUEUE.md lists TASK-0010-Foundation-Audit as the only Active task.
+- docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
+- Active task: TASK-0017-Triage-Manual-Run-Validation.
+- Owner: Codex.
 - Audit state tracking is active.
-- TASK-0011 foundation audit is complete.
+- TASK-0010-Foundation-Audit is not valid active tracked state. TASK-0010 is already used by completed historical task TASK-0010-Classify-Drift-And-Status-Report.
+- Foundation Audit is complete as TASK-0011-Foundation-Audit and REVIEW-0001-Foundation-Audit.
 - TASK-0012 phase-transition readiness is complete.
 - TASK-0013 header tool search is complete.
 - TASK-0014 DHCP Sleuth restoration is complete.
 - TASK-0015 header search tab mapping correction is complete.
 - TASK-0016 tool source-of-truth correction is complete.
-- TASK-0010-Foundation-Audit is active and owned by ChatGPT.
-- Current owner: ChatGPT.
-- Next owner: Codex.
-- Next action: ChatGPT executes TASK-0010.
 
-Audit counter rule:
-- Each subsystem has a change counter in docs/HANDOFF.md.
-- Every accepted subsystem change must be recorded in docs/HISTORY/CHANGE-LEDGER.md.
-- If any subsystem reaches 10 / 10 changes, a new audit is mandatory before further implementation work.
-- After the audit is completed, the audited subsystem counter resets to 0 / 10.
+Your job:
+Complete TASK-0017-Triage-Manual-Run-Validation only.
 
-Repository remote:
-- origin is https://github.com/jstultz1980-beep/ComputerTriage.git.
-- master tracks origin/master.
+Scope:
+- Validate the existing toolkit workflow from the current repository state.
+- Run existing startup/smoke/manual validation paths already present in the repo.
+- Record validation results, defects, and runtime/generated drift.
+- Update docs/TASKS/TASK-0017-Triage-Manual-Run-Validation.md with work log and completion notes.
+- Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
+- Update docs/HISTORY/CHANGE-LEDGER.md only if an accepted subsystem change occurs.
+
+Accepted HEPHAESTUS direction:
+- HEPHAESTUS should evolve from a collector-first bundle builder into a collector + deterministic local analysis platform.
+- That implementation is not active yet.
+- TASK-0018 should design the Local Analysis Engine before Codex implements it.
 
 Rules:
 - Treat repository files as authoritative.
-- Execute only TASK-0010-Foundation-Audit.
+- Do not implement application code during TASK-0017.
 - Do not implement ARGUS.
-- Do not modify application code.
-- Do not modify HEPHAESTUS.
+- Do not modify HEPHAESTUS collectors.
 - Do not refactor existing code.
 - Do not clean unrelated files.
 - Do not use chat history as source of truth unless the same information exists in the repository.
