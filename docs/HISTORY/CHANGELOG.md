@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0018 HEPHAESTUS Local Analysis Engine v1 design.
+- Created `docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md`.
+- Created ADRs for HEPHAESTUS local analysis boundary, normalized output schema versioning, and proposed ARGUS input trust model.
+- Created and activated TASK-0019 HEPHAESTUS Local Analysis Engine v1 Implementation for Codex.
+- Updated roadmap to make Phase 02 active and to sequence rule expansion and ARGUS contract work after the implementation slice.
 - Completed TASK-0017 triage manual run validation.
 - Confirmed smoke and button-smoke validation pass from the current repository state.
 - Documented runtime drift: `custom-tools.json` provenance migration was reset, and untracked `App/NetworkToolkit/LatencyMon/` was left untouched.
