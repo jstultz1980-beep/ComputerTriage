@@ -49,3 +49,5 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0039 | 2026-07-01 | TASK-0018 | Documentation | +1 | Created Local Analysis Engine design document and ADRs. |
 | CHG-0040 | 2026-07-01 | TASK-0018 | Task System | +1 | Completed TASK-0018 and activated focused TASK-0019 implementation work for Codex. |
 | CHG-0041 | 2026-07-01 | TASK-0018 | Roadmap/Backlog | +1 | Updated roadmap and queued follow-on tasks for implementation, ARGUS contract, rule expansion, and portable-tool classification. |
+| CHG-0042 | 2026-07-01 | TASK-0019 | HEPHAESTUS | +1 | Began Local Analysis Engine v1 implementation with a Core module that generates Analysis and Metadata artifacts through a safe CLI command path. |
+| CHG-0043 | 2026-07-01 | TASK-0019 | Documentation | +1 | Updated TASK-0019 work log, handoff, changelog, and ledger for implementation-start state and validation requirements. |
