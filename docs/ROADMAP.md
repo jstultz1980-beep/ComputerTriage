@@ -20,23 +20,18 @@ Completion basis:
 - Runtime drift was documented and excluded from commits.
 
 ## Phase 02 - HEPHAESTUS Local Analysis Engine v1
-Status: Active
+Status: Completed
 
 Goal: add deterministic local analysis after collection baseline validation.
 
-Design status:
-- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` is complete.
-- Design document: `docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md`.
-- Accepted ADRs:
-  - `docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md`
-  - `docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md`
-- Proposed follow-on ADR:
-  - `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`
+Completion basis:
+- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` completed design and ADR work.
+- `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` implemented the minimal vertical slice.
+- Local validation confirmed required `Analysis` and `Metadata` artifacts exist and JSON parses successfully.
+- Smoke and button-smoke tests passed after implementation.
 
-Current active task:
-- `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation`
-
-TASK-0019 minimal vertical slice:
+Delivered capabilities:
+- Safe CLI command path: `Run Local Analysis`.
 - Analysis output folders.
 - Schema and bundle capability metadata.
 - Findings, timeline, evidence score, and machine-profile JSON outputs.
@@ -44,7 +39,21 @@ TASK-0019 minimal vertical slice:
 - Evidence-quality handling for missing or failed evidence.
 - Local HTML report generated from structured outputs.
 
-## Phase 03 - HEPHAESTUS Rule Catalog Expansion
+## Phase 03 - ARGUS Input Contract
+Status: Active
+
+Goal: finalize the contract ARGUS will use to consume HEPHAESTUS deterministic outputs before ARGUS implementation begins.
+
+Current active task:
+- `TASK-0020-ARGUS-Input-Contract-ADR`
+
+TASK-0020 must finalize:
+- ARGUS input artifact priority order.
+- Deterministic evidence versus ARGUS inference trust rules.
+- Missing, partial, and low-quality evidence behavior.
+- Follow-on ARGUS foundation implementation task.
+
+## Phase 04 - HEPHAESTUS Rule Catalog Expansion
 Status: Planned
 
 Expand deterministic rule coverage after the v1 vertical slice exists and validates.
@@ -54,27 +63,27 @@ Planned future capabilities:
 - Additional normalized JSON outputs.
 - More robust timeline correlation.
 
-## Phase 04 - ARGUS Foundation
+## Phase 05 - ARGUS Foundation
 Status: Planned
 
 Build ARGUS only after HEPHAESTUS produces stable normalized outputs and the ARGUS input contract is finalized.
 
-## Phase 05 - ARGUS Evidence Normalization
+## Phase 06 - ARGUS Evidence Normalization
 Status: Planned
 
 Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the input contract is approved.
 
-## Phase 06 - Reporting
+## Phase 07 - Reporting
 Status: Planned
 
 Improve technician and executive reporting after deterministic findings and normalized outputs exist.
 
-## Phase 07 - UI Integration
+## Phase 08 - UI Integration
 Status: Planned
 
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
-## Phase 08 - Release Hardening
+## Phase 09 - Release Hardening
 Status: Planned
 
 Validation, packaging, documentation, and release preparation.
