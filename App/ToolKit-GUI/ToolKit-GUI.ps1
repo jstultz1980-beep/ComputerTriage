@@ -2362,6 +2362,58 @@ function Get-GUIQuickTarget {
     return $target
 }
 
+function Get-GUIQuickDiagnosisTargets {
+    return @("www.microsoft.com","google.com","yahoo.com","amazon.com")
+}
+
+function Test-GUIQuickDiagnosisTarget {
+    param(
+        [Parameter(Mandatory=$true)][string]$Target,
+        [int]$Port = 443,
+        [int]$TimeoutMs = 1600
+    )
+
+    $client = $null
+    $waitHandle = $null
+
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $async = $client.BeginConnect($Target,$Port,$null,$null)
+        $waitHandle = $async.AsyncWaitHandle
+
+        if($waitHandle.WaitOne($TimeoutMs,$false)){
+            $client.EndConnect($async)
+            return $true
+        }
+    }
+    catch {
+        return $false
+    }
+    finally {
+        if($waitHandle){ $waitHandle.Close() }
+        if($client){ $client.Close() }
+    }
+
+    return $false
+}
+
+function Resolve-GUIQuickDiagnosisTarget {
+    $targets = @(Get-GUIQuickDiagnosisTargets)
+
+    foreach($candidate in $targets){
+        Add-GUILog "Checking Quick Diagnosis internet target: $candidate"
+        if(Test-GUIQuickDiagnosisTarget -Target $candidate){
+            if($candidate -ne $targets[0]){
+                Add-GUILog "Using backup Quick Diagnosis internet target: $candidate"
+            }
+            return $candidate
+        }
+    }
+
+    Add-GUILog "All Quick Diagnosis internet targets failed pre-check; using primary target for report evidence."
+    return $targets[0]
+}
+
 function Get-GUIQuickPort {
     $raw = if($script:QuickPortBox){$script:QuickPortBox.Text.Trim()}else{""}
 
@@ -3121,7 +3173,7 @@ function Global:Start-GUIPortServiceTest {
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,105))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add((New-GUILabel 'Target'),0,0)
-    $target = New-GUITextBox; $target.Text = if($script:QuickTargetBox){$script:QuickTargetBox.Text}else{''}; $layout.Controls.Add($target,1,0)
+    $target = New-GUITextBox; $target.Text = if($script:QuickPingBox){$script:QuickPingBox.Text}else{(Get-GUIQuickDiagnosisTargets)[0]}; $layout.Controls.Add($target,1,0)
     $layout.Controls.Add((New-GUILabel 'Port list'),0,1)
     $ports = New-GUITextBox; $ports.Text='22,80,443,445,3389'; $layout.Controls.Add($ports,1,1)
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel; $buttons.Dock='Fill'; $layout.SetColumnSpan($buttons,2); $layout.Controls.Add($buttons,0,2)
@@ -4532,15 +4584,10 @@ function Start-GUISysinternalsTool {
 }
 
 function Start-GUIQuickDiagnosis {
-    $target = "www.microsoft.com"
-
-    if($script:QuickTargetBox -and $script:QuickTargetBox.Text.Trim()){
-        $target = $script:QuickTargetBox.Text.Trim()
-    }
-
-    $commandText = ". `"$ToolkitLauncher`" -NoConsole; Invoke-QuickDiagnosis -Target `"$target`""
-
     try {
+        $target = Resolve-GUIQuickDiagnosisTarget
+        $commandText = ". `"$ToolkitLauncher`" -NoConsole; Invoke-QuickDiagnosis -Target `"$target`""
+
         if($script:QuickLastDiagnosisLabel -and !$script:QuickLastDiagnosisLabel.IsDisposed){
             $script:QuickLastDiagnosisLabel.Text = "Last Quick Diagnosis: running now..."
         }
@@ -8307,18 +8354,22 @@ function Build-QuickTriagePage {
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $runGroup.Controls.Add($runPanel)
 
-    $targetLabel = New-GUILabel "Internet test target"
+    $targetLabel = New-GUILabel "Internet targets"
     $targetLabel.Dock = "Fill"
     $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,6,3)
     [void]$runPanel.Controls.Add($targetLabel,0,0)
 
-    $script:QuickTargetBox = New-GUITextBox "www.microsoft.com"
-    $QuickTargetBox.Dock = "Fill"
-    $QuickTargetBox.Width = 0
-    $QuickTargetBox.Height = 26
-    $QuickTargetBox.Margin = New-Object System.Windows.Forms.Padding(3,7,3,5)
-    $runPanel.SetColumnSpan($QuickTargetBox,2)
-    [void]$runPanel.Controls.Add($QuickTargetBox,1,0)
+    $script:QuickInternetTargetsLabel = New-Object System.Windows.Forms.Label
+    $QuickInternetTargetsLabel.Dock = "Fill"
+    $QuickInternetTargetsLabel.TextAlign = "MiddleLeft"
+    $QuickInternetTargetsLabel.AutoEllipsis = $true
+    $QuickInternetTargetsLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    $QuickInternetTargetsLabel.ForeColor = $script:GUITheme.MutedText
+    $QuickInternetTargetsLabel.Text = (Get-GUIQuickDiagnosisTargets) -join "  ->  "
+    $QuickInternetTargetsLabel.Margin = New-Object System.Windows.Forms.Padding(3,7,3,5)
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickInternetTargetsLabel,"Quick Diagnosis tests these targets in order and stops at the first successful HTTPS connection.") }
+    $runPanel.SetColumnSpan($QuickInternetTargetsLabel,2)
+    [void]$runPanel.Controls.Add($QuickInternetTargetsLabel,1,0)
 
     $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
     $QuickRunButton.Dock = "Fill"

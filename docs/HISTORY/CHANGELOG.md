@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0026 Quick Dx fixed internet targets.
+- Removed the editable Quick Diagnosis internet target and added a fixed target chain: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
+- Quick Diagnosis now pre-checks the fixed targets in order and stops at the first successful HTTPS connection before running the report.
 - Completed TASK-0025 Quick Dx last-scan label fix.
 - Increased the compact Quick Diagnosis block height and gave the Last Quick Diagnosis label a fixed visible row with ellipsis behavior.
 - Completed TASK-0024 Quick Dx layout adjustment.

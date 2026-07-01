@@ -61,3 +61,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0051 | 2026-07-01 | TASK-0025 | UI | +1 | Fixed the clipped Last Quick Diagnosis label in the compact Quick Diagnosis block by giving it a stable visible row. |
 | CHG-0052 | 2026-07-01 | TASK-0025 | Task System | +1 | Created and completed a focused Quick Dx last-scan label bugfix task without changing the active TASK-0020 design-gate scope. |
 | CHG-0053 | 2026-07-01 | TASK-0025 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the Quick Dx label clipping fix. |
+| CHG-0054 | 2026-07-01 | TASK-0026 | UI | +1 | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain and static display label. |
+| CHG-0055 | 2026-07-01 | TASK-0026 | Task System | +1 | Created and completed a focused Quick Dx fixed-target task without changing the active TASK-0020 design-gate scope. |
+| CHG-0056 | 2026-07-01 | TASK-0026 | Documentation | +1 | Updated task, queue, handoff, changelog, and ledger records for the fixed Quick Diagnosis internet target chain. |
