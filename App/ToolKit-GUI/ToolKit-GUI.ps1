@@ -12254,14 +12254,14 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
             }
             else {
                 Add-GUITriageLogLine "Triage failed: $($result.error)"
-                if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage failed. See live log." }
+                if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage failed. Open the latest run folder for details." }
                 [System.Windows.Forms.MessageBox]::Show("Triage failed.`r`n`r`n$($result.error)`r`n`r`nRun folder:`r`n$($result.runPath)","Triage Failed",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
             }
         }
         catch {
             $readError = $_.Exception.Message
             Add-GUITriageLogLine "Triage result could not be read: $readError"
-            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage result could not be read. See live log." }
+            if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage result could not be read. Open the latest run folder for details." }
             [System.Windows.Forms.MessageBox]::Show("Triage ended, but the GUI could not read the result file.`r`n`r`n$readError","Triage Result Problem",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
         }
         finally {
@@ -12358,103 +12358,139 @@ function Open-GUITriageBundleFolder {
 
 function Build-TriagePage {
     param([System.Windows.Forms.TabPage]$Page)
+
+    $script:TriageToolGrid = $null
+    $script:TriageLogBox = $null
+
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
     $layout.ColumnCount = 2
     $layout.RowCount = 3
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,62))) | Out-Null
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,38))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,58))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,154))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,92))) | Out-Null
     $Page.Controls.Add($layout)
 
     $actions = New-Object System.Windows.Forms.GroupBox
-    $actions.Text = "Triage Actions"
+    $actions.Text = "Triage"
     $actions.Dock = "Fill"
-    $layout.SetColumnSpan($actions,2)
     $layout.Controls.Add($actions,0,0)
 
-    $actionPanel = New-Object System.Windows.Forms.FlowLayoutPanel
-    $actionPanel.Dock = "Fill"
-    $actionPanel.Padding = New-Object System.Windows.Forms.Padding(10,14,10,8)
-    $actions.Controls.Add($actionPanel)
-    foreach($button in @(
-        (New-GUIButton "One-Click Triage" { Start-GUITriageRun -Profile "Quick" }),
-        (New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }),
-        (New-GUIButton "Full Triage" { Start-GUITriageRun -Profile "Full" }),
-        (New-GUIButton "Crash Triage" { Start-GUITriageRun -Profile "Crash" }),
-        (New-GUIButton "Collect Selected" { Start-GUITriageSelectedToolsRun }),
-        (New-GUIButton "Open Selected" { Start-GUITriageSelectedToolLaunch }),
-        (New-GUIButton "Cancel" { Stop-GUITriageRun }),
-        (New-GUIButton "Open Latest Run" { Open-GUITriageLatestRun }),
-        (New-GUIButton "Open Bundle" { Open-GUITriageBundleFolder }),
-        (New-GUIButton "Validate Setup" { Invoke-GUITriageValidation }),
-        (New-GUIButton "Export Manifest" { Export-GUITriageManifest })
-    )){
-        $button.Width = 142
-        [void]$actionPanel.Controls.Add($button)
-    }
+    $actionLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $actionLayout.Dock = "Fill"
+    $actionLayout.ColumnCount = 2
+    $actionLayout.RowCount = 2
+    $actionLayout.Padding = New-Object System.Windows.Forms.Padding(14,16,14,10)
+    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $actionLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $actionLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $actions.Controls.Add($actionLayout)
 
-    $toolGroup = New-Object System.Windows.Forms.GroupBox
-    $toolGroup.Text = "Triage Tools"
-    $toolGroup.Dock = "Fill"
-    $layout.Controls.Add($toolGroup,0,1)
-    $script:TriageToolGrid = New-Object System.Windows.Forms.DataGridView
-    $TriageToolGrid.Dock = "Fill"
-    $TriageToolGrid.ReadOnly = $true
-    $TriageToolGrid.AllowUserToAddRows = $false
-    $TriageToolGrid.AllowUserToDeleteRows = $false
-    $TriageToolGrid.RowHeadersVisible = $false
-    $TriageToolGrid.SelectionMode = "FullRowSelect"
-    $TriageToolGrid.AutoSizeColumnsMode = "Fill"
-    [void]$TriageToolGrid.Columns.Add("Name","Tool")
-    [void]$TriageToolGrid.Columns.Add("Status","Status")
-    [void]$TriageToolGrid.Columns.Add("Executables","EXEs")
-    [void]$TriageToolGrid.Columns.Add("Source","Source")
-    [void]$TriageToolGrid.Columns.Add("Notes","Notes")
-    $toolGroup.Controls.Add($TriageToolGrid)
+    $quickButton = New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }
+    $quickButton.Dock = "Fill"
+    $quickButton.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
+    $actionLayout.Controls.Add($quickButton,0,0)
+
+    $fullButton = New-GUIButton "Full Triage" { Start-GUITriageRun -Profile "Full" }
+    $fullButton.Dock = "Fill"
+    $fullButton.Margin = New-Object System.Windows.Forms.Padding(8,0,0,0)
+    $actionLayout.Controls.Add($fullButton,1,0)
+
+    $actionExplain = New-GUILabel "Quick Triage collects the normal read-only evidence bundle. Full Triage gathers deeper command output and can take longer."
+    $actionExplain.Dock = "Fill"
+    $actionExplain.ForeColor = $script:GUITheme.MutedText
+    $actionExplain.TextAlign = "MiddleLeft"
+    $actionLayout.SetColumnSpan($actionExplain,2)
+    $actionLayout.Controls.Add($actionExplain,0,1)
 
     $progressGroup = New-Object System.Windows.Forms.GroupBox
-    $progressGroup.Text = "Progress"
+    $progressGroup.Text = "Status"
     $progressGroup.Dock = "Fill"
-    $layout.Controls.Add($progressGroup,1,1)
+    $layout.Controls.Add($progressGroup,1,0)
     $progressLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $progressLayout.Dock = "Fill"
     $progressLayout.RowCount = 3
-    $progressLayout.ColumnCount = 1
+    $progressLayout.ColumnCount = 2
     $progressLayout.Padding = New-Object System.Windows.Forms.Padding(10)
+    $progressLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $progressLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
     $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
-    $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,36))) | Out-Null
     $progressLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $progressGroup.Controls.Add($progressLayout)
     $script:TriageStatusLabel = New-GUILabel "Ready."
     $TriageStatusLabel.Dock = "Fill"
+    $TriageStatusLabel.TextAlign = "MiddleLeft"
     $progressLayout.Controls.Add($TriageStatusLabel,0,0)
+    $progressLayout.SetColumnSpan($TriageStatusLabel,2)
     $script:TriageProgressBar = New-Object System.Windows.Forms.ProgressBar
     $TriageProgressBar.Dock = "Fill"
     $progressLayout.Controls.Add($TriageProgressBar,0,1)
-    $explain = New-GUILabel "One-Click and Quick Triage collect read-only diagnostics, event summaries, command output, safe file evidence, local analysis, and a ZIP bundle. Full Triage collects more command output and may take longer."
-    $explain.Dock = "Fill"
-    $explain.ForeColor = $script:GUITheme.MutedText
-    $progressLayout.Controls.Add($explain,0,2)
 
-    $logGroup = New-Object System.Windows.Forms.GroupBox
-    $logGroup.Text = "Live Triage Log"
-    $logGroup.Dock = "Fill"
-    $layout.SetColumnSpan($logGroup,2)
-    $layout.Controls.Add($logGroup,0,2)
-    $script:TriageLogBox = New-Object System.Windows.Forms.TextBox
-    $TriageLogBox.Dock = "Fill"
-    $TriageLogBox.Multiline = $true
-    $TriageLogBox.ScrollBars = "Vertical"
-    $TriageLogBox.ReadOnly = $true
-    $TriageLogBox.Font = New-Object System.Drawing.Font("Consolas",9)
-    $TriageLogBox.BackColor = $script:GUITheme.LogBack
-    $TriageLogBox.ForeColor = $script:GUITheme.LogFore
-    $logGroup.Controls.Add($TriageLogBox)
-    Start-GUITriageStatusRefresh
+    $cancelButton = New-GUIButton "Cancel" { Stop-GUITriageRun }
+    $cancelButton.Dock = "Fill"
+    $cancelButton.Margin = New-Object System.Windows.Forms.Padding(8,0,0,0)
+    $progressLayout.Controls.Add($cancelButton,1,1)
+
+    $statusExplain = New-GUILabel "The latest run folder and bundle can be opened below after a triage completes."
+    $statusExplain.Dock = "Fill"
+    $statusExplain.ForeColor = $script:GUITheme.MutedText
+    $statusExplain.TextAlign = "TopLeft"
+    $progressLayout.SetColumnSpan($statusExplain,2)
+    $progressLayout.Controls.Add($statusExplain,0,2)
+
+    $outputGroup = New-Object System.Windows.Forms.GroupBox
+    $outputGroup.Text = "Outputs"
+    $outputGroup.Dock = "Fill"
+    $layout.SetColumnSpan($outputGroup,2)
+    $layout.Controls.Add($outputGroup,0,1)
+
+    $outputLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $outputLayout.Dock = "Fill"
+    $outputLayout.ColumnCount = 4
+    $outputLayout.RowCount = 2
+    $outputLayout.Padding = New-Object System.Windows.Forms.Padding(14,16,14,12)
+    for($i = 0; $i -lt 4; $i++){
+        $outputLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    }
+    $outputLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $outputLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $outputGroup.Controls.Add($outputLayout)
+
+    foreach($button in @(
+        (New-GUIButton "Latest Run" { Open-GUITriageLatestRun }),
+        (New-GUIButton "Bundle Folder" { Open-GUITriageBundleFolder }),
+        (New-GUIButton "Validate Setup" { Invoke-GUITriageValidation }),
+        (New-GUIButton "Export Manifest" { Export-GUITriageManifest })
+    )){
+        $button.Dock = "Fill"
+        $button.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
+        [void]$outputLayout.Controls.Add($button)
+    }
+
+    $outputExplain = New-GUILabel "Advanced collector selection and individual tool launching are intentionally hidden from the normal triage workflow. Use Quick Triage first; use Full Triage when deeper evidence is needed."
+    $outputExplain.Dock = "Fill"
+    $outputExplain.ForeColor = $script:GUITheme.MutedText
+    $outputExplain.TextAlign = "TopLeft"
+    $outputLayout.SetColumnSpan($outputExplain,4)
+    $outputLayout.Controls.Add($outputExplain,0,1)
+
+    $noteGroup = New-Object System.Windows.Forms.GroupBox
+    $noteGroup.Text = "Technician Notes"
+    $noteGroup.Dock = "Fill"
+    $layout.SetColumnSpan($noteGroup,2)
+    $layout.Controls.Add($noteGroup,0,2)
+
+    $note = New-GUILabel "Quick Triage is the default walk-up workflow. Full Triage is for deeper collection when Quick Triage does not explain the issue or when escalation needs more evidence."
+    $note.Dock = "Fill"
+    $note.Margin = New-Object System.Windows.Forms.Padding(12,12,12,12)
+    $note.ForeColor = $script:GUITheme.MutedText
+    $note.TextAlign = "MiddleLeft"
+    $noteGroup.Controls.Add($note)
 }
 
 function Build-ChocolateyPage {

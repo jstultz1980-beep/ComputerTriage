@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0031 Triage Page Simplification.
+- Rebuilt the Triage tab around `Quick Triage` and `Full Triage` as the only primary actions.
+- Removed the normal-view triage tool grid and live triage log, replacing them with concise status/progress, output access, and technician guidance.
+- Preserved backend triage collectors, generated outputs, diagnostic bundle behavior, and triage service validation.
+- Activated TASK-0032 Computer Tab Summary Redesign as the next focused GUI task.
 - Completed TASK-0030 Print Tab Data Path Cleanup.
 - Removed the visible print queue data-folder path from the Print tab and replaced it with a useful ready/status message.
 - Preserved print queue maintenance output paths and embedded print queue behavior.

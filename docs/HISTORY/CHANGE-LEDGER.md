@@ -97,3 +97,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0087 | 2026-07-02 | TASK-0030 | Documentation | +1 | Updated TASK-0030 work log, handoff, changelog, and validation notes for Print tab cleanup. |
 | CHG-0088 | 2026-07-02 | TASK-0030 | Task System | +1 | Completed TASK-0030 and activated TASK-0031 as the next focused GUI task. |
 | CHG-0089 | 2026-07-02 | TASK-0030 | Roadmap/Backlog | +1 | Updated roadmap current UI focus from Print tab cleanup to Triage page simplification. |
+| CHG-0090 | 2026-07-02 | TASK-0031 | UI | +1 | Simplified the Triage page to Quick Triage and Full Triage as the only primary actions and removed normal-view advanced collector clutter. |
+| CHG-0091 | 2026-07-02 | TASK-0031 | Documentation | +1 | Updated TASK-0031 work log, handoff, changelog, and validation notes for Triage page simplification. |
+| CHG-0092 | 2026-07-02 | TASK-0031 | Task System | +1 | Completed TASK-0031 and activated TASK-0032 as the next focused GUI task. |
+| CHG-0093 | 2026-07-02 | TASK-0031 | Roadmap/Backlog | +1 | Updated roadmap current UI focus from Triage page simplification to Computer tab summary redesign. |

@@ -1,7 +1,7 @@
 # TASK-0032 - Computer Tab Summary Redesign
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
