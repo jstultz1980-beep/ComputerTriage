@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0029 Choco Page Layout Refinement.
+- Reworked the Chocolatey status area into a compact top strip.
+- Replaced the thin link-style Choco status actions with real compact buttons for `Refresh Status` and `Install Chocolatey`.
+- Kept package search/install and installed-package management visible and preserved existing Chocolatey behavior.
+- UI counter reached `10 / 10`; activated TASK-0041 UI Counter Audit and paused further implementation per governance.
 - Completed TASK-0028 Quick Dx Compact Run Panel.
 - Removed the visible fixed internet target chain from the Quick Dx page while preserving the internal fallback order: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
 - Compacting the Quick Dx run block left only Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis in that panel and gave the right column breathing room.

@@ -12464,7 +12464,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,56))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -12475,14 +12475,16 @@ function Build-ChocolateyPage {
     $chocoTop.Dock = "Fill"
     $chocoTop.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $layout.Controls.Add($chocoTop,0,0)
+    $layout.SetColumnSpan($chocoTop,2)
 
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
-    $topPanel.Padding = New-Object System.Windows.Forms.Padding(8,4,8,4)
-    $topPanel.ColumnCount = 2
+    $topPanel.Padding = New-Object System.Windows.Forms.Padding(10,3,10,5)
+    $topPanel.ColumnCount = 3
     $topPanel.RowCount = 1
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,210))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,140))) | Out-Null
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,154))) | Out-Null
     $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $chocoTop.Controls.Add($topPanel)
 
@@ -12490,34 +12492,21 @@ function Build-ChocolateyPage {
     $ChocoStatusLabel.Dock = "Fill"
     $ChocoStatusLabel.TextAlign = "MiddleLeft"
     $ChocoStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    $ChocoStatusLabel.AutoEllipsis = $true
+    $ChocoStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,2,8,0)
     [void]$topPanel.Controls.Add($ChocoStatusLabel,0,0)
 
-    $statusActions = New-Object System.Windows.Forms.FlowLayoutPanel
-    $statusActions.Dock = "Fill"
-    $statusActions.FlowDirection = "RightToLeft"
-    $statusActions.WrapContents = $false
-    $statusActions.Margin = New-Object System.Windows.Forms.Padding(0)
-    $statusActions.Padding = New-Object System.Windows.Forms.Padding(0,8,4,0)
+    $refreshChocoButton = New-GUIButton "Refresh Status" { Refresh-GUIChocoStatus }
+    $refreshChocoButton.Dock = "Fill"
+    $refreshChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,3,4,3)
+    Set-GUIButtonChrome -Button $refreshChocoButton -Compact
+    [void]$topPanel.Controls.Add($refreshChocoButton,1,0)
 
-    $installChocoLink = New-Object System.Windows.Forms.LinkLabel
-    $installChocoLink.Text = "Install Chocolatey"
-    $installChocoLink.AutoSize = $true
-    $installChocoLink.LinkColor = $script:GUITheme.AccentDark
-    $installChocoLink.ActiveLinkColor = $script:GUITheme.Accent
-    $installChocoLink.Margin = New-Object System.Windows.Forms.Padding(14,0,0,0)
-    $installChocoLink.Add_LinkClicked({ Invoke-GUISafely -Tool "Install Chocolatey" -Action { Start-GUIChocolateyInstall } })
-
-    $refreshChocoLink = New-Object System.Windows.Forms.LinkLabel
-    $refreshChocoLink.Text = "Refresh Status"
-    $refreshChocoLink.AutoSize = $true
-    $refreshChocoLink.LinkColor = $script:GUITheme.AccentDark
-    $refreshChocoLink.ActiveLinkColor = $script:GUITheme.Accent
-    $refreshChocoLink.Margin = New-Object System.Windows.Forms.Padding(0,0,0,0)
-    $refreshChocoLink.Add_LinkClicked({ Invoke-GUISafely -Tool "Refresh Choco Status" -Action { Refresh-GUIChocoStatus } })
-
-    [void]$statusActions.Controls.Add($installChocoLink)
-    [void]$statusActions.Controls.Add($refreshChocoLink)
-    [void]$topPanel.Controls.Add($statusActions,1,0)
+    $installChocoButton = New-GUIButton "Install Chocolatey" { Start-GUIChocolateyInstall }
+    $installChocoButton.Dock = "Fill"
+    $installChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,3,4,3)
+    Set-GUIButtonChrome -Button $installChocoButton -Compact
+    [void]$topPanel.Controls.Add($installChocoButton,2,0)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
     $searchGroup.Text = "Install Chocolatey Packages"
@@ -12586,8 +12575,7 @@ function Build-ChocolateyPage {
     $installedGroup.Text = "Installed Chocolatey Packages"
     $installedGroup.Dock = "Fill"
     $installedGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
-    $layout.Controls.Add($installedGroup,1,0)
-    $layout.SetRowSpan($installedGroup,2)
+    $layout.Controls.Add($installedGroup,1,1)
 
     $installedLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $installedLayout.Dock = "Fill"

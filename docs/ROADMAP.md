@@ -106,10 +106,14 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0029-Choco-Page-Layout-Refinement`
+- `TASK-0041-UI-Counter-Audit`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
+- `TASK-0029-Choco-Page-Layout-Refinement` compacted the Chocolatey status strip and restored readable status action buttons.
+
+Implementation pause:
+- The UI counter reached `10 / 10` after TASK-0029. Further GUI implementation must wait for TASK-0041 audit completion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

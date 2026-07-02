@@ -1,13 +1,13 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0042
+HANDOFF-0043
 
 ## Current Task
-TASK-0029-Choco-Page-Layout-Refinement
+TASK-0041-UI-Counter-Audit
 
 ## Current Owner
-Codex
+ChatGPT
 
 ## Next Owner
 Codex
@@ -26,9 +26,10 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0028 completed the Quick Dx compact run-panel cleanup. Codex should now execute TASK-0029 and refine the Choco page layout without expanding scope.
+TASK-0029 completed the Choco page layout refinement. The UI subsystem counter is now `10 / 10`, so implementation is paused until TASK-0041 completes the required audit gate.
 
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0029 explicitly discovers and documents a blocker that requires a new task.
+Do not modify application code during TASK-0041.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless a future implementation task explicitly authorizes that work.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,12 +51,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 2 / 10 | No |
-| Task System | 2 / 10 | No |
+| Documentation | 3 / 10 | No |
+| Task System | 3 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 9 / 10 | No |
+| UI | 10 / 10 | Yes |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -75,8 +76,9 @@ Completed work:
 - TASK-0024 through TASK-0027 completed focused GUI/UI corrections without changing the ARGUS design gate.
 - TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
 - TASK-0028 completed focused Quick Dx run-panel cleanup.
-- TASK-0029 is now active for focused Choco page layout refinement.
-- TASK-0030 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
+- TASK-0029 completed focused Choco page layout refinement.
+- TASK-0041 is now active because the UI counter reached `10 / 10`.
+- TASK-0030 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning, blocked by TASK-0041.
 - TASK-0036 through TASK-0040 remain queued follow-up tasks for page health indicators, Activity tracking, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
@@ -131,20 +133,27 @@ TASK-0028 validation evidence:
 - GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
 - Button smoke passed: `Button smoke test completed. Quick tab: OK`.
 
+TASK-0029 validation evidence:
+- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
+- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
+- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
+- The Choco status area was reduced to a compact strip.
+- Choco status actions were restored as compact buttons instead of link-style controls.
+
 ## Active Task
-`TASK-0029-Choco-Page-Layout-Refinement`
+`TASK-0041-UI-Counter-Audit`
 
 Scope summary:
-- Make the Chocolatey ready/status area small and useful.
-- Avoid a large empty top status frame.
-- Keep installed-package management visible and usable.
-- Keep package search/install workflow clear.
-- Restore status actions so they read as buttons instead of thin unlabeled lines.
+- Audit recent UI-focused changes since the last reset.
+- Verify documentation/task-state consistency.
+- Decide whether the UI counter can be reset after review.
+- Identify follow-on implementation tasks needed before more GUI work continues.
+- Preserve the one-active-task rule.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
+- `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex, blocked until TASK-0041 completes.
 - `TASK-0031-Triage-Page-Simplification` owned by Codex.
 - `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
@@ -156,16 +165,16 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0028 Quick Dx compact run-panel cleanup.
-- Verified the visible Quick Dx internet target chain is removed from the GUI.
-- Verified the internal Quick Diagnosis fallback target chain remains unchanged.
+- Completed TASK-0029 Choco page layout refinement.
+- Verified the Chocolatey status area is compact and no longer consumes a large empty top block.
+- Verified the Choco status actions are real compact buttons.
 - Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
 - Verified Network Toolkit GUI smoke test passes.
 - Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-None for tracked work. TASK-0029 is ready to execute.
+Implementation is blocked by governance until TASK-0041 completes because the UI counter is `10 / 10`.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -175,11 +184,11 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0028: Compact Quick Dx run panel
+TASK-0029: Refine Choco page layout
 ```
 
 ## Next Bot Prompt
-Copy and paste the following prompt into Codex. Do not create a separate task packet file.
+Copy and paste the following prompt into ChatGPT. Do not create a separate task packet file.
 
 ```text
 You are assisting with the Computer Triage Toolkit repository.
@@ -193,32 +202,33 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md
+7. docs/TASKS/TASK-0041-UI-Counter-Audit.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0029-Choco-Page-Layout-Refinement.
-- Owner: Codex.
+- Active task: TASK-0041-UI-Counter-Audit.
+- Owner: ChatGPT.
+- TASK-0029 Choco page layout refinement is complete.
+- The UI counter is now 10 / 10 and further implementation is blocked until the audit completes.
 - TASK-0028 Quick Dx compact run-panel cleanup is complete.
 - TASK-0023 ARGUS foundation implementation is complete.
 - TASK-0035 audit is complete and the implementation gate is clear.
 
 Your job:
-Complete TASK-0029 implementation only.
+Complete TASK-0041 audit only.
 
 Scope:
-- Make the Chocolatey ready/status area small and useful.
-- Avoid a large full-width or half-width empty status frame.
-- Keep installed-package management visible and usable.
-- Keep package search/install workflow clear.
-- Preserve existing Choco actions: install, refresh status, search, install selected, add to toolbox, refresh installed, upgrade all, upgrade selected, uninstall, and check updates.
-- Restore action controls if theme/layout changes have made them look like empty lines or non-obvious buttons.
-- Keep the Chocolatey status block much smaller than the package-management sections.
-- Update docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md with work log and completion notes.
+- Audit recent UI-focused changes since the last counter reset.
+- Verify task-state consistency across docs/HANDOFF.md, docs/TASKS/QUEUE.md, task files, changelog, ledger, and roadmap.
+- Determine whether the UI counter can be reset after review.
+- Identify follow-on implementation tasks needed before more GUI work continues.
+- Preserve the one-active-task rule.
+- Update docs/TASKS/TASK-0041-UI-Counter-Audit.md with audit notes and completion status.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
+- Modify application code.
 - Modify ARGUS or HEPHAESTUS.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
@@ -228,12 +238,11 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Chocolatey status no longer consumes a large empty top block.
-- Status text and actions are readable.
-- Choco status actions are clearly buttons, not thin unlabeled lines.
-- Installed-package grid and actions remain visible without awkward crowding.
-- Search/install area remains clear.
-- PowerShell parse, smoke, and button-smoke validation pass.
+- UI counter audit is complete.
+- Task-state source of truth is consistent.
+- Exactly one task is active after audit completion.
+- UI counter is either reset with audit evidence or left at 10 / 10 with a documented blocker.
+- No application code is modified by this audit unless a new implementation task authorizes it.
 
 When done, provide:
 - Concise summary of implementation performed.

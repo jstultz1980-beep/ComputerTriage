@@ -1,7 +1,7 @@
 # TASK-0029 - Choco Page Layout Refinement
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -26,9 +26,36 @@ Rework the Chocolatey tab so the status detail is compact, readable, and no long
 - Untracked `App/NetworkToolkit/LatencyMon/`.
 
 ## Acceptance Criteria
-- [ ] Chocolatey status no longer consumes a large empty top block.
-- [ ] Status text and actions are readable.
-- [ ] Choco status actions are clearly buttons, not thin unlabeled lines.
-- [ ] Installed-package grid and actions remain visible without awkward crowding.
-- [ ] Search/install area remains clear.
-- [ ] PowerShell parse, smoke, and button-smoke validation pass.
+- [x] Chocolatey status no longer consumes a large empty top block.
+- [x] Status text and actions are readable.
+- [x] Choco status actions are clearly buttons, not thin unlabeled lines.
+- [x] Installed-package grid and actions remain visible without awkward crowding.
+- [x] Search/install area remains clear.
+- [x] PowerShell parse, smoke, and button-smoke validation pass.
+
+## Work Log
+
+### Entry 001
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md`
+- `docs/TASKS/TASK-0041-UI-Counter-Audit.md`
+- `docs/TASKS/QUEUE.md`
+- `docs/HANDOFF.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/ROADMAP.md`
+Validation Performed:
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- Completing this task increments the UI counter to `10 / 10`. Per project governance, implementation must pause until a new audit task is completed.
+
+## Completion Notes
+- Converted the Choco status area into a compact full-width strip.
+- Replaced link-style status actions with real compact buttons for `Refresh Status` and `Install Chocolatey`.
+- Moved installed-package management below the status strip so it no longer competes with the top row.
+- Preserved existing Chocolatey package install, toolbox add, refresh, upgrade, uninstall, and update-check behavior.

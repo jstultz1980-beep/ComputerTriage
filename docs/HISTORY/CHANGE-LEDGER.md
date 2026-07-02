@@ -83,3 +83,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0073 | 2026-07-02 | TASK-0028 | UI | +1 | Removed the visible Quick Dx internet target chain and compacted the Quick Diagnosis run block while preserving internal fallback targets. |
 | CHG-0074 | 2026-07-02 | TASK-0028 | Documentation | +1 | Updated TASK-0028 work log, handoff, changelog, and validation notes for the Quick Dx compact run panel fix. |
 | CHG-0075 | 2026-07-02 | TASK-0028 | Task System | +1 | Completed TASK-0028 and activated TASK-0029 as the next focused Codex implementation task. |
+| CHG-0076 | 2026-07-02 | TASK-0029 | UI | +1 | Reworked the Chocolatey page status strip into a compact readable area with real status action buttons. |
+| CHG-0077 | 2026-07-02 | TASK-0029 | Documentation | +1 | Updated TASK-0029 work log, handoff, changelog, roadmap, and validation notes for the Choco page layout refinement. |
+| CHG-0078 | 2026-07-02 | TASK-0029 | Task System | +1 | Completed TASK-0029 and activated TASK-0041 because the UI counter reached the mandatory audit threshold. |

@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Active | Make the Choco status area compact and improve the Choco page layout. |
+| `TASK-0041-UI-Counter-Audit` | ChatGPT | Active | Required audit gate because the UI counter reached 10 / 10 after TASK-0029. |
 
 ## Queued
 
@@ -51,6 +51,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0027-GUI-Polish-QuickDx-Header-Choco-Theme` | Completed | Polished Quick Dx spacing, header health badge space, Choco layout, surface gradient/texture, and added Terminal Dark. |
 | `TASK-0035-Documentation-Task-System-Audit` | Completed | Audited documentation/task-state consistency, reset audited counters, and cleared the implementation gate. |
 | `TASK-0028-Quick-Dx-Compact-Run-Panel` | Completed | Removed the visible Quick Dx internet target chain and compacted the run panel while preserving internal fallback targets. |
+| `TASK-0029-Choco-Page-Layout-Refinement` | Completed | Reworked the Choco status area into a compact strip with readable action buttons and preserved existing package-management behavior. |
 
 ## Reconciliation Decision
 
@@ -59,4 +60,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active implementation task is TASK-0029.
+- Current active task is TASK-0041. Further implementation is paused until the UI counter audit completes.
