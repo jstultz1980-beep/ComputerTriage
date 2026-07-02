@@ -13251,8 +13251,8 @@ function Build-ToolkitActivityPage {
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,230))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,214))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -13301,20 +13301,25 @@ function Build-ToolkitActivityPage {
     $buttons.Dock = "Fill"
     $buttons.ColumnCount = 4
     $buttons.RowCount = 1
-    $buttons.Padding = New-Object System.Windows.Forms.Padding(0,4,0,4)
+    $buttons.Padding = New-Object System.Windows.Forms.Padding(0,8,0,8)
     $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,10))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,12))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
+    $buttons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($buttons,0,3)
 
     $refreshButton = New-GUIButton "Refresh" { Refresh-GUIToolkitActivity }
     $refreshButton.Dock = "Fill"
+    $refreshButton.MinimumSize = New-Object System.Drawing.Size(0,34)
+    $refreshButton.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
     Set-GUIButtonChrome -Button $refreshButton -Compact
     [void]$buttons.Controls.Add($refreshButton,1,0)
 
     $stopButton = New-GUIButton "Stop" { Stop-GUISelectedToolkitActivityProcess }
     $stopButton.Dock = "Fill"
+    $stopButton.MinimumSize = New-Object System.Drawing.Size(0,34)
+    $stopButton.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
     Set-GUIButtonChrome -Button $stopButton -Compact
     [void]$buttons.Controls.Add($stopButton,3,0)
 
