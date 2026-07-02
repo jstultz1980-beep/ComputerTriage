@@ -1,9 +1,11 @@
 # Changelog
 
 ## 2026-07-02
+- Corrected TASK-0031 Triage page simplification after review.
+- Restored the compact Triage tool/app catalog table, tightened the Triage layout, and added a small AI bundle workflow instruction area.
 - Completed TASK-0031 Triage Page Simplification.
 - Rebuilt the Triage tab around `Quick Triage` and `Full Triage` as the only primary actions.
-- Removed the normal-view triage tool grid and live triage log, replacing them with concise status/progress, output access, and technician guidance.
+- Removed the extra normal-view triage action buttons and live triage log, while restoring a compact triage tool catalog with concise status/progress, output access, and technician guidance.
 - Preserved backend triage collectors, generated outputs, diagnostic bundle behavior, and triage service validation.
 - Activated TASK-0032 Computer Tab Summary Redesign as the next focused GUI task.
 - Completed TASK-0030 Print Tab Data Path Cleanup.

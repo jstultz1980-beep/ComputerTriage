@@ -55,6 +55,30 @@ Issues:
 
 ## Completion Notes
 - Rebuilt the Triage tab around two primary workflow buttons: `Quick Triage` and `Full Triage`.
-- Removed the normal-view tool manifest grid and live triage log.
-- Replaced the live log area with concise status/progress, output access, and technician guidance.
+- Removed the extra normal-view collector action buttons and live triage log.
+- Restored the tool manifest grid as a compact catalog with concise status/progress, output access, and technician guidance.
 - Preserved backend advanced functions, generated outputs, diagnostic bundles, and triage service behavior.
+
+### Entry 002
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0031-Triage-Page-Simplification.md`
+- `docs/HANDOFF.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+Validation Performed:
+- Confirmed `Build-TriagePage` includes the compact `Triage Tool Catalog`, `Output And AI Workflow`, `Quick Triage`, `Full Triage`, and AI bundle instruction text.
+- Confirmed `Build-TriagePage` still does not expose `One-Click Triage`, `Crash Triage`, `Collect Selected`, `Open Selected`, or `Live Triage Log`.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit\Tests\Test-TriageService.ps1`.
+Issues:
+- None.
+
+## Post-Completion Correction Notes
+- Restored the Triage tool/app catalog as a compact status table instead of hiding it completely.
+- Tightened the Triage page vertical spacing and shortened run-control rows.
+- Added a compact instruction area describing the expected workflow: run triage, open the bundle folder, then submit the ZIP bundle to AI with the included prompt.

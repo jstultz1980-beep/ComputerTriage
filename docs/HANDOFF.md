@@ -50,12 +50,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 7 / 10 | No |
+| Documentation | 8 / 10 | No |
 | Task System | 7 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 4 / 10 | No |
+| UI | 5 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -172,9 +172,11 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
+- Corrected TASK-0031 after review by restoring the compact Triage tool/app catalog table.
+- Tightened the Triage layout and added AI bundle workflow instructions.
 - Completed TASK-0031 Triage page simplification.
 - Rebuilt the Triage page around `Quick Triage` and `Full Triage` as the only primary actions.
-- Removed the normal-view triage tool grid and live triage log.
+- Restored the normal-view triage tool catalog as a compact status table while keeping the live triage log hidden.
 - Preserved generated outputs, bundle access, backend advanced functions, and triage service behavior.
 - Activated TASK-0032 Computer tab summary redesign.
 - Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
