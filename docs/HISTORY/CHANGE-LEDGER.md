@@ -73,3 +73,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0063 | 2026-07-01 | TASK-0036..TASK-0040 | Task System | +1 | Created queued tasks for page indicators, Activity tracking, modern utility controls, and Software tab inventory/implementation while reconciling TASK-0035 as the active audit gate. |
 | CHG-0064 | 2026-07-01 | TASK-0036..TASK-0040 | Documentation | +1 | Documented the newest requested UI/workflow changes and recorded that the Documentation counter is at 10/10. |
 | CHG-0065 | 2026-07-01 | TASK-0036..TASK-0040 | Roadmap/Backlog | +1 | Added the newest requested UI/workflow refinements to the queued backlog behind the required audit gate. |
+| CHG-0066 | 2026-07-01 | TASK-0020 | ARGUS | +1 | Accepted ADR-0003 and finalized the ARGUS input contract and evidence trust model. |
+| CHG-0067 | 2026-07-01 | TASK-0035 | Documentation | reset to 0 / 10 | Completed the required documentation audit gate after the Documentation counter reached 10/10. |
+| CHG-0068 | 2026-07-01 | TASK-0035 | Task System | reset to 0 / 10 | Completed the task-state audit, verified one active task, and activated TASK-0023 after the audit gate cleared. |
