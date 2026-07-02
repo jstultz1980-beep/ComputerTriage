@@ -12464,7 +12464,7 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,56))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -12479,7 +12479,7 @@ function Build-ChocolateyPage {
 
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
-    $topPanel.Padding = New-Object System.Windows.Forms.Padding(10,3,10,5)
+    $topPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,8)
     $topPanel.ColumnCount = 3
     $topPanel.RowCount = 1
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
@@ -12498,13 +12498,15 @@ function Build-ChocolateyPage {
 
     $refreshChocoButton = New-GUIButton "Refresh Status" { Refresh-GUIChocoStatus }
     $refreshChocoButton.Dock = "Fill"
-    $refreshChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,3,4,3)
+    $refreshChocoButton.MinimumSize = New-Object System.Drawing.Size(0,28)
+    $refreshChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
     Set-GUIButtonChrome -Button $refreshChocoButton -Compact
     [void]$topPanel.Controls.Add($refreshChocoButton,1,0)
 
     $installChocoButton = New-GUIButton "Install Chocolatey" { Start-GUIChocolateyInstall }
     $installChocoButton.Dock = "Fill"
-    $installChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,3,4,3)
+    $installChocoButton.MinimumSize = New-Object System.Drawing.Size(0,28)
+    $installChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
     Set-GUIButtonChrome -Button $installChocoButton -Compact
     [void]$topPanel.Controls.Add($installChocoButton,2,0)
 

@@ -59,3 +59,18 @@ Issues:
 - Replaced link-style status actions with real compact buttons for `Refresh Status` and `Install Chocolatey`.
 - Moved installed-package management below the status strip so it no longer competes with the top row.
 - Preserved existing Chocolatey package install, toolbox add, refresh, upgrade, uninstall, and update-check behavior.
+
+### Entry 002
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md`
+Validation Performed:
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- Screenshot validation showed the compact Choco status-row buttons collapsed into thin horizontal lines because the group-row height left too little content area after the `GroupBox` caption.
+Correction:
+- Increased the Choco status strip height slightly and gave the status action buttons stable minimum height so they render as buttons instead of lines.
