@@ -1,16 +1,16 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0040
+HANDOFF-0041
 
 ## Current Task
-TASK-0023-ARGUS-Foundation-Implementation
+TASK-0028-Quick-Dx-Compact-Run-Panel
 
 ## Current Owner
 Codex
 
 ## Next Owner
-ChatGPT or Codex depending on TASK-0023 findings
+Codex
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
@@ -26,9 +26,9 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0035 completed the documentation/task-system audit gate. Codex should now execute TASK-0023 and implement the minimal ARGUS foundation slice using accepted ADR-0003.
+TASK-0023 completed the minimal ARGUS foundation implementation slice. Codex should now execute TASK-0028 and compact the Quick Dx run panel without expanding scope.
 
-Do not modify HEPHAESTUS code unless TASK-0023 explicitly discovers and documents a blocker that requires a new task.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, tool installation, or unrelated application areas unless TASK-0028 explicitly discovers and documents a blocker that requires a new task.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,16 +50,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 0 / 10 | No |
-| Task System | 0 / 10 | No |
+| Documentation | 1 / 10 | No |
+| Task System | 1 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
-| ARGUS | 1 / 10 | No |
+| ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
 | UI | 8 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 3 / 10 | No |
+| Roadmap/Backlog | 4 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -71,9 +71,11 @@ Completed work:
 - TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
 - TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
 - TASK-0020 completed the ARGUS input contract ADR/design gate and accepted ADR-0003.
+- TASK-0023 completed the minimal ARGUS foundation slice and generated ARGUS validation, summary, and report artifacts.
 - TASK-0024 through TASK-0027 completed focused GUI/UI corrections without changing the ARGUS design gate.
-- TASK-0028 through TASK-0034 were created as queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
 - TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
+- TASK-0028 is now active for focused Quick Dx run-panel cleanup.
+- TASK-0029 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
 - TASK-0036 through TASK-0040 remain queued follow-up tasks for page health indicators, Activity tracking, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
@@ -104,21 +106,36 @@ TASK-0035 audit findings:
 - No application code was modified by TASK-0035.
 - Documentation and Task System counters were audited and reset.
 
+TASK-0023 validation evidence:
+- `Invoke-ARGUSFoundationAnalysis` completed successfully against `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
+- ARGUS output root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles\ARGUS`.
+- Generated files:
+  - `ARGUS/input-validation.json`
+  - `ARGUS/analysis-summary.json`
+  - `ARGUS/report.md`
+- Input validation status was `limited`, which is expected with partial HEPHAESTUS capability coverage.
+- Required artifact count: `6`.
+- Unsupported area count: `4`.
+- Prioritized deterministic findings count: `5`.
+- ARGUS inference was explicitly labeled as `argusInference`.
+- Parser checks passed for `Core\Argus\ArgusFoundation.ps1` and `App\NetworkToolkit\Core\ArgusFoundationCommand.ps1`.
+- Console load passed with exit code `0`.
+- Command registry found `Run ARGUS Foundation` with Id `argus-foundation`, Category `Analyze`, Source `ARGUS`, Order `45`.
+- CLI smoke run of `Run ARGUS Foundation` completed successfully.
+
 ## Active Task
-`TASK-0023-ARGUS-Foundation-Implementation`
+`TASK-0028-Quick-Dx-Compact-Run-Panel`
 
 Scope summary:
-- Implement the first ARGUS foundation slice using accepted ADR-0003.
-- Load and validate required HEPHAESTUS contract artifacts.
-- Produce ARGUS input validation output.
-- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
-- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
-- Produce a basic ARGUS report artifact.
+- Remove the visible Quick Dx internet target list.
+- Keep the fixed primary/backup target chain internally.
+- Keep Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls visible and aligned.
+- Prevent the compact Quick Diagnosis panel from pushing the Hardware Shortcuts area down.
+- Preserve Quick Target Checks behavior and layout.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0028-Quick-Dx-Compact-Run-Panel` owned by Codex.
 - `TASK-0029-Choco-Page-Layout-Refinement` owned by Codex.
 - `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
 - `TASK-0031-Triage-Page-Simplification` owned by Codex.
@@ -132,26 +149,28 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0035 audit/governance work only.
-- Verified the repository source-of-truth task state was consistent.
-- Verified TASK-0020 is complete.
-- Verified TASK-0023 existed and was queued before activation.
-- Verified no ARGUS implementation was added by TASK-0020.
-- Verified no HEPHAESTUS code was modified by TASK-0020.
-- Reset audited Documentation and Task System counters after ledger entries.
+- Completed TASK-0023 ARGUS foundation implementation.
+- Verified ARGUS can load and validate the HEPHAESTUS contract artifact set.
+- Verified ARGUS writes validation, analysis-summary, and Markdown report artifacts.
+- Verified JSON output parses and contains expected validation, finding, unsupported-area, and inference-label data.
+- Verified ARGUS scripts parse successfully.
+- Verified Network Toolkit console load still exits successfully.
+- Verified the `Run ARGUS Foundation` console command is registered.
+- Verified CLI execution of `Run ARGUS Foundation` completes.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-None. The audit gate is cleared.
+None for tracked work. TASK-0028 is ready to execute.
 
 ## Notes for Next AI
 Known working-tree noise:
 - `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder and should not be deleted, imported, or committed unless a future task explicitly handles it.
 - Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has shown local stale/locked drift during ARGUS work. Do not stage it unless a future task explicitly updates the accepted ADR.
 
 ## Recommended Commit Message
 ```text
-TASK-0035: Complete documentation and task system audit
+TASK-0023: Implement ARGUS foundation
 ```
 
 ## Next Bot Prompt
@@ -169,43 +188,31 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md
-8. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
-9. docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md
+7. docs/TASKS/TASK-0028-Quick-Dx-Compact-Run-Panel.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0023-ARGUS-Foundation-Implementation.
+- Active task: TASK-0028-Quick-Dx-Compact-Run-Panel.
 - Owner: Codex.
+- TASK-0023 ARGUS foundation implementation is complete.
 - TASK-0035 audit is complete and the implementation gate is clear.
-- TASK-0020 ARGUS input contract ADR/design work is complete.
-- ADR-0003 is accepted.
-- HEPHAESTUS Local Analysis Engine v1 produces validated Analysis and Metadata artifacts.
 
 Your job:
-Complete TASK-0023 implementation only.
+Complete TASK-0028 implementation only.
 
 Scope:
-- Implement the minimal ARGUS foundation slice using ADR-0003.
-- Create the approved ARGUS foundation location under the existing architecture.
-- Load and validate required HEPHAESTUS contract artifacts:
-  - Metadata/schema-version.json
-  - Metadata/bundle-capabilities.json
-  - Analysis/evidence-score.json
-  - Analysis/findings.json
-  - Analysis/timeline.json
-  - Analysis/normalized/machine-profile.json
-- Produce ARGUS input validation output.
-- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
-- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
-- Produce a basic ARGUS report artifact.
-- Update docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md with work log and completion notes.
+- Remove the visible internet target list from the Quick Dx run block.
+- Keep the fixed primary/backup internet target chain internal to the Quick Dx execution path.
+- Keep Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls compact, visible, and aligned.
+- Give Quick Target Checks the available left-column height.
+- Ensure Hardware Shortcuts stays visible and is not pushed below the panel.
+- Update docs/TASKS/TASK-0028-Quick-Dx-Compact-Run-Panel.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
-- Modify HEPHAESTUS collectors.
-- Modify HEPHAESTUS Local Analysis Engine unless a blocker is documented and a new task is created.
+- Modify ARGUS or HEPHAESTUS.
+- Change deployment, tool installation, or unrelated GUI areas.
 - Download or install tools.
 - Refactor unrelated application code.
 - Clean unrelated files.
@@ -213,14 +220,12 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- ARGUS loads required HEPHAESTUS contract artifacts.
-- ARGUS validates schema and capability metadata before interpretation.
-- ARGUS reads evidence-score data and applies evidence-quality caveats.
-- ARGUS prioritizes deterministic HEPHAESTUS findings without silently overriding them.
-- ARGUS labels inference separately from deterministic evidence.
-- Missing or unsupported evidence is called out explicitly.
-- Required ARGUS output artifacts are generated and parse where applicable.
-- No HEPHAESTUS code is modified unless a new task authorizes it.
+- Quick Dx no longer displays the internet target chain.
+- Quick Dx still uses the fixed target fallback chain internally.
+- Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls are visible.
+- Quick Target Checks has more usable vertical room.
+- Hardware Shortcuts remains visible.
+- Button smoke or GUI parse validation passes.
 
 When done, provide:
 - Concise summary of implementation performed.

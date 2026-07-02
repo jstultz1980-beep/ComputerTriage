@@ -60,12 +60,12 @@ Completion basis:
 - Implementation gate is cleared.
 
 ## Phase 05 - ARGUS Foundation
-Status: Active
+Status: Completed
 
 Goal: implement the minimal ARGUS foundation slice using accepted ADR-0003.
 
 Current active task:
-- `TASK-0023-ARGUS-Foundation-Implementation`
+- None.
 
 TASK-0023 must:
 - Load and validate required HEPHAESTUS contract artifacts.
@@ -73,6 +73,12 @@ TASK-0023 must:
 - Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
 - Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
 - Produce a basic ARGUS report artifact.
+
+Completion basis:
+- `TASK-0023-ARGUS-Foundation-Implementation` completed.
+- ARGUS Foundation validates required HEPHAESTUS contract artifacts.
+- ARGUS Foundation writes `ARGUS/input-validation.json`, `ARGUS/analysis-summary.json`, and `ARGUS/report.md`.
+- Validation confirmed JSON outputs parse and deterministic findings are labeled separately from ARGUS inference.
 
 ## Phase 06 - HEPHAESTUS Rule Catalog Expansion
 Status: Planned
@@ -95,9 +101,12 @@ Status: Planned
 Improve technician and executive reporting after deterministic findings and normalized outputs exist.
 
 ## Phase 09 - UI Integration
-Status: Planned
+Status: Active
 
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
+
+Current active task:
+- `TASK-0028-Quick-Dx-Compact-Run-Panel`
 
 ## Phase 10 - Release Hardening
 Status: Planned

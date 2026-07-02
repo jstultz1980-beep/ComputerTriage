@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-02
+- Completed TASK-0023 ARGUS Foundation Implementation.
+- Added `Core/Argus/ArgusFoundation.ps1` with contract validation, evidence-quality caveats, deterministic finding prioritization, unsupported-area reporting, and explicitly labeled ARGUS inference.
+- Added `App/NetworkToolkit/Core/ArgusFoundationCommand.ps1` to expose `Run ARGUS Foundation` through the existing console command registry.
+- Validated ARGUS against the existing HEPHAESTUS bundle and confirmed `ARGUS/input-validation.json`, `ARGUS/analysis-summary.json`, and `ARGUS/report.md` were generated.
+- Activated TASK-0028 Quick Dx Compact Run Panel as the next Codex implementation task.
+
 ## 2026-07-01
 - Completed TASK-0035 Documentation and Task System Audit.
 - Verified documentation/task-state source of truth was consistent before closeout.

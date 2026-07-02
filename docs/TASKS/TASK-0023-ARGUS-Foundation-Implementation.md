@@ -1,7 +1,7 @@
 # TASK-0023 - ARGUS Foundation Implementation
 
 ## Status
-Queued
+Completed
 
 ## Owner
 Codex
@@ -58,16 +58,16 @@ ARGUS/report.md
 Exact path may use the existing `Core/Argus` architecture path unless a future ADR normalizes casing.
 
 ## Acceptance Criteria
-- [ ] ARGUS loads required HEPHAESTUS contract artifacts.
-- [ ] ARGUS validates schema and capability metadata before interpretation.
-- [ ] ARGUS reads evidence-score data and applies evidence-quality caveats.
-- [ ] ARGUS prioritizes deterministic HEPHAESTUS findings without silently overriding them.
-- [ ] ARGUS labels inference separately from deterministic evidence.
-- [ ] Missing or unsupported evidence is called out explicitly.
-- [ ] Required ARGUS output artifacts are generated and parse where applicable.
-- [ ] No HEPHAESTUS code is modified.
-- [ ] No broad GUI or application refactor is performed.
-- [ ] Handoff and queue are updated when the task is complete.
+- [x] ARGUS loads required HEPHAESTUS contract artifacts.
+- [x] ARGUS validates schema and capability metadata before interpretation.
+- [x] ARGUS reads evidence-score data and applies evidence-quality caveats.
+- [x] ARGUS prioritizes deterministic HEPHAESTUS findings without silently overriding them.
+- [x] ARGUS labels inference separately from deterministic evidence.
+- [x] Missing or unsupported evidence is called out explicitly.
+- [x] Required ARGUS output artifacts are generated and parse where applicable.
+- [x] No HEPHAESTUS code is modified.
+- [x] No broad GUI or application refactor is performed.
+- [x] Handoff and queue are updated when the task is complete.
 
 ## Validation Steps
 ```powershell
@@ -94,3 +94,34 @@ Issues:
 - Documentation counter reached audit threshold during TASK-0020, so this implementation task remains queued behind the required audit gate.
 Instructions for Next Owner:
 - Codex should not implement this until it is the only active task and the audit requirement is cleared.
+
+### Entry 002
+Author: Codex
+Date: 2026-07-02
+Summary: Implemented the minimal ARGUS foundation slice under `Core\Argus` with a console command bridge.
+Files Changed:
+- `Core/Argus/ArgusFoundation.ps1`
+- `App/NetworkToolkit/Core/ArgusFoundationCommand.ps1`
+- `docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md`
+Validation Performed:
+- Loaded toolkit console modules with `-CLI -NoConsole`.
+- Confirmed `Invoke-ARGUSFoundationAnalysis` is available.
+- Ran ARGUS against `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
+- Confirmed generated outputs:
+  - `ARGUS/input-validation.json`
+  - `ARGUS/analysis-summary.json`
+  - `ARGUS/report.md`
+- Parsed generated JSON outputs successfully.
+- Confirmed input validation status was `limited`, reflecting partial/planned bundle capabilities rather than a fatal contract failure.
+- Confirmed required artifact count was `6`, prioritized deterministic findings count was `5`, unsupported capability count was `4`, and inference was labeled `argusInference`.
+- Parser validation passed for both ARGUS PowerShell files.
+- Console command registry contains `Run ARGUS Foundation`.
+- CLI smoke passed with `-RunCommand "Run ARGUS Foundation"`.
+Issues:
+- Current HEPHAESTUS sample bundle has partial evidence, so ARGUS correctly emits limited-mode caveats.
+- Local working tree still has unrelated runtime/stale-file noise documented in handoff notes.
+Instructions for Next Owner:
+- TASK-0028 is the next active task.
+
+## Completion Notes
+TASK-0023 is complete. ARGUS Foundation now validates HEPHAESTUS contract artifacts, prioritizes deterministic findings without overriding them, labels inference separately, and writes the first ARGUS output set.

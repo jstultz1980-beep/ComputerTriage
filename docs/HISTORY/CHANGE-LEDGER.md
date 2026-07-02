@@ -76,3 +76,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0066 | 2026-07-01 | TASK-0020 | ARGUS | +1 | Accepted ADR-0003 and finalized the ARGUS input contract and evidence trust model. |
 | CHG-0067 | 2026-07-01 | TASK-0035 | Documentation | reset to 0 / 10 | Completed the required documentation audit gate after the Documentation counter reached 10/10. |
 | CHG-0068 | 2026-07-01 | TASK-0035 | Task System | reset to 0 / 10 | Completed the task-state audit, verified one active task, and activated TASK-0023 after the audit gate cleared. |
+| CHG-0069 | 2026-07-02 | TASK-0023 | ARGUS | +1 | Implemented ARGUS Foundation contract validation, deterministic finding prioritization, labeled inference, and basic ARGUS output artifacts. |
+| CHG-0070 | 2026-07-02 | TASK-0023 | Documentation | +1 | Updated task, queue, roadmap, handoff, changelog, and ledger records for TASK-0023 completion. |
+| CHG-0071 | 2026-07-02 | TASK-0023 | Task System | +1 | Completed TASK-0023 and activated TASK-0028 as the next Codex implementation task. |
+| CHG-0072 | 2026-07-02 | TASK-0023 | Roadmap/Backlog | +1 | Marked ARGUS Foundation complete and moved the active implementation focus to the queued UI follow-up track. |
