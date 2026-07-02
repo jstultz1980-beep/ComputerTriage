@@ -47,19 +47,34 @@ Goal: finalize the contract ARGUS will use to consume HEPHAESTUS deterministic o
 Completion basis:
 - `TASK-0020-ARGUS-Input-Contract-ADR` completed.
 - `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` is accepted.
-- `TASK-0023-ARGUS-Foundation-Implementation` exists as a focused queued implementation task.
+- `TASK-0023-ARGUS-Foundation-Implementation` exists as a focused implementation task.
 
 ## Phase 04 - Documentation and Task System Audit Gate
-Status: Active
+Status: Completed
 
 Goal: complete the required audit because Documentation reached `10 / 10` during TASK-0020.
 
+Completion basis:
+- `TASK-0035-Documentation-Task-System-Audit` completed.
+- Documentation and Task System counters were audited and reset.
+- Implementation gate is cleared.
+
+## Phase 05 - ARGUS Foundation
+Status: Active
+
+Goal: implement the minimal ARGUS foundation slice using accepted ADR-0003.
+
 Current active task:
-- `TASK-0035-Documentation-Task-System-Audit`
+- `TASK-0023-ARGUS-Foundation-Implementation`
 
-Implementation work must not begin until the audit gate clears.
+TASK-0023 must:
+- Load and validate required HEPHAESTUS contract artifacts.
+- Produce ARGUS input validation output.
+- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
+- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
+- Produce a basic ARGUS report artifact.
 
-## Phase 05 - HEPHAESTUS Rule Catalog Expansion
+## Phase 06 - HEPHAESTUS Rule Catalog Expansion
 Status: Planned
 
 Expand deterministic rule coverage after the v1 vertical slice exists and validates.
@@ -69,15 +84,10 @@ Planned future capabilities:
 - Additional normalized JSON outputs.
 - More robust timeline correlation.
 
-## Phase 06 - ARGUS Foundation
-Status: Planned
-
-Build ARGUS only after HEPHAESTUS produces stable normalized outputs, the ARGUS input contract is finalized, and the required audit gate clears.
-
 ## Phase 07 - ARGUS Evidence Normalization
 Status: Planned
 
-Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the input contract is approved and implementation is active.
+Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the foundation implementation is validated.
 
 ## Phase 08 - Reporting
 Status: Planned
