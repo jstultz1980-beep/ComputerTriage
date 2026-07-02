@@ -8347,7 +8347,7 @@ function Build-QuickTriagePage {
     $rightLayout.RowCount = 2
     $rightLayout.Margin = New-Object System.Windows.Forms.Padding(10,0,0,0)
     $rightLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,132))) | Out-Null
+    $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,96))) | Out-Null
     $rightLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($rightLayout,1,0)
 
@@ -8361,52 +8361,34 @@ function Build-QuickTriagePage {
     $runPanel.Dock = "Fill"
     $runPanel.Padding = New-Object System.Windows.Forms.Padding(10,4,10,4)
     $runPanel.ColumnCount = 3
-    $runPanel.RowCount = 3
+    $runPanel.RowCount = 2
     for($i = 0; $i -lt 3; $i++){
         $runPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,(100 / 3)))) | Out-Null
     }
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
-    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $runPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     $runGroup.Controls.Add($runPanel)
-
-    $targetLabel = New-GUILabel "Internet targets"
-    $targetLabel.Dock = "Fill"
-    $targetLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,6,2)
-    [void]$runPanel.Controls.Add($targetLabel,0,0)
-
-    $script:QuickInternetTargetsLabel = New-Object System.Windows.Forms.Label
-    $QuickInternetTargetsLabel.Dock = "Fill"
-    $QuickInternetTargetsLabel.TextAlign = "MiddleLeft"
-    $QuickInternetTargetsLabel.AutoEllipsis = $true
-    $QuickInternetTargetsLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
-    $QuickInternetTargetsLabel.ForeColor = $script:GUITheme.MutedText
-    $QuickInternetTargetsLabel.Text = (Get-GUIQuickDiagnosisTargets) -join "  ->  "
-    $QuickInternetTargetsLabel.Margin = New-Object System.Windows.Forms.Padding(3,4,3,2)
-    if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickInternetTargetsLabel,"Quick Diagnosis tests these targets in order and stops at the first successful HTTPS connection.") }
-    $runPanel.SetColumnSpan($QuickInternetTargetsLabel,2)
-    [void]$runPanel.Controls.Add($QuickInternetTargetsLabel,1,0)
 
     $script:QuickRunButton = New-GUIButton "Quick Dx" { Start-GUIQuickDiagnosis }
     $QuickRunButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $QuickRunButton -Compact
-    $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
+    $QuickRunButton.Margin = New-Object System.Windows.Forms.Padding(5,4,5,4)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($QuickRunButton,"Run Quick Diagnosis for the target computer and create the current health report.") }
-    [void]$runPanel.Controls.Add($QuickRunButton,0,1)
+    [void]$runPanel.Controls.Add($QuickRunButton,0,0)
 
     $reportButton = New-GUIButton "Report" { Open-GUILatestQuickDiagnosisReport }
     $reportButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $reportButton -Compact
-    $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
+    $reportButton.Margin = New-Object System.Windows.Forms.Padding(5,4,5,4)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($reportButton,"Open the latest Quick Diagnosis HTML report.") }
-    [void]$runPanel.Controls.Add($reportButton,1,1)
+    [void]$runPanel.Controls.Add($reportButton,1,0)
 
     $script:DismRepairButton = New-GUIButton "DISM/SFC" { Start-GUIDismSfcRepairPath }
     $DismRepairButton.Dock = "Fill"
     Set-GUIButtonChrome -Button $DismRepairButton -Compact
-    $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,3,5,3)
+    $DismRepairButton.Margin = New-Object System.Windows.Forms.Padding(5,4,5,4)
     if($script:ToolTip){ $script:ToolTip.SetToolTip($DismRepairButton,"Run the DISM/SFC repair path after reviewing Quick Diagnosis results. Override is available when needed.") }
-    [void]$runPanel.Controls.Add($DismRepairButton,2,1)
+    [void]$runPanel.Controls.Add($DismRepairButton,2,0)
 
     $script:QuickLastDiagnosisLabel = New-Object System.Windows.Forms.Label
     $QuickLastDiagnosisLabel.Dock = "Fill"
@@ -8417,7 +8399,7 @@ function Build-QuickTriagePage {
     $QuickLastDiagnosisLabel.ForeColor = $script:GUITheme.MutedText
     $QuickLastDiagnosisLabel.Margin = New-Object System.Windows.Forms.Padding(3,2,3,1)
     $runPanel.SetColumnSpan($QuickLastDiagnosisLabel,3)
-    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,2)
+    [void]$runPanel.Controls.Add($QuickLastDiagnosisLabel,0,1)
     Refresh-GUILastQuickDiagnosisLabel
 
     $statusGroup = New-Object System.Windows.Forms.GroupBox

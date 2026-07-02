@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0028 Quick Dx Compact Run Panel.
+- Removed the visible fixed internet target chain from the Quick Dx page while preserving the internal fallback order: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
+- Compacting the Quick Dx run block left only Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis in that panel and gave the right column breathing room.
+- Validated `ToolKit-GUI.ps1` parsing, GUI smoke, and button-smoke checks.
+- Activated TASK-0029 Choco Page Layout Refinement as the next Codex implementation task.
 - Completed TASK-0023 ARGUS Foundation Implementation.
 - Added `Core/Argus/ArgusFoundation.ps1` with contract validation, evidence-quality caveats, deterministic finding prioritization, unsupported-area reporting, and explicitly labeled ARGUS inference.
 - Added `App/NetworkToolkit/Core/ArgusFoundationCommand.ps1` to expose `Run ARGUS Foundation` through the existing console command registry.

@@ -106,7 +106,10 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0028-Quick-Dx-Compact-Run-Panel`
+- `TASK-0029-Choco-Page-Layout-Refinement`
+
+Recently completed UI work:
+- `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
 
 ## Phase 10 - Release Hardening
 Status: Planned

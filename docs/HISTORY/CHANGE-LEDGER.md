@@ -80,3 +80,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0070 | 2026-07-02 | TASK-0023 | Documentation | +1 | Updated task, queue, roadmap, handoff, changelog, and ledger records for TASK-0023 completion. |
 | CHG-0071 | 2026-07-02 | TASK-0023 | Task System | +1 | Completed TASK-0023 and activated TASK-0028 as the next Codex implementation task. |
 | CHG-0072 | 2026-07-02 | TASK-0023 | Roadmap/Backlog | +1 | Marked ARGUS Foundation complete and moved the active implementation focus to the queued UI follow-up track. |
+| CHG-0073 | 2026-07-02 | TASK-0028 | UI | +1 | Removed the visible Quick Dx internet target chain and compacted the Quick Diagnosis run block while preserving internal fallback targets. |
+| CHG-0074 | 2026-07-02 | TASK-0028 | Documentation | +1 | Updated TASK-0028 work log, handoff, changelog, and validation notes for the Quick Dx compact run panel fix. |
+| CHG-0075 | 2026-07-02 | TASK-0028 | Task System | +1 | Completed TASK-0028 and activated TASK-0029 as the next focused Codex implementation task. |

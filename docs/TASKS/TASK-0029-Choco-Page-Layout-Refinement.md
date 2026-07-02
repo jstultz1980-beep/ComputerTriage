@@ -1,7 +1,7 @@
 # TASK-0029 - Choco Page Layout Refinement
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

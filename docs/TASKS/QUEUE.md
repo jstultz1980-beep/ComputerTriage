@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0028-Quick-Dx-Compact-Run-Panel` | Codex | Active | Remove visible internet target list from Quick Dx and compact the run block. |
+| `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Active | Make the Choco status area compact and improve the Choco page layout. |
 
 ## Queued
 
@@ -17,7 +17,6 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Queued | Make the Choco status area compact and improve the Choco page layout. |
 | `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Queued | Remove the print data-folder path display and reclaim the space. |
 | `TASK-0031-Triage-Page-Simplification` | Codex | Queued | Reduce Triage primary actions to Quick Triage and Full Triage and revisit live log visibility. |
 | `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Queued | Replace the computer profile list with a richer current-computer summary and LED status indicators. |
@@ -51,6 +50,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0026-Quick-Dx-Fixed-Internet-Targets` | Completed | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain. |
 | `TASK-0027-GUI-Polish-QuickDx-Header-Choco-Theme` | Completed | Polished Quick Dx spacing, header health badge space, Choco layout, surface gradient/texture, and added Terminal Dark. |
 | `TASK-0035-Documentation-Task-System-Audit` | Completed | Audited documentation/task-state consistency, reset audited counters, and cleared the implementation gate. |
+| `TASK-0028-Quick-Dx-Compact-Run-Panel` | Completed | Removed the visible Quick Dx internet target chain and compacted the run panel while preserving internal fallback targets. |
 
 ## Reconciliation Decision
 
@@ -59,4 +59,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active implementation task is TASK-0028.
+- Current active implementation task is TASK-0029.

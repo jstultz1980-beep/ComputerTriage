@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0041
+HANDOFF-0042
 
 ## Current Task
-TASK-0028-Quick-Dx-Compact-Run-Panel
+TASK-0029-Choco-Page-Layout-Refinement
 
 ## Current Owner
 Codex
@@ -26,9 +26,9 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0023 completed the minimal ARGUS foundation implementation slice. Codex should now execute TASK-0028 and compact the Quick Dx run panel without expanding scope.
+TASK-0028 completed the Quick Dx compact run-panel cleanup. Codex should now execute TASK-0029 and refine the Choco page layout without expanding scope.
 
-Do not modify ARGUS, HEPHAESTUS, deployment logic, tool installation, or unrelated application areas unless TASK-0028 explicitly discovers and documents a blocker that requires a new task.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0029 explicitly discovers and documents a blocker that requires a new task.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,12 +50,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 1 / 10 | No |
-| Task System | 1 / 10 | No |
+| Documentation | 2 / 10 | No |
+| Task System | 2 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 8 / 10 | No |
+| UI | 9 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -74,8 +74,9 @@ Completed work:
 - TASK-0023 completed the minimal ARGUS foundation slice and generated ARGUS validation, summary, and report artifacts.
 - TASK-0024 through TASK-0027 completed focused GUI/UI corrections without changing the ARGUS design gate.
 - TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
-- TASK-0028 is now active for focused Quick Dx run-panel cleanup.
-- TASK-0029 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
+- TASK-0028 completed focused Quick Dx run-panel cleanup.
+- TASK-0029 is now active for focused Choco page layout refinement.
+- TASK-0030 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
 - TASK-0036 through TASK-0040 remain queued follow-up tasks for page health indicators, Activity tracking, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
@@ -123,20 +124,26 @@ TASK-0023 validation evidence:
 - Command registry found `Run ARGUS Foundation` with Id `argus-foundation`, Category `Analyze`, Source `ARGUS`, Order `45`.
 - CLI smoke run of `Run ARGUS Foundation` completed successfully.
 
+TASK-0028 validation evidence:
+- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
+- Confirmed the visible `Internet targets`, `Internet test target`, and `QuickInternetTargetsLabel` UI strings no longer exist in the GUI file.
+- Confirmed `Get-GUIQuickDiagnosisTargets` still returns `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
+- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
+- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
+
 ## Active Task
-`TASK-0028-Quick-Dx-Compact-Run-Panel`
+`TASK-0029-Choco-Page-Layout-Refinement`
 
 Scope summary:
-- Remove the visible Quick Dx internet target list.
-- Keep the fixed primary/backup target chain internally.
-- Keep Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls visible and aligned.
-- Prevent the compact Quick Diagnosis panel from pushing the Hardware Shortcuts area down.
-- Preserve Quick Target Checks behavior and layout.
+- Make the Chocolatey ready/status area small and useful.
+- Avoid a large empty top status frame.
+- Keep installed-package management visible and usable.
+- Keep package search/install workflow clear.
+- Restore status actions so they read as buttons instead of thin unlabeled lines.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0029-Choco-Page-Layout-Refinement` owned by Codex.
 - `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
 - `TASK-0031-Triage-Page-Simplification` owned by Codex.
 - `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
@@ -149,18 +156,16 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0023 ARGUS foundation implementation.
-- Verified ARGUS can load and validate the HEPHAESTUS contract artifact set.
-- Verified ARGUS writes validation, analysis-summary, and Markdown report artifacts.
-- Verified JSON output parses and contains expected validation, finding, unsupported-area, and inference-label data.
-- Verified ARGUS scripts parse successfully.
-- Verified Network Toolkit console load still exits successfully.
-- Verified the `Run ARGUS Foundation` console command is registered.
-- Verified CLI execution of `Run ARGUS Foundation` completes.
+- Completed TASK-0028 Quick Dx compact run-panel cleanup.
+- Verified the visible Quick Dx internet target chain is removed from the GUI.
+- Verified the internal Quick Diagnosis fallback target chain remains unchanged.
+- Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
+- Verified Network Toolkit GUI smoke test passes.
+- Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-None for tracked work. TASK-0028 is ready to execute.
+None for tracked work. TASK-0029 is ready to execute.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -170,7 +175,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0023: Implement ARGUS foundation
+TASK-0028: Compact Quick Dx run panel
 ```
 
 ## Next Bot Prompt
@@ -188,31 +193,34 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0028-Quick-Dx-Compact-Run-Panel.md
+7. docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0028-Quick-Dx-Compact-Run-Panel.
+- Active task: TASK-0029-Choco-Page-Layout-Refinement.
 - Owner: Codex.
+- TASK-0028 Quick Dx compact run-panel cleanup is complete.
 - TASK-0023 ARGUS foundation implementation is complete.
 - TASK-0035 audit is complete and the implementation gate is clear.
 
 Your job:
-Complete TASK-0028 implementation only.
+Complete TASK-0029 implementation only.
 
 Scope:
-- Remove the visible internet target list from the Quick Dx run block.
-- Keep the fixed primary/backup internet target chain internal to the Quick Dx execution path.
-- Keep Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls compact, visible, and aligned.
-- Give Quick Target Checks the available left-column height.
-- Ensure Hardware Shortcuts stays visible and is not pushed below the panel.
-- Update docs/TASKS/TASK-0028-Quick-Dx-Compact-Run-Panel.md with work log and completion notes.
+- Make the Chocolatey ready/status area small and useful.
+- Avoid a large full-width or half-width empty status frame.
+- Keep installed-package management visible and usable.
+- Keep package search/install workflow clear.
+- Preserve existing Choco actions: install, refresh status, search, install selected, add to toolbox, refresh installed, upgrade all, upgrade selected, uninstall, and check updates.
+- Restore action controls if theme/layout changes have made them look like empty lines or non-obvious buttons.
+- Keep the Chocolatey status block much smaller than the package-management sections.
+- Update docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
-- Change deployment, tool installation, or unrelated GUI areas.
+- Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
 - Refactor unrelated application code.
 - Clean unrelated files.
@@ -220,12 +228,12 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Quick Dx no longer displays the internet target chain.
-- Quick Dx still uses the fixed target fallback chain internally.
-- Quick Dx, Report, DISM/SFC, and Last Quick Diagnosis controls are visible.
-- Quick Target Checks has more usable vertical room.
-- Hardware Shortcuts remains visible.
-- Button smoke or GUI parse validation passes.
+- Chocolatey status no longer consumes a large empty top block.
+- Status text and actions are readable.
+- Choco status actions are clearly buttons, not thin unlabeled lines.
+- Installed-package grid and actions remain visible without awkward crowding.
+- Search/install area remains clear.
+- PowerShell parse, smoke, and button-smoke validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.
