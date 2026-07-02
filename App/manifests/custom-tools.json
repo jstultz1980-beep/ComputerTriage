@@ -67,8 +67,8 @@
                   {
                       "name":  "GPU-Z",
                       "source":  "Chocolatey Toolbox",
-                      "version":  "2.69.0",
-                      "launchPath":  ".\\Custom\\gpu-z\\GPU-Z.2.69.0.exe",
+                      "version":  "2.70.0",
+                      "launchPath":  ".\\Custom\\gpu-z\\GPU-Z.2.70.0.exe",
                       "installPath":  ".\\Custom\\gpu-z",
                       "arguments":  "",
                       "tabOverride":  ""
