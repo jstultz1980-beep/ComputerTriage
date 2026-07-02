@@ -1,16 +1,16 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0039
+HANDOFF-0040
 
 ## Current Task
-TASK-0035-Documentation-Task-System-Audit
+TASK-0023-ARGUS-Foundation-Implementation
 
 ## Current Owner
-ChatGPT
+Codex
 
 ## Next Owner
-Codex
+ChatGPT or Codex depending on TASK-0023 findings
 
 ## How The Handoff Process Works
 This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
@@ -26,10 +26,9 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0020 completed the ARGUS input contract ADR/design gate. TASK-0035 is now the active audit gate because documentation/task-state work pushed the Documentation counter to `10 / 10`.
+TASK-0035 completed the documentation/task-system audit gate. Codex should now execute TASK-0023 and implement the minimal ARGUS foundation slice using accepted ADR-0003.
 
-Do not implement ARGUS.
-Do not modify HEPHAESTUS code.
+Do not modify HEPHAESTUS code unless TASK-0023 explicitly discovers and documents a blocker that requires a new task.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -51,10 +50,10 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 10 / 10 | Yes |
-| Task System | 9 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 0 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
-| ARGUS | 0 / 10 | No |
+| ARGUS | 1 / 10 | No |
 | Reporting | 0 / 10 | No |
 | UI | 8 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
@@ -71,14 +70,11 @@ Completed work:
 - TASK-0017 completed validation-only work.
 - TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
 - TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
-- TASK-0024 completed a focused Quick Dx layout correction requested by the project owner. Quick Target Checks now owns the full left column, while Quick Diagnosis run controls and Review/Shortcuts are stacked in the right column.
-- TASK-0025 fixed the clipped Last Quick Diagnosis label inside the compact right-column Quick Diagnosis block.
-- TASK-0026 removed the editable Quick Diagnosis internet target and replaced it with a fixed primary/backup target chain: `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
-- TASK-0027 completed a focused GUI polish pass for Quick Dx right-column spacing, header health badge space, Terminal Dark theme, gradient/texture surfaces, and compact Choco status placement.
-- TASK-0028 through TASK-0034 were created as queued follow-up tasks for the project owner's newly requested UI/workflow cleanup items. No application code was changed in that task-creation update.
-- TASK-0020 completed the ARGUS input contract ADR/design gate and created the focused TASK-0023 ARGUS foundation implementation task.
-- TASK-0035 is active because the Documentation counter reached `10 / 10`.
-- TASK-0036 through TASK-0040 were created as queued follow-up tasks for page health indicators, Activity page tracking, modern utility-button styling, and Software tab launchable/installable separation.
+- TASK-0020 completed the ARGUS input contract ADR/design gate and accepted ADR-0003.
+- TASK-0024 through TASK-0027 completed focused GUI/UI corrections without changing the ARGUS design gate.
+- TASK-0028 through TASK-0034 were created as queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
+- TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
+- TASK-0036 through TASK-0040 remain queued follow-up tasks for page health indicators, Activity tracking, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -98,20 +94,30 @@ TASK-0019 validation evidence:
 - Smoke test passed: `Network Toolkit GUI loaded successfully. Commands: 18`.
 - Button smoke test passed: `Button smoke test completed. Quick tab: OK`.
 
+TASK-0035 audit findings:
+- Documentation/task-state source of truth was consistent before closeout.
+- Exactly one task was active before closeout and exactly one task is active after closeout.
+- TASK-0020 is complete.
+- TASK-0023 was queued during the audit and is now active after the audit gate cleared.
+- No ARGUS implementation was added by TASK-0020.
+- No HEPHAESTUS code was modified by TASK-0020.
+- No application code was modified by TASK-0035.
+- Documentation and Task System counters were audited and reset.
+
 ## Active Task
-`TASK-0035-Documentation-Task-System-Audit`
+`TASK-0023-ARGUS-Foundation-Implementation`
 
 Scope summary:
-- Audit documentation and task-state consistency after the Documentation counter reached `10 / 10`.
-- Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree.
-- Verify exactly one task is Active.
-- Verify TASK-0020 is complete and TASK-0023 remains queued.
-- Reset audited counters only after audit completion and ledger entry.
+- Implement the first ARGUS foundation slice using accepted ADR-0003.
+- Load and validate required HEPHAESTUS contract artifacts.
+- Produce ARGUS input validation output.
+- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
+- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
+- Produce a basic ARGUS report artifact.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0023-ARGUS-Foundation-Implementation` owned by Codex, blocked until TASK-0035 audit completes and activates a specific scope.
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` owned by Codex.
 - `TASK-0029-Choco-Page-Layout-Refinement` owned by Codex.
 - `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
@@ -126,20 +132,17 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0024 without changing the active TASK-0020 ChatGPT design gate.
-- Completed TASK-0025 without changing the active TASK-0020 ChatGPT design gate.
-- Completed TASK-0026 without changing the active TASK-0020 ChatGPT design gate.
-- Completed TASK-0027 without changing the active TASK-0020 ChatGPT design gate.
-- Created queued TASK-0028 through TASK-0034 without changing the active TASK-0020 ChatGPT design gate.
-- Reconciled TASK-0020/TASK-0035 state so `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and task files agree that TASK-0035 is Active.
-- Created queued TASK-0036 through TASK-0040 for the newly requested page indicators, Activity page, button style, and Software tab inventory/implementation work.
-- Verified no application code changed in the task-creation update.
-- Reset runtime `App/manifests/custom-tools.json` drift after validation.
-- Left untracked `App/NetworkToolkit/LatencyMon/` untouched.
-- Updated queue, handoff, changelog, and change ledger.
+- Completed TASK-0035 audit/governance work only.
+- Verified the repository source-of-truth task state was consistent.
+- Verified TASK-0020 is complete.
+- Verified TASK-0023 existed and was queued before activation.
+- Verified no ARGUS implementation was added by TASK-0020.
+- Verified no HEPHAESTUS code was modified by TASK-0020.
+- Reset audited Documentation and Task System counters after ledger entries.
+- Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-Documentation counter is at `10 / 10`. No new implementation work should begin until `TASK-0035-Documentation-Task-System-Audit` is completed and the audited counter reset is recorded.
+None. The audit gate is cleared.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -148,11 +151,11 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0036-0040: Queue indicators activity and software tasks
+TASK-0035: Complete documentation and task system audit
 ```
 
 ## Next Bot Prompt
-Copy and paste the following prompt into ChatGPT. Do not create a separate task packet file.
+Copy and paste the following prompt into Codex. Do not create a separate task packet file.
 
 ```text
 You are assisting with the Computer Triage Toolkit repository.
@@ -166,60 +169,63 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0035-Documentation-Task-System-Audit.md
-8. docs/TASKS/TASK-0020-ARGUS-Input-Contract-ADR.md
+7. docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md
+8. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
 9. docs/DESIGN/HEPHAESTUS-Local-Analysis-Engine-v1.md
-10. docs/ADRS/ADR-0001-HEPHAESTUS-Local-Analysis-Boundary.md
-11. docs/ADRS/ADR-0002-Normalized-Output-Schema-Versioning.md
-12. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0035-Documentation-Task-System-Audit.
-- Owner: ChatGPT.
-- Next owner: Codex.
-- TASK-0019 is complete and validated.
-- HEPHAESTUS Local Analysis Engine v1 now produces validated Analysis and Metadata artifacts.
+- Active task: TASK-0023-ARGUS-Foundation-Implementation.
+- Owner: Codex.
+- TASK-0035 audit is complete and the implementation gate is clear.
 - TASK-0020 ARGUS input contract ADR/design work is complete.
-- Documentation counter is at 10/10, so implementation work is blocked until TASK-0035 completes.
-- TASK-0036 through TASK-0040 are queued for follow-up UI/workflow refinements requested by the project owner.
+- ADR-0003 is accepted.
+- HEPHAESTUS Local Analysis Engine v1 produces validated Analysis and Metadata artifacts.
 
 Your job:
-Complete TASK-0035 audit/governance work only.
+Complete TASK-0023 implementation only.
 
 Scope:
-- Audit current documentation and task-state consistency.
-- Verify docs/HANDOFF.md and docs/TASKS/QUEUE.md agree.
-- Verify exactly one task is Active.
-- Verify TASK-0020 is complete and TASK-0023 remains queued.
-- Verify no ARGUS implementation was added by TASK-0020.
-- Verify no HEPHAESTUS code was modified by TASK-0020.
-- Reset audited counters only after audit completion and ledger entry.
+- Implement the minimal ARGUS foundation slice using ADR-0003.
+- Create the approved ARGUS foundation location under the existing architecture.
+- Load and validate required HEPHAESTUS contract artifacts:
+  - Metadata/schema-version.json
+  - Metadata/bundle-capabilities.json
+  - Analysis/evidence-score.json
+  - Analysis/findings.json
+  - Analysis/timeline.json
+  - Analysis/normalized/machine-profile.json
+- Produce ARGUS input validation output.
+- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
+- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
+- Produce a basic ARGUS report artifact.
+- Update docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
-- Implement ARGUS.
-- Modify HEPHAESTUS code.
-- Modify application code.
+- Modify HEPHAESTUS collectors.
+- Modify HEPHAESTUS Local Analysis Engine unless a blocker is documented and a new task is created.
 - Download or install tools.
+- Refactor unrelated application code.
 - Clean unrelated files.
 - Import, delete, or modify untracked App/NetworkToolkit/LatencyMon/ unless a future task explicitly handles it.
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Documentation/task-state source of truth is consistent.
-- Exactly one task is Active.
-- TASK-0020 is complete.
-- TASK-0023 remains queued and is not implemented.
-- Audit findings are recorded.
-- Required counters are reset only if audited.
-- No ARGUS code is implemented.
-- No HEPHAESTUS code is modified.
+- ARGUS loads required HEPHAESTUS contract artifacts.
+- ARGUS validates schema and capability metadata before interpretation.
+- ARGUS reads evidence-score data and applies evidence-quality caveats.
+- ARGUS prioritizes deterministic HEPHAESTUS findings without silently overriding them.
+- ARGUS labels inference separately from deterministic evidence.
+- Missing or unsupported evidence is called out explicitly.
+- Required ARGUS output artifacts are generated and parse where applicable.
+- No HEPHAESTUS code is modified unless a new task authorizes it.
 
 When done, provide:
-- Concise summary of ADR/design work performed.
+- Concise summary of implementation performed.
 - Exact files changed.
+- Validation performed.
 - Current active task.
 - Current owner and next owner.
 - Recommended commit message.
