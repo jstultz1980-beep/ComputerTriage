@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0030-Print-Tab-Data-Path-Cleanup`
+- `TASK-0031-Triage-Page-Simplification`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -117,7 +117,8 @@ Implementation pause:
 
 Current UI work:
 - TASK-0037 completed Activity page network visibility, compact process list, and compact controls.
-- TASK-0030 is active for Print tab data-path cleanup.
+- TASK-0030 completed Print tab data-path cleanup.
+- TASK-0031 is active for Triage page simplification.
 
 ## Phase 10 - Release Hardening
 Status: Planned

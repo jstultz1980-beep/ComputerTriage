@@ -1,7 +1,7 @@
 # TASK-0031 - Triage Page Simplification
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

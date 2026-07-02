@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0030 Print Tab Data Path Cleanup.
+- Removed the visible print queue data-folder path from the Print tab and replaced it with a useful ready/status message.
+- Preserved print queue maintenance output paths and embedded print queue behavior.
+- Activated TASK-0031 Triage Page Simplification as the next focused GUI task.
 - Completed TASK-0037 Activity Page Running Tool Tracking.
 - Made the Activity running-process list fixed-height so it no longer dominates the page.
 - Added a compact Activity detail panel and smaller right-aligned `Refresh` / `Stop` controls.

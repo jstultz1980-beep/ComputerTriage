@@ -11076,7 +11076,7 @@ function Build-PrintToolsPage {
     $PrintQueueStatusLabel.AutoEllipsis = $true
     $PrintQueueStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $PrintQueueStatusLabel.ForeColor = $script:GUITheme.MutedText
-    $PrintQueueStatusLabel.Text = "Data folder: $(Get-GUIPrintQueueDataRoot)"
+    $PrintQueueStatusLabel.Text = "Ready. Enter a print server, find likely servers, or connect to manage queues."
     $queueLayout.Controls.Add($PrintQueueStatusLabel,0,3)
 
     Set-GUIPrintQueueConnectedState -Connected:$false

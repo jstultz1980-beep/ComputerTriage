@@ -93,3 +93,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0083 | 2026-07-02 | TASK-0037 | UI | +1 | Compact Activity page process list, controls, detail panel, and refresh interval. |
 | CHG-0084 | 2026-07-02 | TASK-0037 | Documentation | +1 | Updated TASK-0037 completion notes, handoff, changelog, and validation evidence. |
 | CHG-0085 | 2026-07-02 | TASK-0037 | Task System | +1 | Completed TASK-0037 and activated TASK-0030 as the next focused GUI task. |
+| CHG-0086 | 2026-07-02 | TASK-0030 | UI | +1 | Removed the visible print queue data-folder path from the Print tab and replaced it with a technician-facing status message. |
+| CHG-0087 | 2026-07-02 | TASK-0030 | Documentation | +1 | Updated TASK-0030 work log, handoff, changelog, and validation notes for Print tab cleanup. |
+| CHG-0088 | 2026-07-02 | TASK-0030 | Task System | +1 | Completed TASK-0030 and activated TASK-0031 as the next focused GUI task. |
+| CHG-0089 | 2026-07-02 | TASK-0030 | Roadmap/Backlog | +1 | Updated roadmap current UI focus from Print tab cleanup to Triage page simplification. |

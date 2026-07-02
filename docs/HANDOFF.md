@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0045
+HANDOFF-0046
 
 ## Current Task
-TASK-0030-Print-Tab-Data-Path-Cleanup
+TASK-0031-Triage-Page-Simplification
 
 ## Current Owner
 Codex
@@ -26,9 +26,9 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0037 completed Activity page running-tool tracking improvements. TASK-0030 is now active for Print tab data-path cleanup.
+TASK-0030 completed Print tab data-path cleanup. TASK-0031 is now active for Triage page simplification.
 
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0030 explicitly discovers and documents a blocker that requires a new task.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0031 explicitly discovers and documents a blocker that requires a new task.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,16 +50,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 5 / 10 | No |
-| Task System | 5 / 10 | No |
+| Documentation | 6 / 10 | No |
+| Task System | 6 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 2 / 10 | No |
+| UI | 3 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 4 / 10 | No |
+| Roadmap/Backlog | 5 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -78,8 +78,9 @@ Completed work:
 - TASK-0029 completed focused Choco page layout refinement.
 - TASK-0041 completed the UI counter audit and reset the audited UI counter.
 - TASK-0037 completed Activity page running-tool tracking.
-- TASK-0030 is now active for Print tab data-path cleanup.
-- TASK-0031 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
+- TASK-0030 completed Print tab data-path cleanup.
+- TASK-0031 is now active for Triage page simplification.
+- TASK-0032 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
 - TASK-0036, TASK-0038, TASK-0039, and TASK-0040 remain queued follow-up tasks for page health indicators, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
@@ -151,17 +152,17 @@ TASK-0037 validation evidence:
 - Activity refresh interval is 5 seconds.
 
 ## Active Task
-`TASK-0030-Print-Tab-Data-Path-Cleanup`
+`TASK-0031-Triage-Page-Simplification`
 
 Scope summary:
-- Remove the visible print queue data-folder path from the Print tab.
-- Reclaim the space for useful print queue controls or diagnostics layout.
-- Preserve print queue maintenance behavior and output locations.
+- Reduce Triage page primary actions to Quick Triage and Full Triage.
+- Remove or hide excess triage options from the normal technician workflow.
+- Reevaluate the live triage log and replace it with concise progress/status if possible.
+- Preserve generated triage outputs and diagnostic bundles.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0031-Triage-Page-Simplification` owned by Codex.
 - `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
@@ -171,17 +172,17 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0037 Activity page running-tool tracking.
-- Added a Network gauge to the Activity page.
-- Compacted the running-process list and Activity controls.
-- Activated TASK-0030 Print tab data-path cleanup.
+- Completed TASK-0030 Print tab data-path cleanup.
+- Removed the visible print queue data-folder path from the Print tab.
+- Preserved print queue maintenance data/output paths and behavior.
+- Activated TASK-0031 Triage page simplification.
 - Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
 - Verified Network Toolkit GUI smoke test passes.
 - Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-None for tracked work. TASK-0030 is ready to execute.
+None for tracked work. TASK-0031 is ready to execute.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -191,7 +192,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0037: Complete Activity page tracking
+TASK-0030: Complete Print tab path cleanup
 ```
 
 ## Next Bot Prompt
@@ -209,12 +210,13 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0030-Print-Tab-Data-Path-Cleanup.md
+7. docs/TASKS/TASK-0031-Triage-Page-Simplification.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0030-Print-Tab-Data-Path-Cleanup.
+- Active task: TASK-0031-Triage-Page-Simplification.
 - Owner: Codex.
+- TASK-0030 Print tab data-path cleanup is complete.
 - TASK-0037 Activity page running-tool tracking is complete.
 - TASK-0041 UI counter audit is complete and the UI counter has been reset.
 - TASK-0029 Choco page layout refinement is complete.
@@ -223,13 +225,14 @@ Current task state:
 - TASK-0035 audit is complete and the implementation gate is clear.
 
 Your job:
-Complete TASK-0030 implementation only.
+Complete TASK-0031 implementation only.
 
 Scope:
-- Remove the visible `Data folder:` path display from the Print tab.
-- Reclaim the space for a cleaner print layout.
-- Preserve print queue maintenance behavior and output locations.
-- Update docs/TASKS/TASK-0030-Print-Tab-Data-Path-Cleanup.md with work log and completion notes.
+- Simplify the Triage page so the normal technician workflow exposes Quick Triage and Full Triage as the primary actions.
+- Remove or hide excess triage options from the primary UI.
+- Remove the live triage log from the normal technician view unless validation proves it is needed for clear progress feedback.
+- Preserve generated triage outputs and diagnostic bundles.
+- Update docs/TASKS/TASK-0031-Triage-Page-Simplification.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
@@ -243,9 +246,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Print tab no longer shows the data-folder path.
-- Existing print buttons still launch the correct actions.
-- Print outputs still save to the current expected toolkit data/output locations.
+- Triage page primary actions are Quick Triage and Full Triage only.
+- Advanced collector options do not crowd the normal technician workflow.
+- Existing quick/full triage workflows still produce their expected outputs.
 - PowerShell parse, smoke, and button-smoke validation pass.
 
 When done, provide:
