@@ -1,13 +1,13 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0043
+HANDOFF-0044
 
 ## Current Task
-TASK-0041-UI-Counter-Audit
+TASK-0037-Activity-Page-Running-Tool-Tracking
 
 ## Current Owner
-ChatGPT
+Codex
 
 ## Next Owner
 Codex
@@ -26,10 +26,9 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0029 completed the Choco page layout refinement. The UI subsystem counter is now `10 / 10`, so implementation is paused until TASK-0041 completes the required audit gate.
+TASK-0041 completed the required UI counter audit. TASK-0037 is now active for Activity page running-tool tracking and compact status work.
 
-Do not modify application code during TASK-0041.
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless a future implementation task explicitly authorizes that work.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0037 explicitly discovers and documents a blocker that requires a new task.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -51,12 +50,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 3 / 10 | No |
-| Task System | 3 / 10 | No |
+| Documentation | 4 / 10 | No |
+| Task System | 4 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 10 / 10 | Yes |
+| UI | 1 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -77,9 +76,10 @@ Completed work:
 - TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
 - TASK-0028 completed focused Quick Dx run-panel cleanup.
 - TASK-0029 completed focused Choco page layout refinement.
-- TASK-0041 is now active because the UI counter reached `10 / 10`.
-- TASK-0030 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning, blocked by TASK-0041.
-- TASK-0036 through TASK-0040 remain queued follow-up tasks for page health indicators, Activity tracking, modern controls, and Software tab separation.
+- TASK-0041 completed the UI counter audit and reset the audited UI counter.
+- TASK-0037 is now active for Activity page running-tool tracking.
+- TASK-0030 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
+- TASK-0036, TASK-0038, TASK-0039, and TASK-0040 remain queued follow-up tasks for page health indicators, modern controls, and Software tab separation.
 
 TASK-0019 validation evidence:
 - `Run Local Analysis` completed successfully.
@@ -140,41 +140,46 @@ TASK-0029 validation evidence:
 - The Choco status area was reduced to a compact strip.
 - Choco status actions were restored as compact buttons instead of link-style controls.
 
+TASK-0037 validation evidence:
+- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
+- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
+- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
+- Activity now shows CPU, RAM, Disk, and Network gauges.
+- The Network gauge uses Windows network-interface performance counters and displays Mbps detail when available.
+
 ## Active Task
-`TASK-0041-UI-Counter-Audit`
+`TASK-0037-Activity-Page-Running-Tool-Tracking`
 
 Scope summary:
-- Audit recent UI-focused changes since the last reset.
-- Verify documentation/task-state consistency.
-- Decide whether the UI counter can be reset after review.
-- Identify follow-on implementation tasks needed before more GUI work continues.
-- Preserve the one-active-task rule.
+- Add and refine Activity page visibility for toolkit-owned running work.
+- Network visibility has been added as a live gauge.
+- Running-program list height and compact Refresh/Stop controls remain outstanding.
+- Keep Activity refresh from causing UI lag or memory growth.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex, blocked until TASK-0041 completes.
+- `TASK-0030-Print-Tab-Data-Path-Cleanup` owned by Codex.
 - `TASK-0031-Triage-Page-Simplification` owned by Codex.
 - `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
 - `TASK-0036-Page-Health-Indicators` owned by Codex.
-- `TASK-0037-Activity-Page-Running-Tool-Tracking` owned by Codex.
 - `TASK-0038-Modern-Control-Style-System` owned by Codex.
 - `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` owned by ChatGPT.
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0029 Choco page layout refinement.
-- Verified the Chocolatey status area is compact and no longer consumes a large empty top block.
-- Verified the Choco status actions are real compact buttons.
+- Completed TASK-0041 UI counter audit and reset the audited UI counter.
+- Activated TASK-0037 Activity page running-tool tracking.
+- Added a Network gauge to the Activity page.
 - Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
 - Verified Network Toolkit GUI smoke test passes.
 - Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-Implementation is blocked by governance until TASK-0041 completes because the UI counter is `10 / 10`.
+None for tracked work. TASK-0037 remains active because compacting the running-program list and controls is still outstanding.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -184,11 +189,11 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0029: Refine Choco page layout
+TASK-0037: Add Activity network gauge
 ```
 
 ## Next Bot Prompt
-Copy and paste the following prompt into ChatGPT. Do not create a separate task packet file.
+Copy and paste the following prompt into Codex. Do not create a separate task packet file.
 
 ```text
 You are assisting with the Computer Triage Toolkit repository.
@@ -202,33 +207,33 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0041-UI-Counter-Audit.md
+7. docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0041-UI-Counter-Audit.
-- Owner: ChatGPT.
+- Active task: TASK-0037-Activity-Page-Running-Tool-Tracking.
+- Owner: Codex.
+- TASK-0041 UI counter audit is complete and the UI counter has been reset.
+- TASK-0037 has partial progress: the Network gauge has been added to the Activity page.
 - TASK-0029 Choco page layout refinement is complete.
-- The UI counter is now 10 / 10 and further implementation is blocked until the audit completes.
 - TASK-0028 Quick Dx compact run-panel cleanup is complete.
 - TASK-0023 ARGUS foundation implementation is complete.
 - TASK-0035 audit is complete and the implementation gate is clear.
 
 Your job:
-Complete TASK-0041 audit only.
+Continue TASK-0037 implementation only.
 
 Scope:
-- Audit recent UI-focused changes since the last counter reset.
-- Verify task-state consistency across docs/HANDOFF.md, docs/TASKS/QUEUE.md, task files, changelog, ledger, and roadmap.
-- Determine whether the UI counter can be reset after review.
-- Identify follow-on implementation tasks needed before more GUI work continues.
-- Preserve the one-active-task rule.
-- Update docs/TASKS/TASK-0041-UI-Counter-Audit.md with audit notes and completion status.
+- Continue refining the Activity page.
+- Preserve the existing CPU, RAM, Disk, and Network gauges.
+- Shorten the running-program list so it does not dominate the page.
+- Make Refresh and Stop controls smaller and cleaner.
+- Avoid polling changes that introduce lag or memory growth.
+- Update docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
 - Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
 
 Do not:
-- Modify application code.
 - Modify ARGUS or HEPHAESTUS.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
@@ -238,11 +243,11 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- UI counter audit is complete.
-- Task-state source of truth is consistent.
-- Exactly one task is active after audit completion.
-- UI counter is either reset with audit evidence or left at 10 / 10 with a documented blocker.
-- No application code is modified by this audit unless a new implementation task authorizes it.
+- Activity page keeps CPU, RAM, Disk, and Network gauges visible.
+- Running-program list is shorter and leaves room for status content.
+- Refresh and Stop controls are compact and visually consistent.
+- Activity refresh does not freeze the UI.
+- PowerShell parse, smoke, and button-smoke validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.

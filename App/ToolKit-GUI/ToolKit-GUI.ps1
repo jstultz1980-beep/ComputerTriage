@@ -13105,6 +13105,8 @@ function Get-GUIActivityResourceSnapshot {
     $cpu = $null
     $memory = $null
     $disk = $null
+    $network = $null
+    $networkMbps = $null
 
     try {
         $cpuCounter = Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'" -ErrorAction Stop
@@ -13126,10 +13128,28 @@ function Get-GUIActivityResourceSnapshot {
     }
     catch {}
 
+    try {
+        $networkCounters = @(Get-CimInstance Win32_PerfFormattedData_Tcpip_NetworkInterface -ErrorAction Stop | Where-Object {
+            $_.Name -notmatch 'Loopback|isatap|Teredo' -and
+            [double]$_.CurrentBandwidth -gt 0
+        })
+        if($networkCounters.Count -gt 0){
+            $bytesTotal = [double](($networkCounters | Measure-Object -Property BytesTotalPersec -Sum).Sum)
+            $bandwidthTotal = [double](($networkCounters | Measure-Object -Property CurrentBandwidth -Sum).Sum)
+            if($bandwidthTotal -gt 0){
+                $network = [Math]::Round([Math]::Min(100,(($bytesTotal * 8) / $bandwidthTotal) * 100),0)
+                $networkMbps = [Math]::Round((($bytesTotal * 8) / 1MB),2)
+            }
+        }
+    }
+    catch {}
+
     [pscustomobject]@{
         CPU = $cpu
         Memory = $memory
         Disk = $disk
+        Network = $network
+        NetworkMbps = $networkMbps
     }
 }
 
@@ -13141,6 +13161,8 @@ function Refresh-GUIToolkitActivity {
         Set-GUIActivityGaugeValue -Key "CPU" -Value $snapshot.CPU -Detail "Processor load"
         Set-GUIActivityGaugeValue -Key "Memory" -Value $snapshot.Memory -Detail "Physical RAM used"
         Set-GUIActivityGaugeValue -Key "Disk" -Value $snapshot.Disk -Detail "Disk active time"
+        $networkDetail = if($null -ne $snapshot.NetworkMbps){ "{0:n2} Mbps" -f $snapshot.NetworkMbps }else{ "Network usage" }
+        Set-GUIActivityGaugeValue -Key "Network" -Value $snapshot.Network -Detail $networkDetail
 
         $selectedPid = $null
         if($script:ActivityGrid.SelectedRows.Count -gt 0){
@@ -13225,15 +13247,16 @@ function Build-ToolkitActivityPage {
 
     $gaugeLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $gaugeLayout.Dock = "Fill"
-    $gaugeLayout.ColumnCount = 3
+    $gaugeLayout.ColumnCount = 4
     $gaugeLayout.RowCount = 1
-    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
-    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
-    $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.34))) | Out-Null
+    for($i = 0; $i -lt 4; $i++){
+        $gaugeLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    }
     $layout.Controls.Add($gaugeLayout,0,0)
     [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "CPU" -Key "CPU"),0,0)
     [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "RAM" -Key "Memory"),1,0)
     [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "DISK" -Key "Disk"),2,0)
+    [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "NET" -Key "Network"),3,0)
 
     $script:ActivityStatusLabel = New-GUILabel "Loading toolkit activity..."
     $ActivityStatusLabel.ForeColor = $script:GUITheme.MutedText

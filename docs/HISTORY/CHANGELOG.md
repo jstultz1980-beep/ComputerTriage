@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0041 UI Counter Audit and reset the audited UI counter.
+- Activated TASK-0037 Activity Page Running Tool Tracking.
+- Added a Network gauge to the Activity page alongside CPU, RAM, and Disk.
+- The Network gauge uses Windows network-interface performance counters and displays Mbps detail when available.
 - Completed TASK-0029 Choco Page Layout Refinement.
 - Reworked the Chocolatey status area into a compact top strip.
 - Replaced the thin link-style Choco status actions with real compact buttons for `Refresh Status` and `Install Chocolatey`.

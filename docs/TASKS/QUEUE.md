@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0041-UI-Counter-Audit` | ChatGPT | Active | Required audit gate because the UI counter reached 10 / 10 after TASK-0029. |
+| `TASK-0037-Activity-Page-Running-Tool-Tracking` | Codex | Active | Refine Activity page running-tool tracking, including network visibility and compact controls. |
 
 ## Queued
 
@@ -23,7 +23,6 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | ChatGPT | Queued | Prioritize launch-only tools that should become embedded tab experiences. |
 | `TASK-0036-Page-Health-Indicators` | Codex | Queued | Add compact Windows Update service and Wi-Fi signal-strength indicators. |
-| `TASK-0037-Activity-Page-Running-Tool-Tracking` | Codex | Queued | Refine Activity page running-tool tracking, including network tools and compact controls. |
 | `TASK-0038-Modern-Control-Style-System` | Codex | Queued | Replace default-looking utility buttons with a consistent modern control style. |
 | `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | ChatGPT | Queued | Classify Software tab apps/installers and research Registrar Registry Manager portability. |
 | `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` | Codex | Queued | Implement accepted Software tab separation between launchable apps and installable stored programs. |
@@ -52,6 +51,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0035-Documentation-Task-System-Audit` | Completed | Audited documentation/task-state consistency, reset audited counters, and cleared the implementation gate. |
 | `TASK-0028-Quick-Dx-Compact-Run-Panel` | Completed | Removed the visible Quick Dx internet target chain and compacted the run panel while preserving internal fallback targets. |
 | `TASK-0029-Choco-Page-Layout-Refinement` | Completed | Reworked the Choco status area into a compact strip with readable action buttons and preserved existing package-management behavior. |
+| `TASK-0041-UI-Counter-Audit` | Completed | Audited recent UI task work, reset the UI counter, and cleared the implementation gate. |
 
 ## Reconciliation Decision
 
@@ -60,4 +60,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0041. Further implementation is paused until the UI counter audit completes.
+- Current active task is TASK-0037.

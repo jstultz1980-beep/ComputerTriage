@@ -86,3 +86,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0076 | 2026-07-02 | TASK-0029 | UI | +1 | Reworked the Chocolatey page status strip into a compact readable area with real status action buttons. |
 | CHG-0077 | 2026-07-02 | TASK-0029 | Documentation | +1 | Updated TASK-0029 work log, handoff, changelog, roadmap, and validation notes for the Choco page layout refinement. |
 | CHG-0078 | 2026-07-02 | TASK-0029 | Task System | +1 | Completed TASK-0029 and activated TASK-0041 because the UI counter reached the mandatory audit threshold. |
+| CHG-0079 | 2026-07-02 | TASK-0041 | UI | reset to 0 / 10 | Completed the required UI counter audit after the UI counter reached 10/10. |
+| CHG-0080 | 2026-07-02 | TASK-0037 | UI | +1 | Added a Network gauge to the Activity page alongside CPU, RAM, and Disk gauges. |
+| CHG-0081 | 2026-07-02 | TASK-0037 | Documentation | +1 | Updated Activity task, handoff, changelog, and validation notes for the Network gauge addition. |
+| CHG-0082 | 2026-07-02 | TASK-0037 | Task System | +1 | Activated TASK-0037 after the UI audit gate cleared and recorded partial Activity page progress. |
