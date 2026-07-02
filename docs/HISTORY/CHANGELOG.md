@@ -1,6 +1,12 @@
 # Changelog
 
 ## 2026-07-01
+- Completed TASK-0035 Documentation and Task System Audit.
+- Verified documentation/task-state source of truth was consistent before closeout.
+- Verified TASK-0020 was complete and TASK-0023 remained queued until the audit gate cleared.
+- Verified no ARGUS implementation or HEPHAESTUS code changes were part of TASK-0020 or TASK-0035.
+- Reset audited Documentation and Task System counters after recording ledger entries.
+- Activated TASK-0023 ARGUS Foundation Implementation for Codex.
 - Reconciled TASK-0020/TASK-0035 governance state so `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and task files agree that TASK-0035 is the active audit gate.
 - Added queued tasks TASK-0036 through TASK-0040 for page health indicators, Activity page tracking, modern utility controls, Software tab app/installable classification, and Software tab implementation.
 - Enriched existing queued tasks for Choco layout, Triage simplification, Computer tab summary redesign, Directory tab direction, and embedded-tool planning with the latest requested details.
