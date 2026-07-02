@@ -50,12 +50,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 8 / 10 | No |
+| Documentation | 9 / 10 | No |
 | Task System | 7 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 5 / 10 | No |
+| UI | 6 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -172,6 +172,9 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
+- Removed the horizontal scrollbar from Quick Target Checks by enabling wrapped vertical-only output.
+- Successful triage runs now open the bundle folder after the completion prompt.
+- Added the broader request to make embedded consoles behave consistently with Quick Target Checks to queued TASK-0034.
 - Corrected TASK-0031 after review by restoring the compact Triage tool/app catalog table.
 - Tightened the Triage layout and added AI bundle workflow instructions.
 - Completed TASK-0031 Triage page simplification.

@@ -11,6 +11,8 @@ Create a prioritized roadmap for turning more launch-only tools into embedded ta
 
 ## Scope
 - Inventory launch-only tools that would benefit from embedded UI.
+- Compare existing embedded-output patterns, especially Quick Target Checks versus `Start-GUISafeScriptRunner`, and define one preferred technician-facing console pattern.
+- Identify which tabs should use compact in-tab output panes and which should use full-tab overlays.
 - Identify tools that should get their own tab versus live inside an existing tab.
 - Rank candidates by troubleshooting value, implementation risk, and expected technician benefit.
 - Prefer embedded tab experiences for tools where the technician needs to read, filter, compare, or act on structured output.
@@ -25,6 +27,8 @@ Create a prioritized roadmap for turning more launch-only tools into embedded ta
 - Windows Update diagnostics.
 - Remote/PsExec helpers.
 - Choco/package management refinements.
+- Legacy PowerShell tools currently routed through `Start-GUISafeScriptRunner`.
+- Quick Target Checks style command output panes.
 
 ## Out of Scope
 - Application code changes.
@@ -36,5 +40,6 @@ Create a prioritized roadmap for turning more launch-only tools into embedded ta
 - [ ] Embedded-tool candidates are prioritized.
 - [ ] Each recommendation states why embedded UI is better than a launcher.
 - [ ] Each recommendation states whether the tool belongs on an existing tab or should get a dedicated tab.
+- [ ] The roadmap recommends whether the Quick Target Checks embedded output pattern should become the shared base for other pages.
 - [ ] Each accepted candidate has a small follow-on Codex task.
 - [ ] Tasks avoid overloading any single tab.

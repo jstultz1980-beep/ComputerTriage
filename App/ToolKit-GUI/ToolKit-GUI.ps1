@@ -8491,8 +8491,8 @@ function Build-QuickTriagePage {
     $QuickOutputBox.Dock = "Fill"
     $QuickOutputBox.Multiline = $true
     $QuickOutputBox.ReadOnly = $true
-    $QuickOutputBox.ScrollBars = "Both"
-    $QuickOutputBox.WordWrap = $false
+    $QuickOutputBox.ScrollBars = "Vertical"
+    $QuickOutputBox.WordWrap = $true
     $QuickOutputBox.Font = New-Object System.Drawing.Font("Consolas",9)
     $QuickOutputBox.BackColor = $script:GUITheme.LogBack
     $QuickOutputBox.ForeColor = $script:GUITheme.LogFore
@@ -12251,6 +12251,7 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
                 Add-GUITriageLogLine "Triage completed. Bundle: $($result.bundlePath)"
                 if($script:TriageStatusLabel){ $script:TriageStatusLabel.Text = "Triage completed. Bundle ready." }
                 [System.Windows.Forms.MessageBox]::Show($message,"Triage Complete",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+                Open-GUITriageBundleFolder
             }
             else {
                 Add-GUITriageLogLine "Triage failed: $($result.error)"

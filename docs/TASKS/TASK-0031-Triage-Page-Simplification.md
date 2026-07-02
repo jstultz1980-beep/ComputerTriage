@@ -82,3 +82,27 @@ Issues:
 - Restored the Triage tool/app catalog as a compact status table instead of hiding it completely.
 - Tightened the Triage page vertical spacing and shortened run-control rows.
 - Added a compact instruction area describing the expected workflow: run triage, open the bundle folder, then submit the ZIP bundle to AI with the included prompt.
+
+### Entry 003
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0031-Triage-Page-Simplification.md`
+- `docs/TASKS/TASK-0034-Embedded-Tool-Experience-Roadmap.md`
+- `docs/HANDOFF.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+Validation Performed:
+- Confirmed Quick Target Checks output uses vertical scrolling with wrapped text.
+- Confirmed triage completion still sets the latest bundle path and now opens the bundle folder after the completion prompt.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit\Tests\Test-ToolkitSmoke.ps1`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit\Tests\Test-TriageService.ps1`.
+Issues:
+- The broader "make all embedded consoles behave like Quick Target Checks" request is intentionally captured in queued TASK-0034 because it needs candidate prioritization and a larger implementation pass.
+
+## Post-Completion Correction Notes 2
+- Removed the horizontal scrollbar from Quick Target Checks by wrapping output and keeping only vertical scrolling.
+- Added automatic bundle-folder opening after a successful Quick or Full Triage run.

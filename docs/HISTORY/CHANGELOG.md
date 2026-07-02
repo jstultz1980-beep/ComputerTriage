@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-02
+- Removed the horizontal scrollbar from Quick Target Checks and made successful triage runs open the bundle folder after completion.
+- Added the requested embedded-console unification requirement to the queued embedded-tool roadmap task.
 - Corrected TASK-0031 Triage page simplification after review.
 - Restored the compact Triage tool/app catalog table, tightened the Triage layout, and added a small AI bundle workflow instruction area.
 - Completed TASK-0031 Triage Page Simplification.
