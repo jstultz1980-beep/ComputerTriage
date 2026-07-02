@@ -12464,51 +12464,60 @@ function Build-ChocolateyPage {
     $layout.RowCount = 2
     $layout.ColumnCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,56))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $Page.Controls.Add($layout)
 
-    $chocoTop = New-Object System.Windows.Forms.GroupBox
-    $chocoTop.Text = "Chocolatey"
+    $chocoTop = New-Object System.Windows.Forms.Panel
     $chocoTop.Dock = "Fill"
-    $chocoTop.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $chocoTop.BorderStyle = "FixedSingle"
+    $chocoTop.BackColor = $script:GUITheme.Page
+    $chocoTop.Margin = New-Object System.Windows.Forms.Padding(0,0,0,8)
     $layout.Controls.Add($chocoTop,0,0)
     $layout.SetColumnSpan($chocoTop,2)
 
     $topPanel = New-Object System.Windows.Forms.TableLayoutPanel
     $topPanel.Dock = "Fill"
-    $topPanel.Padding = New-Object System.Windows.Forms.Padding(10,8,10,8)
-    $topPanel.ColumnCount = 3
+    $topPanel.Padding = New-Object System.Windows.Forms.Padding(12,7,12,7)
+    $topPanel.ColumnCount = 4
     $topPanel.RowCount = 1
+    $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,104))) | Out-Null
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,140))) | Out-Null
     $topPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,154))) | Out-Null
     $topPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $chocoTop.Controls.Add($topPanel)
 
+    $chocoTitle = New-GUILabel "Chocolatey"
+    $chocoTitle.Dock = "Fill"
+    $chocoTitle.TextAlign = "MiddleLeft"
+    $chocoTitle.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $chocoTitle.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
+    [void]$topPanel.Controls.Add($chocoTitle,0,0)
+
     $script:ChocoStatusLabel = New-Object System.Windows.Forms.Label
     $ChocoStatusLabel.Dock = "Fill"
     $ChocoStatusLabel.TextAlign = "MiddleLeft"
     $ChocoStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
     $ChocoStatusLabel.AutoEllipsis = $true
-    $ChocoStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,2,8,0)
-    [void]$topPanel.Controls.Add($ChocoStatusLabel,0,0)
+    $ChocoStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,0,8,0)
+    [void]$topPanel.Controls.Add($ChocoStatusLabel,1,0)
 
     $refreshChocoButton = New-GUIButton "Refresh Status" { Refresh-GUIChocoStatus }
     $refreshChocoButton.Dock = "Fill"
-    $refreshChocoButton.MinimumSize = New-Object System.Drawing.Size(0,28)
-    $refreshChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
+    $refreshChocoButton.MinimumSize = New-Object System.Drawing.Size(0,30)
+    $refreshChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,2,4,2)
     Set-GUIButtonChrome -Button $refreshChocoButton -Compact
-    [void]$topPanel.Controls.Add($refreshChocoButton,1,0)
+    [void]$topPanel.Controls.Add($refreshChocoButton,2,0)
 
     $installChocoButton = New-GUIButton "Install Chocolatey" { Start-GUIChocolateyInstall }
     $installChocoButton.Dock = "Fill"
-    $installChocoButton.MinimumSize = New-Object System.Drawing.Size(0,28)
-    $installChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
+    $installChocoButton.MinimumSize = New-Object System.Drawing.Size(0,30)
+    $installChocoButton.Margin = New-Object System.Windows.Forms.Padding(4,2,4,2)
     Set-GUIButtonChrome -Button $installChocoButton -Compact
-    [void]$topPanel.Controls.Add($installChocoButton,2,0)
+    [void]$topPanel.Controls.Add($installChocoButton,3,0)
 
     $searchGroup = New-Object System.Windows.Forms.GroupBox
     $searchGroup.Text = "Install Chocolatey Packages"

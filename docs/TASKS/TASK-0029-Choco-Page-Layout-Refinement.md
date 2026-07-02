@@ -74,3 +74,18 @@ Issues:
 - Screenshot validation showed the compact Choco status-row buttons collapsed into thin horizontal lines because the group-row height left too little content area after the `GroupBox` caption.
 Correction:
 - Increased the Choco status strip height slightly and gave the status action buttons stable minimum height so they render as buttons instead of lines.
+
+### Entry 003
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md`
+Validation Performed:
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- Screenshot validation still showed the Choco status actions clipped inside the captioned `GroupBox`.
+Correction:
+- Replaced the captioned `GroupBox` status container with a plain bordered panel so the status text and Choco action buttons render at full height.
