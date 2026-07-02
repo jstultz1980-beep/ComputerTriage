@@ -84,3 +84,16 @@ Validation Performed:
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
 Issues:
 - Corrected the Activity action row after screenshot testing showed the compact Refresh and Stop buttons could collapse into thin blue lines at the lower-right of the page.
+
+### Entry 004
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md`
+Validation Performed:
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- Moved the Activity `Refresh` and `Stop` buttons into the status strip above the process table so the process grid and bottom status area cannot clip them.

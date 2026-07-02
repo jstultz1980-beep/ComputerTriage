@@ -13246,14 +13246,13 @@ function Build-ToolkitActivityPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.RowCount = 5
+    $layout.RowCount = 4
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,214))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $Page.Controls.Add($layout)
 
     $gaugeLayout = New-Object System.Windows.Forms.TableLayoutPanel
@@ -13269,9 +13268,37 @@ function Build-ToolkitActivityPage {
     [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "DISK" -Key "Disk"),2,0)
     [void]$gaugeLayout.Controls.Add((New-GUIActivityGauge -Title "NET" -Key "Network"),3,0)
 
+    $statusRow = New-Object System.Windows.Forms.TableLayoutPanel
+    $statusRow.Dock = "Fill"
+    $statusRow.ColumnCount = 4
+    $statusRow.RowCount = 1
+    $statusRow.Padding = New-Object System.Windows.Forms.Padding(0,4,0,4)
+    $statusRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $statusRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $statusRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,10))) | Out-Null
+    $statusRow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $statusRow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.Controls.Add($statusRow,0,1)
+
     $script:ActivityStatusLabel = New-GUILabel "Loading toolkit activity..."
+    $ActivityStatusLabel.Dock = "Fill"
     $ActivityStatusLabel.ForeColor = $script:GUITheme.MutedText
-    $layout.Controls.Add($ActivityStatusLabel,0,1)
+    $ActivityStatusLabel.TextAlign = "MiddleLeft"
+    $statusRow.Controls.Add($ActivityStatusLabel,0,0)
+
+    $refreshButton = New-GUIButton "Refresh" { Refresh-GUIToolkitActivity }
+    $refreshButton.Dock = "Fill"
+    $refreshButton.MinimumSize = New-Object System.Drawing.Size(0,30)
+    $refreshButton.Margin = New-Object System.Windows.Forms.Padding(3,0,3,0)
+    Set-GUIButtonChrome -Button $refreshButton -Compact
+    [void]$statusRow.Controls.Add($refreshButton,1,0)
+
+    $stopButton = New-GUIButton "Stop" { Stop-GUISelectedToolkitActivityProcess }
+    $stopButton.Dock = "Fill"
+    $stopButton.MinimumSize = New-Object System.Drawing.Size(0,30)
+    $stopButton.Margin = New-Object System.Windows.Forms.Padding(3,0,3,0)
+    Set-GUIButtonChrome -Button $stopButton -Compact
+    [void]$statusRow.Controls.Add($stopButton,3,0)
 
     $script:ActivityGrid = New-Object System.Windows.Forms.DataGridView
     $ActivityGrid.Dock = "Fill"
@@ -13297,38 +13324,12 @@ function Build-ToolkitActivityPage {
     $ActivityGrid.Columns["CommandLine"].FillWeight = 33
     $layout.Controls.Add($ActivityGrid,0,2)
 
-    $buttons = New-Object System.Windows.Forms.TableLayoutPanel
-    $buttons.Dock = "Fill"
-    $buttons.ColumnCount = 4
-    $buttons.RowCount = 1
-    $buttons.Padding = New-Object System.Windows.Forms.Padding(0,8,0,8)
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,12))) | Out-Null
-    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,124))) | Out-Null
-    $buttons.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.Controls.Add($buttons,0,3)
-
-    $refreshButton = New-GUIButton "Refresh" { Refresh-GUIToolkitActivity }
-    $refreshButton.Dock = "Fill"
-    $refreshButton.MinimumSize = New-Object System.Drawing.Size(0,34)
-    $refreshButton.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
-    Set-GUIButtonChrome -Button $refreshButton -Compact
-    [void]$buttons.Controls.Add($refreshButton,1,0)
-
-    $stopButton = New-GUIButton "Stop" { Stop-GUISelectedToolkitActivityProcess }
-    $stopButton.Dock = "Fill"
-    $stopButton.MinimumSize = New-Object System.Drawing.Size(0,34)
-    $stopButton.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
-    Set-GUIButtonChrome -Button $stopButton -Compact
-    [void]$buttons.Controls.Add($stopButton,3,0)
-
     $detailPanel = New-Object System.Windows.Forms.Panel
     $detailPanel.Dock = "Fill"
-    $detailPanel.Margin = New-Object System.Windows.Forms.Padding(0,4,0,0)
+    $detailPanel.Margin = New-Object System.Windows.Forms.Padding(0,6,0,0)
     $detailPanel.Padding = New-Object System.Windows.Forms.Padding(12,8,12,8)
     $detailPanel.BackColor = $script:GUITheme.Shell
-    $layout.Controls.Add($detailPanel,0,4)
+    $layout.Controls.Add($detailPanel,0,3)
 
     $script:ActivityDetailLabel = New-GUILabel "Activity details will appear here."
     $ActivityDetailLabel.Dock = "Top"
