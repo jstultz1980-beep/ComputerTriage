@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Active | Replace the computer profile list with a richer current-computer summary and LED status indicators. |
+| `TASK-0042-Documentation-Counter-Audit` | Codex | Active | Audit documentation state because the Documentation counter reached 10/10. |
 
 ## Queued
 
@@ -17,6 +17,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
+| `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Queued | Replace the computer profile list with a richer current-computer summary and LED status indicators after the documentation audit gate clears. |
 | `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | ChatGPT | Queued | Prioritize launch-only tools that should become embedded tab experiences. |
 | `TASK-0036-Page-Health-Indicators` | Codex | Queued | Add compact Windows Update service and Wi-Fi signal-strength indicators. |

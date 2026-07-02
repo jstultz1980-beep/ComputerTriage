@@ -97,3 +97,22 @@ Validation Performed:
 - Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
 Issues:
 - Moved the Activity `Refresh` and `Stop` buttons into the status strip above the process table so the process grid and bottom status area cannot clip them.
+
+### Entry 005
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md`
+- `docs/HANDOFF.md`
+- `docs/HISTORY/CHANGELOG.md`
+- `docs/HISTORY/CHANGE-LEDGER.md`
+Validation Performed:
+- Confirmed Activity refresh starts only while the Activity tab is selected.
+- Confirmed Activity refresh stops when leaving the Activity tab.
+- Confirmed tab switches taking 250 ms or longer now write `SlowTabSwitch` diagnostic events.
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit\Tests\Test-ToolkitSmoke.ps1`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- This correction addresses the Activity refresh timer as the most likely cross-tab lag source. If tab switching remains slow, use the new `SlowTabSwitch` diagnostic events to identify the next expensive tab.

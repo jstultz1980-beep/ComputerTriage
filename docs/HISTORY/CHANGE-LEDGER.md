@@ -105,3 +105,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0095 | 2026-07-02 | TASK-0031 | Documentation | +1 | Updated TASK-0031 work log, handoff, changelog, and validation notes for the post-completion Triage page correction. |
 | CHG-0096 | 2026-07-02 | TASK-0031 | UI | +1 | Removed the Quick Target Checks horizontal scrollbar and opened the triage bundle folder automatically after successful bundle creation. |
 | CHG-0097 | 2026-07-02 | TASK-0031/TASK-0034 | Documentation | +1 | Documented the Quick Target Checks correction and added embedded-console pattern unification to the queued embedded-tool roadmap. |
+| CHG-0098 | 2026-07-02 | TASK-0037 | UI | +1 | Stopped Activity page performance-counter refreshes when the Activity tab is not selected and added slow tab-switch diagnostics. |
+| CHG-0099 | 2026-07-02 | TASK-0037 | Documentation | +1 | Documented the Activity timer performance correction and validation notes. |
+| CHG-0100 | 2026-07-02 | TASK-0042 | Task System | +1 | Activated Documentation Counter Audit because the Documentation counter reached 10/10 and returned TASK-0032 to queued status until the audit gate clears. |

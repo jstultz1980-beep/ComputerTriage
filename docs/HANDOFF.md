@@ -4,7 +4,7 @@
 HANDOFF-0047
 
 ## Current Task
-TASK-0032-Computer-Tab-Summary-Redesign
+TASK-0042-Documentation-Counter-Audit
 
 ## Current Owner
 Codex
@@ -26,9 +26,10 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0031 completed Triage page simplification. TASK-0032 is now active for Computer tab summary redesign.
+TASK-0037 received a focused Activity timer performance correction. That documentation update brought the Documentation counter to `10 / 10`, so TASK-0042 is now active as the mandatory Documentation Counter Audit.
 
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless TASK-0032 explicitly discovers and documents a blocker that requires a new task.
+Do not begin new implementation work until TASK-0042 is completed and the Documentation counter is reset.
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -50,12 +51,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 9 / 10 | No |
+| Documentation | 10 / 10 | Yes |
 | Task System | 7 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 6 / 10 | No |
+| UI | 7 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -80,7 +81,8 @@ Completed work:
 - TASK-0037 completed Activity page running-tool tracking.
 - TASK-0030 completed Print tab data-path cleanup.
 - TASK-0031 completed Triage page simplification.
-- TASK-0032 is now active for Computer tab summary redesign.
+- TASK-0042 is now active for the mandatory Documentation Counter Audit.
+- TASK-0032 is queued for Computer tab summary redesign after the audit gate clears.
 - TASK-0033 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
 - TASK-0036, TASK-0038, TASK-0039, and TASK-0040 remain queued follow-up tasks for page health indicators, modern controls, and Software tab separation.
 
@@ -153,17 +155,18 @@ TASK-0037 validation evidence:
 - Activity refresh interval is 5 seconds.
 
 ## Active Task
-`TASK-0032-Computer-Tab-Summary-Redesign`
+`TASK-0042-Documentation-Counter-Audit`
 
 Scope summary:
-- Remove the computer profile list from the Computer tab.
-- Give the Current Computer Summary most of the tab.
-- Keep a small, obvious button to view/open the latest HTML computer profile report.
-- Add high-value current-machine detail and LED-style status indicators.
+- Verify documentation/task-state consistency after the Documentation counter reached `10 / 10`.
+- Confirm exactly one active task.
+- Reset only the audited Documentation counter to `0 / 10` after the audit completes.
+- Preserve queued implementation work without changing application code.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
+- `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
 - `TASK-0036-Page-Health-Indicators` owned by Codex.
@@ -172,6 +175,8 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 
 ## Validation Completed For This Update
+- Reduced tab-to-tab lag by stopping the Activity page refresh timer whenever Activity is not selected.
+- Added `SlowTabSwitch` diagnostic logging for tab switches taking 250 ms or longer.
 - Removed the horizontal scrollbar from Quick Target Checks by enabling wrapped vertical-only output.
 - Successful triage runs now open the bundle folder after the completion prompt.
 - Added the broader request to make embedded consoles behave consistently with Quick Target Checks to queued TASK-0034.
@@ -181,7 +186,7 @@ Scope summary:
 - Rebuilt the Triage page around `Quick Triage` and `Full Triage` as the only primary actions.
 - Restored the normal-view triage tool catalog as a compact status table while keeping the live triage log hidden.
 - Preserved generated outputs, bundle access, backend advanced functions, and triage service behavior.
-- Activated TASK-0032 Computer tab summary redesign.
+- Activated TASK-0042 Documentation Counter Audit because the Documentation counter reached `10 / 10`.
 - Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
 - Verified Network Toolkit GUI smoke test passes.
 - Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
@@ -189,7 +194,7 @@ Scope summary:
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-None for tracked work. TASK-0032 is ready to execute.
+Documentation audit gate is active. No new implementation work should start until TASK-0042 is complete and the Documentation counter is reset.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -199,7 +204,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0031: Simplify Triage page
+TASK-0037: Reduce tab switch lag
 ```
 
 ## Next Bot Prompt
@@ -217,12 +222,13 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0032-Computer-Tab-Summary-Redesign.md
+7. docs/TASKS/TASK-0042-Documentation-Counter-Audit.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0032-Computer-Tab-Summary-Redesign.
+- Active task: TASK-0042-Documentation-Counter-Audit.
 - Owner: Codex.
+- Documentation counter reached `10 / 10`; no implementation work may begin until this audit is complete.
 - TASK-0031 Triage page simplification is complete.
 - TASK-0030 Print tab data-path cleanup is complete.
 - TASK-0037 Activity page running-tool tracking is complete.
@@ -233,19 +239,20 @@ Current task state:
 - TASK-0035 audit is complete and the implementation gate is clear.
 
 Your job:
-Complete TASK-0032 implementation only.
+Complete TASK-0042 documentation audit only.
 
 Scope:
-- Remove the computer profile list from the Computer tab.
-- Give the Current Computer Summary most of the tab.
-- Keep a small, obvious button to view/open the latest HTML computer profile report.
-- Add high-value current-machine detail and LED-style indicators using existing profile/quick diagnosis state where available.
-- Update docs/TASKS/TASK-0032-Computer-Tab-Summary-Redesign.md with work log and completion notes.
+- Verify docs/HANDOFF.md and docs/TASKS/QUEUE.md agree on exactly one active task.
+- Verify task files, changelog, and change ledger are internally consistent.
+- Confirm TASK-0032 remains queued for implementation after the audit gate clears.
+- Reset only the Documentation counter to 0 / 10 after audit completion.
+- Update docs/TASKS/TASK-0042-Documentation-Counter-Audit.md with work log and completion notes.
 - Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
-- Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md if counters change.
+- Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
+- Modify application code.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
 - Refactor unrelated application code.
@@ -254,11 +261,11 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Computer profile list is removed from the Computer tab.
-- Current Computer Summary uses the available tab space well.
-- Latest HTML profile report is still reachable from a small button.
-- Status-bearing fields have LED-style indicators, with unknown/unscanned indicators unlit.
-- PowerShell parse, smoke, and button-smoke validation pass.
+- Documentation/task-state source of truth is consistent.
+- Exactly one task is active.
+- Documentation counter is reset to 0 / 10.
+- TASK-0032 is queued as the next implementation task after the audit.
+- No application code changes are made during TASK-0042.
 
 When done, provide:
 - Concise summary of implementation performed.

@@ -9085,6 +9085,7 @@ function Select-GUITabPage {
     }
 
     $script:GuiTabSwitchInProgress = $true
+    $switchTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $layoutControls = @($script:Form,$script:RootLayout,$script:StaticTabStrip,$script:MainTabs) |
                       Where-Object { $_ -and !$_.IsDisposed }
 
@@ -9098,6 +9099,7 @@ function Select-GUITabPage {
         }
 
         Build-GUITabIfNeeded -Page $Page
+        Update-GUITabRuntimeState -SelectedPage $Page
         Update-GUIStaticTabStripSelection
     }
     finally {
@@ -9108,6 +9110,23 @@ function Select-GUITabPage {
         }
         try { $script:StaticTabStrip.Invalidate() } catch {}
         $script:GuiTabSwitchInProgress = $false
+        if($switchTimer.IsRunning){ $switchTimer.Stop() }
+        if($switchTimer.ElapsedMilliseconds -ge 250 -and $Page){
+            Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $Page.Text -Detail ("ElapsedMs={0}" -f $switchTimer.ElapsedMilliseconds)
+        }
+    }
+}
+
+function Update-GUITabRuntimeState {
+    param([System.Windows.Forms.TabPage]$SelectedPage)
+
+    $selectedName = if($SelectedPage){ [string]$SelectedPage.Text }else{ "" }
+
+    if($selectedName -eq "Activity"){
+        Start-GUIActivityRefreshTimer
+    }
+    else {
+        Stop-GUIActivityRefreshTimer
     }
 }
 
@@ -13277,6 +13296,49 @@ function Refresh-GUIToolkitActivity {
     }
 }
 
+function Start-GUIActivityRefreshTimer {
+    if(!$script:ActivityGrid -or $script:ActivityGrid.IsDisposed){
+        return
+    }
+
+    if($script:ActivityRefreshTimer){
+        try {
+            if(!$script:ActivityRefreshTimer.Enabled){
+                $script:ActivityRefreshTimer.Start()
+            }
+        }
+        catch {}
+        return
+    }
+
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 5000
+    $timer.Add_Tick({
+        if(!$script:MainTabs -or !$script:MainTabs.SelectedTab -or $script:MainTabs.SelectedTab.Text -ne "Activity"){
+            Stop-GUIActivityRefreshTimer
+            return
+        }
+
+        Refresh-GUIToolkitActivity
+    })
+    $script:ActivityRefreshTimer = $timer
+    $timer.Start()
+}
+
+function Stop-GUIActivityRefreshTimer {
+    if(!$script:ActivityRefreshTimer){
+        return
+    }
+
+    try {
+        $script:ActivityRefreshTimer.Stop()
+        $script:ActivityRefreshTimer.Dispose()
+    }
+    catch {}
+
+    $script:ActivityRefreshTimer = $null
+}
+
 function Stop-GUISelectedToolkitActivityProcess {
     if(!$script:ActivityGrid -or $script:ActivityGrid.SelectedRows.Count -eq 0){
         [System.Windows.Forms.MessageBox]::Show("Select a running toolkit process first.","Toolkit Activity",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
@@ -13403,14 +13465,7 @@ function Build-ToolkitActivityPage {
     $detailPanel.Controls.Add($ActivityDetailLabel)
 
     Refresh-GUIToolkitActivity
-    if($script:ActivityRefreshTimer){
-        try { $script:ActivityRefreshTimer.Stop(); $script:ActivityRefreshTimer.Dispose() } catch {}
-    }
-    $timer = New-Object System.Windows.Forms.Timer
-    $timer.Interval = 5000
-    $timer.Add_Tick({ Refresh-GUIToolkitActivity })
-    $script:ActivityRefreshTimer = $timer
-    $timer.Start()
+    Start-GUIActivityRefreshTimer
 }
 
 function Show-GUILiveLogWindow {
@@ -14888,8 +14943,14 @@ function Build-Form {
         if($script:GuiTabSwitchInProgress){
             return
         }
+        $switchTimer = [System.Diagnostics.Stopwatch]::StartNew()
         Build-GUITabIfNeeded -Page $script:MainTabs.SelectedTab
+        Update-GUITabRuntimeState -SelectedPage $script:MainTabs.SelectedTab
         Update-GUIStaticTabStripSelection
+        if($switchTimer.IsRunning){ $switchTimer.Stop() }
+        if($switchTimer.ElapsedMilliseconds -ge 250 -and $script:MainTabs.SelectedTab){
+            Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $script:MainTabs.SelectedTab.Text -Detail ("ElapsedMs={0}; NativeEvent=True" -f $switchTimer.ElapsedMilliseconds)
+        }
     })
 
     $script:RunButton = New-GUIButton "Run Quick Diagnosis" { Start-GUIQuickDiagnosis }

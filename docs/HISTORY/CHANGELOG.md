@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-02
+- Activated TASK-0042 Documentation Counter Audit because the Documentation counter reached the mandatory 10/10 audit gate.
+- Reduced tab-to-tab lag by stopping Activity page performance-counter refreshes when the Activity tab is not selected and adding slow-tab-switch diagnostics.
 - Removed the horizontal scrollbar from Quick Target Checks and made successful triage runs open the bundle folder after completion.
 - Added the requested embedded-console unification requirement to the queued embedded-tool roadmap task.
 - Corrected TASK-0031 Triage page simplification after review.
