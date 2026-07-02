@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0035-Documentation-Task-System-Audit` | ChatGPT | Active | Complete the required audit gate because Documentation reached `10 / 10` during TASK-0020. |
+| `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Active | Implement the minimal ARGUS foundation slice using accepted ADR-0003 after the TASK-0035 audit gate cleared. |
 
 ## Queued
 
@@ -17,7 +17,6 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0023-ARGUS-Foundation-Implementation` | Codex | Queued | Implement ARGUS foundation only after TASK-0035 clears the audit gate and this task becomes active. |
 | `TASK-0028-Quick-Dx-Compact-Run-Panel` | Codex | Queued | Remove visible internet target list from Quick Dx and compact the run block. |
 | `TASK-0029-Choco-Page-Layout-Refinement` | Codex | Queued | Make the Choco status area compact and improve the Choco page layout. |
 | `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Queued | Remove the print data-folder path display and reclaim the space. |
@@ -51,6 +50,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0025-Quick-Dx-Last-Scan-Label-Fix` | Completed | Fixed the clipped Last Quick Diagnosis label in the compact right-column Quick Diagnosis block. |
 | `TASK-0026-Quick-Dx-Fixed-Internet-Targets` | Completed | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain. |
 | `TASK-0027-GUI-Polish-QuickDx-Header-Choco-Theme` | Completed | Polished Quick Dx spacing, header health badge space, Choco layout, surface gradient/texture, and added Terminal Dark. |
+| `TASK-0035-Documentation-Task-System-Audit` | Completed | Audited documentation/task-state consistency, reset audited counters, and cleared the implementation gate. |
 
 ## Reconciliation Decision
 
@@ -59,4 +59,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active audit gate is TASK-0035.
+- Current active implementation task is TASK-0023.
