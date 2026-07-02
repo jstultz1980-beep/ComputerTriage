@@ -1,7 +1,7 @@
 # TASK-0030 - Print Tab Data Path Cleanup
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

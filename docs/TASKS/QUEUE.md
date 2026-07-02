@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0037-Activity-Page-Running-Tool-Tracking` | Codex | Active | Refine Activity page running-tool tracking, including network visibility and compact controls. |
+| `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Active | Remove the print data-folder path display and reclaim the space. |
 
 ## Queued
 
@@ -17,7 +17,6 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0030-Print-Tab-Data-Path-Cleanup` | Codex | Queued | Remove the print data-folder path display and reclaim the space. |
 | `TASK-0031-Triage-Page-Simplification` | Codex | Queued | Reduce Triage primary actions to Quick Triage and Full Triage and revisit live log visibility. |
 | `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Queued | Replace the computer profile list with a richer current-computer summary and LED status indicators. |
 | `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
@@ -52,6 +51,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0028-Quick-Dx-Compact-Run-Panel` | Completed | Removed the visible Quick Dx internet target chain and compacted the run panel while preserving internal fallback targets. |
 | `TASK-0029-Choco-Page-Layout-Refinement` | Completed | Reworked the Choco status area into a compact strip with readable action buttons and preserved existing package-management behavior. |
 | `TASK-0041-UI-Counter-Audit` | Completed | Audited recent UI task work, reset the UI counter, and cleared the implementation gate. |
+| `TASK-0037-Activity-Page-Running-Tool-Tracking` | Completed | Added Activity Network gauge, fixed-height running-process list, compact controls, and slower refresh interval. |
 
 ## Reconciliation Decision
 
@@ -60,4 +60,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0037.
+- Current active task is TASK-0030.

@@ -141,6 +141,7 @@ $script:ActivityGrid = $null
 $script:ActivityStatusLabel = $null
 $script:ActivityRefreshTimer = $null
 $script:ActivityGaugePanels = @{}
+$script:ActivityDetailLabel = $null
 $script:LatestComputerProfileCache = $null
 $script:LatestComputerProfileCacheTime = [datetime]::MinValue
 $script:LogLines = New-Object System.Collections.ArrayList
@@ -13193,6 +13194,15 @@ function Refresh-GUIToolkitActivity {
             $totalMemory = [Math]::Round((($items | Measure-Object -Property MemoryMB -Sum).Sum),1)
             $script:ActivityStatusLabel.Text = "Toolkit-related processes: $($items.Count)    Memory: $totalMemory MB    Last refresh: $(Get-Date -Format HH:mm:ss)"
         }
+        if($script:ActivityDetailLabel -and !$script:ActivityDetailLabel.IsDisposed){
+            if($items.Count -gt 0){
+                $oldest = @($items | Sort-Object AgeSeconds -Descending | Select-Object -First 1)[0]
+                $script:ActivityDetailLabel.Text = "Oldest toolkit process: $($oldest.Name) ($($oldest.PID)). Select a row to stop a toolkit-owned child process."
+            }
+            else{
+                $script:ActivityDetailLabel.Text = "No toolkit child processes are currently running. Gauges continue to show local system activity."
+            }
+        }
     }
     catch {
         if($script:ActivityStatusLabel){ $script:ActivityStatusLabel.Text = "Activity refresh failed: $($_.Exception.Message)" }
@@ -13236,13 +13246,14 @@ function Build-ToolkitActivityPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.RowCount = 4
+    $layout.RowCount = 5
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,128))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,230))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,52))) | Out-Null
     $Page.Controls.Add($layout)
 
     $gaugeLayout = New-Object System.Windows.Forms.TableLayoutPanel
@@ -13286,19 +13297,47 @@ function Build-ToolkitActivityPage {
     $ActivityGrid.Columns["CommandLine"].FillWeight = 33
     $layout.Controls.Add($ActivityGrid,0,2)
 
-    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons = New-Object System.Windows.Forms.TableLayoutPanel
     $buttons.Dock = "Fill"
-    $buttons.Padding = New-Object System.Windows.Forms.Padding(8)
+    $buttons.ColumnCount = 4
+    $buttons.RowCount = 1
+    $buttons.Padding = New-Object System.Windows.Forms.Padding(0,4,0,4)
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,10))) | Out-Null
+    $buttons.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
     $layout.Controls.Add($buttons,0,3)
-    [void]$buttons.Controls.Add((New-GUIButton "Refresh Now" { Refresh-GUIToolkitActivity }))
-    [void]$buttons.Controls.Add((New-GUIButton "Stop Selected" { Stop-GUISelectedToolkitActivityProcess }))
+
+    $refreshButton = New-GUIButton "Refresh" { Refresh-GUIToolkitActivity }
+    $refreshButton.Dock = "Fill"
+    Set-GUIButtonChrome -Button $refreshButton -Compact
+    [void]$buttons.Controls.Add($refreshButton,1,0)
+
+    $stopButton = New-GUIButton "Stop" { Stop-GUISelectedToolkitActivityProcess }
+    $stopButton.Dock = "Fill"
+    Set-GUIButtonChrome -Button $stopButton -Compact
+    [void]$buttons.Controls.Add($stopButton,3,0)
+
+    $detailPanel = New-Object System.Windows.Forms.Panel
+    $detailPanel.Dock = "Fill"
+    $detailPanel.Margin = New-Object System.Windows.Forms.Padding(0,4,0,0)
+    $detailPanel.Padding = New-Object System.Windows.Forms.Padding(12,8,12,8)
+    $detailPanel.BackColor = $script:GUITheme.Shell
+    $layout.Controls.Add($detailPanel,0,4)
+
+    $script:ActivityDetailLabel = New-GUILabel "Activity details will appear here."
+    $ActivityDetailLabel.Dock = "Top"
+    $ActivityDetailLabel.Height = 44
+    $ActivityDetailLabel.ForeColor = $script:GUITheme.MutedText
+    $ActivityDetailLabel.TextAlign = "MiddleLeft"
+    $detailPanel.Controls.Add($ActivityDetailLabel)
 
     Refresh-GUIToolkitActivity
     if($script:ActivityRefreshTimer){
         try { $script:ActivityRefreshTimer.Stop(); $script:ActivityRefreshTimer.Dispose() } catch {}
     }
     $timer = New-Object System.Windows.Forms.Timer
-    $timer.Interval = 3000
+    $timer.Interval = 5000
     $timer.Add_Tick({ Refresh-GUIToolkitActivity })
     $script:ActivityRefreshTimer = $timer
     $timer.Start()

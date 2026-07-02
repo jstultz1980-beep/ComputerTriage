@@ -90,3 +90,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0080 | 2026-07-02 | TASK-0037 | UI | +1 | Added a Network gauge to the Activity page alongside CPU, RAM, and Disk gauges. |
 | CHG-0081 | 2026-07-02 | TASK-0037 | Documentation | +1 | Updated Activity task, handoff, changelog, and validation notes for the Network gauge addition. |
 | CHG-0082 | 2026-07-02 | TASK-0037 | Task System | +1 | Activated TASK-0037 after the UI audit gate cleared and recorded partial Activity page progress. |
+| CHG-0083 | 2026-07-02 | TASK-0037 | UI | +1 | Compact Activity page process list, controls, detail panel, and refresh interval. |
+| CHG-0084 | 2026-07-02 | TASK-0037 | Documentation | +1 | Updated TASK-0037 completion notes, handoff, changelog, and validation evidence. |
+| CHG-0085 | 2026-07-02 | TASK-0037 | Task System | +1 | Completed TASK-0037 and activated TASK-0030 as the next focused GUI task. |

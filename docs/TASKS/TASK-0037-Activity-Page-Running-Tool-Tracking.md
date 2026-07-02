@@ -1,7 +1,7 @@
 # TASK-0037 - Activity Page Running Tool Tracking
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -25,10 +25,10 @@ Make the Activity page a compact live view of toolkit-owned running work, includ
 
 ## Acceptance Criteria
 - [x] Activity page includes network visibility in the live status area.
-- [ ] Running-program list is shorter and leaves room for other status content.
-- [ ] Refresh and Stop controls are compact and visually consistent with the toolkit style.
-- [ ] Activity refresh does not freeze the UI.
-- [ ] PowerShell parse, smoke, and button-smoke validation pass.
+- [x] Running-program list is shorter and leaves room for other status content.
+- [x] Refresh and Stop controls are compact and visually consistent with the toolkit style.
+- [x] Activity refresh does not freeze the UI.
+- [x] PowerShell parse, smoke, and button-smoke validation pass.
 
 ## Work Log
 
@@ -48,3 +48,26 @@ Issues:
 ## Current Notes
 - Activity now shows CPU, RAM, Disk, and Network gauges.
 - The Network gauge uses Windows network-interface performance counters and displays current utilization plus Mbps detail when available.
+- The running-process list is fixed-height instead of consuming all remaining vertical space.
+- Refresh and Stop controls are compact and right-aligned.
+- Activity refresh interval is 5 seconds to reduce UI churn.
+
+### Entry 002
+Author: Codex
+Date: 2026-07-02
+Files Changed:
+- `App/ToolKit-GUI/ToolKit-GUI.ps1`
+- `docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md`
+Validation Performed:
+- Parsed `App/ToolKit-GUI/ToolKit-GUI.ps1` with the PowerShell parser.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -SmokeTest`.
+- Ran `powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Computer_Toolkit\App\NetworkToolkit.ps1 -ButtonSmokeTest`.
+Issues:
+- None.
+
+## Completion Notes
+- Added Network visibility to the Activity gauge row.
+- Reduced the running-program list to a fixed-height table.
+- Added a small details/status panel under the list.
+- Replaced large action controls with compact `Refresh` and `Stop` buttons.
+- Increased the Activity refresh interval from 3 seconds to 5 seconds.

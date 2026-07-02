@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-02
+- Completed TASK-0037 Activity Page Running Tool Tracking.
+- Made the Activity running-process list fixed-height so it no longer dominates the page.
+- Added a compact Activity detail panel and smaller right-aligned `Refresh` / `Stop` controls.
+- Increased the Activity refresh interval from 3 seconds to 5 seconds to reduce UI churn.
+- Activated TASK-0030 Print Tab Data Path Cleanup as the next focused GUI task.
 - Completed TASK-0041 UI Counter Audit and reset the audited UI counter.
 - Activated TASK-0037 Activity Page Running Tool Tracking.
 - Added a Network gauge to the Activity page alongside CPU, RAM, and Disk.
