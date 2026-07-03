@@ -111,3 +111,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0101 | 2026-07-03 | TASK-0042 | Documentation | reset to 0 / 10 | Completed the required Documentation Counter Audit and reset only the audited Documentation counter. |
 | CHG-0102 | 2026-07-03 | TASK-0042 | Task System | +1 | Completed TASK-0042, reactivated TASK-0032, and added queued follow-up tasks for client-data transfer and GUI tab performance hardening. |
 | CHG-0103 | 2026-07-03 | TASK-0042 | Roadmap/Backlog | +1 | Added client-data transfer and GUI tab performance hardening to the implementation backlog. |
+| CHG-0104 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Task System | +1 | Mapped the latest punch-list requests to existing tasks and created focused follow-up tasks for print, triage, and status-bar cleanup. |
+| CHG-0105 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Documentation | +1 | Added the outstanding task audit and updated task scopes for duplicate/refined punch-list items. |
+| CHG-0106 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Roadmap/Backlog | +1 | Added print, triage, and status-bar cleanup work to the queued UI backlog. |

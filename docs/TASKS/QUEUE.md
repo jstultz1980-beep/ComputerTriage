@@ -25,6 +25,9 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` | Codex | Queued | Implement accepted Software tab separation between launchable apps and installable stored programs. |
 | `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
 | `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Queued | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
+| `TASK-0045-Print-Page-Polish` | Codex | Queued | Remove print-page clutter and fix clipped print controls. |
+| `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` | Codex | Queued | Simplify Triage actions, clean the catalog, and make bundle names easier to identify. |
+| `TASK-0047-Status-Bar-WiFi-And-Chrome-Cleanup` | Codex | Queued | Add status-bar Wi-Fi strength and remove or clarify unused bottom-right chrome. |
 
 ## Completed / Historical
 

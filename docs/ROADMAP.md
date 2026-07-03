@@ -123,6 +123,7 @@ Current UI work:
 - TASK-0032 is active for Computer tab summary redesign.
 - TASK-0043 is queued for transferring client diagnostic data between toolkit copies.
 - TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
+- TASK-0045 through TASK-0047 are queued for Print page polish, Triage catalog/bundle cleanup, and status-bar Wi-Fi/chrome cleanup.
 
 ## Phase 10 - Release Hardening
 Status: Planned

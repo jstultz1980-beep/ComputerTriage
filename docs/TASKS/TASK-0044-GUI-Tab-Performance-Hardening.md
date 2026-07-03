@@ -14,6 +14,7 @@ The Activity tab renders faster than most pages after the first load, but the fi
 
 ## Scope
 - Profile first-load cost for the Activity page.
+- Specifically address the first-time Activity tab lag reported during testing.
 - Profile tab-switch cost across high-lag tabs.
 - Ensure timers, background refreshes, WMI calls, performance counters, and discovery refreshes only run when needed.
 - Defer expensive page population until visible and cache safe static UI where practical.

@@ -52,8 +52,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 0 / 10 | No |
-| Task System | 8 / 10 | No |
+| Documentation | 1 / 10 | No |
+| Task System | 9 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -61,7 +61,7 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 7 / 10 | No |
+| Roadmap/Backlog | 8 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -91,6 +91,9 @@ Queued implementation/design work:
 - TASK-0040 Software Tab Launchable And Installable Implementation.
 - TASK-0043 Client Data Transfer.
 - TASK-0044 GUI Tab Performance Hardening.
+- TASK-0045 Print Page Polish.
+- TASK-0046 Triage Page Catalog And Bundle Cleanup.
+- TASK-0047 Status Bar Wi-Fi And Chrome Cleanup.
 
 ## Active Task
 `TASK-0032-Computer-Tab-Summary-Redesign`
@@ -111,6 +114,9 @@ Scope summary:
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
 - `TASK-0044-GUI-Tab-Performance-Hardening` owned by Codex.
+- `TASK-0045-Print-Page-Polish` owned by Codex.
+- `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` owned by Codex.
+- `TASK-0047-Status-Bar-WiFi-And-Chrome-Cleanup` owned by Codex.
 
 ## Validation Completed For This Update
 - Completed TASK-0042 Documentation Counter Audit.
@@ -119,6 +125,13 @@ Scope summary:
 - Reactivated TASK-0032 as the next focused implementation task.
 - Added TASK-0043 for client-data transfer between toolkit copies.
 - Added TASK-0044 for Activity first-load and tab-switch performance hardening.
+- Added the 2026-07-03 outstanding task audit for the latest punch-list.
+- Updated TASK-0032 with the refined Computer tab layout request.
+- Updated TASK-0038 with Settings/Help header-control cleanup.
+- Updated TASK-0044 with the first-time Activity tab lag report.
+- Added TASK-0045 for Print page polish.
+- Added TASK-0046 for Triage page catalog and bundle cleanup.
+- Added TASK-0047 for status-bar Wi-Fi and bottom-right chrome cleanup.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
@@ -159,12 +172,16 @@ Current task state:
 - TASK-0042 completed the Documentation Counter Audit and reset the audited Documentation counter.
 - TASK-0043 is queued for client-data transfer between toolkit copies.
 - TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
+- TASK-0045 through TASK-0047 are queued for Print, Triage, and status-bar cleanup.
+- Task System counter is now `9 / 10`; avoid unnecessary task-state churn.
 
 Your job:
 Execute TASK-0032 only.
 
 Scope:
 - Replace the Computer tab profile list with a current-computer summary.
+- Make the current-computer summary larger and more useful.
+- Reduce the profile table to approximately three visible rows rather than letting it dominate the tab.
 - Preserve a compact action for opening/viewing the HTML profile report.
 - Add Green/Yellow/Red LED-style bulbs beside summary fields that can have status.
 - Use an unlit/neutral bulb when the area has not been scanned.
