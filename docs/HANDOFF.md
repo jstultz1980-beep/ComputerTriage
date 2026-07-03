@@ -52,12 +52,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 1 / 10 | No |
+| Documentation | 2 / 10 | No |
 | Task System | 9 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 7 / 10 | No |
+| UI | 8 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
@@ -78,7 +78,7 @@ Recently completed work:
 - TASK-0042 completed the mandatory Documentation Counter Audit and reset the audited Documentation counter.
 
 Current active work:
-- TASK-0032 is active for Computer tab summary redesign.
+- TASK-0032 is active for Computer tab summary redesign and is awaiting user visual validation.
 
 Queued implementation/design work:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
@@ -132,6 +132,8 @@ Scope summary:
 - Added TASK-0045 for Print page polish.
 - Added TASK-0046 for Triage page catalog and bundle cleanup.
 - Added TASK-0047 for status-bar Wi-Fi and bottom-right chrome cleanup.
+- Implemented the TASK-0032 Computer tab summary redesign pass.
+- Validated GUI PowerShell parse, toolkit smoke, and button-smoke checks.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers

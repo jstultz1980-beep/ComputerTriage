@@ -1272,6 +1272,74 @@ function Set-GUIToolLaunchLed {
     $Control.Invalidate()
 }
 
+function Set-GUISummaryStatusLed {
+    param([System.Windows.Forms.Control]$Control)
+
+    if(!$Control){
+        return
+    }
+
+    $Control.BackColor = $script:GUITheme.Page
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked" -and $Control.Tag.PaintHooked){
+        $Control.Invalidate()
+        return
+    }
+
+    if($Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "PaintHooked"){
+        $Control.Tag.PaintHooked = $true
+    }
+
+    $Control.Add_Paint({
+        param($sender,$eventArgs)
+        try {
+            $graphics = $eventArgs.Graphics
+            $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+            $state = "Unknown"
+            if($sender.Tag -and $sender.Tag.PSObject.Properties.Name -contains "State"){
+                $state = [string]$sender.Tag.State
+            }
+
+            $coreColor = switch($state){
+                "Ok" { [System.Drawing.Color]::FromArgb(38,185,118) }
+                "Warning" { [System.Drawing.Color]::FromArgb(230,176,50) }
+                "Critical" { [System.Drawing.Color]::FromArgb(215,75,62) }
+                default { [System.Drawing.Color]::FromArgb(150,158,166) }
+            }
+            $alpha = if($state -eq "Unknown"){85}else{235}
+            $haloAlpha = if($state -eq "Unknown"){35}else{95}
+            $haloColor = [System.Drawing.Color]::FromArgb($haloAlpha,$coreColor.R,$coreColor.G,$coreColor.B)
+            $litColor = [System.Drawing.Color]::FromArgb($alpha,$coreColor.R,$coreColor.G,$coreColor.B)
+
+            $size = [Math]::Min($sender.Width - 4,$sender.Height - 4)
+            if($size -lt 6){ return }
+            $x = [int](($sender.Width - $size) / 2)
+            $y = [int](($sender.Height - $size) / 2)
+            $rect = New-Object System.Drawing.Rectangle($x,$y,$size,$size)
+            $inner = New-Object System.Drawing.Rectangle(($x + 4),($y + 4),($size - 8),($size - 8))
+            $spark = New-Object System.Drawing.Rectangle(($inner.X + 3),($inner.Y + 3),[Math]::Max(3,[int]($inner.Width / 3)),[Math]::Max(3,[int]($inner.Height / 3)))
+
+            $halo = New-Object System.Drawing.SolidBrush($haloColor)
+            $core = New-Object System.Drawing.SolidBrush($litColor)
+            $shine = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb($(if($state -eq "Unknown"){70}else{190}),255,255,255))
+            $border = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(130,$coreColor.R,$coreColor.G,$coreColor.B),1)
+            try {
+                $graphics.FillEllipse($halo,$rect)
+                $graphics.FillEllipse($core,$inner)
+                $graphics.DrawEllipse($border,$inner)
+                $graphics.FillEllipse($shine,$spark)
+            }
+            finally {
+                $halo.Dispose()
+                $core.Dispose()
+                $shine.Dispose()
+                $border.Dispose()
+            }
+        }
+        catch {}
+    })
+    $Control.Invalidate()
+}
+
 function Set-GUIElevationCrownIcon {
     param([System.Windows.Forms.Control]$Control)
 
@@ -1354,6 +1422,9 @@ function Apply-GUIThemeToControl {
     }
     elseif($Control -is [System.Windows.Forms.Panel] -and $Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "ToolLaunchLed"){
         Set-GUIToolLaunchLed -Control $Control
+    }
+    elseif($Control -is [System.Windows.Forms.Panel] -and $Control.Tag -and $Control.Tag.PSObject.Properties.Name -contains "Visual" -and $Control.Tag.Visual -eq "SummaryStatusLed"){
+        Set-GUISummaryStatusLed -Control $Control
     }
     elseif($Control -is [System.Windows.Forms.TabPage]){
         $Control.BackColor = $script:GUITheme.Page
@@ -2300,17 +2371,47 @@ function Get-GUIPrimaryDiskSummary {
     return $name
 }
 
+function Get-GUIPrimaryDiskStatus {
+    param([object]$Profile)
+
+    if(!$Profile -or !$Profile.Disks){
+        return "Unknown"
+    }
+
+    $disk = @($Profile.Disks | Sort-Object {
+        if($_.DeviceID -eq "C:"){0}else{1}
+    }) | Select-Object -First 1
+
+    if(!$disk -or !$disk.SizeGB -or !$disk.FreeGB){
+        return "Unknown"
+    }
+
+    $freePct = if([double]$disk.SizeGB -gt 0){ ([double]$disk.FreeGB / [double]$disk.SizeGB) * 100 }else{ 0 }
+    if($freePct -lt 10){ return "Critical" }
+    if($freePct -lt 20){ return "Warning" }
+    return "Ok"
+}
+
 function Get-GUIPrimaryAdapterSummary {
     param([object]$Profile)
 
     $adapter = $null
-    if($Profile -and $Profile.MACs){
+    if($Profile -and $Profile.NetworkAdapters){
+        $adapter = @($Profile.NetworkAdapters | Where-Object { $_.IPv4 } | Select-Object -First 1)
+    }
+    elseif($Profile -and $Profile.MACs){
         $adapter = @($Profile.MACs | Where-Object { $_.Status -eq "Up" } | Select-Object -First 1)
     }
 
     if($adapter){
-        $name = Format-GUIEmptyValue -Value $adapter.Name -Fallback "Adapter"
+        $name = Format-GUIEmptyValue -Value $(if($adapter.Interface){$adapter.Interface}else{$adapter.Name}) -Fallback "Adapter"
+        $ipv4 = Format-GUIEmptyValue -Value $adapter.IPv4 -Fallback ""
         $speed = Format-GUIEmptyValue -Value $adapter.LinkSpeed -Fallback ""
+        if($ipv4){
+            $dns = Format-GUIEmptyValue -Value $adapter.DNS -Fallback ""
+            if($dns){ return "$name $ipv4 DNS $dns" }
+            return "$name $ipv4"
+        }
         if($speed){
             return "$name ($speed)"
         }
@@ -2323,6 +2424,71 @@ function Get-GUIPrimaryAdapterSummary {
     }
 
     return "Unknown"
+}
+
+function Get-GUIStatusStateFromBool {
+    param(
+        [object]$Value,
+        [string]$TrueState = "Warning",
+        [string]$FalseState = "Ok"
+    )
+
+    if($null -eq $Value){
+        return "Unknown"
+    }
+
+    if(ConvertTo-GUIBoolean $Value){
+        return $TrueState
+    }
+
+    return $FalseState
+}
+
+function Get-GUIDefenderSummary {
+    param([object]$Profile)
+
+    if(!$Profile -or !$Profile.Defender){
+        return "Unknown"
+    }
+
+    $realTime = ConvertTo-GUIBoolean $Profile.Defender.RealTimeProtectionEnabled -Default $false
+    $av = ConvertTo-GUIBoolean $Profile.Defender.AntivirusEnabled -Default $false
+    if($realTime -and $av){
+        return "Defender real-time protection enabled"
+    }
+    if($av){
+        return "Defender AV enabled; real-time protection not confirmed"
+    }
+    return "Defender not enabled"
+}
+
+function Get-GUIDefenderStatus {
+    param([object]$Profile)
+
+    if(!$Profile -or !$Profile.Defender){
+        return "Unknown"
+    }
+
+    $realTime = ConvertTo-GUIBoolean $Profile.Defender.RealTimeProtectionEnabled -Default $false
+    $av = ConvertTo-GUIBoolean $Profile.Defender.AntivirusEnabled -Default $false
+    if($realTime -and $av){ return "Ok" }
+    if($av){ return "Warning" }
+    return "Critical"
+}
+
+function Get-GUISecurityProductsSummary {
+    param([object]$Profile)
+
+    if(!$Profile -or !$Profile.SecurityProducts){
+        return "Unknown"
+    }
+
+    $products = @($Profile.SecurityProducts | ForEach-Object { Format-GUIEmptyValue -Value $_.Name -Fallback "" } | Where-Object { $_ })
+    if($products.Count -eq 0){
+        return "No security product inventory"
+    }
+
+    return ($products | Select-Object -First 3) -join ", "
 }
 
 function Get-GUIQuickDiagnosisSummaryValue {
@@ -8204,8 +8370,8 @@ function Build-FingerprintPage {
     $layout.RowCount = 3
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,184))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,98))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -8218,20 +8384,32 @@ function Build-FingerprintPage {
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
     $summary.Dock = "Fill"
     $summary.ColumnCount = 6
-    $summary.RowCount = 5
-    $summary.Padding = New-Object System.Windows.Forms.Padding(12)
-    for($i=0; $i -lt 3; $i++){
-        $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
-        $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
+    $summary.RowCount = 10
+    $summary.Padding = New-Object System.Windows.Forms.Padding(14,14,14,10)
+    foreach($width in @(24,112,50,24,112,50)){
+        if($width -eq 50){
+            $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+        }
+        else{
+            $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,$width))) | Out-Null
+        }
     }
-    for($i=0; $i -lt 5; $i++){
-        $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,20))) | Out-Null
+    for($i=0; $i -lt 10; $i++){
+        $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
     }
     $summaryGroup.Controls.Add($summary)
 
     $profile = Get-GUILatestComputerProfile
-    $pendingText = if($profile -and $profile.PendingReboot -and (ConvertTo-GUIBoolean $profile.PendingReboot.Pending)){"Pending reboot"}else{"No pending reboot"}
-    $healthText = if($profile){ Get-GUIComputerHealthSummaryText -Profile $profile }else{ "No profile yet" }
+    $healthSummary = Get-GUIComputerHealthSummary -Profile $profile
+    $healthText = if($profile){ $healthSummary.Text }else{ "No profile yet" }
+    $healthState = switch($healthSummary.Level){
+        "Healthy" { "Ok" }
+        "Review" { "Warning" }
+        "Needs Attention" { "Critical" }
+        default { "Unknown" }
+    }
+    $pendingState = if($profile -and $profile.PendingReboot){ Get-GUIStatusStateFromBool -Value $profile.PendingReboot.Pending -TrueState "Warning" -FalseState "Ok" }else{ "Unknown" }
+    $pendingText = if($pendingState -eq "Warning"){"Pending reboot"}elseif($pendingState -eq "Ok"){"No pending reboot"}else{"Unknown"}
     $osText = if($profile){ "{0} build {1}" -f (Format-GUIEmptyValue $profile.OS),(Format-GUIEmptyValue $profile.OSBuild) }else{ "No profile yet" }
     $modelText = if($profile){ "{0} {1}" -f (Format-GUIEmptyValue $profile.Manufacturer),(Format-GUIEmptyValue $profile.Model) }else{ "No profile yet" }
     $cpuText = if($profile){ "{0} ({1}C/{2}T)" -f (Format-GUIEmptyValue $profile.CPU),(Format-GUIEmptyValue $profile.Cores),(Format-GUIEmptyValue $profile.LogicalProcessors) }else{ "No profile yet" }
@@ -8243,26 +8421,57 @@ function Build-FingerprintPage {
     }else{
         "Unknown"
     }
+    $servicingState = if($profile -and $profile.ServicingHealth){ Get-GUIStatusStateFromBool -Value $profile.ServicingHealth.FollowUpDismSfc -TrueState "Warning" -FalseState "Ok" }else{ "Unknown" }
+    $capturedText = if($profile){ Format-GUIProfileDateTime -Value $profile.CapturedAt }else{ "No profile yet" }
+    $networkText = Get-GUIPrimaryAdapterSummary -Profile $profile
+    $diskText = Get-GUIPrimaryDiskSummary -Profile $profile
+    $diskState = Get-GUIPrimaryDiskStatus -Profile $profile
+    $defenderText = Get-GUIDefenderSummary -Profile $profile
+    $defenderState = Get-GUIDefenderStatus -Profile $profile
+    $securityProductsText = Get-GUISecurityProductsSummary -Profile $profile
+    $domainText = if($profile -and $profile.Domain){ Format-GUIEmptyValue $profile.Domain }else{ (Get-GUIDashboardInfo).Domain }
+    $userText = if($profile -and $profile.UserName){ Format-GUIEmptyValue $profile.UserName }else{ [System.Security.Principal.WindowsIdentity]::GetCurrent().Name }
+    $bitLockerText = if($profile -and $profile.BitLocker){ Format-GUIEmptyValue $profile.BitLocker }else{ "Unknown" }
+    $firewallText = if($profile -and $profile.FirewallProfiles){ (@($profile.FirewallProfiles | ForEach-Object { "{0}:{1}" -f $_.Name,$_.Enabled }) -join ", ") }else{ "Unknown" }
+    $timeText = if($profile -and $profile.TimeSource){ Format-GUIEmptyValue $profile.TimeSource }else{ "Unknown" }
     $summaryItems = @(
-        @{ Label="Computer"; Value=$env:COMPUTERNAME },
-        @{ Label="Domain"; Value=(Get-GUIDashboardInfo).Domain },
-        @{ Label="Serial"; Value=$(if($profile){Format-GUIEmptyValue $profile.SerialNumber}else{"Unknown"}) },
-        @{ Label="Health"; Value=$healthText },
-        @{ Label="Quick Diag"; Value=Get-GUIQuickDiagnosisSummaryValue },
-        @{ Label="Reboot"; Value=$pendingText },
-        @{ Label="OS"; Value=$osText },
-        @{ Label="PowerShell"; Value=$(if($profile){Format-GUIEmptyValue $profile.PowerShell}else{$PSVersionTable.PSVersion.ToString()}) },
-        @{ Label="Servicing"; Value=$servicingText },
-        @{ Label="Model"; Value=$modelText },
-        @{ Label="CPU"; Value=$cpuText },
-        @{ Label="Memory"; Value=$memoryText },
-        @{ Label="Disk"; Value=Get-GUIPrimaryDiskSummary -Profile $profile },
-        @{ Label="Network"; Value=Get-GUIPrimaryAdapterSummary -Profile $profile },
-        @{ Label="Boot/Uptime"; Value="$lastBootText / $uptimeText" }
+        @{ Label="Computer"; Value=$env:COMPUTERNAME; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Health"; Value=$healthText; State=$healthState },
+        @{ Label="Domain"; Value=$domainText; State=$(if($domainText -and $domainText -ne "Unavailable"){"Ok"}else{"Unknown"}) },
+        @{ Label="User"; Value=$userText; State=$(if($userText){"Ok"}else{"Unknown"}) },
+        @{ Label="Last Profile"; Value=$capturedText; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Quick Dx"; Value=Get-GUIQuickDiagnosisSummaryValue; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="OS"; Value=$osText; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Model"; Value=$modelText; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Serial"; Value=$(if($profile){Format-GUIEmptyValue $profile.SerialNumber}else{"Unknown"}); State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="CPU"; Value=$cpuText; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Memory"; Value=$memoryText; State=$(if($profile -and $profile.MemoryGB){"Ok"}else{"Unknown"}) },
+        @{ Label="Boot/Uptime"; Value="$lastBootText / $uptimeText"; State=$(if($profile){"Ok"}else{"Unknown"}) },
+        @{ Label="Reboot"; Value=$pendingText; State=$pendingState },
+        @{ Label="Servicing"; Value=$servicingText; State=$servicingState },
+        @{ Label="Disk"; Value=$diskText; State=$diskState },
+        @{ Label="Network"; Value=$networkText; State=$(if($networkText -and $networkText -ne "Unknown"){"Ok"}else{"Unknown"}) },
+        @{ Label="Defender"; Value=$defenderText; State=$defenderState },
+        @{ Label="Security"; Value=$securityProductsText; State=$(if($securityProductsText -and $securityProductsText -ne "Unknown" -and $securityProductsText -ne "No security product inventory"){"Ok"}elseif($securityProductsText -eq "No security product inventory"){"Warning"}else{"Unknown"}) },
+        @{ Label="Firewall"; Value=$firewallText; State=$(if($firewallText -and $firewallText -ne "Unknown"){"Ok"}else{"Unknown"}) },
+        @{ Label="BitLocker"; Value=$bitLockerText; State=$(if($bitLockerText -and $bitLockerText -ne "Unknown"){"Ok"}else{"Unknown"}) },
+        @{ Label="Time Source"; Value=$timeText; State=$(if($timeText -and $timeText -ne "Unknown"){"Ok"}else{"Unknown"}) },
+        @{ Label="PowerShell"; Value=$(if($profile){Format-GUIEmptyValue $profile.PowerShell}else{$PSVersionTable.PSVersion.ToString()}); State="Ok" }
     )
 
     $cellIndex = 0
     foreach($item in $summaryItems){
+        $led = New-Object System.Windows.Forms.Panel
+        $led.Width = 20
+        $led.Height = 20
+        $led.Margin = New-Object System.Windows.Forms.Padding(0,3,4,3)
+        $led.Tag = [pscustomobject]@{
+            Visual = "SummaryStatusLed"
+            State = $item.State
+            PaintHooked = $false
+        }
+        Set-GUISummaryStatusLed -Control $led
+
         $label = New-Object System.Windows.Forms.Label
         $label.Text = $item.Label
         $label.Dock = "Fill"
@@ -8279,12 +8488,15 @@ function Build-FingerprintPage {
         $value.Font = New-Object System.Drawing.Font("Segoe UI",8.75)
         $value.ForeColor = $script:GUITheme.Text
 
-        $row = [math]::Floor($cellIndex / 3)
-        $column = ($cellIndex % 3) * 2
-        $summary.Controls.Add($label,$column,$row)
-        $summary.Controls.Add($value,($column + 1),$row)
+        $row = [math]::Floor($cellIndex / 2)
+        if($row -ge 10){ break }
+        $column = ($cellIndex % 2) * 3
+        $summary.Controls.Add($led,$column,$row)
+        $summary.Controls.Add($label,($column + 1),$row)
+        $summary.Controls.Add($value,($column + 2),$row)
         if($script:ToolTip){
             $script:ToolTip.SetToolTip($value,[string]$item.Value)
+            $script:ToolTip.SetToolTip($led,("{0}: {1}" -f $item.Label,$item.State))
         }
         $cellIndex++
     }
@@ -8300,6 +8512,8 @@ function Build-FingerprintPage {
     $FingerprintGrid.AutoSizeColumnsMode = "Fill"
     $FingerprintGrid.BackgroundColor = [System.Drawing.Color]::White
     $FingerprintGrid.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10)
+    $FingerprintGrid.RowTemplate.Height = 22
+    $FingerprintGrid.ColumnHeadersHeight = 24
     $layout.Controls.Add($FingerprintGrid,0,1)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel

@@ -48,10 +48,26 @@ Redesign the Computer tab around a useful current-computer summary, with the pro
 - Untracked `App/NetworkToolkit/LatencyMon/`.
 
 ## Acceptance Criteria
-- [ ] Computer profile table is reduced to approximately three visible rows.
-- [ ] Current Computer Summary uses the available tab space well.
-- [ ] Latest HTML profile report is still reachable from a small button.
-- [ ] The Computer tab shows more useful current-machine detail than the old profile list view.
-- [ ] Status-bearing fields have LED-style indicators.
-- [ ] Unknown/unscanned indicators render as unlit/off.
-- [ ] PowerShell parse, smoke, and button-smoke validation pass.
+- [x] Computer profile table is reduced to approximately three visible rows.
+- [x] Current Computer Summary uses the available tab space well.
+- [x] Latest HTML profile report is still reachable from a small button.
+- [x] The Computer tab shows more useful current-machine detail than the old profile list view.
+- [x] Status-bearing fields have LED-style indicators.
+- [x] Unknown/unscanned indicators render as unlit/off.
+- [x] PowerShell parse, smoke, and button-smoke validation pass.
+- [ ] User visual validation confirms the Computer tab layout is acceptable at normal and minimum toolkit sizes.
+
+## Work Log
+- Reflowed the Computer tab so the Current Computer Summary owns the flexible vertical space.
+- Reduced the recent profile table to a small supporting strip with approximately three visible rows.
+- Added compact LED-style status indicators for summary fields that can have status.
+- Added additional high-value summary fields including last profile time, user, reboot, servicing, Defender, security products, firewall, BitLocker, time source, disk, and network.
+- Updated the network summary helper to support the current `NetworkAdapters` profile shape as well as the older `MACs` shape.
+- Validated PowerShell parse, GUI smoke, and button-smoke checks.
+
+## Test This
+- Open the Computer tab at normal toolkit size and verify the summary is the main focus.
+- Confirm the recent profile table shows only a few rows and does not dominate the tab.
+- Confirm the `View`, `Create Profile`, `Delete`, and `Refresh` buttons still appear and fit.
+- Run or refresh a computer profile, then confirm LEDs update meaningfully for health, reboot, servicing, disk, Defender, security, firewall, and network.
+- Resize the toolkit to its smallest usable size and verify labels/buttons do not clip badly.

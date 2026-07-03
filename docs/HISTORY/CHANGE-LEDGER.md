@@ -114,3 +114,5 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0104 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Task System | +1 | Mapped the latest punch-list requests to existing tasks and created focused follow-up tasks for print, triage, and status-bar cleanup. |
 | CHG-0105 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Documentation | +1 | Added the outstanding task audit and updated task scopes for duplicate/refined punch-list items. |
 | CHG-0106 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Roadmap/Backlog | +1 | Added print, triage, and status-bar cleanup work to the queued UI backlog. |
+| CHG-0107 | 2026-07-03 | TASK-0032 | UI | +1 | Reworked the Computer tab so the summary owns the page, recent profiles are reduced, and status-bearing fields use LED-style indicators. |
+| CHG-0108 | 2026-07-03 | TASK-0032 | Documentation | +1 | Updated TASK-0032 work log, validation notes, changelog, ledger, and handoff for the Computer tab implementation pass. |
