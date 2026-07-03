@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0047
+HANDOFF-0048
 
 ## Current Task
-TASK-0042-Documentation-Counter-Audit
+TASK-0032-Computer-Tab-Summary-Redesign
 
 ## Current Owner
 Codex
@@ -26,10 +26,11 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0037 received a focused Activity timer performance correction. That documentation update brought the Documentation counter to `10 / 10`, so TASK-0042 is now active as the mandatory Documentation Counter Audit.
+TASK-0042 completed the mandatory Documentation Counter Audit after the Documentation counter reached `10 / 10`.
 
-Do not begin new implementation work until TASK-0042 is completed and the Documentation counter is reset.
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas.
+Implementation work may resume under the single active task: TASK-0032 Computer Tab Summary Redesign.
+
+Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
 Do not clean unrelated files.
 Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
@@ -51,8 +52,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 10 / 10 | Yes |
-| Task System | 7 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 8 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
@@ -60,141 +61,68 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 6 / 10 | No |
+| Roadmap/Backlog | 7 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
 Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one active task.
 
-Completed work:
-- TASK-0017 completed validation-only work.
-- TASK-0018 completed HEPHAESTUS Local Analysis Engine v1 design.
-- TASK-0019 completed the minimal HEPHAESTUS Local Analysis Engine v1 implementation slice.
-- TASK-0020 completed the ARGUS input contract ADR/design gate and accepted ADR-0003.
-- TASK-0023 completed the minimal ARGUS foundation slice and generated ARGUS validation, summary, and report artifacts.
-- TASK-0024 through TASK-0027 completed focused GUI/UI corrections without changing the ARGUS design gate.
-- TASK-0035 completed the documentation/task-system audit gate and reset audited counters.
+Recently completed work:
 - TASK-0028 completed focused Quick Dx run-panel cleanup.
 - TASK-0029 completed focused Choco page layout refinement.
 - TASK-0041 completed the UI counter audit and reset the audited UI counter.
 - TASK-0037 completed Activity page running-tool tracking.
 - TASK-0030 completed Print tab data-path cleanup.
 - TASK-0031 completed Triage page simplification.
-- TASK-0042 is now active for the mandatory Documentation Counter Audit.
-- TASK-0032 is queued for Computer tab summary redesign after the audit gate clears.
-- TASK-0033 through TASK-0034 remain queued follow-up tasks for UI/workflow cleanup and embedded-tool planning.
-- TASK-0036, TASK-0038, TASK-0039, and TASK-0040 remain queued follow-up tasks for page health indicators, modern controls, and Software tab separation.
+- TASK-0042 completed the mandatory Documentation Counter Audit and reset the audited Documentation counter.
 
-TASK-0019 validation evidence:
-- `Run Local Analysis` completed successfully.
-- Bundle root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
-- Analysis root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles\Analysis`.
-- Findings: `6`.
-- EvidenceScore: `50`.
-- Required files existed:
-  - `Analysis/findings.json`
-  - `Analysis/timeline.json`
-  - `Analysis/evidence-score.json`
-  - `Analysis/normalized/machine-profile.json`
-  - `Analysis/report.html`
-  - `Metadata/bundle-capabilities.json`
-  - `Metadata/schema-version.json`
-- JSON parse checks passed for findings, evidence score, and bundle capabilities.
-- Smoke test passed: `Network Toolkit GUI loaded successfully. Commands: 18`.
-- Button smoke test passed: `Button smoke test completed. Quick tab: OK`.
+Current active work:
+- TASK-0032 is active for Computer tab summary redesign.
 
-TASK-0035 audit findings:
-- Documentation/task-state source of truth was consistent before closeout.
-- Exactly one task was active before closeout and exactly one task is active after closeout.
-- TASK-0020 is complete.
-- TASK-0023 was queued during the audit and is now active after the audit gate cleared.
-- No ARGUS implementation was added by TASK-0020.
-- No HEPHAESTUS code was modified by TASK-0020.
-- No application code was modified by TASK-0035.
-- Documentation and Task System counters were audited and reset.
-
-TASK-0023 validation evidence:
-- `Invoke-ARGUSFoundationAnalysis` completed successfully against `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles`.
-- ARGUS output root: `C:\Computer_Toolkit\App\NetworkToolkit\Exports\AI-Bundles\ARGUS`.
-- Generated files:
-  - `ARGUS/input-validation.json`
-  - `ARGUS/analysis-summary.json`
-  - `ARGUS/report.md`
-- Input validation status was `limited`, which is expected with partial HEPHAESTUS capability coverage.
-- Required artifact count: `6`.
-- Unsupported area count: `4`.
-- Prioritized deterministic findings count: `5`.
-- ARGUS inference was explicitly labeled as `argusInference`.
-- Parser checks passed for `Core\Argus\ArgusFoundation.ps1` and `App\NetworkToolkit\Core\ArgusFoundationCommand.ps1`.
-- Console load passed with exit code `0`.
-- Command registry found `Run ARGUS Foundation` with Id `argus-foundation`, Category `Analyze`, Source `ARGUS`, Order `45`.
-- CLI smoke run of `Run ARGUS Foundation` completed successfully.
-
-TASK-0028 validation evidence:
-- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
-- Confirmed the visible `Internet targets`, `Internet test target`, and `QuickInternetTargetsLabel` UI strings no longer exist in the GUI file.
-- Confirmed `Get-GUIQuickDiagnosisTargets` still returns `www.microsoft.com`, `google.com`, `yahoo.com`, and `amazon.com`.
-- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
-- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
-
-TASK-0029 validation evidence:
-- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
-- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
-- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
-- The Choco status area was reduced to a compact strip.
-- Choco status actions were restored as compact buttons instead of link-style controls.
-
-TASK-0037 validation evidence:
-- Parsed `App\ToolKit-GUI\ToolKit-GUI.ps1` successfully with the PowerShell parser.
-- GUI smoke passed: `Network Toolkit GUI loaded successfully. Commands: 19`.
-- Button smoke passed: `Button smoke test completed. Quick tab: OK`.
-- Activity now shows CPU, RAM, Disk, and Network gauges.
-- The Network gauge uses Windows network-interface performance counters and displays Mbps detail when available.
-- The running-process list is fixed-height, the Activity detail panel is visible, and `Refresh` / `Stop` controls are compact.
-- Activity refresh interval is 5 seconds.
+Queued implementation/design work:
+- TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- TASK-0022 HEPHAESTUS Portable Tool Classification.
+- TASK-0033 Directory Tab Direction And Embedding Plan.
+- TASK-0034 Embedded Tool Experience Roadmap.
+- TASK-0036 Page Health Indicators.
+- TASK-0038 Modern Control Style System.
+- TASK-0039 Software Tab Launchable And Installable Inventory.
+- TASK-0040 Software Tab Launchable And Installable Implementation.
+- TASK-0043 Client Data Transfer.
+- TASK-0044 GUI Tab Performance Hardening.
 
 ## Active Task
-`TASK-0042-Documentation-Counter-Audit`
+`TASK-0032-Computer-Tab-Summary-Redesign`
 
 Scope summary:
-- Verify documentation/task-state consistency after the Documentation counter reached `10 / 10`.
-- Confirm exactly one active task.
-- Reset only the audited Documentation counter to `0 / 10` after the audit completes.
-- Preserve queued implementation work without changing application code.
+- Replace the computer profile list with a richer current-computer summary.
+- Add LED-style status indicators next to status-changing summary items.
+- Preserve profile report access without keeping the old profile list as the main Computer tab experience.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 - `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0032-Computer-Tab-Summary-Redesign` owned by Codex.
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
 - `TASK-0036-Page-Health-Indicators` owned by Codex.
 - `TASK-0038-Modern-Control-Style-System` owned by Codex.
 - `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` owned by ChatGPT.
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
+- `TASK-0043-Client-Data-Transfer` owned by Codex.
+- `TASK-0044-GUI-Tab-Performance-Hardening` owned by Codex.
 
 ## Validation Completed For This Update
-- Reduced tab-to-tab lag by stopping the Activity page refresh timer whenever Activity is not selected.
-- Added `SlowTabSwitch` diagnostic logging for tab switches taking 250 ms or longer.
-- Removed the horizontal scrollbar from Quick Target Checks by enabling wrapped vertical-only output.
-- Successful triage runs now open the bundle folder after the completion prompt.
-- Added the broader request to make embedded consoles behave consistently with Quick Target Checks to queued TASK-0034.
-- Corrected TASK-0031 after review by restoring the compact Triage tool/app catalog table.
-- Tightened the Triage layout and added AI bundle workflow instructions.
-- Completed TASK-0031 Triage page simplification.
-- Rebuilt the Triage page around `Quick Triage` and `Full Triage` as the only primary actions.
-- Restored the normal-view triage tool catalog as a compact status table while keeping the live triage log hidden.
-- Preserved generated outputs, bundle access, backend advanced functions, and triage service behavior.
-- Activated TASK-0042 Documentation Counter Audit because the Documentation counter reached `10 / 10`.
-- Verified `App\ToolKit-GUI\ToolKit-GUI.ps1` parses successfully.
-- Verified Network Toolkit GUI smoke test passes.
-- Verified Network Toolkit button-smoke test passes and the Quick tab reports OK.
-- Verified `App\NetworkToolkit\Tests\Test-TriageService.ps1` passes.
+- Completed TASK-0042 Documentation Counter Audit.
+- Verified `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` had exactly one active task before audit closeout.
+- Reset only the Documentation counter to `0 / 10`.
+- Reactivated TASK-0032 as the next focused implementation task.
+- Added TASK-0043 for client-data transfer between toolkit copies.
+- Added TASK-0044 for Activity first-load and tab-switch performance hardening.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
-Documentation audit gate is active. No new implementation work should start until TASK-0042 is complete and the Documentation counter is reset.
+No audit gate is currently blocking implementation. Known working-tree drift remains excluded unless a future task explicitly owns it.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -204,7 +132,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0037: Reduce tab switch lag
+TASK-0042: Complete documentation counter audit
 ```
 
 ## Next Bot Prompt
@@ -222,37 +150,28 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0042-Documentation-Counter-Audit.md
+7. docs/TASKS/TASK-0032-Computer-Tab-Summary-Redesign.md
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0042-Documentation-Counter-Audit.
+- Active task: TASK-0032-Computer-Tab-Summary-Redesign.
 - Owner: Codex.
-- Documentation counter reached `10 / 10`; no implementation work may begin until this audit is complete.
-- TASK-0031 Triage page simplification is complete.
-- TASK-0030 Print tab data-path cleanup is complete.
-- TASK-0037 Activity page running-tool tracking is complete.
-- TASK-0041 UI counter audit is complete and the UI counter has been reset.
-- TASK-0029 Choco page layout refinement is complete.
-- TASK-0028 Quick Dx compact run-panel cleanup is complete.
-- TASK-0023 ARGUS foundation implementation is complete.
-- TASK-0035 audit is complete and the implementation gate is clear.
+- TASK-0042 completed the Documentation Counter Audit and reset the audited Documentation counter.
+- TASK-0043 is queued for client-data transfer between toolkit copies.
+- TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
 
 Your job:
-Complete TASK-0042 documentation audit only.
+Execute TASK-0032 only.
 
 Scope:
-- Verify docs/HANDOFF.md and docs/TASKS/QUEUE.md agree on exactly one active task.
-- Verify task files, changelog, and change ledger are internally consistent.
-- Confirm TASK-0032 remains queued for implementation after the audit gate clears.
-- Reset only the Documentation counter to 0 / 10 after audit completion.
-- Update docs/TASKS/TASK-0042-Documentation-Counter-Audit.md with work log and completion notes.
-- Update docs/TASKS/QUEUE.md and docs/HANDOFF.md so they still agree.
-- Update docs/HISTORY/CHANGE-LEDGER.md and docs/HISTORY/CHANGELOG.md.
+- Replace the Computer tab profile list with a current-computer summary.
+- Preserve a compact action for opening/viewing the HTML profile report.
+- Add Green/Yellow/Red LED-style bulbs beside summary fields that can have status.
+- Use an unlit/neutral bulb when the area has not been scanned.
+- Add more useful top-level computer identity and health information without dumping verbose raw inventory.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
-- Modify application code.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
 - Refactor unrelated application code.
@@ -261,11 +180,10 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Documentation/task-state source of truth is consistent.
-- Exactly one task is active.
-- Documentation counter is reset to 0 / 10.
-- TASK-0032 is queued as the next implementation task after the audit.
-- No application code changes are made during TASK-0042.
+- PowerShell parse check passes for the GUI script.
+- GUI smoke test passes.
+- Button-smoke test passes.
+- Computer tab opens without excessive layout lag or control clipping.
 
 When done, provide:
 - Concise summary of implementation performed.

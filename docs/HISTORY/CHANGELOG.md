@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-03
+- Completed TASK-0042 Documentation Counter Audit, verified documentation/task-state consistency, reset the audited Documentation counter, and reactivated TASK-0032 as the next implementation task.
+- Added queued TASK-0043 Client Data Transfer for moving client diagnostic data between toolkit copies without copying application binaries or tools.
+- Added queued TASK-0044 GUI Tab Performance Hardening for Activity first-load lag and remaining tab-to-tab navigation lag.
+
 ## 2026-07-02
 - Activated TASK-0042 Documentation Counter Audit because the Documentation counter reached the mandatory 10/10 audit gate.
 - Reduced tab-to-tab lag by stopping Activity page performance-counter refreshes when the Activity tab is not selected and adding slow-tab-switch diagnostics.

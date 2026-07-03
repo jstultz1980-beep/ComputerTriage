@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0042-Documentation-Counter-Audit` | Codex | Active | Audit documentation state because the Documentation counter reached 10/10. |
+| `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Active | Replace the computer profile list with a richer current-computer summary and LED status indicators after the documentation audit gate clears. |
 
 ## Queued
 
@@ -17,13 +17,14 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 |---|---|---|---|
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0032-Computer-Tab-Summary-Redesign` | Codex | Queued | Replace the computer profile list with a richer current-computer summary and LED status indicators after the documentation audit gate clears. |
 | `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | ChatGPT | Queued | Prioritize launch-only tools that should become embedded tab experiences. |
 | `TASK-0036-Page-Health-Indicators` | Codex | Queued | Add compact Windows Update service and Wi-Fi signal-strength indicators. |
 | `TASK-0038-Modern-Control-Style-System` | Codex | Queued | Replace default-looking utility buttons with a consistent modern control style. |
 | `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | ChatGPT | Queued | Classify Software tab apps/installers and research Registrar Registry Manager portability. |
 | `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` | Codex | Queued | Implement accepted Software tab separation between launchable apps and installable stored programs. |
+| `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
+| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Queued | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
 
 ## Completed / Historical
 
@@ -53,6 +54,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0037-Activity-Page-Running-Tool-Tracking` | Completed | Added Activity Network gauge, fixed-height running-process list, compact controls, and slower refresh interval. |
 | `TASK-0030-Print-Tab-Data-Path-Cleanup` | Completed | Removed the visible print queue data-folder path and preserved print queue maintenance output behavior. |
 | `TASK-0031-Triage-Page-Simplification` | Completed | Simplified the Triage tab to Quick Triage and Full Triage, removed normal-view advanced collector clutter, and replaced the live log with concise status/output access. |
+| `TASK-0042-Documentation-Counter-Audit` | Completed | Audited documentation/task-state consistency after the Documentation counter reached 10/10 and reset the audited counter. |
 
 ## Reconciliation Decision
 
@@ -61,4 +63,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0030.
+- Current active task is TASK-0032.
