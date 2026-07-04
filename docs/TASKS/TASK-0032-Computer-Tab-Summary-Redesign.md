@@ -1,7 +1,7 @@
 # TASK-0032 - Computer Tab Summary Redesign
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -55,7 +55,7 @@ Redesign the Computer tab around a useful current-computer summary, with the pro
 - [x] Status-bearing fields have LED-style indicators.
 - [x] Unknown/unscanned indicators render as unlit/off.
 - [x] PowerShell parse, smoke, and button-smoke validation pass.
-- [ ] User visual validation confirms the Computer tab layout is acceptable at normal and minimum toolkit sizes.
+- [x] User visual validation confirms the Computer tab layout is acceptable at normal and minimum toolkit sizes.
 
 ## Work Log
 - Reflowed the Computer tab so the Current Computer Summary owns the flexible vertical space.
@@ -64,6 +64,7 @@ Redesign the Computer tab around a useful current-computer summary, with the pro
 - Added additional high-value summary fields including last profile time, user, reboot, servicing, Defender, security products, firewall, BitLocker, time source, disk, and network.
 - Updated the network summary helper to support the current `NetworkAdapters` profile shape as well as the older `MACs` shape.
 - Validated PowerShell parse, GUI smoke, and button-smoke checks.
+- Follow-up correction: tightened the visible summary to the highest-signal rows and reserved more fixed height for the recent profile table so the bottom row/header no longer clips at normal toolkit size.
 
 ## Test This
 - Open the Computer tab at normal toolkit size and verify the summary is the main focus.
@@ -71,3 +72,8 @@ Redesign the Computer tab around a useful current-computer summary, with the pro
 - Confirm the `View`, `Create Profile`, `Delete`, and `Refresh` buttons still appear and fit.
 - Run or refresh a computer profile, then confirm LEDs update meaningfully for health, reboot, servicing, disk, Defender, security, firewall, and network.
 - Resize the toolkit to its smallest usable size and verify labels/buttons do not clip badly.
+- Confirm the recent profile table header and first few profile rows are fully visible, with no cut-off row at the bottom of the summary area.
+
+## Completion Notes
+- User directed work to proceed after the Computer tab implementation pass.
+- `punch_list.txt` was read after the task; the only unmapped item was the smaller crown request, which was consolidated into TASK-0038.

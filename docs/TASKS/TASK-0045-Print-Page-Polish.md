@@ -1,7 +1,7 @@
 # TASK-0045 - Print Page Polish
 
 ## Status
-Queued
+Complete
 
 ## Owner
 Codex
@@ -24,7 +24,19 @@ The Print page should be easy to scan during troubleshooting. Current issues inc
 - Changing report/output locations.
 
 ## Acceptance Criteria
-- [ ] The Print Diagnostics block no longer shows an unnecessary `Printing` subheading.
-- [ ] `Find Servers` button text is fully visible.
-- [ ] Print page opens without clipping at the toolkit minimum supported window size.
-- [ ] PowerShell parse, GUI smoke, and button-smoke validation pass.
+- [x] The Print Diagnostics block no longer shows an unnecessary `Printing` subheading.
+- [x] `Find Servers` button text is fully visible.
+- [x] Print page opens without clipping at the toolkit minimum supported window size.
+- [x] PowerShell parse, GUI smoke, and button-smoke validation pass.
+
+## Work Log
+- Added an optional compact-tool-grid switch to hide section headers.
+- Used that switch on the Print Diagnostics And Cleanup block so the redundant `Printing` subheading is removed.
+- Gave the Print Queue top row and `Find Servers` button more room to prevent vertical text clipping.
+- Read `punch_list.txt` after the task; no new unmapped items were found.
+
+## Test This
+- Open the Print tab and confirm the Print Diagnostics block does not show a `Printing` subheading.
+- Confirm `Find Servers` text is fully visible.
+- Click `Find Servers` and confirm it still attempts discovery.
+- Confirm `Connect`, `Refresh`, `Clear Selected`, `Restart Spooler`, `Full Reset`, `Save Target`, and `Standalone` still fit.

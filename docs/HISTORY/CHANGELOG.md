@@ -1,6 +1,16 @@
 # Changelog
 
 ## 2026-07-03
+- Tightened the TASK-0032 Computer tab summary follow-up so the recent profile table/header no longer clips below the summary area.
+- Completed TASK-0045 Print Page Polish and activated the UI counter audit gate.
+- Removed the redundant Print Diagnostics `Printing` subheading and fixed the clipped `Find Servers` print queue button.
+- Completed TASK-0049 UI Counter Audit, reset the audited UI counter, and activated TASK-0046 Triage Page Catalog And Bundle Cleanup.
+- Completed TASK-0038 Modern Control Style System and activated TASK-0045 Print Page Polish.
+- Reduced the header crown/elevation icon and cleaned up the Settings and Help header icon controls.
+- Completed TASK-0032 Computer Tab Summary Redesign and activated the Task System audit gate.
+- Completed TASK-0048 Task System Counter Audit, reset the audited Task System counter, and activated TASK-0038 Modern Control Style System.
+- Added the `punch_list.txt` reconciliation step to the required task workflow.
+- Consolidated the saved punch-list crown-size request into TASK-0038.
 - Implemented the TASK-0032 Computer tab summary redesign and left the task active pending user visual validation.
 - Expanded the current-computer summary, added LED-style status indicators, reduced the recent profile table height, and preserved profile report actions.
 - Added the 2026-07-03 outstanding task audit and mapped the latest print, computer, activity, header-control, triage, Wi-Fi/status-bar, and bundle-naming punch-list requests to existing or new tasks.

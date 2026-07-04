@@ -22,10 +22,11 @@ ignore chat history unless the same information exists in the repository.
 6. Read the active task document listed in `docs/HANDOFF.md`.
 7. Perform only the work assigned in the active task.
 8. Validate the work.
-9. Update the active task document.
-10. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
+9. Read `punch_list.txt` if it exists and reconcile any new change requests into the task queue without duplicating existing tasks.
+10. Update the active task document.
+11. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
     task or for creating the next task from the user's next request.
-11. Commit all related changes.
+12. Commit all related changes.
 
 ## Core Rule
 No implementation work may begin unless there is an active task document under `docs/TASKS`.

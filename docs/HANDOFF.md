@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0048
+HANDOFF-0050
 
 ## Current Task
-TASK-0032-Computer-Tab-Summary-Redesign
+TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup
 
 ## Current Owner
 Codex
@@ -28,7 +28,7 @@ Only one task may be `Active`.
 ## Objective
 TASK-0042 completed the mandatory Documentation Counter Audit after the Documentation counter reached `10 / 10`.
 
-Implementation work may resume under the single active task: TASK-0032 Computer Tab Summary Redesign.
+Implementation work may resume under the single active task: TASK-0046 Triage Page Catalog And Bundle Cleanup.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -52,16 +52,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 0 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 2 / 10 | No |
-| Task System | 9 / 10 | No |
+| Documentation | 6 / 10 | No |
+| Task System | 2 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 0 / 10 | No |
-| UI | 8 / 10 | No |
+| UI | 1 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
 | Build System | 0 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 8 / 10 | No |
+| Roadmap/Backlog | 9 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -78,7 +78,7 @@ Recently completed work:
 - TASK-0042 completed the mandatory Documentation Counter Audit and reset the audited Documentation counter.
 
 Current active work:
-- TASK-0032 is active for Computer tab summary redesign and is awaiting user visual validation.
+- TASK-0046 is active for Triage page catalog and bundle cleanup.
 
 Queued implementation/design work:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
@@ -86,22 +86,22 @@ Queued implementation/design work:
 - TASK-0033 Directory Tab Direction And Embedding Plan.
 - TASK-0034 Embedded Tool Experience Roadmap.
 - TASK-0036 Page Health Indicators.
-- TASK-0038 Modern Control Style System.
 - TASK-0039 Software Tab Launchable And Installable Inventory.
 - TASK-0040 Software Tab Launchable And Installable Implementation.
 - TASK-0043 Client Data Transfer.
 - TASK-0044 GUI Tab Performance Hardening.
 - TASK-0045 Print Page Polish.
-- TASK-0046 Triage Page Catalog And Bundle Cleanup.
 - TASK-0047 Status Bar Wi-Fi And Chrome Cleanup.
 
 ## Active Task
-`TASK-0032-Computer-Tab-Summary-Redesign`
+`TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup`
 
 Scope summary:
-- Replace the computer profile list with a richer current-computer summary.
-- Add LED-style status indicators next to status-changing summary items.
-- Preserve profile report access without keeping the old profile list as the main Computer tab experience.
+- Move `Quick Triage` and `Full Triage` buttons out of the surrounding box and place them across the top of the tab.
+- Move visible triage status into the status bar instead of a large page block.
+- Clean the Triage tool catalog by removing Sysinternals, duplicate apps, and non-working/non-portable WinAudit if necessary.
+- Decide whether `Export Manifest` should remain visible.
+- Make triage bundle names more descriptive.
 
 ## Queued Work
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
@@ -109,13 +109,11 @@ Scope summary:
 - `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
 - `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
 - `TASK-0036-Page-Health-Indicators` owned by Codex.
-- `TASK-0038-Modern-Control-Style-System` owned by Codex.
 - `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` owned by ChatGPT.
 - `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
 - `TASK-0044-GUI-Tab-Performance-Hardening` owned by Codex.
 - `TASK-0045-Print-Page-Polish` owned by Codex.
-- `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` owned by Codex.
 - `TASK-0047-Status-Bar-WiFi-And-Chrome-Cleanup` owned by Codex.
 
 ## Validation Completed For This Update
@@ -134,6 +132,16 @@ Scope summary:
 - Added TASK-0047 for status-bar Wi-Fi and bottom-right chrome cleanup.
 - Implemented the TASK-0032 Computer tab summary redesign pass.
 - Validated GUI PowerShell parse, toolkit smoke, and button-smoke checks.
+- Read `punch_list.txt` after TASK-0032.
+- Consolidated the smaller-crown request into TASK-0038.
+- Completed TASK-0032 and the mandatory TASK-0048 Task System Counter Audit.
+- Reset only the Task System counter.
+- Activated TASK-0038 as the next implementation task.
+- Completed TASK-0038 Modern Control Style System.
+- Completed TASK-0045 Print Page Polish.
+- Completed TASK-0049 UI Counter Audit and reset only the UI counter.
+- Activated TASK-0046 as the next implementation task.
+- Applied a TASK-0032 follow-up correction so the Computer tab profile strip no longer clips below the summary.
 - Updated task, queue, roadmap, changelog, ledger, and handoff.
 
 ## Blockers
@@ -165,29 +173,34 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0032-Computer-Tab-Summary-Redesign.md
+7. docs/TASKS/TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup.md
+8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0032-Computer-Tab-Summary-Redesign.
+- Active task: TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup.
 - Owner: Codex.
-- TASK-0042 completed the Documentation Counter Audit and reset the audited Documentation counter.
+- TASK-0032 completed the Computer tab summary redesign.
+- TASK-0048 completed the Task System Counter Audit and reset the audited Task System counter.
+- TASK-0038 completed header/control cleanup.
+- TASK-0045 completed Print page polish.
+- TASK-0049 completed the UI Counter Audit and reset the audited UI counter.
 - TASK-0043 is queued for client-data transfer between toolkit copies.
 - TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
 - TASK-0045 through TASK-0047 are queued for Print, Triage, and status-bar cleanup.
-- Task System counter is now `9 / 10`; avoid unnecessary task-state churn.
+- `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 
 Your job:
-Execute TASK-0032 only.
+Execute TASK-0046 only.
 
 Scope:
-- Replace the Computer tab profile list with a current-computer summary.
-- Make the current-computer summary larger and more useful.
-- Reduce the profile table to approximately three visible rows rather than letting it dominate the tab.
-- Preserve a compact action for opening/viewing the HTML profile report.
-- Add Green/Yellow/Red LED-style bulbs beside summary fields that can have status.
-- Use an unlit/neutral bulb when the area has not been scanned.
-- Add more useful top-level computer identity and health information without dumping verbose raw inventory.
+- Move Quick Triage and Full Triage out of the surrounding box and place them across the top of the tab.
+- Remove the visible Triage status block and surface that status in the status bar instead.
+- Remove Sysinternals entries from the Triage tool catalog.
+- Make WinAudit work if it can run portably; otherwise remove it from the Triage tool catalog.
+- Remove catalog applications that already live elsewhere in the toolkit.
+- Decide whether Export Manifest is still useful; keep it only if the UI clearly explains its purpose.
+- Make triage bundle names more descriptive for easier identification.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -202,7 +215,12 @@ Validation expectations:
 - PowerShell parse check passes for the GUI script.
 - GUI smoke test passes.
 - Button-smoke test passes.
-- Computer tab opens without excessive layout lag or control clipping.
+- Triage tab primary actions are top-level controls, not boxed inside a status area.
+- Triage status is visible through the status bar.
+- Triage catalog no longer lists Sysinternals or tools already represented elsewhere.
+- WinAudit is either functional as a portable triage tool or removed.
+- Triage bundle names include computer, triage type, and timestamp context.
+- PowerShell parse, GUI smoke, button-smoke, and triage service validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.

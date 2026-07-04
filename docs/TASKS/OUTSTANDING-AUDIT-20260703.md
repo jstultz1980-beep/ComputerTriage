@@ -25,6 +25,7 @@ This prevents a long list of tiny paper-cut tasks while still keeping each imple
 | Add Wi-Fi signal strength indicator. | Page-level indicator already exists; status-bar placement added separately. | TASK-0036 and TASK-0047 |
 | Determine purpose of bottom-right rectangle. | New status-bar cleanup work. | TASK-0047 |
 | Make triage bundle names more descriptive. | New focused triage cleanup work. | TASK-0046 |
+| Make the crown a little smaller. | Existing modern header/control styling work updated. | TASK-0038 |
 
 ## Outstanding Queue Summary
 
@@ -60,4 +61,5 @@ Continue with active TASK-0032. It is already active, aligns with the current UI
 | Triage tab | TASK-0046 | Top-level Quick/Full Triage controls, status-bar status, catalog cleanup, WinAudit decision, `Export Manifest` decision, descriptive bundle names. |
 | Activity tab / performance | TASK-0044 | First-open Activity lag and remaining tab-switch lag. |
 | Header/shared controls | TASK-0038 | Settings and Help button cleanup plus shared modern utility-button styling. |
+| Header/elevation icon | TASK-0038 | Make the crown/elevation icon smaller and less visually dominant. |
 | Status bar / Wi-Fi | TASK-0047 and TASK-0036 | Bottom-right chrome cleanup, status-bar Wi-Fi strength, page-level Windows Update and Wi-Fi indicators. |

@@ -1370,26 +1370,33 @@ function Set-GUIElevationCrownIcon {
             $grey = [System.Drawing.Color]::FromArgb(150,158,166)
             $strokeColor = if($elevated){$gold}else{$grey}
 
+            $w = [Math]::Max(20,$sender.Width)
+            $h = [Math]::Max(18,$sender.Height)
+            $left = [single]($w * 0.16)
+            $right = [single]($w * 0.84)
+            $baseY = [single]($h * 0.68)
+            $lowPeak = [single]($h * 0.36)
+            $midPeak = [single]($h * 0.18)
             $points = @(
-                (New-Object System.Drawing.PointF(5,22)),
-                (New-Object System.Drawing.PointF(8,10)),
-                (New-Object System.Drawing.PointF(15,17)),
-                (New-Object System.Drawing.PointF(22,7)),
-                (New-Object System.Drawing.PointF(29,17)),
-                (New-Object System.Drawing.PointF(36,10)),
-                (New-Object System.Drawing.PointF(39,22))
+                (New-Object System.Drawing.PointF($left,$baseY)),
+                (New-Object System.Drawing.PointF([single]($w * 0.22),$lowPeak)),
+                (New-Object System.Drawing.PointF([single]($w * 0.36),[single]($h * 0.52))),
+                (New-Object System.Drawing.PointF([single]($w * 0.50),$midPeak)),
+                (New-Object System.Drawing.PointF([single]($w * 0.64),[single]($h * 0.52))),
+                (New-Object System.Drawing.PointF([single]($w * 0.78),$lowPeak)),
+                (New-Object System.Drawing.PointF($right,$baseY))
             )
 
-            $stroke = New-Object System.Drawing.Pen($strokeColor,2.2)
+            $stroke = New-Object System.Drawing.Pen($strokeColor,[Math]::Max(1.6,($w * 0.055)))
             try {
                 $graphics.DrawLines($stroke,$points)
-                $graphics.DrawLine($stroke,7,25,38,25)
+                $graphics.DrawLine($stroke,[single]($w * 0.18),[single]($h * 0.78),[single]($w * 0.82),[single]($h * 0.78))
 
                 if(!$elevated){
-                    $slash = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(185,90,90,90),3.2)
+                    $slash = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(185,90,90,90),[Math]::Max(2.1,($w * 0.075)))
                     try {
-                        $graphics.DrawEllipse($slash,(New-Object System.Drawing.Rectangle(3,3,39,28)))
-                        $graphics.DrawLine($slash,8,29,38,6)
+                        $graphics.DrawEllipse($slash,(New-Object System.Drawing.Rectangle(2,2,($w - 5),($h - 5))))
+                        $graphics.DrawLine($slash,[single]($w * 0.22),[single]($h * 0.84),[single]($w * 0.82),[single]($h * 0.18))
                     }
                     finally { $slash.Dispose() }
                 }
@@ -8371,7 +8378,7 @@ function Build-FingerprintPage {
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,98))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,122))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
     $Page.Controls.Add($layout)
 
@@ -8384,8 +8391,8 @@ function Build-FingerprintPage {
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
     $summary.Dock = "Fill"
     $summary.ColumnCount = 6
-    $summary.RowCount = 10
-    $summary.Padding = New-Object System.Windows.Forms.Padding(14,14,14,10)
+    $summary.RowCount = 8
+    $summary.Padding = New-Object System.Windows.Forms.Padding(14,10,14,8)
     foreach($width in @(24,112,50,24,112,50)){
         if($width -eq 50){
             $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
@@ -8394,8 +8401,8 @@ function Build-FingerprintPage {
             $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,$width))) | Out-Null
         }
     }
-    for($i=0; $i -lt 10; $i++){
-        $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
+    for($i=0; $i -lt 8; $i++){
+        $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,12.5))) | Out-Null
     }
     $summaryGroup.Controls.Add($summary)
 
@@ -8443,7 +8450,6 @@ function Build-FingerprintPage {
         @{ Label="Quick Dx"; Value=Get-GUIQuickDiagnosisSummaryValue; State=$(if($profile){"Ok"}else{"Unknown"}) },
         @{ Label="OS"; Value=$osText; State=$(if($profile){"Ok"}else{"Unknown"}) },
         @{ Label="Model"; Value=$modelText; State=$(if($profile){"Ok"}else{"Unknown"}) },
-        @{ Label="Serial"; Value=$(if($profile){Format-GUIEmptyValue $profile.SerialNumber}else{"Unknown"}); State=$(if($profile){"Ok"}else{"Unknown"}) },
         @{ Label="CPU"; Value=$cpuText; State=$(if($profile){"Ok"}else{"Unknown"}) },
         @{ Label="Memory"; Value=$memoryText; State=$(if($profile -and $profile.MemoryGB){"Ok"}else{"Unknown"}) },
         @{ Label="Boot/Uptime"; Value="$lastBootText / $uptimeText"; State=$(if($profile){"Ok"}else{"Unknown"}) },
@@ -8454,9 +8460,7 @@ function Build-FingerprintPage {
         @{ Label="Defender"; Value=$defenderText; State=$defenderState },
         @{ Label="Security"; Value=$securityProductsText; State=$(if($securityProductsText -and $securityProductsText -ne "Unknown" -and $securityProductsText -ne "No security product inventory"){"Ok"}elseif($securityProductsText -eq "No security product inventory"){"Warning"}else{"Unknown"}) },
         @{ Label="Firewall"; Value=$firewallText; State=$(if($firewallText -and $firewallText -ne "Unknown"){"Ok"}else{"Unknown"}) },
-        @{ Label="BitLocker"; Value=$bitLockerText; State=$(if($bitLockerText -and $bitLockerText -ne "Unknown"){"Ok"}else{"Unknown"}) },
-        @{ Label="Time Source"; Value=$timeText; State=$(if($timeText -and $timeText -ne "Unknown"){"Ok"}else{"Unknown"}) },
-        @{ Label="PowerShell"; Value=$(if($profile){Format-GUIEmptyValue $profile.PowerShell}else{$PSVersionTable.PSVersion.ToString()}); State="Ok" }
+        @{ Label="Serial"; Value=$(if($profile){Format-GUIEmptyValue $profile.SerialNumber}else{"Unknown"}); State=$(if($profile){"Ok"}else{"Unknown"}) }
     )
 
     $cellIndex = 0
@@ -8489,7 +8493,7 @@ function Build-FingerprintPage {
         $value.ForeColor = $script:GUITheme.Text
 
         $row = [math]::Floor($cellIndex / 2)
-        if($row -ge 10){ break }
+        if($row -ge 8){ break }
         $column = ($cellIndex % 2) * 3
         $summary.Controls.Add($led,$column,$row)
         $summary.Controls.Add($label,($column + 1),$row)
@@ -10135,7 +10139,8 @@ function Add-GUICompactToolGrid {
         [System.Windows.Forms.Control]$Page,
         [string]$Title,
         [object[]]$Tools,
-        [int]$Columns = 3
+        [int]$Columns = 3,
+        [switch]$HideSectionHeaders
     )
 
     $group = New-Object System.Windows.Forms.GroupBox
@@ -10196,7 +10201,7 @@ function Add-GUICompactToolGrid {
     $currentSection = $null
 
     foreach($tool in $orderedTools){
-        if($tool.Section -and $tool.Section -ne $currentSection){
+        if(!$HideSectionHeaders -and $tool.Section -and $tool.Section -ne $currentSection){
             $currentSection = $tool.Section
             $row++
             $col = 0
@@ -11206,7 +11211,7 @@ function Build-PrintToolsPage {
     $queueLayout.Dock = "Fill"
     $queueLayout.ColumnCount = 1
     $queueLayout.RowCount = 4
-    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
     $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,44))) | Out-Null
     $queueLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
@@ -11222,7 +11227,7 @@ function Build-PrintToolsPage {
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,160))) | Out-Null
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,112))) | Out-Null
-    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,108))) | Out-Null
+    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
     $queueLayout.Controls.Add($top,0,0)
 
     Load-GUIPrintQueueConfig
@@ -11258,10 +11263,12 @@ function Build-PrintToolsPage {
 
     $connectButton = New-GUIButton "Connect" { [void](Connect-GUIPrintQueueServer -ComputerName $script:PrintQueueComputerBox.Text -PromptForCredentials -ShowErrors) }
     $connectButton.Dock = "Fill"
+    $connectButton.Margin = New-Object System.Windows.Forms.Padding(4,5,4,5)
     $top.Controls.Add($connectButton,5,0)
 
     $findButton = New-GUIButton "Find Servers" { Start-GUIPrintQueueDiscovery }
     $findButton.Dock = "Fill"
+    $findButton.Margin = New-Object System.Windows.Forms.Padding(4,5,4,5)
     $top.Controls.Add($findButton,6,0)
 
     $script:PrintQueueGrid = New-Object System.Windows.Forms.DataGridView
@@ -11318,7 +11325,7 @@ function Build-PrintToolsPage {
     }
 
     $tools = @(Get-GUIToolsForTab -Tab "Print" | Where-Object { $_.Text -ne "Print Queue Maintenance" })
-    Add-GUICompactToolGrid -Page $layout -Title "Print Diagnostics And Cleanup" -Tools $tools -Columns 4
+    Add-GUICompactToolGrid -Page $layout -Title "Print Diagnostics And Cleanup" -Tools $tools -Columns 4 -HideSectionHeaders
 }
 
 function Build-ReportsPage {
@@ -14938,16 +14945,16 @@ function Build-Form {
     $headerTools = New-Object System.Windows.Forms.Panel
     $headerTools.Anchor = "Top,Right"
     $headerTools.Location = New-Object System.Drawing.Point(1070,14)
-    $headerTools.Size = New-Object System.Drawing.Size(158,42)
+    $headerTools.Size = New-Object System.Drawing.Size(136,42)
     $headerTools.BackColor = [System.Drawing.Color]::Transparent
     $script:HeaderToolsPanel = $headerTools
     $header.Controls.Add($headerTools)
 
     $settingsMenu = New-Object System.Windows.Forms.Button
-    $settingsMenu.Text = [string][char]0x22EE
-    $settingsMenu.Location = New-Object System.Drawing.Point(68,6)
-    $settingsMenu.Size = New-Object System.Drawing.Size(36,30)
-    $settingsMenu.Font = New-Object System.Drawing.Font("Segoe UI Symbol",15,[System.Drawing.FontStyle]::Bold)
+    $settingsMenu.Text = [string][char]0x2699
+    $settingsMenu.Location = New-Object System.Drawing.Point(50,7)
+    $settingsMenu.Size = New-Object System.Drawing.Size(34,28)
+    $settingsMenu.Font = New-Object System.Drawing.Font("Segoe UI Symbol",12.5,[System.Drawing.FontStyle]::Bold)
     $settingsMenu.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $settingsMenu
     $settingsMenu.BackColor = $script:GUITheme.AccentDark
@@ -14975,8 +14982,8 @@ function Build-Form {
     $header.Controls.Add($subtitle)
 
     $admin = New-Object System.Windows.Forms.Panel
-    $admin.Location = New-Object System.Drawing.Point(8,5)
-    $admin.Size = New-Object System.Drawing.Size(46,34)
+    $admin.Location = New-Object System.Drawing.Point(8,9)
+    $admin.Size = New-Object System.Drawing.Size(32,24)
     $admin.Tag = [pscustomobject]@{
         Visual = "ElevationCrown"
         PaintHooked = $false
@@ -14990,9 +14997,9 @@ function Build-Form {
 
     $helpButton = New-Object System.Windows.Forms.Button
     $helpButton.Text = "?"
-    $helpButton.Location = New-Object System.Drawing.Point(116,6)
-    $helpButton.Size = New-Object System.Drawing.Size(36,30)
-    $helpButton.Font = New-Object System.Drawing.Font("Segoe UI Semibold",12,[System.Drawing.FontStyle]::Bold)
+    $helpButton.Location = New-Object System.Drawing.Point(94,7)
+    $helpButton.Size = New-Object System.Drawing.Size(34,28)
+    $helpButton.Font = New-Object System.Drawing.Font("Segoe UI Semibold",11,[System.Drawing.FontStyle]::Bold)
     $helpButton.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $helpButton
     $helpButton.BackColor = $script:GUITheme.AccentDark

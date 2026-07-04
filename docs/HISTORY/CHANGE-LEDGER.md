@@ -116,3 +116,16 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0106 | 2026-07-03 | TASK-0032/TASK-0045..TASK-0047 | Roadmap/Backlog | +1 | Added print, triage, and status-bar cleanup work to the queued UI backlog. |
 | CHG-0107 | 2026-07-03 | TASK-0032 | UI | +1 | Reworked the Computer tab so the summary owns the page, recent profiles are reduced, and status-bearing fields use LED-style indicators. |
 | CHG-0108 | 2026-07-03 | TASK-0032 | Documentation | +1 | Updated TASK-0032 work log, validation notes, changelog, ledger, and handoff for the Computer tab implementation pass. |
+| CHG-0109 | 2026-07-03 | TASK-0032 | Task System | +1 | Completed TASK-0032 and activated the required Task System counter audit gate. |
+| CHG-0110 | 2026-07-03 | TASK-0048 | Task System | reset to 0 / 10 | Completed the required Task System audit and reset only the audited Task System counter. |
+| CHG-0111 | 2026-07-03 | TASK-0048 | Documentation | +1 | Recorded the punch-list reconciliation rule, TASK-0048 audit completion, and next-task handoff. |
+| CHG-0112 | 2026-07-03 | TASK-0038 | UI | +1 | Reduced and scaled the header crown/elevation icon and cleaned up the Settings and Help header controls. |
+| CHG-0113 | 2026-07-03 | TASK-0038 | Documentation | +1 | Updated TASK-0038 work log, validation notes, changelog, ledger, and handoff. |
+| CHG-0114 | 2026-07-03 | TASK-0038 | Task System | +1 | Completed TASK-0038 and activated TASK-0045 as the next tab-based punch-list task. |
+| CHG-0115 | 2026-07-03 | TASK-0045 | UI | +1 | Removed the redundant Print Diagnostics section label and fixed clipped Print Queue discovery controls. |
+| CHG-0116 | 2026-07-03 | TASK-0045 | Documentation | +1 | Updated TASK-0045 work log, validation notes, changelog, ledger, and handoff. |
+| CHG-0117 | 2026-07-03 | TASK-0045 | Task System | +1 | Completed TASK-0045 and activated the required UI counter audit gate. |
+| CHG-0118 | 2026-07-03 | TASK-0049 | UI | reset to 0 / 10 | Completed the required UI counter audit and reset only the audited UI counter. |
+| CHG-0119 | 2026-07-03 | TASK-0049 | Task System | +1 | Completed TASK-0049 and activated TASK-0046 as the next tab-based punch-list task. |
+| CHG-0120 | 2026-07-03 | TASK-0032 | UI | +1 | Tightened the Computer tab summary layout and reserved more height for the recent profile table to prevent bottom-row clipping. |
+| CHG-0121 | 2026-07-03 | TASK-0032 | Documentation | +1 | Updated TASK-0032, handoff, changelog, and ledger records for the Computer tab clipping follow-up. |

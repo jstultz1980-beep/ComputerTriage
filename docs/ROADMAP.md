@@ -120,7 +120,12 @@ Current UI work:
 - TASK-0030 completed Print tab data-path cleanup.
 - TASK-0031 completed Triage page simplification.
 - TASK-0042 completed the required documentation audit gate after the Documentation counter reached 10/10.
-- TASK-0032 is active for Computer tab summary redesign.
+- TASK-0032 completed Computer tab summary redesign.
+- TASK-0048 completed the required Task System audit gate after the Task System counter reached 10/10.
+- TASK-0038 completed modern control styling for Settings/Help header controls and the crown/elevation icon.
+- TASK-0045 completed Print page polish.
+- TASK-0049 completed the required UI audit gate after the UI counter reached 10/10.
+- TASK-0046 is active for Triage page catalog and bundle cleanup.
 - TASK-0043 is queued for transferring client diagnostic data between toolkit copies.
 - TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
 - TASK-0045 through TASK-0047 are queued for Print page polish, Triage catalog/bundle cleanup, and status-bar Wi-Fi/chrome cleanup.
