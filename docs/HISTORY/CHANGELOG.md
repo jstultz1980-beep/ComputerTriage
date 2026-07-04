@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-04
+- Activated TASK-0047 for the requested status-bar version/build placement change.
+- Moved toolkit version/build to a small static bottom-left status-bar label and removed the duplicate version/build row from Settings.
+- Updated toolkit build metadata for the TASK-0047 status-bar slice.
 - Completed TASK-0046 Triage Page Catalog And Bundle Cleanup.
 - Reworked the Triage tab top area into a flat action row, moved triage status into the application status path, filtered redundant catalog tools from the visible Triage catalog, removed the visible Export Manifest action, and made triage bundle ZIP names include triage profile context.
 - Added the Build Metadata Rule to `PROJECT.md` and updated `App/manifests/toolkit-version.json` for this implementation change.

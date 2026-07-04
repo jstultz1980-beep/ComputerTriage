@@ -141,3 +141,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0131 | 2026-07-04 | TASK-0046 / TASK-0052 | Documentation | +1 | Updated TASK-0046, handoff, roadmap, changelog, and governance documentation for the triage cleanup and build metadata rule. |
 | CHG-0132 | 2026-07-04 | TASK-0052 | Documentation | reset to 0 / 10 | Completed the required Documentation Counter Audit and reset only the audited Documentation counter. |
 | CHG-0133 | 2026-07-04 | TASK-0046 / TASK-0044 | Task System | +1 | Completed TASK-0046 and activated TASK-0044 as the single active task. |
+| CHG-0134 | 2026-07-04 | TASK-0047 | Task System | +1 | Activated TASK-0047 for the requested status-bar version/build placement and returned TASK-0044 to queued status. |
+| CHG-0135 | 2026-07-04 | TASK-0047 | UI | +1 | Moved toolkit version/build to a small static bottom-left status-bar label and removed the duplicate Settings-page version display. |
+| CHG-0136 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the status-bar version/build change. |
+| CHG-0137 | 2026-07-04 | TASK-0047 | Documentation | +1 | Updated TASK-0047, queue, roadmap, handoff, changelog, and ledger records for the status-bar version/build slice. |

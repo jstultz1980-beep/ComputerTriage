@@ -9,13 +9,13 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Active | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
+| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Codex | Active | Consolidated status-bar/page indicators, bottom chrome cleanup, and version/build placement. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Codex | Queued | Consolidated status-bar/page indicators, bottom chrome cleanup, and version/build placement. |
+| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Queued | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
 | `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
 | `TASK-0051-Development-File-Deployment-Exclusions` | Codex | Queued | Inventory development-only files and exclude them from toolkit deployment and deployed updates. |
 | `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Queued | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |

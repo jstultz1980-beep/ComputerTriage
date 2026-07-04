@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0044-GUI-Tab-Performance-Hardening`
+- `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -128,9 +128,9 @@ Current UI work:
 - TASK-0046 completed Triage page catalog and bundle cleanup.
 - TASK-0050 completed the required Roadmap/Backlog audit after outstanding tasks were consolidated.
 - TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
-- TASK-0044 is active for GUI tab performance hardening.
+- TASK-0047 is active for status-bar indicators and chrome cleanup.
 - The consolidated queued order is:
-  1. TASK-0047 Status Bar Indicators And Chrome Cleanup.
+  1. TASK-0044 GUI Tab Performance Hardening.
   2. TASK-0043 Client Data Transfer.
   3. TASK-0051 Development File Deployment Exclusions.
   4. TASK-0040 Software Inventory And Placement Implementation.

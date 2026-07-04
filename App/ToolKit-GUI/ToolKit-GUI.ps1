@@ -13988,8 +13988,7 @@ function Update-GUIToolkitVersionLabel {
     if(Test-Path -LiteralPath $manifestPath){
         try {
             $manifest = Get-Content -LiteralPath $manifestPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
-            $published = if($manifest.SourceUpdatedAt){ ([datetime]$manifest.SourceUpdatedAt).ToString("MM/dd/yyyy h:mm tt") } else { "date unavailable" }
-            $text = "Toolkit version: $($manifest.Version)  |  Build $($manifest.Build)  |  Source updated $published"
+            $text = "v$($manifest.Version)  |  build $($manifest.Build)"
         }
         catch {
             $text = "Toolkit version: unavailable"
@@ -14715,12 +14714,11 @@ function Build-SettingsPage {
 
     $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $maintenanceLayout.Dock = "Fill"
-    $maintenanceLayout.RowCount = 7
+    $maintenanceLayout.RowCount = 6
     $maintenanceLayout.ColumnCount = 2
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
@@ -14729,48 +14727,40 @@ function Build-SettingsPage {
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $maintenanceGroup.Controls.Add($maintenanceLayout)
 
-    $script:ToolkitVersionLabel = New-GUILabel "Toolkit version: unavailable"
-    $ToolkitVersionLabel.Dock = "Fill"
-    $ToolkitVersionLabel.TextAlign = "MiddleLeft"
-    $ToolkitVersionLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitVersionLabel,0,0)
-    $maintenanceLayout.SetColumnSpan($ToolkitVersionLabel,2)
-    Update-GUIToolkitVersionLabel
-
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
     $ToolkitSizeLabel.Dock = "Fill"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
-    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,1)
+    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,0)
 
     $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
     $sizeRefreshButton.Dock = "Fill"
     $sizeRefreshButton.Width = 0
-    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,1)
+    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,0)
 
     $toolkitAppsButton = New-GUIButton "App Manager" { Show-GUICustomToolsWindow }
     $toolkitAppsButton.Dock = "Fill"
     $toolkitAppsButton.Width = 0
-    $maintenanceLayout.Controls.Add($toolkitAppsButton,0,2)
+    $maintenanceLayout.Controls.Add($toolkitAppsButton,0,1)
 
     $sanitizeButton = New-GUIButton "Remove Client Data" { Invoke-GUIRemoveClientData }
     $sanitizeButton.Dock = "Fill"
     $sanitizeButton.Width = 0
-    $maintenanceLayout.Controls.Add($sanitizeButton,1,2)
+    $maintenanceLayout.Controls.Add($sanitizeButton,1,1)
 
     $updateButton = New-GUIButton "Update Toolkit" { Show-GUIToolkitUpdater }
     $updateButton.Dock = "Fill"
     $updateButton.Width = 0
-    $maintenanceLayout.Controls.Add($updateButton,0,3)
+    $maintenanceLayout.Controls.Add($updateButton,0,2)
     $deployButton = New-GUIButton "Deploy Fresh Toolkit" { Show-GUIToolkitDeployment }
     $deployButton.Dock = "Fill"
     $deployButton.Width = 0
-    $maintenanceLayout.Controls.Add($deployButton,1,3)
+    $maintenanceLayout.Controls.Add($deployButton,1,2)
 
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
     $foldersLabel.TextAlign = "MiddleLeft"
-    $maintenanceLayout.Controls.Add($foldersLabel,0,5)
+    $maintenanceLayout.Controls.Add($foldersLabel,0,4)
     $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -14782,7 +14772,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.Controls.Add($folderPanel,0,6)
+    $maintenanceLayout.Controls.Add($folderPanel,0,5)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "View Live Log" { Show-GUILiveLogWindow }
@@ -15196,6 +15186,12 @@ function Build-Form {
     $consoleButton.Add_Click({ Start-ToolkitConsole })
 
     $status = New-Object System.Windows.Forms.StatusStrip
+    $script:ToolkitVersionLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
+    $ToolkitVersionLabel.Text = "v?.?.?  |  build unavailable"
+    $ToolkitVersionLabel.Spring = $false
+    $ToolkitVersionLabel.ForeColor = $script:GUITheme.MutedText
+    $ToolkitVersionLabel.Margin = New-Object System.Windows.Forms.Padding(0,0,14,0)
+    $ToolkitVersionLabel.ToolTipText = "Toolkit version and build from App\manifests\toolkit-version.json"
     $script:StatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
     $StatusLabel.Text = "Ready"
     $StatusLabel.Spring = $true
@@ -15208,10 +15204,12 @@ function Build-Form {
     $GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
     $GUIBusyProgress.MarqueeAnimationSpeed = 28
     $GUIBusyProgress.Visible = $false
+    $status.Items.Add($ToolkitVersionLabel) | Out-Null
     $status.Items.Add($StatusLabel) | Out-Null
     $status.Items.Add($GUIBusyLabel) | Out-Null
     $status.Items.Add($GUIBusyProgress) | Out-Null
     $root.Controls.Add($status,0,3)
+    Update-GUIToolkitVersionLabel
 
     if(!$script:ToolTip){
         $script:ToolTip = New-Object System.Windows.Forms.ToolTip

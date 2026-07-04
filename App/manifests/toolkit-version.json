@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260704153239,
-    "SourceUpdatedAt":  "2026-07-04T15:32:39.5785442-05:00",
-    "ReleaseNotes":  "Triage page catalog cleanup, descriptive triage bundle naming, and task consolidation."
+    "Build":  20260704154743,
+    "SourceUpdatedAt":  "2026-07-04T15:47:43.2054764-05:00",
+    "ReleaseNotes":  "Moved toolkit version and build to the bottom-left status bar and removed the duplicate Settings-page version display."
 }

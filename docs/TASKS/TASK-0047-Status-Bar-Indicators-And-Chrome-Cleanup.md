@@ -1,7 +1,7 @@
 # TASK-0047 - Status Bar Indicators And Chrome Cleanup
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
@@ -33,7 +33,22 @@ The status bar should expose useful live information without mystery UI pieces. 
 - [ ] Wi-Fi signal strength appears in the status bar when Wi-Fi data is available.
 - [ ] Windows Update page shows a compact Windows Update service health indicator.
 - [ ] Wi-Fi page shows compact signal strength if page-level placement is useful.
-- [ ] Version and Build appear as small static text in the bottom-left status bar.
+- [x] Version and Build appear as small static text in the bottom-left status bar.
 - [ ] Unknown or unavailable Wi-Fi status renders neutral/off without errors.
 - [ ] Indicator updates do not slow tab switching.
-- [ ] PowerShell parse, GUI smoke, and button-smoke validation pass.
+- [x] PowerShell parse, GUI smoke, and button-smoke validation pass for the version/build status-bar slice.
+
+## Progress Notes
+- Moved toolkit version/build from the Settings-page maintenance block to a static bottom-left `StatusStrip` label.
+- Removed the duplicate Settings-page version/build row so Settings keeps the maintenance space for actions and folder links.
+- Updated toolkit build metadata with `App/Update-ToolkitVersion.ps1`.
+
+## Validation
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+
+## Test This
+- Launch the toolkit and confirm the bottom-left status bar shows `v1.0.0 | build <number>`.
+- Open Settings and confirm the old `Toolkit version... Source updated...` text is gone.
+- Confirm the Settings maintenance buttons still align and do not look shifted or clipped.

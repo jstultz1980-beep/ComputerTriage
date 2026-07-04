@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0053
+HANDOFF-0054
 
 ## Current Task
-TASK-0044-GUI-Tab-Performance-Hardening
+TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup
 
 ## Current Owner
 Codex
@@ -30,7 +30,7 @@ TASK-0046 completed the Triage page catalog and bundle cleanup.
 
 TASK-0052 completed the mandatory Documentation Counter Audit after TASK-0046/build metadata documentation reached the Documentation threshold.
 
-Implementation work may resume under the single active task: TASK-0044 GUI Tab Performance Hardening.
+Implementation work may resume under the single active task: TASK-0047 Status Bar Indicators And Chrome Cleanup.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -54,14 +54,14 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 1 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 0 / 10 | No |
-| Task System | 6 / 10 | No |
+| Documentation | 1 / 10 | No |
+| Task System | 7 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
-| UI | 2 / 10 | No |
+| UI | 3 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 1 / 10 | No |
+| Build System | 2 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
@@ -77,10 +77,10 @@ Recently completed work:
 - TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
 
 Current active work:
-- TASK-0044 is active for GUI tab performance hardening.
+- TASK-0047 is active for status-bar indicators and chrome cleanup.
 
 Queued implementation/design work, in recommended order:
-- TASK-0047 Status Bar Indicators And Chrome Cleanup.
+- TASK-0044 GUI Tab Performance Hardening.
 - TASK-0043 Client Data Transfer.
 - TASK-0051 Development File Deployment Exclusions.
 - TASK-0040 Software Inventory And Placement Implementation.
@@ -88,20 +88,18 @@ Queued implementation/design work, in recommended order:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0044-GUI-Tab-Performance-Hardening`
+`TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`
 
 Scope summary:
-- Profile first-load cost for the Activity page.
-- Specifically address the first-time Activity tab lag reported during testing.
-- Profile tab-switch cost across high-lag tabs.
-- Ensure timers, background refreshes, WMI calls, performance counters, and discovery refreshes only run when needed.
-- Defer expensive page population until visible and cache safe static UI where practical.
-- Preserve live gauge behavior on the Activity tab.
-- Add or improve diagnostics for slow tab changes so future lag has useful evidence.
-- Keep the GUI stable if performance counters are missing or slow.
+- Determine whether the small rectangle in the bottom-right status area serves a purpose.
+- Add compact Wi-Fi signal-strength status where available.
+- Add compact Windows Update service health on the Windows Update page.
+- Keep unknown/unavailable indicators neutral/off.
+- Keep indicators lightweight so they do not slow tab switching.
+- Version/build placement in the bottom-left status bar is complete.
 
 ## Queued Work
-- `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` owned by Codex.
+- `TASK-0044-GUI-Tab-Performance-Hardening` owned by Codex.
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
 - `TASK-0051-Development-File-Deployment-Exclusions` owned by Codex.
 - `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
@@ -122,6 +120,10 @@ Scope summary:
 - Direct triage setup validation passed via `TriageService.ps1`.
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0047 for the requested status-bar version/build placement slice.
+- Moved toolkit version/build to the bottom-left status bar and removed the duplicate Settings-page version display.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation, GUI smoke test, and button-smoke test passed for the TASK-0047 slice.
 
 ## Blockers
 No audit gate is currently blocking implementation.
@@ -136,7 +138,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0046: Clean up triage page and catalog
+TASK-0047: Move version build to status bar
 ```
 
 ## Next Bot Prompt
@@ -154,31 +156,31 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0044-GUI-Tab-Performance-Hardening.md
+7. docs/TASKS/TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0044-GUI-Tab-Performance-Hardening.
+- Active task: TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup.
 - Owner: Codex.
 - TASK-0046 completed the Triage page catalog and bundle cleanup.
 - TASK-0052 completed the Documentation Counter Audit and reset the audited Documentation counter.
-- Next queued tasks after TASK-0044 are TASK-0047, TASK-0043, TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
+- Next queued tasks after TASK-0047 are TASK-0044, TASK-0043, TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 
 Your job:
-Execute TASK-0044 only.
+Execute TASK-0047 only.
 
 Scope:
-- Profile first-load cost for the Activity page.
-- Specifically address the first-time Activity tab lag reported during testing.
-- Profile tab-switch cost across high-lag tabs.
-- Ensure timers, background refreshes, WMI calls, performance counters, and discovery refreshes only run when needed.
-- Defer expensive page population until visible and cache safe static UI where practical.
-- Preserve live gauge behavior on the Activity tab.
-- Add or improve diagnostics for slow tab changes so future lag has useful evidence.
-- Keep the GUI stable if performance counters are missing or slow.
+- Determine whether the small rectangle in the bottom-right status area serves a purpose.
+- Remove the bottom-right rectangle if it is decorative or unused; if it has a purpose, make it obvious.
+- Add compact Wi-Fi signal strength to the bottom-right status bar area.
+- Show both icon-style strength and numerical strength where available.
+- Add compact Windows Update service health to the Windows Update page.
+- Add compact Wi-Fi signal strength to the Wi-Fi page when useful.
+- Keep indicators neutral/off when unknown or unavailable.
+- Preserve the completed bottom-left version/build status-bar label.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -193,9 +195,10 @@ Validation expectations:
 - PowerShell parse check passes for the GUI script.
 - GUI smoke test passes.
 - Button-smoke test passes.
-- Activity refresh does not run while another tab is selected.
-- Slow tab-switch diagnostics are recorded when a tab exceeds the chosen threshold.
-- First-open lag is reduced or the blocking operation is isolated and documented.
+- Bottom-right status-bar rectangle is either removed or has an obvious purpose.
+- Wi-Fi signal strength appears in the status bar when available.
+- Windows Update page shows compact service health.
+- Indicators do not slow tab switching.
 
 When done, provide:
 - Concise summary of implementation performed.

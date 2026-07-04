@@ -1,7 +1,7 @@
 # TASK-0044 - GUI Tab Performance Hardening
 
 ## Status
-Active
+Queued
 
 ## Owner
 Codex
