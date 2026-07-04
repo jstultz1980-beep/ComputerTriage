@@ -145,3 +145,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0135 | 2026-07-04 | TASK-0047 | UI | +1 | Moved toolkit version/build to a small static bottom-left status-bar label and removed the duplicate Settings-page version display. |
 | CHG-0136 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the status-bar version/build change. |
 | CHG-0137 | 2026-07-04 | TASK-0047 | Documentation | +1 | Updated TASK-0047, queue, roadmap, handoff, changelog, and ledger records for the status-bar version/build slice. |
+| CHG-0138 | 2026-07-04 | TASK-0047 | UI | +1 | Fixed header summary clipping and replaced Settings/Help with compact dedicated header icon controls. |
+| CHG-0139 | 2026-07-04 | TASK-0047 / TASK-0044 | Documentation | +1 | Updated punch list, TASK-0047, TASK-0044, handoff, changelog, and ledger for header chrome and performance follow-up notes. |
+| CHG-0140 | 2026-07-04 | PROJECT | Repository Governance | +1 | Added the GitHub Sync Rule to defer routine pushes until the 10-change audit/refactor checkpoint unless explicitly requested. |
+| CHG-0141 | 2026-07-04 | TASK-0033 | Task System | +1 | Changed queued TASK-0033 ownership from ChatGPT to Codex while ChatGPT is not in use. |
+| CHG-0142 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the header chrome and punch-list tracking change. |

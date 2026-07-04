@@ -85,6 +85,11 @@ Use `App/Update-ToolkitVersion.ps1` unless a task explicitly changes versioning 
 The semantic `Version` may remain unchanged for normal task work, but the `Build`,
 `SourceUpdatedAt`, and `ReleaseNotes` fields must reflect the committed change.
 
+## GitHub Sync Rule
+Normal implementation tasks may be committed locally, but should not be pushed to GitHub unless explicitly requested.
+
+Repository GitHub sync should happen during the 10-change audit/refactor checkpoint, or sooner only when the user asks for a push.
+
 ## Product
 Computer Triage Toolkit.
 

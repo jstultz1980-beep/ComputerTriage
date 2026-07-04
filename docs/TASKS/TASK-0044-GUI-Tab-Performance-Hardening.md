@@ -13,6 +13,9 @@ Reduce the first-open Activity tab lag and remaining tab-to-tab navigation lag.
 The Activity tab renders faster than most pages after the first load, but the first visit still lags. Moving between tabs is improved but still noticeably slow. The toolkit should feel responsive during live troubleshooting.
 
 ## Scope
+- Profile `NetworkToolkit.vbs` launch delay before the PowerShell GUI appears.
+- Reduce launcher overhead where possible without reintroducing console popups.
+- Confirm tabs are not unnecessarily built during launch; defer tab page construction until first selection where practical.
 - Profile first-load cost for the Activity page.
 - Specifically address the first-time Activity tab lag reported during testing.
 - Profile tab-switch cost across high-lag tabs.
@@ -28,6 +31,8 @@ The Activity tab renders faster than most pages after the first load, but the fi
 - Changing diagnostic collection behavior unrelated to page rendering.
 
 ## Acceptance Criteria
+- [ ] `NetworkToolkit.vbs` launch delay is measured and the slowest step is identified or improved.
+- [ ] Tabs are not prebuilt during launch unless required for startup correctness.
 - [ ] First Activity tab load is measurably faster or the blocking operation is identified and isolated.
 - [ ] Tab-switch diagnostics identify any tab taking longer than the slow-switch threshold.
 - [ ] Activity refresh does not run while another tab is selected.

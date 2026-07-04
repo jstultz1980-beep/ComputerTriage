@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-04
+- Fixed header summary clipping so the `Computer` label no longer renders under the title block.
+- Reworked Settings and Help header controls with dedicated compact icon styling.
+- Updated `punch_list.txt` to use Markdown-style strike-through for completed requests and added the new header, tab first-render, VBS launch, and GitHub sync-policy notes.
+- Added the GitHub Sync Rule to keep routine work local and defer GitHub pushes to the 10-change audit/refactor checkpoint unless explicitly requested.
+- Moved TASK-0033 ownership from ChatGPT to Codex while ChatGPT is not in use.
 - Activated TASK-0047 for the requested status-bar version/build placement change.
 - Moved toolkit version/build to a small static bottom-left status-bar label and removed the duplicate version/build row from Settings.
 - Updated toolkit build metadata for the TASK-0047 status-bar slice.

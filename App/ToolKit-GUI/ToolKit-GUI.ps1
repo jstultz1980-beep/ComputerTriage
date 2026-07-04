@@ -1172,6 +1172,25 @@ function Set-GUIButtonChrome {
     Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){6}else{8})
 }
 
+function Set-GUIHeaderIconButtonChrome {
+    param([System.Windows.Forms.Button]$Button)
+
+    if(!$Button){
+        return
+    }
+
+    $Button.FlatStyle = "Flat"
+    $Button.UseVisualStyleBackColor = $false
+    $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $Button.FlatAppearance.BorderSize = 0
+    $Button.FlatAppearance.MouseOverBackColor = $script:GUITheme.Accent
+    $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
+    $Button.BackColor = $script:GUITheme.AccentDark
+    $Button.ForeColor = [System.Drawing.Color]::White
+    $Button.Padding = New-Object System.Windows.Forms.Padding(0,0,0,1)
+    Set-GUIRoundedCorners -Control $Button -Radius 9
+}
+
 function Set-GUITabButtonChrome {
     param(
         [System.Windows.Forms.Button]$Button,
@@ -1515,8 +1534,7 @@ function Apply-GUIThemeRuntime {
 
     foreach($headerButton in @($script:SettingsGearButton,$script:HelpButton)){
         if($headerButton -and !$headerButton.IsDisposed){
-            $headerButton.BackColor = $script:GUITheme.AccentDark
-            $headerButton.ForeColor = [System.Drawing.Color]::White
+            Set-GUIHeaderIconButtonChrome -Button $headerButton
         }
     }
 
@@ -8795,7 +8813,7 @@ function Add-GUIHeaderComputerSummary {
     $dashboard = Get-GUIDashboardInfo
 
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
-    $summary.Location = New-Object System.Drawing.Point(330,10)
+    $summary.Location = New-Object System.Drawing.Point(370,10)
     $summary.Size = New-Object System.Drawing.Size(710,58)
     $summary.Anchor = "Top,Left,Right"
     $summary.ColumnCount = 4
@@ -9199,14 +9217,14 @@ function Update-GUIHeaderLayout {
     $searchLeft = $null
     if($script:HeaderToolSearchBox -and !$script:HeaderToolSearchBox.IsDisposed -and $script:HeaderToolsPanel){
         $searchWidth = 270
-        $searchLeft = [Math]::Max(360, $script:HeaderToolsPanel.Left - $searchWidth - 14)
+        $searchLeft = [Math]::Max(390, $script:HeaderToolsPanel.Left - $searchWidth - 14)
         $script:HeaderToolSearchBox.Location = New-Object System.Drawing.Point($searchLeft,22)
         $script:HeaderToolSearchBox.Size = New-Object System.Drawing.Size($searchWidth,28)
         $script:HeaderToolSearchBox.Visible = ($script:HeaderToolsPanel.Left - $searchLeft - 10) -ge 230
     }
 
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
-        $summaryLeft = 330
+        $summaryLeft = 370
         $summaryRight = if($searchLeft){ $searchLeft - 16 }else{ $script:HeaderToolsPanel.Left - 16 }
         $summaryWidth = [Math]::Max(430, $summaryRight - $summaryLeft)
         $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
@@ -14948,19 +14966,18 @@ function Build-Form {
     $headerTools = New-Object System.Windows.Forms.Panel
     $headerTools.Anchor = "Top,Right"
     $headerTools.Location = New-Object System.Drawing.Point(1070,14)
-    $headerTools.Size = New-Object System.Drawing.Size(136,42)
+    $headerTools.Size = New-Object System.Drawing.Size(122,42)
     $headerTools.BackColor = [System.Drawing.Color]::Transparent
     $script:HeaderToolsPanel = $headerTools
     $header.Controls.Add($headerTools)
 
     $settingsMenu = New-Object System.Windows.Forms.Button
-    $settingsMenu.Text = [string][char]0x2699
-    $settingsMenu.Location = New-Object System.Drawing.Point(50,7)
-    $settingsMenu.Size = New-Object System.Drawing.Size(34,28)
-    $settingsMenu.Font = New-Object System.Drawing.Font("Segoe UI Symbol",12.5,[System.Drawing.FontStyle]::Bold)
+    $settingsMenu.Text = [string][char]0x22EE
+    $settingsMenu.Location = New-Object System.Drawing.Point(48,6)
+    $settingsMenu.Size = New-Object System.Drawing.Size(32,30)
+    $settingsMenu.Font = New-Object System.Drawing.Font("Segoe UI Symbol",14,[System.Drawing.FontStyle]::Bold)
     $settingsMenu.TextAlign = "MiddleCenter"
-    Set-GUIButtonChrome -Button $settingsMenu
-    $settingsMenu.BackColor = $script:GUITheme.AccentDark
+    Set-GUIHeaderIconButtonChrome -Button $settingsMenu
     $settingsMenu.Add_Click({ Open-GUISettingsPage })
     $script:SettingsGearButton = $settingsMenu
     $headerTools.Controls.Add($settingsMenu)
@@ -15000,12 +15017,11 @@ function Build-Form {
 
     $helpButton = New-Object System.Windows.Forms.Button
     $helpButton.Text = "?"
-    $helpButton.Location = New-Object System.Drawing.Point(94,7)
-    $helpButton.Size = New-Object System.Drawing.Size(34,28)
-    $helpButton.Font = New-Object System.Drawing.Font("Segoe UI Semibold",11,[System.Drawing.FontStyle]::Bold)
+    $helpButton.Location = New-Object System.Drawing.Point(88,6)
+    $helpButton.Size = New-Object System.Drawing.Size(32,30)
+    $helpButton.Font = New-Object System.Drawing.Font("Segoe UI Semibold",12,[System.Drawing.FontStyle]::Bold)
     $helpButton.TextAlign = "MiddleCenter"
-    Set-GUIButtonChrome -Button $helpButton
-    $helpButton.BackColor = $script:GUITheme.AccentDark
+    Set-GUIHeaderIconButtonChrome -Button $helpButton
     $helpButton.Add_Click({ Open-GUIHelpFile })
     $script:HelpButton = $helpButton
     $headerTools.Controls.Add($helpButton)

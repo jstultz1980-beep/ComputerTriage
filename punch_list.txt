@@ -1,18 +1,22 @@
 Computer Toolkit Change Requests
 
-1. Remove 'Printing" Sub Heading from the Print Diagnostics block on the Printing Page
-2. The "Find Servers" Button on the printing page has the top and bottom of the text cut off
-3. Computer Tab: Make the info section larger and add any additional info you think may need to be there. Make the Profile table only have about 3 visible lines.
+1. ~~Remove 'Printing" Sub Heading from the Print Diagnostics block on the Printing Page~~
+2. ~~The "Find Servers" Button on the printing page has the top and bottom of the text cut off~~
+3. ~~Computer Tab: Make the info section larger and add any additional info you think may need to be there. Make the Profile table only have about 3 visible lines.~~
 4. Activity Tab needs to render quicker and smoother.
-5. The Setttings and Hlep button look pretty ghetto.
+5. ~~The Setttings and Hlep button look pretty ghetto.~~
 6. Triage tab
-6a. Move the quick and full triage buttons oput of a box. Just make them across the top of the tab. Remove the status block. That is info that should be in the STATUS bar.
-6b. Remove sysinternals from the tool cataloge list.
-6c. Make WinAudit work or remove it. Remove applications from this list that live elsewhere in the toolkit.
-6d. What is 'Export Manifest' used for?
+6a. ~~Move the quick and full triage buttons oput of a box. Just make them across the top of the tab. Remove the status block. That is info that should be in the STATUS bar.~~
+6b. ~~Remove sysinternals from the tool cataloge list.~~
+6c. ~~Make WinAudit work or remove it. Remove applications from this list that live elsewhere in the toolkit.~~
+6d. ~~What is 'Export Manifest' used for?~~
 7. I would like a wifi signal strength indicator in the status bar. Does the small rectangle in the bottom right server a purpose? I havent seen it do anything.
 8. Add a Wifi Strength indicator to the bottom right of the status bar.
-9. I want the trtiage bundles to be named more descriptive for easier identification.
-10. Make the crown a little smaller
-11. Move the Version and Build information to the bottom left in the status bar. Make the text small and static.
+9. ~~I want the trtiage bundles to be named more descriptive for easier identification.~~
+10. ~~Make the crown a little smaller~~
+11. ~~Move the Version and Build information to the bottom left in the status bar. Make the text small and static.~~
+12. ~~Header layout: the word "Computer" is cut off on the left side of the header summary.~~
+13. Tabs are slow to render the first time but fast after that; investigate lazy tab construction and first-open work.
+14. NetworkToolkit.vbs is slow to launch the actual toolkit; profile startup and reduce launcher delay where possible.
+15. ~~Hold off on routine GitHub syncing; perform GitHub sync during the 10-change audit/refactor checkpoint unless explicitly requested earlier.~~
 

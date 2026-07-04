@@ -4,7 +4,7 @@
 Queued
 
 ## Owner
-ChatGPT
+Codex
 
 ## Objective
 Run the planned tab-by-tab analysis pass and define which tabs should remain launchers, which should become richer workflow pages, and which launch-only tools should become embedded experiences.

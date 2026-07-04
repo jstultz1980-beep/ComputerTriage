@@ -19,7 +19,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
 | `TASK-0051-Development-File-Deployment-Exclusions` | Codex | Queued | Inventory development-only files and exclude them from toolkit deployment and deployed updates. |
 | `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Queued | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |
-| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Consolidated Directory direction and embedded-tool roadmap into a tab-by-tab workflow plan. |
+| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | Codex | Queued | Consolidated Directory direction and embedded-tool roadmap into a tab-by-tab workflow plan. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
 ## Completed / Historical

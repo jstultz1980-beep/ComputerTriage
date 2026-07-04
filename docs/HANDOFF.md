@@ -52,16 +52,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 1 / 10 | No |
+| Repository Governance | 2 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 1 / 10 | No |
-| Task System | 7 / 10 | No |
+| Documentation | 2 / 10 | No |
+| Task System | 8 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
-| UI | 3 / 10 | No |
+| UI | 4 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 2 / 10 | No |
+| Build System | 3 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
@@ -103,7 +103,7 @@ Scope summary:
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
 - `TASK-0051-Development-File-Deployment-Exclusions` owned by Codex.
 - `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
-- `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
+- `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 
 ## Validation Completed For This Update
@@ -124,6 +124,13 @@ Scope summary:
 - Moved toolkit version/build to the bottom-left status bar and removed the duplicate Settings-page version display.
 - Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
 - PowerShell parser validation, GUI smoke test, and button-smoke test passed for the TASK-0047 slice.
+- Fixed header summary clipping so the `Computer` label no longer renders under the title block.
+- Reworked Settings and Help as compact dedicated header icon controls.
+- Updated `punch_list.txt` with Markdown-style strike-through for completed items.
+- Added new punch-list items for first-render tab lag, `NetworkToolkit.vbs` launch delay, and GitHub sync policy.
+- Added the GitHub Sync Rule to `PROJECT.md`; routine work should be committed locally but not pushed until the 10-change audit/refactor checkpoint unless explicitly requested.
+- Moved queued TASK-0033 ownership from ChatGPT to Codex while ChatGPT is not in use.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
 
 ## Blockers
 No audit gate is currently blocking implementation.
@@ -136,9 +143,12 @@ Known working-tree noise:
 - Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
 - `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has shown local stale/locked drift during ARGUS work. Do not stage it unless a future task explicitly updates the accepted ADR.
 
+GitHub sync note:
+- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
+
 ## Recommended Commit Message
 ```text
-TASK-0047: Move version build to status bar
+TASK-0047: Fix header chrome and status tracking
 ```
 
 ## Next Bot Prompt
@@ -168,6 +178,7 @@ Current task state:
 - Next queued tasks after TASK-0047 are TASK-0044, TASK-0043, TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
+- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
 Execute TASK-0047 only.
