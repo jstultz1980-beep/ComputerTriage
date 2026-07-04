@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Codex | Active | Consolidated status-bar/page indicators, bottom chrome cleanup, and version/build placement. |
+| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Active | Reduce Activity first-open lag, remaining tab-to-tab navigation lag, and launcher startup delay. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Queued | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
 | `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
 | `TASK-0051-Development-File-Deployment-Exclusions` | Codex | Queued | Inventory development-only files and exclude them from toolkit deployment and deployed updates. |
 | `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Queued | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |
@@ -57,6 +56,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` | Completed | Simplified the Triage action row, removed visible catalog noise, removed the visible manifest export action, and made bundle names more descriptive. |
 | `TASK-0048-Task-System-Counter-Audit` | Completed | Audited task-state consistency after the Task System counter reached 10/10 and reset the audited counter. |
 | `TASK-0049-UI-Counter-Audit` | Completed | Audited UI task history after the UI counter reached 10/10 and reset the audited counter. |
+| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Completed | Added status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
 | `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
@@ -71,4 +71,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0046.
+- Current active task is TASK-0044.

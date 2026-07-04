@@ -10,8 +10,8 @@ Computer Toolkit Change Requests
 6b. ~~Remove sysinternals from the tool cataloge list.~~
 6c. ~~Make WinAudit work or remove it. Remove applications from this list that live elsewhere in the toolkit.~~
 6d. ~~What is 'Export Manifest' used for?~~
-7. I would like a wifi signal strength indicator in the status bar. Does the small rectangle in the bottom right server a purpose? I havent seen it do anything.
-8. Add a Wifi Strength indicator to the bottom right of the status bar.
+7. ~~I would like a wifi signal strength indicator in the status bar. Does the small rectangle in the bottom right server a purpose? I havent seen it do anything.~~
+8. ~~Add a Wifi Strength indicator to the bottom right of the status bar.~~
 9. ~~I want the trtiage bundles to be named more descriptive for easier identification.~~
 10. ~~Make the crown a little smaller~~
 11. ~~Move the Version and Build information to the bottom left in the status bar. Make the text small and static.~~

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260704160112,
-    "SourceUpdatedAt":  "2026-07-04T16:01:12.2423326-05:00",
-    "ReleaseNotes":  "Fixed header summary clipping, refined Settings and Help header controls, updated punch-list tracking, and recorded local-only GitHub sync policy."
+    "Build":  20260704161646,
+    "SourceUpdatedAt":  "2026-07-04T16:16:46.1485325-05:00",
+    "ReleaseNotes":  "Completed status-bar indicators with Wi-Fi signal, Windows Update service health, and clarified busy indicator purpose."
 }

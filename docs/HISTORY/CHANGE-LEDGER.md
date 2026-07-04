@@ -150,3 +150,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0140 | 2026-07-04 | PROJECT | Repository Governance | +1 | Added the GitHub Sync Rule to defer routine pushes until the 10-change audit/refactor checkpoint unless explicitly requested. |
 | CHG-0141 | 2026-07-04 | TASK-0033 | Task System | +1 | Changed queued TASK-0033 ownership from ChatGPT to Codex while ChatGPT is not in use. |
 | CHG-0142 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the header chrome and punch-list tracking change. |
+| CHG-0143 | 2026-07-04 | TASK-0047 | UI | +1 | Added compact Wi-Fi status-bar/page indicators, Windows Update service health, and clarified the busy progress indicator purpose. |
+| CHG-0144 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for completed status-bar indicators. |
+| CHG-0145 | 2026-07-04 | TASK-0047 | Documentation | +1 | Updated TASK-0047, queue, roadmap, handoff, changelog, and punch-list records for status-indicator completion. |
+| CHG-0146 | 2026-07-04 | TASK-0047 / TASK-0044 | Task System | +1 | Completed TASK-0047 and activated TASK-0044 as the next single active task. |

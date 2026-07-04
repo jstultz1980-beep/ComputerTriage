@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-04
+- Completed TASK-0047 Status Bar Indicators And Chrome Cleanup.
+- Added compact Wi-Fi signal status in the bottom status bar and on the Wi-Fi tab, including neutral/off handling when Wi-Fi is unavailable.
+- Added a compact Windows Update service-health indicator on the Windows Update tab.
+- Clarified the purpose of the bottom-right busy progress indicator and prevented Wi-Fi probing from leaking `netsh` exit codes into GUI smoke tests.
+- Activated TASK-0044 GUI Tab Performance Hardening as the next implementation task.
 - Fixed header summary clipping so the `Computer` label no longer renders under the title block.
 - Reworked Settings and Help header controls with dedicated compact icon styling.
 - Updated `punch_list.txt` to use Markdown-style strike-through for completed requests and added the new header, tab first-render, VBS launch, and GitHub sync-policy notes.
