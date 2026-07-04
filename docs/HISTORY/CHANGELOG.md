@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-07-04
+- Completed TASK-0046 Triage Page Catalog And Bundle Cleanup.
+- Reworked the Triage tab top area into a flat action row, moved triage status into the application status path, filtered redundant catalog tools from the visible Triage catalog, removed the visible Export Manifest action, and made triage bundle ZIP names include triage profile context.
+- Added the Build Metadata Rule to `PROJECT.md` and updated `App/manifests/toolkit-version.json` for this implementation change.
+- Completed TASK-0052 Documentation Counter Audit after documentation updates reached the counter threshold and reset only the Documentation counter.
+- Activated TASK-0044 GUI Tab Performance Hardening as the next implementation task.
+- Consolidated the outstanding task queue into a smaller logical order: Triage cleanup, GUI performance, status indicators/chrome, client-data transfer, development-file deployment exclusions, software inventory/placement, tab-by-tab embedding plan, and HEPHAESTUS rule expansion.
+- Archived duplicate/superseded planning tasks for portable-tool classification, embedded-tool roadmap, page indicators, and software inventory.
+- Added missing TASK-0021 HEPHAESTUS Rule Catalog Expansion and new TASK-0051 Development File Deployment Exclusions.
+- Completed TASK-0050 Roadmap Backlog Counter Audit and reset the audited Roadmap/Backlog counter.
+
 ## 2026-07-03
 - Tightened the TASK-0032 Computer tab summary follow-up so the recent profile table/header no longer clips below the summary area.
 - Completed TASK-0045 Print Page Polish and activated the UI counter audit gate.

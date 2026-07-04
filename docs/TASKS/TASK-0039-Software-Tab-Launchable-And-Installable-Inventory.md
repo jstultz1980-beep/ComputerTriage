@@ -1,7 +1,10 @@
 # TASK-0039 - Software Tab Launchable And Installable Inventory
 
 ## Status
-Queued
+Archived
+
+## Superseded By
+`TASK-0040-Software-Inventory-And-Placement-Implementation`
 
 ## Owner
 ChatGPT

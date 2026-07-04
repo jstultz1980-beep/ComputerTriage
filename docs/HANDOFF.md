@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0050
+HANDOFF-0053
 
 ## Current Task
-TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup
+TASK-0044-GUI-Tab-Performance-Hardening
 
 ## Current Owner
 Codex
@@ -26,9 +26,11 @@ The handoff process has four core files:
 Only one task may be `Active`.
 
 ## Objective
-TASK-0042 completed the mandatory Documentation Counter Audit after the Documentation counter reached `10 / 10`.
+TASK-0046 completed the Triage page catalog and bundle cleanup.
 
-Implementation work may resume under the single active task: TASK-0046 Triage Page Catalog And Bundle Cleanup.
+TASK-0052 completed the mandatory Documentation Counter Audit after TASK-0046/build metadata documentation reached the Documentation threshold.
+
+Implementation work may resume under the single active task: TASK-0044 GUI Tab Performance Hardening.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -50,18 +52,18 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 0 / 10 | No |
+| Repository Governance | 1 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 6 / 10 | No |
-| Task System | 2 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 6 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
-| Reporting | 0 / 10 | No |
-| UI | 1 / 10 | No |
+| Reporting | 1 / 10 | No |
+| UI | 2 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 0 / 10 | No |
+| Build System | 1 / 10 | No |
 | Validation/Test Framework | 3 / 10 | No |
-| Roadmap/Backlog | 9 / 10 | No |
+| Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -69,83 +71,62 @@ The GitHub remote is configured as `https://github.com/jstultz1980-beep/Computer
 Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one active task.
 
 Recently completed work:
-- TASK-0028 completed focused Quick Dx run-panel cleanup.
-- TASK-0029 completed focused Choco page layout refinement.
-- TASK-0041 completed the UI counter audit and reset the audited UI counter.
-- TASK-0037 completed Activity page running-tool tracking.
-- TASK-0030 completed Print tab data-path cleanup.
-- TASK-0031 completed Triage page simplification.
-- TASK-0042 completed the mandatory Documentation Counter Audit and reset the audited Documentation counter.
+- TASK-0045 completed Print page polish.
+- TASK-0050 completed the required Roadmap/Backlog audit after outstanding tasks were consolidated.
+- TASK-0046 completed Triage page catalog and bundle cleanup.
+- TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
 
 Current active work:
-- TASK-0046 is active for Triage page catalog and bundle cleanup.
+- TASK-0044 is active for GUI tab performance hardening.
 
-Queued implementation/design work:
-- TASK-0021 HEPHAESTUS Rule Catalog Expansion.
-- TASK-0022 HEPHAESTUS Portable Tool Classification.
-- TASK-0033 Directory Tab Direction And Embedding Plan.
-- TASK-0034 Embedded Tool Experience Roadmap.
-- TASK-0036 Page Health Indicators.
-- TASK-0039 Software Tab Launchable And Installable Inventory.
-- TASK-0040 Software Tab Launchable And Installable Implementation.
+Queued implementation/design work, in recommended order:
+- TASK-0047 Status Bar Indicators And Chrome Cleanup.
 - TASK-0043 Client Data Transfer.
-- TASK-0044 GUI Tab Performance Hardening.
-- TASK-0045 Print Page Polish.
-- TASK-0047 Status Bar Wi-Fi And Chrome Cleanup.
+- TASK-0051 Development File Deployment Exclusions.
+- TASK-0040 Software Inventory And Placement Implementation.
+- TASK-0033 Tab-By-Tab Direction And Embedding Plan.
+- TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup`
+`TASK-0044-GUI-Tab-Performance-Hardening`
 
 Scope summary:
-- Move `Quick Triage` and `Full Triage` buttons out of the surrounding box and place them across the top of the tab.
-- Move visible triage status into the status bar instead of a large page block.
-- Clean the Triage tool catalog by removing Sysinternals, duplicate apps, and non-working/non-portable WinAudit if necessary.
-- Decide whether `Export Manifest` should remain visible.
-- Make triage bundle names more descriptive.
+- Profile first-load cost for the Activity page.
+- Specifically address the first-time Activity tab lag reported during testing.
+- Profile tab-switch cost across high-lag tabs.
+- Ensure timers, background refreshes, WMI calls, performance counters, and discovery refreshes only run when needed.
+- Defer expensive page population until visible and cache safe static UI where practical.
+- Preserve live gauge behavior on the Activity tab.
+- Add or improve diagnostics for slow tab changes so future lag has useful evidence.
+- Keep the GUI stable if performance counters are missing or slow.
 
 ## Queued Work
-- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
-- `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` owned by ChatGPT.
-- `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
-- `TASK-0034-Embedded-Tool-Experience-Roadmap` owned by ChatGPT.
-- `TASK-0036-Page-Health-Indicators` owned by Codex.
-- `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` owned by ChatGPT.
-- `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` owned by Codex.
+- `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` owned by Codex.
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
-- `TASK-0044-GUI-Tab-Performance-Hardening` owned by Codex.
-- `TASK-0045-Print-Page-Polish` owned by Codex.
-- `TASK-0047-Status-Bar-WiFi-And-Chrome-Cleanup` owned by Codex.
+- `TASK-0051-Development-File-Deployment-Exclusions` owned by Codex.
+- `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
+- `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by ChatGPT.
+- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 
 ## Validation Completed For This Update
-- Completed TASK-0042 Documentation Counter Audit.
-- Verified `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` had exactly one active task before audit closeout.
-- Reset only the Documentation counter to `0 / 10`.
-- Reactivated TASK-0032 as the next focused implementation task.
-- Added TASK-0043 for client-data transfer between toolkit copies.
-- Added TASK-0044 for Activity first-load and tab-switch performance hardening.
-- Added the 2026-07-03 outstanding task audit for the latest punch-list.
-- Updated TASK-0032 with the refined Computer tab layout request.
-- Updated TASK-0038 with Settings/Help header-control cleanup.
-- Updated TASK-0044 with the first-time Activity tab lag report.
-- Added TASK-0045 for Print page polish.
-- Added TASK-0046 for Triage page catalog and bundle cleanup.
-- Added TASK-0047 for status-bar Wi-Fi and bottom-right chrome cleanup.
-- Implemented the TASK-0032 Computer tab summary redesign pass.
-- Validated GUI PowerShell parse, toolkit smoke, and button-smoke checks.
-- Read `punch_list.txt` after TASK-0032.
-- Consolidated the smaller-crown request into TASK-0038.
-- Completed TASK-0032 and the mandatory TASK-0048 Task System Counter Audit.
-- Reset only the Task System counter.
-- Activated TASK-0038 as the next implementation task.
-- Completed TASK-0038 Modern Control Style System.
-- Completed TASK-0045 Print Page Polish.
-- Completed TASK-0049 UI Counter Audit and reset only the UI counter.
-- Activated TASK-0046 as the next implementation task.
-- Applied a TASK-0032 follow-up correction so the Computer tab profile strip no longer clips below the summary.
-- Updated task, queue, roadmap, changelog, ledger, and handoff.
+- Consolidated outstanding tasks into a smaller logical sequence.
+- Completed TASK-0046 Triage Page Catalog And Bundle Cleanup.
+- Completed TASK-0052 Documentation Counter Audit and reset only the Documentation counter to `0 / 10`.
+- Activated TASK-0044 as the single active task.
+- Added TASK-0051 for development-only deployment/update exclusions.
+- Added the Build Metadata Rule to `PROJECT.md`.
+- Updated `App/manifests/toolkit-version.json` through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for:
+  - `App/ToolKit-GUI/ToolKit-GUI.ps1`
+  - `App/NetworkToolkit/Utilities/TriageService.ps1`
+- Direct triage setup validation passed via `TriageService.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 
 ## Blockers
-No audit gate is currently blocking implementation. Known working-tree drift remains excluded unless a future task explicitly owns it.
+No audit gate is currently blocking implementation.
+
+Known working-tree drift remains excluded unless a future task explicitly owns it.
 
 ## Notes for Next AI
 Known working-tree noise:
@@ -155,7 +136,7 @@ Known working-tree noise:
 
 ## Recommended Commit Message
 ```text
-TASK-0042: Complete documentation counter audit
+TASK-0046: Clean up triage page and catalog
 ```
 
 ## Next Bot Prompt
@@ -173,34 +154,31 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup.md
+7. docs/TASKS/TASK-0044-GUI-Tab-Performance-Hardening.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup.
+- Active task: TASK-0044-GUI-Tab-Performance-Hardening.
 - Owner: Codex.
-- TASK-0032 completed the Computer tab summary redesign.
-- TASK-0048 completed the Task System Counter Audit and reset the audited Task System counter.
-- TASK-0038 completed header/control cleanup.
-- TASK-0045 completed Print page polish.
-- TASK-0049 completed the UI Counter Audit and reset the audited UI counter.
-- TASK-0043 is queued for client-data transfer between toolkit copies.
-- TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
-- TASK-0045 through TASK-0047 are queued for Print, Triage, and status-bar cleanup.
+- TASK-0046 completed the Triage page catalog and bundle cleanup.
+- TASK-0052 completed the Documentation Counter Audit and reset the audited Documentation counter.
+- Next queued tasks after TASK-0044 are TASK-0047, TASK-0043, TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
+- Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 
 Your job:
-Execute TASK-0046 only.
+Execute TASK-0044 only.
 
 Scope:
-- Move Quick Triage and Full Triage out of the surrounding box and place them across the top of the tab.
-- Remove the visible Triage status block and surface that status in the status bar instead.
-- Remove Sysinternals entries from the Triage tool catalog.
-- Make WinAudit work if it can run portably; otherwise remove it from the Triage tool catalog.
-- Remove catalog applications that already live elsewhere in the toolkit.
-- Decide whether Export Manifest is still useful; keep it only if the UI clearly explains its purpose.
-- Make triage bundle names more descriptive for easier identification.
+- Profile first-load cost for the Activity page.
+- Specifically address the first-time Activity tab lag reported during testing.
+- Profile tab-switch cost across high-lag tabs.
+- Ensure timers, background refreshes, WMI calls, performance counters, and discovery refreshes only run when needed.
+- Defer expensive page population until visible and cache safe static UI where practical.
+- Preserve live gauge behavior on the Activity tab.
+- Add or improve diagnostics for slow tab changes so future lag has useful evidence.
+- Keep the GUI stable if performance counters are missing or slow.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -215,17 +193,15 @@ Validation expectations:
 - PowerShell parse check passes for the GUI script.
 - GUI smoke test passes.
 - Button-smoke test passes.
-- Triage tab primary actions are top-level controls, not boxed inside a status area.
-- Triage status is visible through the status bar.
-- Triage catalog no longer lists Sysinternals or tools already represented elsewhere.
-- WinAudit is either functional as a portable triage tool or removed.
-- Triage bundle names include computer, triage type, and timestamp context.
-- PowerShell parse, GUI smoke, button-smoke, and triage service validation pass.
+- Activity refresh does not run while another tab is selected.
+- Slow tab-switch diagnostics are recorded when a tab exceeds the chosen threshold.
+- First-open lag is reduced or the blocking operation is isolated and documented.
 
 When done, provide:
 - Concise summary of implementation performed.
 - Exact files changed.
 - Validation performed.
+- Test This list for the user.
 - Current active task.
 - Current owner and next owner.
 - Recommended commit message.

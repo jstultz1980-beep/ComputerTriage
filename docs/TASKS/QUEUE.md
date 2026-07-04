@@ -9,22 +9,18 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` | Codex | Active | Simplify Triage actions, clean the catalog, and make bundle names easier to identify. |
+| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Active | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
-| `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | ChatGPT | Queued | Classify optional portable tools, including whether LatencyMon should be tracked, ignored, or handled separately. |
-| `TASK-0033-Directory-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Decide whether Directory remains a launcher or becomes a domain insight page. |
-| `TASK-0034-Embedded-Tool-Experience-Roadmap` | ChatGPT | Queued | Prioritize launch-only tools that should become embedded tab experiences. |
-| `TASK-0036-Page-Health-Indicators` | Codex | Queued | Add compact Windows Update service and Wi-Fi signal-strength indicators. |
-| `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | ChatGPT | Queued | Classify Software tab apps/installers and research Registrar Registry Manager portability. |
-| `TASK-0040-Software-Tab-Launchable-And-Installable-Implementation` | Codex | Queued | Implement accepted Software tab separation between launchable apps and installable stored programs. |
+| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Codex | Queued | Consolidated status-bar/page indicators, bottom chrome cleanup, and version/build placement. |
 | `TASK-0043-Client-Data-Transfer` | Codex | Queued | Add a Settings-page workflow to transfer client diagnostic data to another toolkit copy. |
-| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Queued | Reduce Activity first-open lag and remaining tab-to-tab navigation lag. |
-| `TASK-0047-Status-Bar-WiFi-And-Chrome-Cleanup` | Codex | Queued | Add status-bar Wi-Fi strength and remove or clarify unused bottom-right chrome. |
+| `TASK-0051-Development-File-Deployment-Exclusions` | Codex | Queued | Inventory development-only files and exclude them from toolkit deployment and deployed updates. |
+| `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Queued | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |
+| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | ChatGPT | Queued | Consolidated Directory direction and embedded-tool roadmap into a tab-by-tab workflow plan. |
+| `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
 ## Completed / Historical
 
@@ -58,8 +54,15 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0038-Modern-Control-Style-System` | Completed | Cleaned up header Settings/Help controls, reduced the crown/elevation icon, and preserved shared rounded button styling. |
 | `TASK-0042-Documentation-Counter-Audit` | Completed | Audited documentation/task-state consistency after the Documentation counter reached 10/10 and reset the audited counter. |
 | `TASK-0045-Print-Page-Polish` | Completed | Removed the redundant Print diagnostics subheading and fixed clipped Print Queue discovery controls. |
+| `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` | Completed | Simplified the Triage action row, removed visible catalog noise, removed the visible manifest export action, and made bundle names more descriptive. |
 | `TASK-0048-Task-System-Counter-Audit` | Completed | Audited task-state consistency after the Task System counter reached 10/10 and reset the audited counter. |
 | `TASK-0049-UI-Counter-Audit` | Completed | Audited UI task history after the UI counter reached 10/10 and reset the audited counter. |
+| `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
+| `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
+| `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
+| `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
+| `TASK-0050-Roadmap-Backlog-Counter-Audit` | Completed | Audited roadmap/backlog consistency after task consolidation reached 10/10 and reset the audited counter. |
+| `TASK-0052-Documentation-Counter-Audit` | Completed | Audited documentation consistency after TASK-0046/build metadata updates reached 10/10 and reset the audited counter. |
 
 ## Reconciliation Decision
 

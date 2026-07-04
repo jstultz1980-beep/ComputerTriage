@@ -1,7 +1,10 @@
 # TASK-0036 - Page Health Indicators
 
 ## Status
-Queued
+Archived
+
+## Superseded By
+`TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`
 
 ## Owner
 Codex

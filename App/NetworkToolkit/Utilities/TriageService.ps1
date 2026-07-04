@@ -593,7 +593,10 @@ function Global:Invoke-NTKTriageRun {
         }
         $commandResults | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\command_results.json") -Encoding UTF8
         $findings = Invoke-NTKTriageAnalysis -Run $run -CommandResults $commandResults -EventResults $eventResults -FileRecords $fileRecords -ToolResults $toolResults -MissingTools $missingTools -Warnings $warnings -StartedUtc $started
-        $bundlePath = Join-Path $run.Path ("Bundle\{0}_DiagnosticsBundle.zip" -f $run.RunId)
+        $bundleProfile = if($SelectedToolsOnly){"SelectedTools"}else{$Profile}
+        $bundleProfile = ([regex]::Replace([string]$bundleProfile,'[^A-Za-z0-9._-]+','-')).Trim('-')
+        if([string]::IsNullOrWhiteSpace($bundleProfile)){ $bundleProfile = "Triage" }
+        $bundlePath = Join-Path $run.Path ("Bundle\{0}_{1}_DiagnosticBundle.zip" -f $run.RunId,$bundleProfile)
         $manifest = [pscustomobject]@{runId=$run.RunId;toolkitVersion=(Get-Content -LiteralPath (Join-Path (Get-NTKTriagePaths).Manifests "toolkit-version.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue);computerName=$env:COMPUTERNAME;profile=$Profile;startedUtc=$started;endedUtc=(Get-Date).ToUniversalTime().ToString("o");selectedToolsOnly=[bool]$SelectedToolsOnly;selectedToolIds=@($SelectedToolIds);filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);missingTools=@($missingTools | Select-Object name,id,required,status);warnings=$warnings;bundleFileName=[IO.Path]::GetFileName($bundlePath);bundlePath=$bundlePath;bundleSha256=""}
         $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Encoding UTF8
         Copy-Item -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Destination (Join-Path $run.Path "Metadata\collection_manifest.json") -Force

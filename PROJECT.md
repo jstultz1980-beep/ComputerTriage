@@ -77,6 +77,14 @@ Every completed task must update:
 - `docs/HANDOFF.md`
 - `docs/HISTORY/CHANGE-LEDGER.md` when it records a subsystem change
 
+## Build Metadata Rule
+Every accepted implementation change must update `App/manifests/toolkit-version.json` before commit.
+
+Use `App/Update-ToolkitVersion.ps1` unless a task explicitly changes versioning behavior.
+
+The semantic `Version` may remain unchanged for normal task work, but the `Build`,
+`SourceUpdatedAt`, and `ReleaseNotes` fields must reflect the committed change.
+
 ## Product
 Computer Triage Toolkit.
 

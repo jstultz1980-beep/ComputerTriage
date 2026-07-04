@@ -14,4 +14,5 @@ Computer Toolkit Change Requests
 8. Add a Wifi Strength indicator to the bottom right of the status bar.
 9. I want the trtiage bundles to be named more descriptive for easier identification.
 10. Make the crown a little smaller
+11. Move the Version and Build information to the bottom left in the status bar. Make the text small and static.
 

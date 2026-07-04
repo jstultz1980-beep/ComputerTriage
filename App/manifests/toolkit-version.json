@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260629163424,
-    "SourceUpdatedAt":  "2026-06-29T16:34:24.4444864-05:00",
-    "ReleaseNotes":  "Expanded the AI diagnostic bundle collector with modular read-only crash, driver, filter, network, process, service/startup, event timeline, domain, DFSR, Group Policy, security product, and manifest evidence collection; strengthened the bundled analysis prompt."
+    "Build":  20260704153239,
+    "SourceUpdatedAt":  "2026-07-04T15:32:39.5785442-05:00",
+    "ReleaseNotes":  "Triage page catalog cleanup, descriptive triage bundle naming, and task consolidation."
 }

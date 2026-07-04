@@ -1,7 +1,10 @@
 # TASK-0034 - Embedded Tool Experience Roadmap
 
 ## Status
-Queued
+Archived
+
+## Superseded By
+`TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`
 
 ## Owner
 ChatGPT

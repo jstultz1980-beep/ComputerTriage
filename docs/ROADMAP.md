@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0032-Computer-Tab-Summary-Redesign`
+- `TASK-0044-GUI-Tab-Performance-Hardening`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -125,10 +125,17 @@ Current UI work:
 - TASK-0038 completed modern control styling for Settings/Help header controls and the crown/elevation icon.
 - TASK-0045 completed Print page polish.
 - TASK-0049 completed the required UI audit gate after the UI counter reached 10/10.
-- TASK-0046 is active for Triage page catalog and bundle cleanup.
-- TASK-0043 is queued for transferring client diagnostic data between toolkit copies.
-- TASK-0044 is queued for Activity first-load and tab-switch performance hardening.
-- TASK-0045 through TASK-0047 are queued for Print page polish, Triage catalog/bundle cleanup, and status-bar Wi-Fi/chrome cleanup.
+- TASK-0046 completed Triage page catalog and bundle cleanup.
+- TASK-0050 completed the required Roadmap/Backlog audit after outstanding tasks were consolidated.
+- TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
+- TASK-0044 is active for GUI tab performance hardening.
+- The consolidated queued order is:
+  1. TASK-0047 Status Bar Indicators And Chrome Cleanup.
+  2. TASK-0043 Client Data Transfer.
+  3. TASK-0051 Development File Deployment Exclusions.
+  4. TASK-0040 Software Inventory And Placement Implementation.
+  5. TASK-0033 Tab-By-Tab Direction And Embedding Plan.
+  6. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

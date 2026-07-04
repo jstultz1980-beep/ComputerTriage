@@ -129,3 +129,15 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0119 | 2026-07-03 | TASK-0049 | Task System | +1 | Completed TASK-0049 and activated TASK-0046 as the next tab-based punch-list task. |
 | CHG-0120 | 2026-07-03 | TASK-0032 | UI | +1 | Tightened the Computer tab summary layout and reserved more height for the recent profile table to prevent bottom-row clipping. |
 | CHG-0121 | 2026-07-03 | TASK-0032 | Documentation | +1 | Updated TASK-0032, handoff, changelog, and ledger records for the Computer tab clipping follow-up. |
+| CHG-0122 | 2026-07-04 | TASK-0046 / TASK-0050 | Roadmap/Backlog | +1 | Consolidated outstanding queued tasks into a smaller logical sequence and archived duplicate/superseded task entries. |
+| CHG-0123 | 2026-07-04 | TASK-0050 | Roadmap/Backlog | reset to 0 / 10 | Completed the required Roadmap/Backlog audit after consolidation reached the counter threshold. |
+| CHG-0124 | 2026-07-04 | TASK-0051 | Roadmap/Backlog | +1 | Added development-only file inventory and deployment/update exclusion work to the queued backlog. |
+| CHG-0125 | 2026-07-04 | TASK-0046 / TASK-0050 / TASK-0051 | Task System | +3 | Corrected active task status, consolidated queued task state, added missing TASK-0021, completed TASK-0050, and added TASK-0051. |
+| CHG-0126 | 2026-07-04 | TASK-0046 / TASK-0050 / TASK-0051 | Documentation | +3 | Updated queue, task files, roadmap, changelog, ledger, and handoff for task consolidation and deployment-exclusion tracking. |
+| CHG-0127 | 2026-07-04 | TASK-0046 | UI | +1 | Reworked the Triage tab into a flat action row, removed the large visible status block, and filtered redundant tools from the visible catalog. |
+| CHG-0128 | 2026-07-04 | TASK-0046 | Reporting | +1 | Updated triage bundle ZIP names to include run id and triage profile context. |
+| CHG-0129 | 2026-07-04 | TASK-0046 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1`. |
+| CHG-0130 | 2026-07-04 | TASK-0046 | Repository Governance | +1 | Added the Build Metadata Rule requiring accepted implementation changes to update the toolkit version manifest before commit. |
+| CHG-0131 | 2026-07-04 | TASK-0046 / TASK-0052 | Documentation | +1 | Updated TASK-0046, handoff, roadmap, changelog, and governance documentation for the triage cleanup and build metadata rule. |
+| CHG-0132 | 2026-07-04 | TASK-0052 | Documentation | reset to 0 / 10 | Completed the required Documentation Counter Audit and reset only the audited Documentation counter. |
+| CHG-0133 | 2026-07-04 | TASK-0046 / TASK-0044 | Task System | +1 | Completed TASK-0046 and activated TASK-0044 as the single active task. |
