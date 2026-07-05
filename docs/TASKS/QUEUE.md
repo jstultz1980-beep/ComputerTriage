@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0054-Directory-Domain-Status-Page` | Codex | Active | Turn Directory into a domain identity and AD health page without duplicating Network or Infrastructure. |
+| `TASK-0060-UI-Counter-Audit` | Codex | Active | Required audit because the UI counter reached the threshold after TASK-0054. |
 
 ## Queued
 
@@ -20,6 +20,17 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Codex | Queued | Complete Wi-Fi and Windows Update status polish from the punch list. |
 | `TASK-0058-Settings-And-Control-Polish` | Codex | Queued | Tighten Settings controls, status bar noise, logo sizing, and button sizing. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
+
+## Consolidated Plan
+
+The remaining work is intentionally ordered from shared UI foundation to page-specific polish, then analysis-engine depth:
+
+1. `TASK-0060-UI-Counter-Audit` clears the required UI audit gate.
+2. `TASK-0055-Shared-Embedded-Output-Pattern` creates the common embedded command-output pattern before more pages are converted.
+3. `TASK-0056-Triage-Guided-Workflow-Polish` handles punch-list items 24 and 25.
+4. `TASK-0057-WiFi-And-Windows-Status-Polish` handles punch-list items 16, 17, 18, 19, 20, and 29.
+5. `TASK-0058-Settings-And-Control-Polish` handles punch-list items 21, 22, 23, 26, and 28.
+6. `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` resumes deterministic analysis-rule depth after the current GUI cleanup pass.
 
 ## Completed / Historical
 
@@ -70,6 +81,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0050-Roadmap-Backlog-Counter-Audit` | Completed | Audited roadmap/backlog consistency after task consolidation reached 10/10 and reset the audited counter. |
 | `TASK-0052-Documentation-Counter-Audit` | Completed | Audited documentation consistency after TASK-0046/build metadata updates reached 10/10 and reset the audited counter. |
 | `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
+| `TASK-0054-Directory-Domain-Status-Page` | Completed | Added Directory domain identity and AD health status summary with visible Domain Logon Health, GPO Health, and GPResult actions. |
 
 ## Reconciliation Decision
 
@@ -78,4 +90,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0054.
+- Current active task is TASK-0060.

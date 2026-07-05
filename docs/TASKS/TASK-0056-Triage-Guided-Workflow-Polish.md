@@ -16,6 +16,10 @@ Make the Triage tab guide a junior technician through the intended collection wo
 - Preserve access to latest run and bundle folder.
 - Ensure triage bundles remain descriptively named.
 
+## Consolidated Punch-List Mapping
+- Punch-list item 24 maps here: guide the user through the triage process on the page.
+- Punch-list item 25 maps here: remove Technician Notes from the normal Triage workflow.
+
 ## Out of Scope
 - Changing collection semantics.
 - New triage tools or downloads.

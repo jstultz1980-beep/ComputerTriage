@@ -187,3 +187,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0177 | 2026-07-05 | TASK-0059 | Documentation | reset to 0 / 10 | Completed the required Documentation counter audit and reset only the audited Documentation counter. |
 | CHG-0178 | 2026-07-05 | TASK-0059 | Build System | reset to 0 / 10 | Completed the required Build System counter audit and reset only the audited Build System counter. |
 | CHG-0179 | 2026-07-05 | TASK-0059 / TASK-0054 | Task System | +1 | Completed TASK-0059 and activated TASK-0054 as the single active implementation task. |
+| CHG-0180 | 2026-07-05 | TASK-0054 | UI | +1 | Reworked the Directory tab into a domain identity and AD health status page with visible domain/policy actions. |
+| CHG-0181 | 2026-07-05 | TASK-0054 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the Directory status page. |
+| CHG-0182 | 2026-07-05 | TASK-0054 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the Directory status page. |
+| CHG-0183 | 2026-07-05 | TASK-0054 / TASK-0060 | Documentation | +1 | Updated TASK-0054, queued task mapping, handoff, roadmap, changelog, and ledger records for Directory completion and the next audit gate. |
+| CHG-0184 | 2026-07-05 | TASK-0054 / TASK-0060 | Task System | +1 | Completed TASK-0054 and activated TASK-0060 because the UI counter reached 10/10. |

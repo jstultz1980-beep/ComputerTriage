@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-05
+- Completed TASK-0054 Directory Domain Status Page and activated TASK-0060 UI Counter Audit.
+- Replaced the Directory tab catalog-only view with domain identity, secure channel, AD site, logon DC, and DNS SRV status while keeping Domain Logon Health, GPO Health, and GPResult visible.
+- Consolidated remaining punch-list items into the queued shared-output, Triage, Wi-Fi/Windows, Settings/control, and HEPHAESTUS tasks.
+- Updated toolkit build metadata for TASK-0054.
 - Completed TASK-0059 Documentation And Build Counter Audit and reset only the Documentation and Build System counters.
 - Activated TASK-0054 Directory Domain Status Page as the next implementation task.
 - Completed TASK-0033 Tab-By-Tab Direction And Embedding Plan and activated TASK-0059 Documentation And Build Counter Audit.

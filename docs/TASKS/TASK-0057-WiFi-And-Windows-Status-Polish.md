@@ -17,6 +17,10 @@ Complete the requested Wi-Fi and Windows Update status polish from the punch lis
 - Add bottom-of-page Wi-Fi network information when available.
 - Remove the redundant `Wi-Fi Tools` label.
 
+## Consolidated Punch-List Mapping
+- Punch-list items 16 and 17 map to Windows Update status and repair guidance.
+- Punch-list items 18, 19, 20, and 29 map to Wi-Fi status/page polish.
+
 ## Out of Scope
 - Windows Update install/uninstall semantics.
 - Wi-Fi profile backup behavior changes.

@@ -11162,9 +11162,273 @@ function Build-RepairToolsPage {
     Build-GUICatalogToolsPage -Page $Page -Tab "Repair" -Title "Repair Tools"
 }
 
+function Get-GUIDirectoryDomainStatus {
+    $result = [ordered]@{
+        JoinState = "Unknown"
+        Domain = "Unknown"
+        User = "Unknown"
+        LogonDC = "Unknown"
+        SecureChannel = "Unknown"
+        ADSite = "Unknown"
+        DCSrvLookup = "Unknown"
+        Summary = "Directory status unknown"
+        SummaryState = "Unknown"
+    }
+
+    try {
+        $computer = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop
+        $result.Domain = if($computer.Domain){[string]$computer.Domain}else{"Unknown"}
+        $result.User = if($computer.UserName){[string]$computer.UserName}else{[System.Security.Principal.WindowsIdentity]::GetCurrent().Name}
+
+        if($computer.PartOfDomain){
+            $result.JoinState = "Domain joined"
+            $result.Summary = "Domain joined; directory checks attempted"
+            $result.SummaryState = "Ok"
+        }
+        else {
+            $result.JoinState = "Workgroup"
+            $result.Summary = "Not domain joined"
+            $result.SummaryState = "Unknown"
+            $result.LogonDC = "Skipped"
+            $result.SecureChannel = "Skipped"
+            $result.ADSite = "Skipped"
+            $result.DCSrvLookup = "Skipped"
+            return [pscustomobject]$result
+        }
+    }
+    catch {
+        $result.Summary = "Unable to read domain join state"
+        $result.SummaryState = "Warning"
+        return [pscustomobject]$result
+    }
+
+    $domain = [string]$result.Domain
+    if($env:LOGONSERVER){
+        $result.LogonDC = $env:LOGONSERVER.TrimStart("\")
+    }
+
+    if(Get-Command Test-ComputerSecureChannel -ErrorAction SilentlyContinue){
+        try {
+            $secure = Test-ComputerSecureChannel -ErrorAction Stop
+            $result.SecureChannel = if($secure){"Healthy"}else{"Failed"}
+            if(!$secure){
+                $result.Summary = "Secure channel needs repair"
+                $result.SummaryState = "Warning"
+            }
+        }
+        catch {
+            $result.SecureChannel = "Check failed: $($_.Exception.Message)"
+            $result.Summary = "Secure channel check failed"
+            $result.SummaryState = "Warning"
+        }
+    }
+
+    if(Get-Command nltest.exe -ErrorAction SilentlyContinue){
+        try {
+            $siteOutput = @(nltest.exe /dsgetsite 2>&1)
+            $siteLine = @($siteOutput | Where-Object { $_ -and ($_ -notmatch "command completed successfully") } | Select-Object -First 1)[0]
+            if($siteLine){ $result.ADSite = [string]$siteLine }
+        }
+        catch {
+            $result.ADSite = "Unavailable"
+        }
+
+        try {
+            $dcOutput = @(nltest.exe "/dsgetdc:$domain" 2>&1)
+            $dcLine = @($dcOutput | Where-Object { $_ -match "\\\\" } | Select-Object -First 1)[0]
+            if($dcLine){
+                $result.LogonDC = ([string]$dcLine).Trim().TrimStart("\")
+            }
+        }
+        catch {}
+    }
+
+    try {
+        $srvName = "_ldap._tcp.dc._msdcs.$domain"
+        if(Get-Command Resolve-DnsName -ErrorAction SilentlyContinue){
+            $records = @(Resolve-DnsName -Name $srvName -Type SRV -ErrorAction Stop)
+            $srvCount = @($records | Where-Object { $_.Type -eq "SRV" -or $_.QueryType -eq "SRV" }).Count
+            $result.DCSrvLookup = if($srvCount -gt 0){"$srvCount DC SRV record(s)"}else{"No SRV records"}
+            if($srvCount -eq 0){
+                $result.Summary = "Domain controller DNS SRV lookup failed"
+                $result.SummaryState = "Warning"
+            }
+        }
+        else {
+            $result.DCSrvLookup = "Resolve-DnsName unavailable"
+        }
+    }
+    catch {
+        $result.DCSrvLookup = "Lookup failed"
+        $result.Summary = "Domain controller DNS SRV lookup failed"
+        $result.SummaryState = "Warning"
+    }
+
+    return [pscustomobject]$result
+}
+
+function Get-GUIDirectoryStateForValue {
+    param(
+        [string]$Label,
+        [string]$Value
+    )
+
+    if($Value -match "Failed|failed|Unavailable|unknown|Unknown|No SRV|needs repair"){
+        return "Warning"
+    }
+    if($Value -match "Skipped|Workgroup"){
+        return "Unknown"
+    }
+    return "Ok"
+}
+
+function Add-GUIDirectoryStatusCell {
+    param(
+        [System.Windows.Forms.TableLayoutPanel]$Layout,
+        [int]$Column,
+        [int]$Row,
+        [string]$Label,
+        [string]$Value
+    )
+
+    $cell = New-Object System.Windows.Forms.TableLayoutPanel
+    $cell.Dock = "Fill"
+    $cell.ColumnCount = 2
+    $cell.RowCount = 2
+    $cell.Margin = New-Object System.Windows.Forms.Padding(6,4,6,4)
+    $cell.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,24))) | Out-Null
+    $cell.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $cell.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,18))) | Out-Null
+    $cell.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+
+    $state = Get-GUIDirectoryStateForValue -Label $Label -Value $Value
+    $led = New-Object System.Windows.Forms.Panel
+    $led.Dock = "Fill"
+    $led.Margin = New-Object System.Windows.Forms.Padding(1,4,6,4)
+    $led.Tag = [pscustomobject]@{
+        Visual = "SummaryStatusLed"
+        State = $state
+        PaintHooked = $false
+    }
+    Set-GUISummaryStatusLed -Control $led
+    $cell.Controls.Add($led,0,0)
+    $cell.SetRowSpan($led,2)
+
+    $name = New-Object System.Windows.Forms.Label
+    $name.Text = $Label
+    $name.Dock = "Fill"
+    $name.TextAlign = "BottomLeft"
+    $name.AutoEllipsis = $true
+    $name.Font = New-Object System.Drawing.Font("Segoe UI Semilight",8.5,[System.Drawing.FontStyle]::Bold)
+    $name.ForeColor = $script:GUITheme.MutedText
+    $cell.Controls.Add($name,1,0)
+
+    $text = New-Object System.Windows.Forms.Label
+    $text.Text = $Value
+    $text.Dock = "Fill"
+    $text.TextAlign = "TopLeft"
+    $text.AutoEllipsis = $true
+    $text.Font = New-Object System.Drawing.Font("Segoe UI",9)
+    $text.ForeColor = $script:GUITheme.Text
+    $cell.Controls.Add($text,1,1)
+
+    if($script:ToolTip){
+        $script:ToolTip.SetToolTip($cell,("{0}: {1}" -f $Label,$Value))
+        $script:ToolTip.SetToolTip($text,[string]$Value)
+        $script:ToolTip.SetToolTip($led,("{0}: {1}" -f $Label,$state))
+    }
+
+    $Layout.Controls.Add($cell,$Column,$Row)
+}
+
 function Build-DirectoryToolsPage {
     param([System.Windows.Forms.TabPage]$Page)
-    Build-GUICatalogToolsPage -Page $Page -Tab "Directory" -Title "Directory Tools"
+
+    $Page.Controls.Clear()
+
+    $root = New-Object System.Windows.Forms.TableLayoutPanel
+    $root.Dock = "Fill"
+    $root.ColumnCount = 1
+    $root.RowCount = 3
+    $root.Padding = New-Object System.Windows.Forms.Padding(10)
+    $root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,178))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,68))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $Page.Controls.Add($root)
+
+    $status = Get-GUIDirectoryDomainStatus
+
+    $summaryGroup = New-Object System.Windows.Forms.GroupBox
+    $summaryGroup.Text = "Directory Status"
+    $summaryGroup.Dock = "Fill"
+    $summaryGroup.Padding = New-Object System.Windows.Forms.Padding(10)
+    $summaryGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $root.Controls.Add($summaryGroup,0,0)
+
+    $summary = New-Object System.Windows.Forms.TableLayoutPanel
+    $summary.Dock = "Fill"
+    $summary.ColumnCount = 3
+    $summary.RowCount = 3
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
+    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.34))) | Out-Null
+    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $summaryGroup.Controls.Add($summary)
+
+    $banner = New-Object System.Windows.Forms.Label
+    $banner.Text = $status.Summary
+    $banner.Dock = "Fill"
+    $banner.TextAlign = "MiddleLeft"
+    $banner.AutoEllipsis = $true
+    $banner.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $banner.ForeColor = switch($status.SummaryState){
+        "Ok" { $script:GUITheme.Success }
+        "Warning" { $script:GUITheme.Warning }
+        default { $script:GUITheme.MutedText }
+    }
+    $summary.Controls.Add($banner,0,0)
+    $summary.SetColumnSpan($banner,3)
+
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 0 -Row 1 -Label "Join state" -Value $status.JoinState
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 1 -Row 1 -Label "Domain" -Value $status.Domain
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 2 -Row 1 -Label "Logon DC" -Value $status.LogonDC
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 0 -Row 2 -Label "Secure channel" -Value $status.SecureChannel
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 1 -Row 2 -Label "AD site" -Value $status.ADSite
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 2 -Row 2 -Label "DC DNS SRV" -Value $status.DCSrvLookup
+
+    $actionGroup = New-Object System.Windows.Forms.GroupBox
+    $actionGroup.Text = "Domain And Policy Actions"
+    $actionGroup.Dock = "Fill"
+    $actionGroup.Padding = New-Object System.Windows.Forms.Padding(8)
+    $actionGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $root.Controls.Add($actionGroup,0,1)
+
+    $actions = New-Object System.Windows.Forms.FlowLayoutPanel
+    $actions.Dock = "Fill"
+    $actions.FlowDirection = "LeftToRight"
+    $actions.WrapContents = $false
+    $actionGroup.Controls.Add($actions)
+    [void]$actions.Controls.Add((New-GUIToolButton -Text "Domain Logon Health" -FunctionName "Invoke-DomainLogonHealth"))
+    [void]$actions.Controls.Add((New-GUIToolButton -Text "GPO Health" -FunctionName "Invoke-GPOHealth"))
+    [void]$actions.Controls.Add((New-GUIButton -Text "GPResult HTML" -Action { Start-GUIGPResultReport }))
+    [void]$actions.Controls.Add((New-GUIButton -Text "Refresh Status" -Action {
+        if($script:MainTabs){
+            $directoryPage = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Directory" } | Select-Object -First 1
+            if($directoryPage){
+                Build-DirectoryToolsPage -Page $directoryPage
+            }
+        }
+    }))
+
+    $toolsPanel = New-Object System.Windows.Forms.Panel
+    $toolsPanel.Dock = "Fill"
+    $root.Controls.Add($toolsPanel,0,2)
+
+    $tools = @(Get-GUIToolsForTab -Tab "Directory")
+    Add-GUICompactToolGrid -Page $toolsPanel -Title "Directory Tool Catalog" -Tools $tools -Columns 4
 }
 
 function Get-GUIDriverUpdateInventory {

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260705122533,
-    "SourceUpdatedAt":  "2026-07-05T12:25:33.4487319-05:00",
-    "ReleaseNotes":  "Completed tab-by-tab embedding plan and queued focused workflow implementation tasks."
+    "Build":  20260705185607,
+    "SourceUpdatedAt":  "2026-07-05T18:56:07.9601287-05:00",
+    "ReleaseNotes":  "Added Directory domain identity and AD health status page."
 }
