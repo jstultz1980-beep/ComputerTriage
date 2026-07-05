@@ -13231,39 +13231,137 @@ function Build-ChocolateyPage {
     Refresh-GUIChocoToolboxPackages
 }
 
-function Build-SoftwareToolsPage {
-    param([System.Windows.Forms.TabPage]$Page)
-    $sectionMap = @{
-        "notepad" = "Everyday Tools"
-        "firefoxportable" = "Everyday Tools"
-        "libreoffice" = "Everyday Tools"
-        "drawio" = "Everyday Tools"
-        "kompozer" = "Everyday Tools"
+function Start-GUIRegistrarRegistryInstaller {
+    $installer = Join-Path (Get-NTKExternalToolRoot) "RegistrarRegistryManager\RegistrarHomeV9.exe"
+    if(!(Test-Path -LiteralPath $installer)){
+        [System.Windows.Forms.MessageBox]::Show(
+            "Registrar Registry Manager installer was not found in the toolkit.",
+            "Registrar Registry Manager",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) | Out-Null
+        Add-GUILog "Registrar Registry Manager installer not found."
+        return
     }
 
-    Build-GUIOptimizedToolPage `
-        -Page $Page `
-        -Tab "Software" `
-        -Title "Software Tools" `
-        -SectionMap $sectionMap `
-        -SectionOrder @("Everyday Tools")
+    $answer = [System.Windows.Forms.MessageBox]::Show(
+        "The toolkit currently has the Registrar Registry Manager installer, not the extracted portable runtime.`r`n`r`nResplendence documents that Registrar can be run from copied installed files after one normal installation. Run this only if you intend to install or stage it for later portable extraction.",
+        "Launch Installer?",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Information
+    )
+
+    if($answer -ne [System.Windows.Forms.DialogResult]::Yes){
+        Add-GUILog "Cancelled Registrar Registry Manager installer."
+        return
+    }
+
+    Start-NTKToolProcess -FilePath $installer -WorkingDirectory (Split-Path -Parent $installer) -WindowStyle Normal -Elevated | Out-Null
+    Add-GUILog "Launched Registrar Registry Manager installer."
+    Write-GUIToolUsageLog -Tool "Registrar Registry Manager" -Action "InstallerLaunch" -Detail $installer
+}
+
+function Get-GUISoftwareInstallableTools {
+    $tools = @()
+    $registrarInstaller = Join-Path (Get-NTKExternalToolRoot) "RegistrarRegistryManager\RegistrarHomeV9.exe"
+    if(Test-Path -LiteralPath $registrarInstaller){
+        $tools += New-GUIToolItem `
+            -Text "Registrar Registry Manager Installer" `
+            -Description "Stored installer only. Resplendence documents portable use after installing once and copying the installed program files; this is not currently a ready portable launcher." `
+            -Section "Installable / Extract Needed" `
+            -RequiresAdmin $true `
+            -Action { Start-GUIRegistrarRegistryInstaller }
+    }
+    return @($tools)
+}
+
+function Set-GUISoftwareToolSections {
+    param([object[]]$Tools)
+
+    $sectionMap = @{
+        "notepad" = "Everyday Apps"
+        "notepadportable" = "Everyday Apps"
+        "firefoxportable" = "Everyday Apps"
+        "libreoffice" = "Everyday Apps"
+        "libreofficeportable" = "Everyday Apps"
+        "sumatrapdf" = "Everyday Apps"
+        "drawio" = "Diagramming"
+        "drawioportable" = "Diagramming"
+        "kompozer" = "HTML And Reports"
+        "kompozerportable" = "HTML And Reports"
+    }
+
+    foreach($tool in @($Tools)){
+        $key = ($tool.Text -replace '[^A-Za-z0-9]+','').ToLowerInvariant()
+        if($sectionMap.ContainsKey($key)){
+            Set-GUIToolSection -Tool $tool -Section $sectionMap[$key]
+        }
+    }
+
+    return @($Tools | Sort-Object `
+        @{Expression={
+            switch($_.Section){
+                "Everyday Apps" { 0; break }
+                "Diagramming" { 1; break }
+                "HTML And Reports" { 2; break }
+                default { 9; break }
+            }
+        }},
+        @{Expression={$_.Text}})
+}
+
+function Build-SoftwareToolsPage {
+    param([System.Windows.Forms.TabPage]$Page)
+
+    $Page.Controls.Clear()
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 1
+    $layout.RowCount = 3
+    $layout.Padding = New-Object System.Windows.Forms.Padding(8)
+    $layout.BackColor = $script:GUITheme.Page
+    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,70)))
+    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,150)))
+    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40)))
+    [void]$layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100)))
+    $Page.Controls.Add($layout)
+
+    $launchPanel = New-Object System.Windows.Forms.Panel
+    $launchPanel.Dock = "Fill"
+    $launchPanel.BackColor = $script:GUITheme.Page
+    [void]$layout.Controls.Add($launchPanel,0,0)
+
+    $launchableTools = @(Set-GUISoftwareToolSections -Tools @(Get-GUIToolsForTab -Tab "Software"))
+    Add-GUICompactToolGrid -Page $launchPanel -Title "Launchable Portable Apps" -Tools $launchableTools -Columns 4
+
+    $installPanel = New-Object System.Windows.Forms.Panel
+    $installPanel.Dock = "Fill"
+    $installPanel.BackColor = $script:GUITheme.Page
+    [void]$layout.Controls.Add($installPanel,0,1)
+
+    $installableTools = @(Get-GUISoftwareInstallableTools)
+    Add-GUICompactToolGrid -Page $installPanel -Title "Installable Programs Stored In Toolkit" -Tools $installableTools -Columns 3 -HideSectionHeaders
 
     $resources = New-Object System.Windows.Forms.FlowLayoutPanel
-    $resources.Dock = "Bottom"
-    $resources.Height = 42
+    $resources.Dock = "Fill"
     $resources.WrapContents = $false
     $resources.Padding = New-Object System.Windows.Forms.Padding(12,6,12,4)
+    $resources.BackColor = $script:GUITheme.Page
     $resourceLabel = New-GUILabel "Safe software resources:"
-    $resourceLabel.Width = 132; $resourceLabel.TextAlign = 'MiddleLeft'
+    $resourceLabel.Width = 132
+    $resourceLabel.TextAlign = 'MiddleLeft'
     [void]$resources.Controls.Add($resourceLabel)
     foreach($resource in @(@{Text='PortableApps.com';Url='https://portableapps.com/apps'},@{Text='Ninite';Url='https://ninite.com/'},@{Text='Chocolatey Search';Url='https://community.chocolatey.org/packages'})){
         $link = New-Object System.Windows.Forms.LinkLabel
-        $link.Text = $resource.Text; $link.AutoSize = $true; $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)
-        $link.Tag = $resource.Url; $link.Add_LinkClicked({ param($sender,$args) Start-Process $sender.Tag })
+        $link.Text = $resource.Text
+        $link.AutoSize = $true
+        $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)
+        $link.Tag = $resource.Url
+        $link.Add_LinkClicked({ param($sender,$args) Start-Process $sender.Tag })
         [void]$resources.Controls.Add($link)
     }
-    $Page.Controls.Add($resources)
-    $resources.BringToFront()
+    [void]$layout.Controls.Add($resources,0,2)
 }
 
 function Refresh-GUISoftwareKeyFinderResults {

@@ -1,6 +1,12 @@
 # Changelog
 
 ## 2026-07-05
+- Completed TASK-0040 Software Inventory And Placement Implementation and activated TASK-0033 Tab-By-Tab Direction And Embedding Plan.
+- Split the Software tab into launchable portable apps and installable/extract-needed stored programs.
+- Moved Registrar Registry Manager out of the normal Repair-tab launch flow because only the installer is currently present.
+- Added source notes documenting that Registrar can be portable after installed files are copied, while the current toolkit copy is installer-only.
+- Removed Sysinternals Suite and WinAudit from the triage manifest; kept LatencyMon as optional/manual portable triage tooling.
+- Updated toolkit build metadata for TASK-0040.
 - Completed TASK-0051 Development File Deployment Exclusions and activated TASK-0040 Software Inventory And Placement Implementation.
 - Added `docs/DEPLOYMENT-FILE-INVENTORY.md` to document runtime-required files, client data, preserved runtime state, and development-only files.
 - Added shared deployment/update exclusion policy in `App/DeploymentExclusions.ps1`.

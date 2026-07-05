@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0060
+HANDOFF-0061
 
 ## Current Task
-TASK-0040-Software-Inventory-And-Placement-Implementation
+TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan
 
 ## Current Owner
 Codex
@@ -36,7 +36,9 @@ TASK-0043 completed the Settings-page client data transfer workflow.
 
 TASK-0051 completed the deployment/update development-file exclusion slice.
 
-Implementation work may continue under the single active task: TASK-0040 Software Inventory And Placement Implementation.
+TASK-0040 completed the Software tab launchable/installable placement and portable-tool classification slice.
+
+Implementation work may continue under the single active task: TASK-0033 Tab-By-Tab Direction And Embedding Plan.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -60,16 +62,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 3 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 8 / 10 | No |
-| Task System | 3 / 10 | No |
+| Documentation | 9 / 10 | No |
+| Task System | 4 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
-| UI | 8 / 10 | No |
+| UI | 9 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 8 / 10 | No |
-| Validation/Test Framework | 5 / 10 | No |
-| Roadmap/Backlog | 1 / 10 | No |
+| Build System | 9 / 10 | No |
+| Validation/Test Framework | 6 / 10 | No |
+| Roadmap/Backlog | 2 / 10 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -84,27 +86,26 @@ Recently completed work:
 - TASK-0047 completed status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, and busy indicator clarification.
 - TASK-0043 completed Settings-page client data transfer with destination validation, merge confirmation, client-data-only copying, and manifest output.
 - TASK-0051 completed shared development-file deployment exclusions and validated fake fresh deployment/update scenarios.
+- TASK-0040 completed Software tab launchable/installable placement, Registrar classification, triage manifest cleanup, and LatencyMon classification.
 
 Current active work:
-- TASK-0040 is active for Software tab launchable/installable placement and portable-tool classification.
+- TASK-0033 is active for tab-by-tab direction and embedded-tool planning.
 
 Queued implementation/design work, in recommended order:
-- TASK-0040 Software Inventory And Placement Implementation.
 - TASK-0033 Tab-By-Tab Direction And Embedding Plan.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0040-Software-Inventory-And-Placement-Implementation`
+`TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`
 
 Scope summary:
-- Put launchable portable applications at the top of the Software tab.
-- Reserve the bottom area for installable programs stored in the toolkit.
-- Classify optional portable tools, including LatencyMon.
-- Answer whether Registrar Registry Manager can be used portably.
-- Remove non-portable tools from launchable triage lists.
+- Review current Directory tab tools and adjacent Network/Infrastructure tools.
+- Decide whether Directory should expose domain/network discovery information directly or remain a launcher-focused AD/domain page.
+- Inventory launch-only tools that would benefit from embedded UI.
+- Compare existing embedded-output patterns and define one preferred technician-facing output pattern.
+- Recommend follow-on Codex implementation tasks.
 
 ## Queued Work
-- `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
 - `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 
@@ -159,6 +160,13 @@ Scope summary:
 - Activated TASK-0051 as the next implementation task.
 - Completed TASK-0051 with a shared deployment exclusion helper, deployment inventory, and fake deployment/update validation.
 - Activated TASK-0040 as the next implementation task.
+- Completed TASK-0040 with Software tab launchable/installable placement, Registrar classification, triage manifest cleanup, and LatencyMon classification.
+- Added `docs/SOFTWARE-TOOL-CLASSIFICATION.md` with source notes for Registrar and triage tool classification.
+- Removed Registrar Registry Manager from the Repair-tab launch catalog because only the installer is currently present.
+- Removed Sysinternals Suite and WinAudit from the default and current triage manifests.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation, GUI smoke test, button-smoke test, and triage-manifest validation passed for TASK-0040.
+- Activated TASK-0033 as the next implementation task.
 
 ## Blockers
 No audit gate is currently blocking implementation.
@@ -176,7 +184,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0051: Exclude development files from deployment
+TASK-0040: Classify software tools and triage entries
 ```
 
 ## Next Bot Prompt
@@ -194,30 +202,31 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0040-Software-Inventory-And-Placement-Implementation.md
+7. docs/TASKS/TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0040-Software-Inventory-And-Placement-Implementation.
+- Active task: TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan.
 - Owner: Codex.
-- TASK-0051 completed development-file deployment exclusions and activated TASK-0040.
-- Next queued implementation tasks after TASK-0040 are TASK-0033 and TASK-0021.
+- TASK-0040 completed Software tab launchable/installable placement and portable-tool classification.
+- Next queued implementation task after TASK-0033 is TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0040 only.
+Execute TASK-0033 only.
 
 Scope:
-- Put launchable portable applications at the top of the Software tab.
-- Reserve the bottom area for installable programs stored in the toolkit.
-- Classify optional portable tools, including LatencyMon, without importing untracked tools unless explicitly in scope.
-- Research whether a usable portable edition of Registrar Registry Manager exists.
-- Remove non-portable tools from launchable triage lists.
-- Keep installable tools visible without implying they are portable launchers.
+- Review current Directory tab tools and adjacent Network/Infrastructure tools.
+- Decide whether Directory should expose domain/network discovery information directly or remain a launcher-focused AD/domain page.
+- Inventory launch-only tools that would benefit from embedded UI.
+- Compare existing embedded-output patterns, especially Quick Target Checks versus `Start-GUISafeScriptRunner`.
+- Define one preferred technician-facing output pattern.
+- Identify tabs that should use compact in-tab output panes versus full-tab overlays.
+- Recommend follow-on Codex implementation tasks.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -229,11 +238,13 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Software tab launchable/installable placement is implemented.
-- Optional portable tools are classified.
-- Registrar Registry Manager portability is answered with source notes.
-- Non-portable tools no longer appear as launchable triage tools.
-- PowerShell parse, smoke, and button-smoke validation pass.
+- Directory tab direction is explicitly decided.
+- The recommendation answers whether network information belongs on Directory or should stay on Network/Infrastructure.
+- Recommendations avoid duplicating Network and Infrastructure tabs.
+- Embedded-tool candidates are listed and prioritized.
+- Each embedded recommendation states why embedded UI is better than a launcher.
+- The roadmap recommends whether the Quick Target Checks embedded output pattern should become the shared base for other pages.
+- Follow-on Codex implementation tasks are created if changes are accepted.
 
 When done, provide:
 - Concise summary of implementation performed.

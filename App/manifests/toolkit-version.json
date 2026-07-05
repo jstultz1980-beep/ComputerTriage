@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260705120756,
-    "SourceUpdatedAt":  "2026-07-05T12:07:56.1449512-05:00",
-    "ReleaseNotes":  "Centralized development-only deployment exclusions and updated fresh deployment/update logic."
+    "Build":  20260705122050,
+    "SourceUpdatedAt":  "2026-07-05T12:20:50.6663939-05:00",
+    "ReleaseNotes":  "Classified Software tab tools, separated launchable apps from installable programs, and cleaned triage manifest entries."
 }

@@ -1,7 +1,7 @@
 # TASK-0040 - Software Inventory And Placement Implementation
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -26,10 +26,31 @@ Classify and implement Software tab placement so portable launchers, installable
 - Untracked `App/NetworkToolkit/LatencyMon/`.
 
 ## Acceptance Criteria
-- [ ] Software tab is split into launchable and installable areas.
-- [ ] Optional portable tools, including LatencyMon, are classified.
-- [ ] Registrar Registry Manager portability is answered with source notes.
-- [ ] Non-portable tools no longer appear as launchable triage tools.
-- [ ] Installable tools are clearly labeled as installable.
-- [ ] Existing portable launch buttons still work.
-- [ ] PowerShell parse, smoke, and button-smoke validation pass.
+- [x] Software tab is split into launchable and installable areas.
+- [x] Optional portable tools, including LatencyMon, are classified.
+- [x] Registrar Registry Manager portability is answered with source notes.
+- [x] Non-portable tools no longer appear as launchable triage tools.
+- [x] Installable tools are clearly labeled as installable.
+- [x] Existing portable launch buttons still work.
+- [x] PowerShell parse, smoke, and button-smoke validation pass.
+
+## Work Log
+
+- Split the Software tab into `Launchable Portable Apps` and `Installable Programs Stored In Toolkit`.
+- Removed Registrar Registry Manager from the Repair-tab launch catalog because only the installer is currently present.
+- Added an installable/extract-needed Registrar Registry Manager entry on the Software tab with a confirmation prompt before launching the installer.
+- Removed Sysinternals Suite and WinAudit from the default and current triage manifests.
+- Kept LatencyMon classified as optional/manual portable triage tooling.
+- Added `docs/SOFTWARE-TOOL-CLASSIFICATION.md` as the source note for Registrar, triage removals, and LatencyMon classification.
+- Updated toolkit build metadata.
+
+## Validation
+
+- PowerShell parser validation passed for:
+  - `App\ToolKit-GUI\ToolKit-GUI.ps1`
+  - `App\NetworkToolkit\Utilities\TriageService.ps1`
+  - `App\NetworkToolkit\Config\ToolCatalog.ps1`
+- Confirmed current triage manifest no longer contains `sysinternals` or `winaudit`.
+- Confirmed LatencyMon remains present as optional/manual triage tooling.
+- GUI smoke test passed.
+- Button smoke test passed.

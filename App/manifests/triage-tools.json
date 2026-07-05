@@ -1,6 +1,6 @@
 ﻿{
     "schemaVersion":  "1.0",
-    "updatedUtc":  "2026-06-28T04:26:29.2785193Z",
+    "updatedUtc":  "2026-07-05T17:16:21.0268309Z",
     "tools":  [
                   {
                       "source":  "Microsoft",
@@ -18,92 +18,6 @@
                                               "autoRun":  false,
                                               "path":  ".\\Triage\\Tools\\TSS\\TSS.ps1",
                                               "outputFile":  "ToolOutput\\tss.txt",
-                                              "captureStdout":  true,
-                                              "requiresConsent":  true
-                                          }
-                                      ],
-                      "required":  false
-                  },
-                  {
-                      "source":  "Microsoft",
-                      "downloadUrl":  "https://learn.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite",
-                      "id":  "sysinternals",
-                      "category":  "Triage",
-                      "notes":  "Endpoint tools may be blocked by security software.",
-                      "localPath":  ".\\Triage\\Tools\\Sysinternals",
-                      "name":  "Sysinternals Suite",
-                      "portable":  true,
-                      "executables":  [
-                                          {
-                                              "name":  "Autoruns",
-                                              "arguments":  "-accepteula -a * -ct -h -s -m",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\autorunsc.exe",
-                                              "outputFile":  "ToolOutput\\autoruns.csv",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "PsInfo",
-                                              "arguments":  "-accepteula -s -d",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\psinfo.exe",
-                                              "outputFile":  "ToolOutput\\psinfo.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "PsList",
-                                              "arguments":  "-accepteula",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\pslist.exe",
-                                              "outputFile":  "ToolOutput\\pslist.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "PsService",
-                                              "arguments":  "-accepteula",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\psservice.exe",
-                                              "outputFile":  "ToolOutput\\psservice.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "Handle",
-                                              "arguments":  "-accepteula -a",
-                                              "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\handle.exe",
-                                              "outputFile":  "ToolOutput\\handle.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "ListDLLs",
-                                              "arguments":  "-accepteula",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\listdlls.exe",
-                                              "outputFile":  "ToolOutput\\listdlls.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "TCPView Console",
-                                              "arguments":  "-accepteula -a -c",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\tcpvcon.exe",
-                                              "outputFile":  "ToolOutput\\tcpvcon.csv",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "Sigcheck",
-                                              "arguments":  "-accepteula -nobanner -q -m c:\\windows\\system32",
-                                              "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\sigcheck.exe",
-                                              "outputFile":  "ToolOutput\\sigcheck_system32.txt",
-                                              "captureStdout":  true
-                                          },
-                                          {
-                                              "name":  "ProcDump",
-                                              "arguments":  "-accepteula",
-                                              "autoRun":  false,
-                                              "path":  ".\\Triage\\Tools\\Sysinternals\\procdump.exe",
-                                              "outputFile":  "ToolOutput\\procdump.txt",
                                               "captureStdout":  true,
                                               "requiresConsent":  true
                                           }
@@ -349,27 +263,6 @@
                                           }
                                       ],
                       "required":  false
-                  },
-                  {
-                      "source":  "Parmavex",
-                      "downloadUrl":  "http://parmavex.co.uk/winaudit.html",
-                      "id":  "winaudit",
-                      "category":  "Triage",
-                      "localPath":  ".\\Triage\\Tools\\WinAudit",
-                      "name":  "WinAudit",
-                      "portable":  true,
-                      "executables":  [
-                                          {
-                                              "name":  "WinAudit",
-                                              "arguments":  "/r=gsoPxuTUeERNtnzDaIbMpmidcSArCOHG /f=ToolOutput\\winaudit.html",
-                                              "autoRun":  true,
-                                              "path":  ".\\Triage\\Tools\\WinAudit\\WinAudit.exe",
-                                              "outputFile":  "ToolOutput\\winaudit.html",
-                                              "captureStdout":  false
-                                          }
-                                      ],
-                      "required":  false,
-                      "notes":  "Legacy optional inventory collector. Parmavex HTTPS certificate validation may fail; HTTP download page is currently reachable."
                   },
                   {
                       "source":  "MiTeC",
