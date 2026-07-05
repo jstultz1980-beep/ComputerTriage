@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0062
+HANDOFF-0063
 
 ## Current Task
-TASK-0059-Documentation-Build-Counter-Audit
+TASK-0054-Directory-Domain-Status-Page
 
 ## Current Owner
 Codex
@@ -40,7 +40,9 @@ TASK-0040 completed the Software tab launchable/installable placement and portab
 
 TASK-0033 completed tab-by-tab direction and embedded-tool planning.
 
-Implementation work is paused at the audit gate. The single active task is TASK-0059 Documentation And Build Counter Audit.
+TASK-0059 completed the required Documentation and Build System counter audit.
+
+Implementation work may resume under the single active task: TASK-0054 Directory Domain Status Page.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -64,14 +66,14 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 3 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 10 / 10 | Yes |
-| Task System | 5 / 10 | No |
+| Documentation | 0 / 10 | No |
+| Task System | 6 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
 | UI | 9 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 10 / 10 | Yes |
+| Build System | 0 / 10 | No |
 | Validation/Test Framework | 6 / 10 | No |
 | Roadmap/Backlog | 3 / 10 | No |
 
@@ -90,13 +92,12 @@ Recently completed work:
 - TASK-0051 completed shared development-file deployment exclusions and validated fake fresh deployment/update scenarios.
 - TASK-0040 completed Software tab launchable/installable placement, Registrar classification, triage manifest cleanup, and LatencyMon classification.
 - TASK-0033 completed tab-by-tab direction and embedded-tool planning, created follow-on implementation tasks, and activated the audit gate.
+- TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
 
 Current active work:
-- TASK-0059 is active for Documentation and Build System counter audit.
+- TASK-0054 is active for Directory domain identity and AD health status.
 
 Queued implementation/design work, in recommended order:
-- TASK-0059 Documentation And Build Counter Audit.
-- TASK-0054 Directory Domain Status Page.
 - TASK-0055 Shared Embedded Output Pattern.
 - TASK-0056 Triage Guided Workflow Polish.
 - TASK-0057 Wi-Fi And Windows Status Polish.
@@ -104,17 +105,17 @@ Queued implementation/design work, in recommended order:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0059-Documentation-Build-Counter-Audit`
+`TASK-0054-Directory-Domain-Status-Page`
 
 Scope summary:
-- Verify task queue and handoff agree on exactly one active task.
-- Review documentation changes since the last Documentation audit.
-- Review build metadata changes since the last Build System audit.
-- Confirm no unrelated app implementation happened during TASK-0033.
-- Reset only audited counters after completion.
+- Turn the Directory tab into an Active Directory and domain identity status page instead of a simple launcher page.
+- Show domain join state, current domain, logon DC, secure channel status, and AD site when available.
+- Add DNS SRV domain-controller lookup status.
+- Keep GPO report access visible.
+- Avoid duplicating generic Network or Infrastructure troubleshooting.
+- Reuse existing Domain Logon Health and GPO Health logic where practical.
 
 ## Queued Work
-- `TASK-0054-Directory-Domain-Status-Page` owned by Codex.
 - `TASK-0055-Shared-Embedded-Output-Pattern` owned by Codex.
 - `TASK-0056-Triage-Guided-Workflow-Polish` owned by Codex.
 - `TASK-0057-WiFi-And-Windows-Status-Polish` owned by Codex.
@@ -184,9 +185,11 @@ Scope summary:
 - Created follow-on tasks TASK-0054 through TASK-0058.
 - Created and activated TASK-0059 because Documentation and Build System counters reached `10 / 10`.
 - Re-read `punch_list.txt` before completing TASK-0033.
+- Completed TASK-0059 and reset only the Documentation and Build System counters.
+- Activated TASK-0054 as the next implementation task.
 
 ## Blockers
-Documentation and Build System counters are at `10 / 10`. TASK-0059 must complete before further implementation work.
+No active audit gate. Implementation may continue under TASK-0054 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -201,7 +204,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0033: Complete tab embedding plan
+TASK-0059: Complete documentation and build audit
 ```
 
 ## Next Bot Prompt
@@ -219,46 +222,47 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0059-Documentation-Build-Counter-Audit.md
+7. docs/TASKS/TASK-0054-Directory-Domain-Status-Page.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0059-Documentation-Build-Counter-Audit.
+- Active task: TASK-0054-Directory-Domain-Status-Page.
 - Owner: Codex.
-- TASK-0033 completed tab-by-tab direction and embedded-tool planning.
-- Documentation and Build System counters are at `10 / 10`; audit is mandatory before more implementation.
-- Next queued implementation tasks after TASK-0059 are TASK-0054 through TASK-0058, then TASK-0021.
+- TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
+- Documentation and Build System counters were reset to `0 / 10`.
+- Next queued implementation tasks after TASK-0054 are TASK-0055 through TASK-0058, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0059 only.
+Execute TASK-0054 only.
 
 Scope:
-- Verify queue, handoff, roadmap, changelog, and ledger agree on exactly one active task.
-- Review Documentation and Build System counter increments since their last audits.
-- Confirm TASK-0033 made documentation/planning changes only and no app implementation changes.
-- Reset only Documentation and Build System counters after audit completion.
-- Activate the next queued implementation task only after the audit gate clears.
+- Turn the Directory tab into an Active Directory and domain identity status page instead of a simple launcher page.
+- Show domain join state, current domain, logon DC, secure channel status, and AD site when available.
+- Add DNS SRV domain-controller lookup status.
+- Keep GPO report access visible.
+- Avoid duplicating generic Network or Infrastructure troubleshooting.
+- Reuse existing Domain Logon Health and GPO Health logic where practical.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
-- Refactor or modify application code.
+- Modify unrelated application code.
 - Clean unrelated files.
 - Import, delete, or modify untracked App/NetworkToolkit/LatencyMon/ unless a future task explicitly handles it.
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Documentation counter audit is complete.
-- Build System counter audit is complete.
-- Only audited counters are reset.
-- Queue and handoff are consistent.
-- Next implementation task is activated only after the audit gate clears.
+- Directory has a clear AD/domain status summary.
+- Directory does not duplicate Network or Infrastructure checks.
+- Domain Logon Health and GPO Health remain available.
+- Status failures are visible without opening an external console.
+- Parser, smoke, and button-smoke validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.

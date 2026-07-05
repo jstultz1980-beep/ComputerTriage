@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0059-Documentation-Build-Counter-Audit`
+- `TASK-0054-Directory-Domain-Status-Page`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -135,15 +135,14 @@ Current UI work:
 - TASK-0051 completed development-only deployment/update exclusions.
 - TASK-0040 completed Software tab launchable/installable placement and portable-tool classification.
 - TASK-0033 completed tab-by-tab direction and embedded-tool planning.
-- TASK-0059 is active because Documentation and Build System counters reached the audit threshold.
+- TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
+- TASK-0054 is active for Directory domain identity and AD health status.
 - The consolidated queued order is:
-  1. TASK-0059 Documentation And Build Counter Audit.
-  2. TASK-0054 Directory Domain Status Page.
-  3. TASK-0055 Shared Embedded Output Pattern.
-  4. TASK-0056 Triage Guided Workflow Polish.
-  5. TASK-0057 Wi-Fi And Windows Status Polish.
-  6. TASK-0058 Settings And Control Polish.
-  7. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+  1. TASK-0055 Shared Embedded Output Pattern.
+  2. TASK-0056 Triage Guided Workflow Polish.
+  3. TASK-0057 Wi-Fi And Windows Status Polish.
+  4. TASK-0058 Settings And Control Polish.
+  5. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

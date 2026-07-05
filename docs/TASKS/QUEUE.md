@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0059-Documentation-Build-Counter-Audit` | Codex | Active | Required audit because Documentation and Build System counters reached the threshold after TASK-0033. |
+| `TASK-0054-Directory-Domain-Status-Page` | Codex | Active | Turn Directory into a domain identity and AD health page without duplicating Network or Infrastructure. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0054-Directory-Domain-Status-Page` | Codex | Queued | Turn Directory into a domain identity and AD health page without duplicating Network or Infrastructure. |
 | `TASK-0055-Shared-Embedded-Output-Pattern` | Codex | Queued | Create the shared embedded output pattern based on Quick Target Checks and convert the first low-risk tool. |
 | `TASK-0056-Triage-Guided-Workflow-Polish` | Codex | Queued | Make Triage guide the run, bundle, submit workflow without catalog clutter. |
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Codex | Queued | Complete Wi-Fi and Windows Update status polish from the punch list. |
@@ -70,6 +69,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
 | `TASK-0050-Roadmap-Backlog-Counter-Audit` | Completed | Audited roadmap/backlog consistency after task consolidation reached 10/10 and reset the audited counter. |
 | `TASK-0052-Documentation-Counter-Audit` | Completed | Audited documentation consistency after TASK-0046/build metadata updates reached 10/10 and reset the audited counter. |
+| `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
 
 ## Reconciliation Decision
 
@@ -78,4 +78,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0059.
+- Current active task is TASK-0054.

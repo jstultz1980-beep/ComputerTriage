@@ -1,7 +1,7 @@
 # TASK-0054 - Directory Domain Status Page
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

@@ -184,3 +184,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0174 | 2026-07-05 | TASK-0033 | Build System | +1 | Updated toolkit build metadata for the completed planning batch. |
 | CHG-0175 | 2026-07-05 | TASK-0033 / TASK-0054..TASK-0059 | Task System | +1 | Created follow-on implementation tasks and activated TASK-0059 as the required audit gate. |
 | CHG-0176 | 2026-07-05 | TASK-0033 / TASK-0059 | Roadmap/Backlog | +1 | Updated roadmap focus from tab-by-tab planning to the required audit gate and queued implementation sequence. |
+| CHG-0177 | 2026-07-05 | TASK-0059 | Documentation | reset to 0 / 10 | Completed the required Documentation counter audit and reset only the audited Documentation counter. |
+| CHG-0178 | 2026-07-05 | TASK-0059 | Build System | reset to 0 / 10 | Completed the required Build System counter audit and reset only the audited Build System counter. |
+| CHG-0179 | 2026-07-05 | TASK-0059 / TASK-0054 | Task System | +1 | Completed TASK-0059 and activated TASK-0054 as the single active implementation task. |
