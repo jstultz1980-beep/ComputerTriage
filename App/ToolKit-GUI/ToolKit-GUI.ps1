@@ -104,6 +104,7 @@ $script:TabBuilders = @{}
 $script:BuiltTabs = @{}
 $script:StaticTabStrip = $null
 $script:StartupTabBuildTimer = $null
+$script:SlowTabSwitchThresholdMs = 250
 $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
 $script:SettingsStartupTabCombo = $null
@@ -9297,6 +9298,12 @@ function Build-GUITabIfNeeded {
         Set-GUIFallbackButtonToolTips
         $buildTimer.Stop()
         Write-GUIDiagnosticLog -Event 'TabBuilt' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count)
+        if($buildTimer.ElapsedMilliseconds -ge $script:SlowTabSwitchThresholdMs){
+            Write-GUIDiagnosticLog -Event 'SlowTabBuild' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}; ThresholdMs={2}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count,$script:SlowTabSwitchThresholdMs)
+            if($script:StatusLabel -and !$script:StatusLabel.IsDisposed){
+                $script:StatusLabel.Text = "Slow first-load: $($Page.Text) took $($buildTimer.ElapsedMilliseconds) ms"
+            }
+        }
     }
     catch {
         Add-GUILog "Failed to build $($Page.Text) tab: $($_.Exception.Message)"
@@ -9313,6 +9320,33 @@ function Build-GUITabIfNeeded {
     finally {
         if($buildTimer.IsRunning){ $buildTimer.Stop() }
         $Page.ResumeLayout()
+    }
+}
+
+function Complete-GUITabSwitchTiming {
+    param(
+        [System.Windows.Forms.TabPage]$Page,
+        [System.Diagnostics.Stopwatch]$Timer,
+        [string]$Source = "Manual"
+    )
+
+    if(!$Timer){
+        return
+    }
+
+    if($Timer.IsRunning){
+        $Timer.Stop()
+    }
+
+    if(!$Page -or $Timer.ElapsedMilliseconds -lt $script:SlowTabSwitchThresholdMs){
+        return
+    }
+
+    $built = $script:BuiltTabs.ContainsKey($Page.Text)
+    $detail = "ElapsedMs={0}; Source={1}; Built={2}; Controls={3}; ThresholdMs={4}" -f $Timer.ElapsedMilliseconds,$Source,$built,$Page.Controls.Count,$script:SlowTabSwitchThresholdMs
+    Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $Page.Text -Detail $detail
+    if($script:StatusLabel -and !$script:StatusLabel.IsDisposed){
+        $script:StatusLabel.Text = "Slow tab switch: $($Page.Text) took $($Timer.ElapsedMilliseconds) ms"
     }
 }
 
@@ -9353,10 +9387,7 @@ function Select-GUITabPage {
         }
         try { $script:StaticTabStrip.Invalidate() } catch {}
         $script:GuiTabSwitchInProgress = $false
-        if($switchTimer.IsRunning){ $switchTimer.Stop() }
-        if($switchTimer.ElapsedMilliseconds -ge 250 -and $Page){
-            Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $Page.Text -Detail ("ElapsedMs={0}" -f $switchTimer.ElapsedMilliseconds)
-        }
+        Complete-GUITabSwitchTiming -Page $Page -Timer $switchTimer -Source "StaticTabStrip"
     }
 }
 
@@ -15434,10 +15465,7 @@ function Build-Form {
         Build-GUITabIfNeeded -Page $script:MainTabs.SelectedTab
         Update-GUITabRuntimeState -SelectedPage $script:MainTabs.SelectedTab
         Update-GUIStaticTabStripSelection
-        if($switchTimer.IsRunning){ $switchTimer.Stop() }
-        if($switchTimer.ElapsedMilliseconds -ge 250 -and $script:MainTabs.SelectedTab){
-            Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $script:MainTabs.SelectedTab.Text -Detail ("ElapsedMs={0}; NativeEvent=True" -f $switchTimer.ElapsedMilliseconds)
-        }
+        Complete-GUITabSwitchTiming -Page $script:MainTabs.SelectedTab -Timer $switchTimer -Source "NativeTabControl"
     })
 
     $script:RunButton = New-GUIButton "Run Quick Diagnosis" { Start-GUIQuickDiagnosis }

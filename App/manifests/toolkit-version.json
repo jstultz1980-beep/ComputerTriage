@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260704222824,
-    "SourceUpdatedAt":  "2026-07-04T22:28:24.2953710-05:00",
-    "ReleaseNotes":  "Deferred normal GUI startup tab construction, deferred Activity refresh, added startup timing diagnostics, and trimmed VBS launcher flags."
+    "Build":  20260704223513,
+    "SourceUpdatedAt":  "2026-07-04T22:35:13.2572381-05:00",
+    "ReleaseNotes":  "Completed GUI tab performance diagnostics with unified slow tab switch/build logging and status-bar feedback."
 }

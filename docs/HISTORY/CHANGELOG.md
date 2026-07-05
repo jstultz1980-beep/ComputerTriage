@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-04
+- Completed TASK-0044 GUI Tab Performance Hardening.
+- Added shared slow tab-switch/build diagnostics and status-bar feedback for tabs that exceed the slow threshold.
+- Activated TASK-0053 Task System Counter Audit because completing TASK-0044 brings the Task System counter to `10 / 10`.
 - Started TASK-0044 GUI Tab Performance Hardening.
 - Deferred normal GUI startup tab construction until after the shell is shown, so the window can paint before the selected page builds.
 - Deferred Activity page CIM/process refresh until after the Activity tab paints.

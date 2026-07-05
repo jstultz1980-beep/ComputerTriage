@@ -158,3 +158,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0148 | 2026-07-04 | PROJECT | Repository Governance | +1 | Updated the required startup sequence so `punch_list.txt` is read before implementation and re-read before completion. |
 | CHG-0149 | 2026-07-04 | TASK-0044 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the GUI startup performance pass. |
 | CHG-0150 | 2026-07-04 | TASK-0044 | Documentation | +1 | Updated TASK-0044, handoff, changelog, and ledger records for launch/tab performance hardening progress. |
+| CHG-0151 | 2026-07-04 | TASK-0044 | UI | +1 | Added shared slow tab-switch and slow tab-build diagnostics with status-bar feedback. |
+| CHG-0152 | 2026-07-04 | TASK-0044 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for completed slow-tab diagnostics. |
+| CHG-0153 | 2026-07-04 | TASK-0044 | Documentation | +1 | Updated TASK-0044, punch list, queue, roadmap, handoff, changelog, and ledger records for task completion. |
+| CHG-0154 | 2026-07-04 | TASK-0044 / TASK-0053 | Task System | +1 | Completed TASK-0044 and activated TASK-0053 because the Task System counter reached 10/10. |

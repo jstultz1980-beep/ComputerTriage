@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0044-GUI-Tab-Performance-Hardening` | Codex | Active | Reduce Activity first-open lag, remaining tab-to-tab navigation lag, and launcher startup delay. |
+| `TASK-0053-Task-System-Counter-Audit` | Codex | Active | Audit task-state consistency because the Task System counter reached 10/10. |
 
 ## Queued
 
@@ -57,6 +57,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0048-Task-System-Counter-Audit` | Completed | Audited task-state consistency after the Task System counter reached 10/10 and reset the audited counter. |
 | `TASK-0049-UI-Counter-Audit` | Completed | Audited UI task history after the UI counter reached 10/10 and reset the audited counter. |
 | `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Completed | Added status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build. |
+| `TASK-0044-GUI-Tab-Performance-Hardening` | Completed | Deferred startup tab construction, deferred Activity refresh, trimmed VBS launch flags, and added slow tab diagnostics. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
 | `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
@@ -71,4 +72,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0044.
+- Current active task is TASK-0053.
