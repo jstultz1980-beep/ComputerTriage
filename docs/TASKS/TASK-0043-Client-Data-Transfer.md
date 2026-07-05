@@ -1,7 +1,7 @@
 # TASK-0043 - Client Data Transfer
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0053-Task-System-Counter-Audit`
+- `TASK-0043-Client-Data-Transfer`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -130,7 +130,8 @@ Current UI work:
 - TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
 - TASK-0047 completed status-bar Wi-Fi signal, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build placement.
 - TASK-0044 completed GUI startup/tab performance hardening and slow-tab diagnostics.
-- TASK-0053 is active because the Task System counter reached `10 / 10` after TASK-0044 completion.
+- TASK-0053 completed the required Task System counter audit and reset only the audited counter.
+- TASK-0043 is active for technician-safe client diagnostic data transfer between toolkit copies.
 - The consolidated queued order is:
   1. TASK-0043 Client Data Transfer.
   2. TASK-0051 Development File Deployment Exclusions.

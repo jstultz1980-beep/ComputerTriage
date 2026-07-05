@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0057
+HANDOFF-0058
 
 ## Current Task
-TASK-0053-Task-System-Counter-Audit
+TASK-0043-Client-Data-Transfer
 
 ## Current Owner
 Codex
@@ -30,7 +30,9 @@ TASK-0047 completed status-bar indicators and chrome cleanup.
 
 TASK-0044 completed GUI tab performance hardening.
 
-Implementation work must pause because the Task System counter reached `10 / 10`. The single active task is now TASK-0053 Task System Counter Audit.
+TASK-0053 completed the required Task System counter audit.
+
+Implementation work may resume under the single active task: TASK-0043 Client Data Transfer.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -54,8 +56,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 3 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 5 / 10 | No |
-| Task System | 10 / 10 | Yes |
+| Documentation | 6 / 10 | No |
+| Task System | 1 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
@@ -78,7 +80,7 @@ Recently completed work:
 - TASK-0047 completed status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, and busy indicator clarification.
 
 Current active work:
-- TASK-0053 is active for the mandatory Task System counter audit.
+- TASK-0043 is active for technician-safe client diagnostic data transfer between toolkit copies.
 
 Queued implementation/design work, in recommended order:
 - TASK-0043 Client Data Transfer.
@@ -88,14 +90,15 @@ Queued implementation/design work, in recommended order:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0053-Task-System-Counter-Audit`
+`TASK-0043-Client-Data-Transfer`
 
 Scope summary:
-- Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` identify exactly one active task.
-- Verify completed tasks are not still listed as queued or active.
-- Verify open punch-list items are mapped or explicitly deferred.
-- Reset only the audited Task System counter after the audit is complete.
-- Do not change application code during the audit.
+- Add a Settings-page workflow for transferring client data to another toolkit destination.
+- Allow destination path entry by typing.
+- Validate the destination appears to be a Network Toolkit copy.
+- Transfer client diagnostic data only and preserve source data.
+- Exclude app binaries, portable tools, and development files.
+- Write a transfer manifest and confirm before merging into existing client data.
 
 ## Queued Work
 - `TASK-0043-Client-Data-Transfer` owned by Codex.
@@ -149,9 +152,11 @@ Scope summary:
 - Completed TASK-0044 and marked punch-list items 4, 13, 14, and 27 complete.
 - PowerShell parser validation, GUI smoke test, and button-smoke test passed after the final slow-tab diagnostics pass.
 - Activated TASK-0053 because the Task System counter reached `10 / 10`.
+- Completed TASK-0053 and reset only the Task System counter.
+- Activated TASK-0043 as the next implementation task.
 
 ## Blockers
-The Task System counter is at `10 / 10`. Complete TASK-0053 before any further implementation work.
+No audit gate is currently blocking implementation.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -166,7 +171,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0044: Complete GUI performance hardening
+TASK-0053: Complete task system audit
 ```
 
 ## Next Bot Prompt
@@ -184,30 +189,32 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0053-Task-System-Counter-Audit.md
+7. docs/TASKS/TASK-0043-Client-Data-Transfer.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0053-Task-System-Counter-Audit.
+- Active task: TASK-0043-Client-Data-Transfer.
 - Owner: Codex.
-- TASK-0044 completed GUI tab performance hardening and slow-tab diagnostics.
-- Task System counter is `10 / 10`; implementation is blocked until TASK-0053 is completed.
-- Next queued implementation tasks after the audit are TASK-0043, TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
+- TASK-0053 completed the required Task System counter audit and reset only the audited counter.
+- Next queued implementation tasks after TASK-0043 are TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0053 only.
+Execute TASK-0043 only.
 
 Scope:
-- Audit task-state consistency.
-- Verify queue and handoff agree on exactly one active task.
-- Verify TASK-0044 is complete and TASK-0053 is active.
-- Review open punch-list items and ensure they are mapped or explicitly deferred.
-- Reset only the Task System counter after audit completion.
+- Add a Settings-page workflow for transferring client data to another toolkit destination.
+- Allow destination path entry by typing, not only browsing.
+- Validate that the destination appears to be a Network Toolkit copy.
+- Transfer only client diagnostic data and preserve source data.
+- Avoid copying application/tool binaries.
+- Write a transfer manifest with source, destination, timestamp, included folders, file count, and copied byte count.
+- Require confirmation before merging into a destination that already contains client data.
+- Log transfer failures clearly without closing the toolkit.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -219,10 +226,10 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- No application code changes are made.
-- `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and the active task file agree.
-- Task System counter resets to `0 / 10` only after the audit is complete.
-- Open punch-list items remain visible for future planning.
+- PowerShell parse check passes for modified scripts.
+- GUI smoke test passes.
+- Button-smoke test passes.
+- Client-data transfer helper can validate a destination and generate a manifest in a local temporary destination without copying application binaries.
 
 When done, provide:
 - Concise summary of implementation performed.
