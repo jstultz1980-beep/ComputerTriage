@@ -1,7 +1,7 @@
 # TASK-0051 - Development File Deployment Exclusions
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

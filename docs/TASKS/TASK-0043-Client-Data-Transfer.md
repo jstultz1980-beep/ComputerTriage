@@ -1,7 +1,7 @@
 # TASK-0043 - Client Data Transfer
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -29,10 +29,23 @@ A technician may collect reports, profiles, bundles, crash evidence, and other c
 - Changing deployment/update semantics.
 
 ## Acceptance Criteria
-- [ ] Settings page exposes a clear client-data transfer action.
-- [ ] Destination path can be typed.
-- [ ] Transfer excludes app binaries and portable tools.
-- [ ] Transfer writes a manifest.
-- [ ] Existing destination data is protected by confirmation.
-- [ ] Failure paths are logged and surfaced without crashing the GUI.
-- [ ] Validation confirms PowerShell parse, GUI smoke, and button-smoke checks pass.
+- [x] Settings page exposes a clear client-data transfer action.
+- [x] Destination path can be typed.
+- [x] Transfer excludes app binaries and portable tools.
+- [x] Transfer writes a manifest.
+- [x] Existing destination data is protected by confirmation.
+- [x] Failure paths are logged and surfaced without crashing the GUI.
+- [x] Validation confirms PowerShell parse, GUI smoke, and button-smoke checks pass.
+
+## Implementation Notes
+- Added `App/NetworkToolkit/Utilities/ClientDataTransfer.ps1` as the reusable client-data transfer backend.
+- Added a Settings-page `Transfer Client Data` action with typed destination entry, optional browse, validation, merge confirmation, manifest output, GUI logging, and tool usage logging.
+- Transfer scope is limited to client diagnostic data roots such as NetworkToolkit Data, Exports, Logs, Triage Runs, Triage Profiles, and app logs.
+- Application code, portable apps, external tools, custom tool binaries, Git metadata, and build/release folders are excluded.
+
+## Validation
+- PowerShell parser check passed for `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- PowerShell parser check passed for `App/NetworkToolkit/Utilities/ClientDataTransfer.ps1`.
+- Local fake toolkit transfer validation copied client data, created a manifest, and confirmed a fake external-tool binary was not copied.
+- GUI smoke test passed.
+- Button smoke test passed.

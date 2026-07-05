@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0058
+HANDOFF-0059
 
 ## Current Task
-TASK-0043-Client-Data-Transfer
+TASK-0051-Development-File-Deployment-Exclusions
 
 ## Current Owner
 Codex
@@ -32,7 +32,9 @@ TASK-0044 completed GUI tab performance hardening.
 
 TASK-0053 completed the required Task System counter audit.
 
-Implementation work may resume under the single active task: TASK-0043 Client Data Transfer.
+TASK-0043 completed the Settings-page client data transfer workflow.
+
+Implementation work may continue under the single active task: TASK-0051 Development File Deployment Exclusions.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -56,15 +58,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 3 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 6 / 10 | No |
-| Task System | 1 / 10 | No |
+| Documentation | 7 / 10 | No |
+| Task System | 2 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
-| UI | 7 / 10 | No |
+| UI | 8 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 6 / 10 | No |
-| Validation/Test Framework | 3 / 10 | No |
+| Build System | 7 / 10 | No |
+| Validation/Test Framework | 4 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
@@ -78,30 +80,28 @@ Recently completed work:
 - TASK-0046 completed Triage page catalog and bundle cleanup.
 - TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
 - TASK-0047 completed status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, and busy indicator clarification.
+- TASK-0043 completed Settings-page client data transfer with destination validation, merge confirmation, client-data-only copying, and manifest output.
 
 Current active work:
-- TASK-0043 is active for technician-safe client diagnostic data transfer between toolkit copies.
+- TASK-0051 is active for development-only file inventory and deployment/update exclusions.
 
 Queued implementation/design work, in recommended order:
-- TASK-0043 Client Data Transfer.
 - TASK-0051 Development File Deployment Exclusions.
 - TASK-0040 Software Inventory And Placement Implementation.
 - TASK-0033 Tab-By-Tab Direction And Embedding Plan.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0043-Client-Data-Transfer`
+`TASK-0051-Development-File-Deployment-Exclusions`
 
 Scope summary:
-- Add a Settings-page workflow for transferring client data to another toolkit destination.
-- Allow destination path entry by typing.
-- Validate the destination appears to be a Network Toolkit copy.
-- Transfer client diagnostic data only and preserve source data.
-- Exclude app binaries, portable tools, and development files.
-- Write a transfer manifest and confirm before merging into existing client data.
+- Inventory repository files and folders that are development-only.
+- Document runtime-required versus development-only files.
+- Update fresh deployment and deployed update logic to exclude development-only files.
+- Keep source repository files intact.
+- Validate deployment/update exclusions without a live production push.
 
 ## Queued Work
-- `TASK-0043-Client-Data-Transfer` owned by Codex.
 - `TASK-0051-Development-File-Deployment-Exclusions` owned by Codex.
 - `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
 - `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by Codex.
@@ -154,6 +154,8 @@ Scope summary:
 - Activated TASK-0053 because the Task System counter reached `10 / 10`.
 - Completed TASK-0053 and reset only the Task System counter.
 - Activated TASK-0043 as the next implementation task.
+- Completed TASK-0043 with a reusable client-data transfer helper and Settings-page transfer workflow.
+- Activated TASK-0051 as the next implementation task.
 
 ## Blockers
 No audit gate is currently blocking implementation.
@@ -171,7 +173,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0053: Complete task system audit
+TASK-0043: Add client data transfer
 ```
 
 ## Next Bot Prompt
@@ -189,32 +191,30 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0043-Client-Data-Transfer.md
+7. docs/TASKS/TASK-0051-Development-File-Deployment-Exclusions.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0043-Client-Data-Transfer.
+- Active task: TASK-0051-Development-File-Deployment-Exclusions.
 - Owner: Codex.
-- TASK-0053 completed the required Task System counter audit and reset only the audited counter.
-- Next queued implementation tasks after TASK-0043 are TASK-0051, TASK-0040, TASK-0033, and TASK-0021.
+- TASK-0043 completed client-data transfer and activated TASK-0051.
+- Next queued implementation tasks after TASK-0051 are TASK-0040, TASK-0033, and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0043 only.
+Execute TASK-0051 only.
 
 Scope:
-- Add a Settings-page workflow for transferring client data to another toolkit destination.
-- Allow destination path entry by typing, not only browsing.
-- Validate that the destination appears to be a Network Toolkit copy.
-- Transfer only client diagnostic data and preserve source data.
-- Avoid copying application/tool binaries.
-- Write a transfer manifest with source, destination, timestamp, included folders, file count, and copied byte count.
-- Require confirmation before merging into a destination that already contains client data.
-- Log transfer failures clearly without closing the toolkit.
+- Inventory development-only files and folders.
+- Document runtime-required versus development-only files.
+- Update fresh deployment logic to exclude development-only files.
+- Update toolkit update logic to exclude development-only files.
+- Preserve source repository files; exclusions apply only to deployment/update outputs.
+- Prefer a single explicit helper/list for exclusions.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -226,10 +226,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- PowerShell parse check passes for modified scripts.
-- GUI smoke test passes.
-- Button-smoke test passes.
-- Client-data transfer helper can validate a destination and generate a manifest in a local temporary destination without copying application binaries.
+- Development-only inventory exists.
+- Fresh deployment and toolkit update exclusion behavior can be validated locally.
+- Runtime-required files remain included.
 
 When done, provide:
 - Concise summary of implementation performed.

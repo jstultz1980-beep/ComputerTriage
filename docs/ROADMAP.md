@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0043-Client-Data-Transfer`
+- `TASK-0051-Development-File-Deployment-Exclusions`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -131,13 +131,13 @@ Current UI work:
 - TASK-0047 completed status-bar Wi-Fi signal, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build placement.
 - TASK-0044 completed GUI startup/tab performance hardening and slow-tab diagnostics.
 - TASK-0053 completed the required Task System counter audit and reset only the audited counter.
-- TASK-0043 is active for technician-safe client diagnostic data transfer between toolkit copies.
+- TASK-0043 completed technician-safe client diagnostic data transfer between toolkit copies.
+- TASK-0051 is active for development-only deployment/update exclusions.
 - The consolidated queued order is:
-  1. TASK-0043 Client Data Transfer.
-  2. TASK-0051 Development File Deployment Exclusions.
-  3. TASK-0040 Software Inventory And Placement Implementation.
-  4. TASK-0033 Tab-By-Tab Direction And Embedding Plan.
-  5. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+  1. TASK-0051 Development File Deployment Exclusions.
+  2. TASK-0040 Software Inventory And Placement Implementation.
+  3. TASK-0033 Tab-By-Tab Direction And Embedding Plan.
+  4. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

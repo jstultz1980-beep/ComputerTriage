@@ -14272,6 +14272,177 @@ function Invoke-GUIRemoveClientData {
     ) | Out-Null
 }
 
+function Show-GUIClientDataTransfer {
+    $sourceRoot = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
+
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Transfer Client Data"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(720,340)
+    $form.MinimumSize = New-Object System.Drawing.Size(720,340)
+    $form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $form.BackColor = $script:GUITheme.Page
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 3
+    $layout.RowCount = 6
+    $layout.Padding = New-Object System.Windows.Forms.Padding(18)
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,95))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,1))) | Out-Null
+    $form.Controls.Add($layout)
+
+    $sourceLabel = New-GUILabel "Source"
+    $layout.Controls.Add($sourceLabel,0,0)
+    $sourceValue = New-GUILabel $sourceRoot
+    $sourceValue.Dock = "Fill"
+    $sourceValue.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($sourceValue,1,0)
+    $layout.SetColumnSpan($sourceValue,2)
+
+    $destinationLabel = New-GUILabel "Destination"
+    $layout.Controls.Add($destinationLabel,0,1)
+
+    $destinationBox = New-Object System.Windows.Forms.TextBox
+    $destinationBox.Dock = "Fill"
+    $destinationBox.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $destinationBox.BackColor = $script:GUITheme.InputBack
+    $destinationBox.ForeColor = $script:GUITheme.InputText
+    $layout.Controls.Add($destinationBox,1,1)
+
+    $browse = New-GUIButton "Browse" {
+        $picker = New-Object System.Windows.Forms.FolderBrowserDialog
+        $picker.Description = "Select the destination Network Toolkit root or App folder."
+        if($picker.ShowDialog($form) -eq [System.Windows.Forms.DialogResult]::OK){
+            $destinationBox.Text = $picker.SelectedPath
+        }
+    }
+    $browse.Dock = "Fill"
+    $layout.Controls.Add($browse,2,1)
+
+    $hint = New-GUILabel "Only client diagnostic data is copied. Application code, portable tools, custom apps, Git data, and release/build files are excluded."
+    $hint.Dock = "Fill"
+    $hint.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($hint,0,2)
+    $layout.SetColumnSpan($hint,3)
+
+    $summaryBox = New-Object System.Windows.Forms.TextBox
+    $summaryBox.Dock = "Fill"
+    $summaryBox.Multiline = $true
+    $summaryBox.ReadOnly = $true
+    $summaryBox.ScrollBars = "Vertical"
+    $summaryBox.Font = New-Object System.Drawing.Font("Consolas",9)
+    $summaryBox.BackColor = $script:GUITheme.ConsoleBack
+    $summaryBox.ForeColor = $script:GUITheme.ConsoleText
+    $summaryBox.Text = "Enter or browse to the destination toolkit, then click Validate."
+    $layout.Controls.Add($summaryBox,0,3)
+    $layout.SetColumnSpan($summaryBox,3)
+
+    $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttons.Dock = "Fill"
+    $buttons.FlowDirection = "RightToLeft"
+    $buttons.WrapContents = $false
+    $layout.Controls.Add($buttons,0,4)
+    $layout.SetColumnSpan($buttons,3)
+
+    $cancel = New-GUIButton "Close" { $form.Close() }
+    $cancel.Width = 90
+    $transfer = New-GUIButton "Transfer" { }
+    $transfer.Width = 110
+    $validate = New-GUIButton "Validate" { }
+    $validate.Width = 100
+    [void]$buttons.Controls.Add($cancel)
+    [void]$buttons.Controls.Add($transfer)
+    [void]$buttons.Controls.Add($validate)
+
+    $validate.Add_Click({
+        try {
+            $destinationRoot = Resolve-NTKDeploymentRoot -Path $destinationBox.Text.Trim()
+            $sourceFiles = @(Get-NTKClientDataFileList -DeploymentRoot $sourceRoot)
+            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $destinationRoot
+            $bytes = [int64](@($sourceFiles | Measure-Object -Property Length -Sum).Sum)
+            $summaryBox.Text = @(
+                "Destination valid: $destinationRoot",
+                "Source client files: $($sourceFiles.Count)",
+                "Source client size: $([math]::Round(($bytes / 1MB),2)) MB",
+                "Destination already has client data: $destinationHasData",
+                "",
+                "Included roots:",
+                ((Get-NTKClientDataTransferRoots -DeploymentRoot $sourceRoot | ForEach-Object { " - $($_.RelativePath)" }) -join "`r`n")
+            ) -join "`r`n"
+            Add-GUILog "Client data transfer destination validated: $destinationRoot"
+        }
+        catch {
+            $summaryBox.Text = "Validation failed:`r`n$($_.Exception.Message)"
+            Add-GUILog "Client data transfer validation failed: $($_.Exception.Message)" "ERROR"
+        }
+    })
+
+    $transfer.Add_Click({
+        $destinationText = $destinationBox.Text.Trim()
+        if([string]::IsNullOrWhiteSpace($destinationText)){
+            [System.Windows.Forms.MessageBox]::Show("Type or browse to a destination toolkit first.","Transfer Client Data",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            return
+        }
+
+        try {
+            $destinationRoot = Resolve-NTKDeploymentRoot -Path $destinationText
+            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $destinationRoot
+            if($destinationHasData){
+                $choice = [System.Windows.Forms.MessageBox]::Show(
+                    "The destination already contains client diagnostic data.`r`n`r`nDestination:`r`n$destinationRoot`r`n`r`nTransfer will merge and overwrite matching client-data files only. Continue?",
+                    "Confirm Client Data Merge",
+                    [System.Windows.Forms.MessageBoxButtons]::YesNo,
+                    [System.Windows.Forms.MessageBoxIcon]::Warning
+                )
+                if($choice -ne [System.Windows.Forms.DialogResult]::Yes){
+                    Add-GUILog "Client data transfer cancelled before merge."
+                    return
+                }
+            }
+
+            Add-GUILog "Client data transfer started: $sourceRoot -> $destinationRoot"
+            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action "Started" -Detail ("Source={0}; Destination={1}" -f $sourceRoot,$destinationRoot)
+            $manifest = Copy-NTKClientData -SourceRoot $sourceRoot -DestinationRoot $destinationRoot -Force:$destinationHasData
+            $summaryBox.Text = @(
+                "Transfer $($manifest.Status).",
+                "Destination: $($manifest.DestinationRoot)",
+                "Files copied: $($manifest.CopiedFileCount) / $($manifest.SourceFileCount)",
+                "Size copied: $($manifest.CopiedSizeMB) MB",
+                "Manifest: $($manifest.ManifestPath)",
+                "Failures: $(@($manifest.Failures).Count)"
+            ) -join "`r`n"
+
+            Add-GUILog "Client data transfer completed: $($manifest.CopiedFileCount) file(s), $($manifest.CopiedSizeMB) MB"
+            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action $manifest.Status -Detail ("Destination={0}; Files={1}; Manifest={2}" -f $manifest.DestinationRoot,$manifest.CopiedFileCount,$manifest.ManifestPath)
+
+            $icon = if(@($manifest.Failures).Count -gt 0){[System.Windows.Forms.MessageBoxIcon]::Warning}else{[System.Windows.Forms.MessageBoxIcon]::Information}
+            [System.Windows.Forms.MessageBox]::Show(
+                "Client data transfer $($manifest.Status.ToLower()).`r`n`r`nFiles copied: $($manifest.CopiedFileCount)`r`nSize copied: $($manifest.CopiedSizeMB) MB`r`n`r`nManifest:`r`n$($manifest.ManifestPath)",
+                "Transfer Client Data",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                $icon
+            ) | Out-Null
+        }
+        catch {
+            $summaryBox.Text = "Transfer failed:`r`n$($_.Exception.Message)"
+            Add-GUILog "Client data transfer failed: $($_.Exception.Message)" "ERROR"
+            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action "Failed" -Detail $_.Exception.Message
+            [System.Windows.Forms.MessageBox]::Show("Client data transfer failed.`r`n`r`n$($_.Exception.Message)","Transfer Client Data",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+    })
+
+    [void]$form.ShowDialog($script:Form)
+    $form.Dispose()
+}
+
 function Update-GUIToolkitVersionLabel {
     if(!$script:ToolkitVersionLabel -or $script:ToolkitVersionLabel.IsDisposed){
         return
@@ -15010,11 +15181,12 @@ function Build-SettingsPage {
 
     $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $maintenanceLayout.Dock = "Fill"
-    $maintenanceLayout.RowCount = 6
+    $maintenanceLayout.RowCount = 7
     $maintenanceLayout.ColumnCount = 2
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
@@ -15053,10 +15225,16 @@ function Build-SettingsPage {
     $deployButton.Width = 0
     $maintenanceLayout.Controls.Add($deployButton,1,2)
 
+    $transferButton = New-GUIButton "Transfer Client Data" { Show-GUIClientDataTransfer }
+    $transferButton.Dock = "Fill"
+    $transferButton.Width = 0
+    $maintenanceLayout.Controls.Add($transferButton,0,3)
+    $maintenanceLayout.SetColumnSpan($transferButton,2)
+
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
     $foldersLabel.TextAlign = "MiddleLeft"
-    $maintenanceLayout.Controls.Add($foldersLabel,0,4)
+    $maintenanceLayout.Controls.Add($foldersLabel,0,5)
     $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -15068,7 +15246,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.Controls.Add($folderPanel,0,5)
+    $maintenanceLayout.Controls.Add($folderPanel,0,6)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "View Live Log" { Show-GUILiveLogWindow }
@@ -15128,6 +15306,7 @@ function Set-GUIFallbackButtonToolTips {
         "Apply Settings" = "Apply and save Settings tab choices to the portable toolkit drive."
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
+        "Transfer Client Data" = "Copy reports, profiles, triage runs, logs, and diagnostic outputs into another Network Toolkit copy without copying apps or program files."
         "Refresh Size" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
         "Scan Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
         "Copy Key" = "Copy the selected license or registration value to the clipboard."

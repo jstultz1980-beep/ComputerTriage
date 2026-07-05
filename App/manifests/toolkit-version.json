@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260704223513,
-    "SourceUpdatedAt":  "2026-07-04T22:35:13.2572381-05:00",
-    "ReleaseNotes":  "Completed GUI tab performance diagnostics with unified slow tab switch/build logging and status-bar feedback."
+    "Build":  20260705115905,
+    "SourceUpdatedAt":  "2026-07-05T11:59:05.4581656-05:00",
+    "ReleaseNotes":  "Added Settings workflow to transfer client diagnostic data between toolkit copies without copying app binaries."
 }

@@ -1,8 +1,14 @@
 # Changelog
 
-## 2026-07-04
+## 2026-07-05
+- Completed TASK-0043 Client Data Transfer and activated TASK-0051 Development File Deployment Exclusions.
+- Added a Settings-page workflow to transfer client diagnostic data to another toolkit copy with typed destination entry, destination validation, merge confirmation, GUI/tool logging, and manifest output.
+- Added reusable client-data transfer helper logic that copies diagnostic data roots while excluding application code, portable apps, external tools, custom app binaries, Git metadata, and build/release folders.
+- Updated toolkit build metadata for TASK-0043.
 - Completed TASK-0053 Task System Counter Audit and reset only the Task System counter.
 - Activated TASK-0043 Client Data Transfer as the next implementation task.
+
+## 2026-07-04
 - Completed TASK-0044 GUI Tab Performance Hardening.
 - Added shared slow tab-switch/build diagnostics and status-bar feedback for tabs that exceed the slow threshold.
 - Activated TASK-0053 Task System Counter Audit because completing TASK-0044 brings the Task System counter to `10 / 10`.

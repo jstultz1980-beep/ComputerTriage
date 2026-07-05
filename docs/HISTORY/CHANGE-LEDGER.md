@@ -165,3 +165,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0155 | 2026-07-05 | TASK-0053 | Task System | reset to 0 / 10 | Completed the required Task System counter audit and reset only the audited counter. |
 | CHG-0156 | 2026-07-05 | TASK-0053 / TASK-0043 | Task System | +1 | Activated TASK-0043 as the next implementation task after the audit gate cleared. |
 | CHG-0157 | 2026-07-05 | TASK-0053 | Documentation | +1 | Updated TASK-0053, queue, roadmap, handoff, changelog, and ledger records for audit completion. |
+| CHG-0158 | 2026-07-05 | TASK-0043 | UI | +1 | Added Settings-page client data transfer workflow with typed destination validation, transfer confirmation, and result messaging. |
+| CHG-0159 | 2026-07-05 | TASK-0043 | Build System | +1 | Added reusable client-data transfer helper and updated toolkit build metadata using `App/Update-ToolkitVersion.ps1`. |
+| CHG-0160 | 2026-07-05 | TASK-0043 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, button smoke, and fake toolkit transfer manifest generation excluding external-tool binaries. |
+| CHG-0161 | 2026-07-05 | TASK-0043 | Documentation | +1 | Updated TASK-0043, queue, roadmap, handoff, changelog, and ledger records for client data transfer completion. |
+| CHG-0162 | 2026-07-05 | TASK-0043 / TASK-0051 | Task System | +1 | Completed TASK-0043 and activated TASK-0051 as the next single active task. |
