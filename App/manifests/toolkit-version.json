@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260705115905,
-    "SourceUpdatedAt":  "2026-07-05T11:59:05.4581656-05:00",
-    "ReleaseNotes":  "Added Settings workflow to transfer client diagnostic data between toolkit copies without copying app binaries."
+    "Build":  20260705120756,
+    "SourceUpdatedAt":  "2026-07-05T12:07:56.1449512-05:00",
+    "ReleaseNotes":  "Centralized development-only deployment exclusions and updated fresh deployment/update logic."
 }

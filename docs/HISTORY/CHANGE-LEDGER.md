@@ -170,3 +170,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0160 | 2026-07-05 | TASK-0043 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, button smoke, and fake toolkit transfer manifest generation excluding external-tool binaries. |
 | CHG-0161 | 2026-07-05 | TASK-0043 | Documentation | +1 | Updated TASK-0043, queue, roadmap, handoff, changelog, and ledger records for client data transfer completion. |
 | CHG-0162 | 2026-07-05 | TASK-0043 / TASK-0051 | Task System | +1 | Completed TASK-0043 and activated TASK-0051 as the next single active task. |
+| CHG-0163 | 2026-07-05 | TASK-0051 | Build System | +1 | Added shared deployment/update exclusion helper and updated fresh deployment/update scripts to consume it. |
+| CHG-0164 | 2026-07-05 | TASK-0051 | Validation/Test Framework | +1 | Validated parser checks, exclusion policy, fake fresh deployment, and fake toolkit update exclusion behavior. |
+| CHG-0165 | 2026-07-05 | TASK-0051 | Documentation | +1 | Added deployment file inventory and updated TASK-0051, queue, roadmap, handoff, changelog, and ledger records. |
+| CHG-0166 | 2026-07-05 | TASK-0051 / TASK-0040 | Task System | +1 | Completed TASK-0051 and activated TASK-0040 as the next single active task. |

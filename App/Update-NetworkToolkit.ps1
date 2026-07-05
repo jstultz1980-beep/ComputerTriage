@@ -12,6 +12,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$exclusionHelper = Join-Path $PSScriptRoot "DeploymentExclusions.ps1"
+if(!(Test-Path -LiteralPath $exclusionHelper)){
+    throw "Deployment exclusion helper was not found: $exclusionHelper"
+}
+. $exclusionHelper
+
 function Resolve-NetworkToolkitFileSystemPath {
     param([Parameter(Mandatory=$true)][string]$Path)
 
@@ -111,6 +117,7 @@ function Test-NetworkToolkitCopy {
     $verified = @()
     foreach($relativePath in @(
         "NetworkToolkit.ps1",
+        "DeploymentExclusions.ps1",
         "ToolKit-GUI\ToolKit-GUI.ps1",
         "NetworkToolkit\NetworkToolkit-Core.ps1",
         "manifests\toolkit-version.json"
@@ -142,6 +149,7 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
         "NetworkToolkit\Core",
         "NetworkToolkit\Discovery",
         "NetworkToolkit\Plugins",
+        "NetworkToolkit\Tests",
         "NetworkToolkit\UI",
         "NetworkToolkit\Utilities",
         "manifests"
@@ -156,10 +164,10 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
         "NetworkToolkit.ps1",
         "NetworkToolkit.vbs",
         "Update-NetworkToolkit.ps1",
-        "Update-ToolkitVersion.ps1",
-        "Build-ProductionPackage.ps1",
-        "Test-ProductionPackage.ps1"
+        "Deploy-NetworkToolkit.ps1",
+        "DeploymentExclusions.ps1"
     )
+    $exclusions = Get-NetworkToolkitDeploymentExclusions -SourceRoot $SourceRoot -Mode Update
     $removed = 0
     $skipped = 0
 
@@ -184,6 +192,17 @@ function Remove-NetworkToolkitObsoleteProgramFiles {
         foreach($destinationFile in @(Get-ChildItem -LiteralPath $destinationManagedRoot -Recurse -File -Force -ErrorAction SilentlyContinue)){
             $relativePath = $destinationFile.FullName.Substring($DestinationRoot.Length).TrimStart('\\')
             if($preservedPaths -contains $relativePath -or $relativePath -match '(?i)(^|\\)(Data|Logs|ExternalTools|Exports)(\\|$)'){
+                continue
+            }
+
+            if(Test-NetworkToolkitRelativePathExcluded -RelativePath $relativePath -Exclusions $exclusions){
+                try {
+                    Remove-Item -LiteralPath $destinationFile.FullName -Force -ErrorAction Stop
+                    $removed++
+                }
+                catch {
+                    $skipped++
+                }
                 continue
             }
 
@@ -273,23 +292,8 @@ try {
         }
     }
 
-    $excludeDirectories = @(
-        (Join-Path $SourceRoot ".git"),
-        (Join-Path $SourceRoot "Release"),
-        (Join-Path $SourceRoot "NetworkToolkit\Data"),
-        (Join-Path $SourceRoot "NetworkToolkit\Exports"),
-        (Join-Path $SourceRoot "NetworkToolkit\Logs"),
-        (Join-Path $SourceRoot "NetworkToolkit\ExternalTools"),
-        (Join-Path $SourceRoot "Custom")
-    )
-    # Runtime settings and the technician-maintained toolbox registry belong to
-    # the destination. Updating code must never overwrite either file.
-    $excludedFiles = @(
-        (Join-Path $SourceRoot "manifests\gui-settings.json"),
-        (Join-Path $SourceRoot "manifests\custom-tools.json"),
-        (Join-Path $SourceRoot "manifests\custom-tools.json.bak")
-    )
-    $arguments = @($SourceRoot,$DestinationRoot,"/E","/COPY:DAT","/DCOPY:DAT","/R:1","/W:1","/NFL","/NDL","/NJH","/NJS","/NP","/XD") + $excludeDirectories + @("/XF") + $excludedFiles
+    $exclusions = Get-NetworkToolkitDeploymentExclusions -SourceRoot $SourceRoot -Mode Update
+    $arguments = @($SourceRoot,$DestinationRoot,"/E","/COPY:DAT","/DCOPY:DAT","/R:1","/W:1","/NFL","/NDL","/NJH","/NJS","/NP","/XD") + $exclusions.Directories + @("/XF") + $exclusions.Files
     & robocopy @arguments | Out-String | Set-Content -LiteralPath ($ResultPath + ".log") -Encoding UTF8
     $result.ExitCode = $LASTEXITCODE
     if($result.ExitCode -gt 7){

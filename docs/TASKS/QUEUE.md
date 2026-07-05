@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0051-Development-File-Deployment-Exclusions` | Codex | Active | Inventory development-only files and exclude them from toolkit deployment and deployed updates. |
+| `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Active | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0040-Software-Inventory-And-Placement-Implementation` | Codex | Queued | Consolidated portable-tool classification, Software tab launchable/installable placement, Registrar research, and non-portable triage cleanup. |
 | `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | Codex | Queued | Consolidated Directory direction and embedded-tool roadmap into a tab-by-tab workflow plan. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
@@ -58,6 +57,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0044-GUI-Tab-Performance-Hardening` | Completed | Deferred startup tab construction, deferred Activity refresh, trimmed VBS launch flags, and added slow tab diagnostics. |
 | `TASK-0053-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached 10/10 and reset only the audited counter. |
 | `TASK-0043-Client-Data-Transfer` | Completed | Added Settings workflow to validate a destination toolkit, transfer client diagnostic data only, and write a transfer manifest. |
+| `TASK-0051-Development-File-Deployment-Exclusions` | Completed | Added shared deployment exclusion policy, documented dev-only files, and validated fake fresh deployment/update exclusions. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
 | `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
@@ -72,4 +72,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0051.
+- Current active task is TASK-0040.

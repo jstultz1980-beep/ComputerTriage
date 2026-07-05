@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0059
+HANDOFF-0060
 
 ## Current Task
-TASK-0051-Development-File-Deployment-Exclusions
+TASK-0040-Software-Inventory-And-Placement-Implementation
 
 ## Current Owner
 Codex
@@ -34,7 +34,9 @@ TASK-0053 completed the required Task System counter audit.
 
 TASK-0043 completed the Settings-page client data transfer workflow.
 
-Implementation work may continue under the single active task: TASK-0051 Development File Deployment Exclusions.
+TASK-0051 completed the deployment/update development-file exclusion slice.
+
+Implementation work may continue under the single active task: TASK-0040 Software Inventory And Placement Implementation.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -58,15 +60,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 3 / 10 | No |
 | Architecture | 1 / 10 | No |
-| Documentation | 7 / 10 | No |
-| Task System | 2 / 10 | No |
+| Documentation | 8 / 10 | No |
+| Task System | 3 / 10 | No |
 | HEPHAESTUS | 3 / 10 | No |
 | ARGUS | 2 / 10 | No |
 | Reporting | 1 / 10 | No |
 | UI | 8 / 10 | No |
 | Plugin Framework | 1 / 10 | No |
-| Build System | 7 / 10 | No |
-| Validation/Test Framework | 4 / 10 | No |
+| Build System | 8 / 10 | No |
+| Validation/Test Framework | 5 / 10 | No |
 | Roadmap/Backlog | 1 / 10 | No |
 
 ## Current State
@@ -81,28 +83,27 @@ Recently completed work:
 - TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
 - TASK-0047 completed status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, and busy indicator clarification.
 - TASK-0043 completed Settings-page client data transfer with destination validation, merge confirmation, client-data-only copying, and manifest output.
+- TASK-0051 completed shared development-file deployment exclusions and validated fake fresh deployment/update scenarios.
 
 Current active work:
-- TASK-0051 is active for development-only file inventory and deployment/update exclusions.
+- TASK-0040 is active for Software tab launchable/installable placement and portable-tool classification.
 
 Queued implementation/design work, in recommended order:
-- TASK-0051 Development File Deployment Exclusions.
 - TASK-0040 Software Inventory And Placement Implementation.
 - TASK-0033 Tab-By-Tab Direction And Embedding Plan.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0051-Development-File-Deployment-Exclusions`
+`TASK-0040-Software-Inventory-And-Placement-Implementation`
 
 Scope summary:
-- Inventory repository files and folders that are development-only.
-- Document runtime-required versus development-only files.
-- Update fresh deployment and deployed update logic to exclude development-only files.
-- Keep source repository files intact.
-- Validate deployment/update exclusions without a live production push.
+- Put launchable portable applications at the top of the Software tab.
+- Reserve the bottom area for installable programs stored in the toolkit.
+- Classify optional portable tools, including LatencyMon.
+- Answer whether Registrar Registry Manager can be used portably.
+- Remove non-portable tools from launchable triage lists.
 
 ## Queued Work
-- `TASK-0051-Development-File-Deployment-Exclusions` owned by Codex.
 - `TASK-0040-Software-Inventory-And-Placement-Implementation` owned by Codex.
 - `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
@@ -156,6 +157,8 @@ Scope summary:
 - Activated TASK-0043 as the next implementation task.
 - Completed TASK-0043 with a reusable client-data transfer helper and Settings-page transfer workflow.
 - Activated TASK-0051 as the next implementation task.
+- Completed TASK-0051 with a shared deployment exclusion helper, deployment inventory, and fake deployment/update validation.
+- Activated TASK-0040 as the next implementation task.
 
 ## Blockers
 No audit gate is currently blocking implementation.
@@ -173,7 +176,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0043: Add client data transfer
+TASK-0051: Exclude development files from deployment
 ```
 
 ## Next Bot Prompt
@@ -191,30 +194,30 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0051-Development-File-Deployment-Exclusions.md
+7. docs/TASKS/TASK-0040-Software-Inventory-And-Placement-Implementation.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0051-Development-File-Deployment-Exclusions.
+- Active task: TASK-0040-Software-Inventory-And-Placement-Implementation.
 - Owner: Codex.
-- TASK-0043 completed client-data transfer and activated TASK-0051.
-- Next queued implementation tasks after TASK-0051 are TASK-0040, TASK-0033, and TASK-0021.
+- TASK-0051 completed development-file deployment exclusions and activated TASK-0040.
+- Next queued implementation tasks after TASK-0040 are TASK-0033 and TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0051 only.
+Execute TASK-0040 only.
 
 Scope:
-- Inventory development-only files and folders.
-- Document runtime-required versus development-only files.
-- Update fresh deployment logic to exclude development-only files.
-- Update toolkit update logic to exclude development-only files.
-- Preserve source repository files; exclusions apply only to deployment/update outputs.
-- Prefer a single explicit helper/list for exclusions.
+- Put launchable portable applications at the top of the Software tab.
+- Reserve the bottom area for installable programs stored in the toolkit.
+- Classify optional portable tools, including LatencyMon, without importing untracked tools unless explicitly in scope.
+- Research whether a usable portable edition of Registrar Registry Manager exists.
+- Remove non-portable tools from launchable triage lists.
+- Keep installable tools visible without implying they are portable launchers.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -226,9 +229,11 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Development-only inventory exists.
-- Fresh deployment and toolkit update exclusion behavior can be validated locally.
-- Runtime-required files remain included.
+- Software tab launchable/installable placement is implemented.
+- Optional portable tools are classified.
+- Registrar Registry Manager portability is answered with source notes.
+- Non-portable tools no longer appear as launchable triage tools.
+- PowerShell parse, smoke, and button-smoke validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.

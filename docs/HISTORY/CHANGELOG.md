@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-07-05
+- Completed TASK-0051 Development File Deployment Exclusions and activated TASK-0040 Software Inventory And Placement Implementation.
+- Added `docs/DEPLOYMENT-FILE-INVENTORY.md` to document runtime-required files, client data, preserved runtime state, and development-only files.
+- Added shared deployment/update exclusion policy in `App/DeploymentExclusions.ps1`.
+- Updated fresh deployment and toolkit update logic to exclude development-only scripts/test folders while preserving runtime files, client data, custom tools, and technician manifests.
+- Updated toolkit build metadata for TASK-0051.
 - Completed TASK-0043 Client Data Transfer and activated TASK-0051 Development File Deployment Exclusions.
 - Added a Settings-page workflow to transfer client diagnostic data to another toolkit copy with typed destination entry, destination validation, merge confirmation, GUI/tool logging, and manifest output.
 - Added reusable client-data transfer helper logic that copies diagnostic data roots while excluding application code, portable apps, external tools, custom app binaries, Git metadata, and build/release folders.

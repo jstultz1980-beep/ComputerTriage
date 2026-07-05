@@ -8,6 +8,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+$exclusionHelper = Join-Path $PSScriptRoot 'DeploymentExclusions.ps1'
+if(!(Test-Path -LiteralPath $exclusionHelper)){
+    throw "Deployment exclusion helper was not found: $exclusionHelper"
+}
+. $exclusionHelper
+
 function Resolve-DeploymentRoot {
     param([string]$Path)
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
@@ -44,17 +50,8 @@ try {
     $appDestination = Join-Path $destination 'App'
     New-Item -ItemType Directory -Path $appDestination -Force | Out-Null
     $appSource = Join-Path $source 'App'
-    $excludedDirectories = @(
-        (Join-Path $appSource '.git'),
-        (Join-Path $appSource 'Release'),
-        (Join-Path $appSource 'NetworkToolkit\Data'),
-        (Join-Path $appSource 'NetworkToolkit\Exports'),
-        (Join-Path $appSource 'NetworkToolkit\Logs')
-    )
-    if($ExcludeSysinternals){
-        $excludedDirectories += (Join-Path $appSource 'NetworkToolkit\ExternalTools\Sysinternals')
-    }
-    $arguments = @($appSource,$appDestination,'/E','/COPY:DAT','/DCOPY:DAT','/R:1','/W:1','/NFL','/NDL','/NJH','/NJS','/NP','/XD') + $excludedDirectories + @('/XF',(Join-Path $appSource 'manifests\gui-settings.json'))
+    $exclusions = Get-NetworkToolkitDeploymentExclusions -SourceRoot $appSource -Mode Fresh -ExcludeSysinternals:$ExcludeSysinternals
+    $arguments = @($appSource,$appDestination,'/E','/COPY:DAT','/DCOPY:DAT','/R:1','/W:1','/NFL','/NDL','/NJH','/NJS','/NP','/XD') + $exclusions.Directories + @('/XF') + $exclusions.Files
     & robocopy @arguments | Out-String | Set-Content -LiteralPath $result.LogPath -Encoding UTF8
     $result.ExitCode = $LASTEXITCODE
     if($result.ExitCode -gt 7){ throw "Robocopy failed with exit code $($result.ExitCode). Review $($result.LogPath)." }
@@ -74,7 +71,7 @@ try {
     $launcher = Join-Path $source 'NetworkToolkit.vbs'
     if(!(Test-Path -LiteralPath $launcher)){ throw "Launcher not found: $launcher" }
     Copy-Item -LiteralPath $launcher -Destination (Join-Path $destination 'NetworkToolkit.vbs') -Force
-    foreach($required in @('NetworkToolkit.ps1','ToolKit-GUI\ToolKit-GUI.ps1','NetworkToolkit\NetworkToolkit-Core.ps1','manifests\toolkit-version.json')){
+    foreach($required in @('NetworkToolkit.ps1','DeploymentExclusions.ps1','ToolKit-GUI\ToolKit-GUI.ps1','NetworkToolkit\NetworkToolkit-Core.ps1','manifests\toolkit-version.json')){
         if(!(Test-Path -LiteralPath (Join-Path $appDestination $required))){ throw "Deployment is missing required file: App\$required" }
     }
     $result.FilesCopied = @(Get-ChildItem -LiteralPath $destination -File -Recurse -Force).Count

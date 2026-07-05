@@ -1,7 +1,7 @@
 # TASK-0040 - Software Inventory And Placement Implementation
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
