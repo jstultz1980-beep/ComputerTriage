@@ -12,6 +12,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$script:GUIStartupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -102,6 +103,7 @@ $script:TabButtons = @{}
 $script:TabBuilders = @{}
 $script:BuiltTabs = @{}
 $script:StaticTabStrip = $null
+$script:StartupTabBuildTimer = $null
 $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
 $script:SettingsStartupTabCombo = $null
@@ -140,6 +142,7 @@ $script:TriageStatusRefreshTimer = $null
 $script:ActivityGrid = $null
 $script:ActivityStatusLabel = $null
 $script:ActivityRefreshTimer = $null
+$script:ActivityInitialRefreshTimer = $null
 $script:ActivityGaugePanels = @{}
 $script:ActivityDetailLabel = $null
 $script:LatestComputerProfileCache = $null
@@ -3067,7 +3070,7 @@ function Stop-GUIAsyncWorkers {
     foreach($timerName in @(
         "QuickDiagnosisTimer","ToolkitSizeTimer","ToolkitUpdateTimer","ToolkitDeploymentTimer",
         "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer",
-        "ActivityRefreshTimer","TriageTimer","TriageStatusRefreshTimer","GUIBusyTimer"
+        "ActivityRefreshTimer","ActivityInitialRefreshTimer","StartupTabBuildTimer","TriageTimer","TriageStatusRefreshTimer","GUIBusyTimer"
     )){
         try {
             $timer = Get-Variable -Name $timerName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
@@ -9287,6 +9290,7 @@ function Build-GUITabIfNeeded {
     try {
         $Page.BackColor = $script:GUITheme.Page
         Enable-GUISubtleSurfaceTexture -Control $Page
+        $Page.Controls.Clear()
         & $entry.Builder $Page
         Apply-GUIThemeToControl -Control $Page
         $script:BuiltTabs[$Page.Text] = $true
@@ -9354,6 +9358,25 @@ function Select-GUITabPage {
             Write-GUIDiagnosticLog -Event 'SlowTabSwitch' -Tool $Page.Text -Detail ("ElapsedMs={0}" -f $switchTimer.ElapsedMilliseconds)
         }
     }
+}
+
+function Add-GUITabLoadingPlaceholder {
+    param(
+        [System.Windows.Forms.TabPage]$Page,
+        [string]$Text = "Loading page..."
+    )
+
+    if(!$Page -or $Page.IsDisposed -or $Page.Controls.Count -gt 0){
+        return
+    }
+
+    $label = New-Object System.Windows.Forms.Label
+    $label.Dock = "Fill"
+    $label.TextAlign = "MiddleCenter"
+    $label.Font = New-Object System.Drawing.Font("Segoe UI Semilight",11)
+    $label.ForeColor = $script:GUITheme.MutedText
+    $label.Text = $Text
+    $Page.Controls.Add($label)
 }
 
 function Update-GUITabRuntimeState {
@@ -13763,6 +13786,44 @@ function Start-GUIActivityRefreshTimer {
     $timer.Start()
 }
 
+function Start-GUIActivityInitialRefresh {
+    if(!$script:ActivityGrid -or $script:ActivityGrid.IsDisposed){
+        return
+    }
+
+    if($script:ActivityInitialRefreshTimer){
+        try {
+            $script:ActivityInitialRefreshTimer.Stop()
+            $script:ActivityInitialRefreshTimer.Dispose()
+        }
+        catch {}
+        $script:ActivityInitialRefreshTimer = $null
+    }
+
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 200
+    $timer.Add_Tick({
+        try {
+            if($script:ActivityInitialRefreshTimer){
+                $script:ActivityInitialRefreshTimer.Stop()
+                $script:ActivityInitialRefreshTimer.Dispose()
+                $script:ActivityInitialRefreshTimer = $null
+            }
+
+            if($script:MainTabs -and $script:MainTabs.SelectedTab -and $script:MainTabs.SelectedTab.Text -eq "Activity"){
+                Refresh-GUIToolkitActivity
+                Start-GUIActivityRefreshTimer
+            }
+        }
+        catch {
+            Add-GUILog "Deferred Activity refresh failed: $($_.Exception.Message)"
+            if($script:ActivityStatusLabel){ $script:ActivityStatusLabel.Text = "Activity refresh failed: $($_.Exception.Message)" }
+        }
+    })
+    $script:ActivityInitialRefreshTimer = $timer
+    $timer.Start()
+}
+
 function Stop-GUIActivityRefreshTimer {
     if(!$script:ActivityRefreshTimer){
         return
@@ -13902,8 +13963,8 @@ function Build-ToolkitActivityPage {
     $ActivityDetailLabel.TextAlign = "MiddleLeft"
     $detailPanel.Controls.Add($ActivityDetailLabel)
 
-    Refresh-GUIToolkitActivity
-    Start-GUIActivityRefreshTimer
+    $script:ActivityStatusLabel.Text = "Activity page loaded. Gathering live process and system counters..."
+    Start-GUIActivityInitialRefresh
 }
 
 function Show-GUILiveLogWindow {
@@ -15420,7 +15481,6 @@ function Build-Form {
     $status.Items.Add($GUIBusyProgress) | Out-Null
     $root.Controls.Add($status,0,3)
     Update-GUIToolkitVersionLabel
-    Update-GUIWifiIndicators
 
     if(!$script:ToolTip){
         $script:ToolTip = New-Object System.Windows.Forms.ToolTip
@@ -15469,7 +15529,52 @@ function Build-Form {
         $startupPage = $quickPage
     }
 
-    Select-GUITabPage -Page $startupPage
+    if($SmokeTest -or $ButtonSmokeTest){
+        Select-GUITabPage -Page $startupPage
+        Update-GUIWifiIndicators
+    }
+    else {
+        try {
+            $script:GuiTabSwitchInProgress = $true
+            if($script:MainTabs.SelectedTab -ne $startupPage){
+                $script:MainTabs.SelectedTab = $startupPage
+            }
+        }
+        finally {
+            $script:GuiTabSwitchInProgress = $false
+        }
+        Add-GUITabLoadingPlaceholder -Page $startupPage -Text "Loading $($startupPage.Text)..."
+        Update-GUIStaticTabStripSelection
+        $Form.Add_Shown({
+            if($script:StartupTabBuildTimer){
+                try { $script:StartupTabBuildTimer.Stop(); $script:StartupTabBuildTimer.Dispose() } catch {}
+                $script:StartupTabBuildTimer = $null
+            }
+
+            $timer = New-Object System.Windows.Forms.Timer
+            $timer.Interval = 100
+            $timer.Add_Tick({
+                try {
+                    if($script:StartupTabBuildTimer){
+                        $script:StartupTabBuildTimer.Stop()
+                        $script:StartupTabBuildTimer.Dispose()
+                        $script:StartupTabBuildTimer = $null
+                    }
+
+                    if($script:MainTabs -and $script:MainTabs.SelectedTab){
+                        Select-GUITabPage -Page $script:MainTabs.SelectedTab
+                    }
+                    Update-GUIWifiIndicators
+                }
+                catch {
+                    Add-GUILog "Deferred startup tab build failed: $($_.Exception.Message)"
+                    Write-GUIDiagnosticLog -Event 'DeferredStartupBuildFailed' -Tool 'GUI' -Level 'ERROR' -Detail $_.ScriptStackTrace -Exception $_.Exception
+                }
+            })
+            $script:StartupTabBuildTimer = $timer
+            $timer.Start()
+        })
+    }
     Enable-GUIDoubleBuffering -Control $Form
 }
 
@@ -15478,6 +15583,11 @@ Build-Form
 Add-GUILog "Loaded GUI launcher from $GuiRoot"
 Add-GUILog "Using shared toolkit from $SharedToolkitRoot"
 Add-GUILog ("Registered commands: {0}" -f $script:Commands.Count)
+if($script:GUIStartupStopwatch){
+    $script:GUIStartupStopwatch.Stop()
+    Add-GUILog ("GUI shell initialized in {0} ms" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
+    Write-GUIDiagnosticLog -Event 'GUIStartupShellReady' -Tool 'GUI' -Detail ("ElapsedMs={0}; DeferredStartupTab=True" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
+}
 if($script:ToolkitLoadFailures.Count -gt 0){
     foreach($failure in $script:ToolkitLoadFailures){
         Add-GUILog ("Toolkit load failure [{0}] {1}: {2}" -f $failure.Stage,$failure.Name,$failure.Error)

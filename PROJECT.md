@@ -20,13 +20,14 @@ ignore chat history unless the same information exists in the repository.
 4. Read `docs/ROADMAP.md`.
 5. Read `docs/HANDOFF.md`.
 6. Read the active task document listed in `docs/HANDOFF.md`.
-7. Perform only the work assigned in the active task.
-8. Validate the work.
-9. Read `punch_list.txt` if it exists and reconcile any new change requests into the task queue without duplicating existing tasks.
-10. Update the active task document.
-11. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
+7. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
+8. Perform only the work assigned in the active task.
+9. Validate the work.
+10. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
+11. Update the active task document.
+12. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
     task or for creating the next task from the user's next request.
-12. Commit all related changes.
+13. Commit all related changes.
 
 ## Core Rule
 No implementation work may begin unless there is an active task document under `docs/TASKS`.

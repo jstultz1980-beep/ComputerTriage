@@ -154,3 +154,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0144 | 2026-07-04 | TASK-0047 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for completed status-bar indicators. |
 | CHG-0145 | 2026-07-04 | TASK-0047 | Documentation | +1 | Updated TASK-0047, queue, roadmap, handoff, changelog, and punch-list records for status-indicator completion. |
 | CHG-0146 | 2026-07-04 | TASK-0047 / TASK-0044 | Task System | +1 | Completed TASK-0047 and activated TASK-0044 as the next single active task. |
+| CHG-0147 | 2026-07-04 | TASK-0044 | UI | +1 | Deferred normal GUI startup tab construction, startup Wi-Fi probing, and Activity page refresh work so the shell and Activity page can paint before expensive work runs. |
+| CHG-0148 | 2026-07-04 | PROJECT | Repository Governance | +1 | Updated the required startup sequence so `punch_list.txt` is read before implementation and re-read before completion. |
+| CHG-0149 | 2026-07-04 | TASK-0044 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the GUI startup performance pass. |
+| CHG-0150 | 2026-07-04 | TASK-0044 | Documentation | +1 | Updated TASK-0044, handoff, changelog, and ledger records for launch/tab performance hardening progress. |

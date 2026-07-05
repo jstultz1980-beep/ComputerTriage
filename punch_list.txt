@@ -19,4 +19,16 @@ Computer Toolkit Change Requests
 13. Tabs are slow to render the first time but fast after that; investigate lazy tab construction and first-open work.
 14. NetworkToolkit.vbs is slow to launch the actual toolkit; profile startup and reduce launcher delay where possible.
 15. ~~Hold off on routine GitHub syncing; perform GitHub sync during the 10-change audit/refactor checkpoint unless explicitly requested earlier.~~
-
+16. Remove the instruction from the windows update tab.
+17. Fix the Windows Update Status indicator. I want it to notify me if I need to repair the windows update services.
+18. Remove the Wifi on/off from the wifi tab.
+19. Change the label on wifi in the status bar to be a three color indicator led. Have it greyed out if there is no wifi on the computer. Green if good, yellow slight issues, red problems.
+20. Along the bottom of the wifi page, I want the wifi network info if available.
+21. Change the refresh size button on the settings page to the refresh circular arrow.
+22. Make the Tab ordering more compact and slick.
+23. Get rid of the Registered Commands display.
+24. We need to fix the flow of the Triage Page. The instructions should be on the page in such a way that it guides the user through the triage process.
+25. Triage page Technician Notes can go away.
+26. Make the logo a bit bigger. It is hard to make it out being that small.
+27. Every tab has lag the first time i load it after launch. We need to be constantly trying to reduce the lag.
+28. Buttons need to have a smaller font so that their physical size on the page can shrink.

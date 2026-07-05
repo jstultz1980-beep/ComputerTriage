@@ -1,6 +1,12 @@
 # Changelog
 
 ## 2026-07-04
+- Started TASK-0044 GUI Tab Performance Hardening.
+- Deferred normal GUI startup tab construction until after the shell is shown, so the window can paint before the selected page builds.
+- Deferred Activity page CIM/process refresh until after the Activity tab paints.
+- Deferred startup Wi-Fi probing until after the form is shown and added GUI shell startup timing diagnostics.
+- Trimmed `NetworkToolkit.vbs` PowerShell startup flags with `-NoLogo` and `-NonInteractive`.
+- Updated the required startup sequence so `punch_list.txt` is read before implementation and re-read before completion.
 - Completed TASK-0047 Status Bar Indicators And Chrome Cleanup.
 - Added compact Wi-Fi signal status in the bottom status bar and on the Wi-Fi tab, including neutral/off handling when Wi-Fi is unavailable.
 - Added a compact Windows Update service-health indicator on the Windows Update tab.

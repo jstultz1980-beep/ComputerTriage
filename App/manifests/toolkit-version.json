@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260704161646,
-    "SourceUpdatedAt":  "2026-07-04T16:16:46.1485325-05:00",
-    "ReleaseNotes":  "Completed status-bar indicators with Wi-Fi signal, Windows Update service health, and clarified busy indicator purpose."
+    "Build":  20260704222824,
+    "SourceUpdatedAt":  "2026-07-04T22:28:24.2953710-05:00",
+    "ReleaseNotes":  "Deferred normal GUI startup tab construction, deferred Activity refresh, added startup timing diagnostics, and trimmed VBS launcher flags."
 }
