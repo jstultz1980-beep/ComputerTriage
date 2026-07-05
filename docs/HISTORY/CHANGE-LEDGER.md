@@ -180,3 +180,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0170 | 2026-07-05 | TASK-0040 | Documentation | +1 | Added software tool classification notes and updated TASK-0040, queue, roadmap, changelog, ledger, and handoff records. |
 | CHG-0171 | 2026-07-05 | TASK-0040 / TASK-0033 | Task System | +1 | Completed TASK-0040 and activated TASK-0033 as the next single active task. |
 | CHG-0172 | 2026-07-05 | TASK-0040 / TASK-0033 | Roadmap/Backlog | +1 | Updated roadmap current UI focus from software inventory placement to tab-by-tab direction and embedding planning. |
+| CHG-0173 | 2026-07-05 | TASK-0033 | Documentation | +1 | Added the tab-by-tab embedding plan and completed TASK-0033 documentation deliverables. |
+| CHG-0174 | 2026-07-05 | TASK-0033 | Build System | +1 | Updated toolkit build metadata for the completed planning batch. |
+| CHG-0175 | 2026-07-05 | TASK-0033 / TASK-0054..TASK-0059 | Task System | +1 | Created follow-on implementation tasks and activated TASK-0059 as the required audit gate. |
+| CHG-0176 | 2026-07-05 | TASK-0033 / TASK-0059 | Roadmap/Backlog | +1 | Updated roadmap focus from tab-by-tab planning to the required audit gate and queued implementation sequence. |

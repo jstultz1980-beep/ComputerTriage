@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-05
+- Completed TASK-0033 Tab-By-Tab Direction And Embedding Plan and activated TASK-0059 Documentation And Build Counter Audit.
+- Added `docs/DESIGN/TAB-BY-TAB-EMBEDDING-PLAN.md` defining Directory, Network, Infrastructure, and embedded-output direction.
+- Created follow-on tasks TASK-0054 through TASK-0058 for Directory, embedded output, Triage, Wi-Fi/Windows status, and Settings/control polish.
+- Created TASK-0059 because Documentation and Build System counters reached the audit threshold.
 - Completed TASK-0040 Software Inventory And Placement Implementation and activated TASK-0033 Tab-By-Tab Direction And Embedding Plan.
 - Split the Software tab into launchable portable apps and installable/extract-needed stored programs.
 - Moved Registrar Registry Manager out of the normal Repair-tab launch flow because only the installer is currently present.

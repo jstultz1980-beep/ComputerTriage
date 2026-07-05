@@ -1,7 +1,7 @@
 # TASK-0033 - Tab-By-Tab Direction And Embedding Plan
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -35,10 +35,27 @@ Run the planned tab-by-tab analysis pass and define which tabs should remain lau
 - Untracked `App/NetworkToolkit/LatencyMon/`.
 
 ## Acceptance Criteria
-- [ ] Directory tab direction is explicitly decided.
-- [ ] The recommendation answers whether network information belongs on Directory or should stay on Network/Infrastructure.
-- [ ] Recommendations avoid duplicating Network and Infrastructure tabs.
-- [ ] Embedded-tool candidates are listed and prioritized.
-- [ ] Each embedded recommendation states why embedded UI is better than a launcher.
-- [ ] The roadmap recommends whether the Quick Target Checks embedded output pattern should become the shared base for other pages.
-- [ ] Follow-on Codex implementation tasks are created if changes are accepted.
+- [x] Directory tab direction is explicitly decided.
+- [x] The recommendation answers whether network information belongs on Directory or should stay on Network/Infrastructure.
+- [x] Recommendations avoid duplicating Network and Infrastructure tabs.
+- [x] Embedded-tool candidates are listed and prioritized.
+- [x] Each embedded recommendation states why embedded UI is better than a launcher.
+- [x] The roadmap recommends whether the Quick Target Checks embedded output pattern should become the shared base for other pages.
+- [x] Follow-on Codex implementation tasks are created if changes are accepted.
+
+## Deliverables
+
+- `docs\DESIGN\TAB-BY-TAB-EMBEDDING-PLAN.md`
+- `TASK-0054-Directory-Domain-Status-Page`
+- `TASK-0055-Shared-Embedded-Output-Pattern`
+- `TASK-0056-Triage-Guided-Workflow-Polish`
+- `TASK-0057-WiFi-And-Windows-Status-Polish`
+- `TASK-0058-Settings-And-Control-Polish`
+- `TASK-0059-Documentation-Build-Counter-Audit`
+
+## Validation
+
+- Reviewed the current GUI tab builders and registered tab list.
+- Reviewed the current tool catalog placement by tab, section, and run mode.
+- Re-read `punch_list.txt` before completion.
+- Confirmed the next step must be an audit gate because Documentation reaches `10 / 10`.

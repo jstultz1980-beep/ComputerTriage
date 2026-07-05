@@ -9,12 +9,17 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | Codex | Active | Consolidated Directory direction and embedded-tool roadmap into a tab-by-tab workflow plan. |
+| `TASK-0059-Documentation-Build-Counter-Audit` | Codex | Active | Required audit because Documentation and Build System counters reached the threshold after TASK-0033. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
+| `TASK-0054-Directory-Domain-Status-Page` | Codex | Queued | Turn Directory into a domain identity and AD health page without duplicating Network or Infrastructure. |
+| `TASK-0055-Shared-Embedded-Output-Pattern` | Codex | Queued | Create the shared embedded output pattern based on Quick Target Checks and convert the first low-risk tool. |
+| `TASK-0056-Triage-Guided-Workflow-Polish` | Codex | Queued | Make Triage guide the run, bundle, submit workflow without catalog clutter. |
+| `TASK-0057-WiFi-And-Windows-Status-Polish` | Codex | Queued | Complete Wi-Fi and Windows Update status polish from the punch list. |
+| `TASK-0058-Settings-And-Control-Polish` | Codex | Queued | Tighten Settings controls, status bar noise, logo sizing, and button sizing. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
 ## Completed / Historical
@@ -58,6 +63,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0043-Client-Data-Transfer` | Completed | Added Settings workflow to validate a destination toolkit, transfer client diagnostic data only, and write a transfer manifest. |
 | `TASK-0051-Development-File-Deployment-Exclusions` | Completed | Added shared deployment exclusion policy, documented dev-only files, and validated fake fresh deployment/update exclusions. |
 | `TASK-0040-Software-Inventory-And-Placement-Implementation` | Completed | Split Software tab launchable/installable areas, classified Registrar and LatencyMon, and removed non-portable/redundant triage entries. |
+| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | Completed | Decided Directory/Network/Infrastructure boundaries, selected Quick Target Checks as the preferred embedded-output pattern, and created follow-on implementation tasks. |
 | `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
 | `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
 | `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
@@ -72,4 +78,4 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0033.
+- Current active task is TASK-0059.

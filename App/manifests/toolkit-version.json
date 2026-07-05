@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260705122050,
-    "SourceUpdatedAt":  "2026-07-05T12:20:50.6663939-05:00",
-    "ReleaseNotes":  "Classified Software tab tools, separated launchable apps from installable programs, and cleaned triage manifest entries."
+    "Build":  20260705122533,
+    "SourceUpdatedAt":  "2026-07-05T12:25:33.4487319-05:00",
+    "ReleaseNotes":  "Completed tab-by-tab embedding plan and queued focused workflow implementation tasks."
 }
