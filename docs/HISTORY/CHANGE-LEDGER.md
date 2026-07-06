@@ -2,7 +2,7 @@
 
 This ledger records accepted engineering changes that increment subsystem audit counters.
 
-A subsystem counter reaching `10 / 10` requires a new audit before additional implementation work continues.
+A subsystem counter reaching `25 / 25` requires a new audit before additional implementation work continues.
 
 After an audit is completed, the audited subsystem counter resets to `0 / 10` and the audit completion is recorded here.
 
@@ -192,3 +192,6 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0182 | 2026-07-05 | TASK-0054 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the Directory status page. |
 | CHG-0183 | 2026-07-05 | TASK-0054 / TASK-0060 | Documentation | +1 | Updated TASK-0054, queued task mapping, handoff, roadmap, changelog, and ledger records for Directory completion and the next audit gate. |
 | CHG-0184 | 2026-07-05 | TASK-0054 / TASK-0060 | Task System | +1 | Completed TASK-0054 and activated TASK-0060 because the UI counter reached 10/10. |
+| CHG-0185 | 2026-07-05 | PROJECT / TASK-0060 / TASK-0061 | Repository Governance | +1 | Raised the audit gate threshold from 10 changes to 25 changes. |
+| CHG-0186 | 2026-07-05 | TASK-0060 / TASK-0061 | Task System | +1 | Archived TASK-0060 because the raised threshold cleared the audit gate and activated TASK-0061 for Directory page layout polish. |
+| CHG-0187 | 2026-07-05 | TASK-0061 | Roadmap/Backlog | +1 | Mapped new Directory punch-list feedback into TASK-0061 and moved it before shared embedded-output work. |

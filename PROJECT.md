@@ -66,7 +66,7 @@ Each subsystem has its own audit change counter in `docs/HANDOFF.md`.
 
 A subsystem change is an accepted engineering change that materially affects that subsystem's behavior, structure, responsibility, interface, documentation, or validation model.
 
-When any subsystem counter reaches `10 / 10`, no new implementation work may begin until a new audit task is completed.
+When any subsystem counter reaches `25 / 25`, no new implementation work may begin until a new audit task is completed.
 
 After the audit is completed:
 1. The audited subsystem counter resets to `0 / 10`.
@@ -89,7 +89,7 @@ The semantic `Version` may remain unchanged for normal task work, but the `Build
 ## GitHub Sync Rule
 Normal implementation tasks may be committed locally, but should not be pushed to GitHub unless explicitly requested.
 
-Repository GitHub sync should happen during the 10-change audit/refactor checkpoint, or sooner only when the user asks for a push.
+Repository GitHub sync should happen during the 25-change audit/refactor checkpoint, or sooner only when the user asks for a push.
 
 ## Product
 Computer Triage Toolkit.

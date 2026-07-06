@@ -18,7 +18,7 @@
 12. ~~Header layout: the word "Computer" is cut off on the left side of the header summary.~~
 13. ~~Tabs are slow to render the first time but fast after that; investigate lazy tab construction and first-open work.~~
 14. ~~NetworkToolkit.vbs is slow to launch the actual toolkit; profile startup and reduce launcher delay where possible.~~
-15. ~~Hold off on routine GitHub syncing; perform GitHub sync during the 10-change audit/refactor checkpoint unless explicitly requested earlier.~~
+15. ~~Hold off on routine GitHub syncing; perform GitHub sync during the 25-change audit/refactor checkpoint unless explicitly requested earlier.~~
 16. Remove the instruction from the windows update tab.
 17. Fix the Windows Update Status indicator. I want it to notify me if I need to repair the windows update services.
 18. Remove the Wifi on/off from the wifi tab.
@@ -33,3 +33,5 @@
 27. ~~Every tab has lag the first time i load it after launch. We need to be constantly trying to reduce the lag.~~
 28. Buttons need to have a smaller font so that their physical size on the page can shrink.
 29. Wifi page. Wifi Tools Label is redundant.
+30. Directory Page layout looks like shit and I have to scroll down.
+31. Directory page, refresh button can go away.

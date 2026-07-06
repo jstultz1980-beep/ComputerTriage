@@ -1,7 +1,7 @@
 # TASK-0060 - UI Counter Audit
 
 ## Status
-Active
+Archived
 
 ## Owner
 Codex
@@ -30,3 +30,8 @@ TASK-0054 completed the Directory domain identity and AD health status page, whi
 - [ ] UI counter is reset only after this audit is completed.
 - [ ] Consolidated queued task order remains clear.
 - [ ] No application code is changed by the audit.
+
+## Archive Notes
+- Archived before execution because project governance changed the audit threshold from `10 / 10` to `25 / 25`.
+- UI is now `10 / 25`, so this audit gate is no longer active.
+- TASK-0061 Directory Page Layout Polish is active for the latest Directory page punch-list feedback.

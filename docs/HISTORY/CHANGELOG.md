@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-05
+- Raised the audit gate threshold from 10 changes to 25 changes and cleared the UI audit gate that had been triggered at 10/10.
+- Added TASK-0061 Directory Page Layout Polish for new Directory punch-list feedback and moved it ahead of shared embedded-output work.
 - Completed TASK-0054 Directory Domain Status Page and activated TASK-0060 UI Counter Audit.
 - Replaced the Directory tab catalog-only view with domain identity, secure channel, AD site, logon DC, and DNS SRV status while keeping Domain Logon Health, GPO Health, and GPResult visible.
 - Consolidated remaining punch-list items into the queued shared-output, Triage, Wi-Fi/Windows, Settings/control, and HEPHAESTUS tasks.

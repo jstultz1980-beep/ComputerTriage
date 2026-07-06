@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0060-UI-Counter-Audit` | Codex | Active | Required audit because the UI counter reached the threshold after TASK-0054. |
+| `TASK-0061-Directory-Page-Layout-Polish` | Codex | Active | Fix the latest Directory page layout feedback and remove the page refresh button. |
 
 ## Queued
 
@@ -23,9 +23,9 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 ## Consolidated Plan
 
-The remaining work is intentionally ordered from shared UI foundation to page-specific polish, then analysis-engine depth:
+The remaining work is intentionally ordered from immediate user feedback to shared UI foundation, page-specific polish, then analysis-engine depth:
 
-1. `TASK-0060-UI-Counter-Audit` clears the required UI audit gate.
+1. `TASK-0061-Directory-Page-Layout-Polish` handles punch-list items 30 and 31.
 2. `TASK-0055-Shared-Embedded-Output-Pattern` creates the common embedded command-output pattern before more pages are converted.
 3. `TASK-0056-Triage-Guided-Workflow-Polish` handles punch-list items 24 and 25.
 4. `TASK-0057-WiFi-And-Windows-Status-Polish` handles punch-list items 16, 17, 18, 19, 20, and 29.
@@ -82,6 +82,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0052-Documentation-Counter-Audit` | Completed | Audited documentation consistency after TASK-0046/build metadata updates reached 10/10 and reset the audited counter. |
 | `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
 | `TASK-0054-Directory-Domain-Status-Page` | Completed | Added Directory domain identity and AD health status summary with visible Domain Logon Health, GPO Health, and GPResult actions. |
+| `TASK-0060-UI-Counter-Audit` | Archived | Superseded before execution when the audit threshold changed from 10 changes to 25 changes. |
 
 ## Reconciliation Decision
 
@@ -90,4 +91,4 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0060.
+- Current active task is TASK-0061.

@@ -297,4 +297,4 @@ The following tasks were created from this plan:
 - `TASK-0057-WiFi-And-Windows-Status-Polish`
 - `TASK-0058-Settings-And-Control-Polish`
 
-Implementation should pause for the required audit if any subsystem counter reaches `10 / 10`.
+Implementation should pause for the required audit if any subsystem counter reaches `25 / 25`.

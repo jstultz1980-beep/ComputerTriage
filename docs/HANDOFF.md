@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0064
+HANDOFF-0065
 
 ## Current Task
-TASK-0060-UI-Counter-Audit
+TASK-0061-Directory-Page-Layout-Polish
 
 ## Current Owner
 Codex
@@ -44,7 +44,9 @@ TASK-0059 completed the required Documentation and Build System counter audit.
 
 TASK-0054 completed the Directory domain identity and AD health status page.
 
-Implementation work is paused at the audit gate. The single active task is TASK-0060 UI Counter Audit.
+The audit threshold was raised from 10 changes to 25 changes. TASK-0060 was archived before execution because UI is now `10 / 25`, not at the audit threshold.
+
+Implementation work may resume under the single active task: TASK-0061 Directory Page Layout Polish.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -54,7 +56,7 @@ Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unle
 ## Audit State Tracking
 Each subsystem has its own change counter.
 
-When any subsystem reaches `10 / 10` recorded subsystem changes, work must pause and a new audit task must be completed before further implementation work continues.
+When any subsystem reaches `25 / 25` recorded subsystem changes, work must pause and a new audit task must be completed before further implementation work continues.
 
 Change records are tracked in:
 
@@ -66,18 +68,18 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 3 / 10 | No |
-| Architecture | 1 / 10 | No |
-| Documentation | 1 / 10 | No |
-| Task System | 7 / 10 | No |
-| HEPHAESTUS | 3 / 10 | No |
-| ARGUS | 2 / 10 | No |
-| Reporting | 1 / 10 | No |
-| UI | 10 / 10 | Yes |
-| Plugin Framework | 1 / 10 | No |
-| Build System | 1 / 10 | No |
-| Validation/Test Framework | 7 / 10 | No |
-| Roadmap/Backlog | 4 / 10 | No |
+| Repository Governance | 4 / 25 | No |
+| Architecture | 1 / 25 | No |
+| Documentation | 1 / 25 | No |
+| Task System | 8 / 25 | No |
+| HEPHAESTUS | 3 / 25 | No |
+| ARGUS | 2 / 25 | No |
+| Reporting | 1 / 25 | No |
+| UI | 10 / 25 | No |
+| Plugin Framework | 1 / 25 | No |
+| Build System | 1 / 25 | No |
+| Validation/Test Framework | 7 / 25 | No |
+| Roadmap/Backlog | 5 / 25 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -98,7 +100,7 @@ Recently completed work:
 - TASK-0054 completed Directory domain identity and AD health status, then activated the next UI audit gate.
 
 Current active work:
-- TASK-0060 is active for the required UI counter audit.
+- TASK-0061 is active for Directory page layout polish from the latest punch-list feedback.
 
 Queued implementation/design work, in recommended order:
 - TASK-0055 Shared Embedded Output Pattern.
@@ -108,14 +110,13 @@ Queued implementation/design work, in recommended order:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0060-UI-Counter-Audit`
+`TASK-0061-Directory-Page-Layout-Polish`
 
 Scope summary:
-- Verify task queue and handoff agree on exactly one active audit task.
-- Review recent UI changes since the last UI audit.
-- Verify completed TASK-0054 is listed as completed.
-- Reset only the UI counter after this audit is completed.
-- Confirm queued punch-list work remains mapped to TASK-0055 through TASK-0058 and TASK-0021.
+- Make the Directory page fit better without requiring unnecessary vertical scrolling.
+- Remove the Directory page Refresh Status button.
+- Preserve the domain identity, secure channel, AD site, logon DC, DNS SRV, Domain Logon Health, GPO Health, GPResult, and Directory tool access created in TASK-0054.
+- Keep Directory focused on AD/domain identity and policy health, not generic Network or Infrastructure troubleshooting.
 
 ## Queued Work
 - `TASK-0055-Shared-Embedded-Output-Pattern` owned by Codex.
@@ -196,9 +197,13 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0060 because the UI counter reached `10 / 10`.
+- Raised the audit threshold from 10 changes to 25 changes.
+- Archived TASK-0060 before execution because UI is now `10 / 25`.
+- Added TASK-0061 for Directory page layout feedback from punch-list items 30 and 31.
+- Activated TASK-0061 as the next implementation task.
 
 ## Blockers
-UI counter is at `10 / 10`. TASK-0060 must complete before further implementation work.
+No active audit gate. Implementation may continue under TASK-0061 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -209,11 +214,11 @@ Known working-tree noise:
 - `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has shown local stale/locked drift during ARGUS work. Do not stage it unless a future task explicitly updates the accepted ADR.
 
 GitHub sync note:
-- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
+- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 ## Recommended Commit Message
 ```text
-TASK-0054: Add Directory domain status page
+PROJECT: Raise audit gate to 25 changes
 ```
 
 ## Next Bot Prompt
@@ -231,46 +236,45 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0060-UI-Counter-Audit.md
+7. docs/TASKS/TASK-0061-Directory-Page-Layout-Polish.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0060-UI-Counter-Audit.
+- Active task: TASK-0061-Directory-Page-Layout-Polish.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
-- UI counter is at `10 / 10`; audit is mandatory before more implementation.
-- Next queued implementation tasks after TASK-0060 are TASK-0055 through TASK-0058, then TASK-0021.
+- Audit threshold is now `25 / 25`; UI is `10 / 25`, so no audit is currently required.
+- TASK-0060 was archived before execution because the raised threshold cleared the gate.
+- Next queued implementation tasks after TASK-0061 are TASK-0055 through TASK-0058, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
-- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 10-change audit/refactor checkpoint.
+- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0060 only.
+Execute TASK-0061 only.
 
 Scope:
-- Verify queue, handoff, roadmap, changelog, and ledger agree on exactly one active audit task.
-- Review UI counter increments since the last UI audit.
-- Confirm TASK-0054 is complete and no unrelated implementation drift is included.
-- Reset only the UI counter after audit completion.
-- Activate the next queued implementation task only after the audit gate clears.
+- Make the Directory page fit better without requiring unnecessary vertical scrolling.
+- Remove the Directory page Refresh Status button.
+- Preserve the domain identity, secure channel, AD site, logon DC, DNS SRV, Domain Logon Health, GPO Health, GPResult, and Directory tool access created in TASK-0054.
+- Keep Directory focused on AD/domain identity and policy health, not generic Network or Infrastructure troubleshooting.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
 - Change package installation semantics, deployment, or unrelated GUI areas.
 - Download or install tools.
-- Refactor or modify application code.
+- Modify unrelated application code.
 - Clean unrelated files.
 - Import, delete, or modify untracked App/NetworkToolkit/LatencyMon/ unless a future task explicitly handles it.
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- UI counter audit is complete.
-- Only the audited UI counter is reset.
-- Queue and handoff are consistent.
-- Completed TASK-0054 is listed as completed.
-- Next implementation task is activated only after the audit gate clears.
+- Directory page layout is compact and does not require unnecessary vertical scrolling at normal window size.
+- Refresh Status button is removed.
+- TASK-0054 Directory status and action capabilities remain available.
+- Parser, smoke, and button-smoke validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.
