@@ -23,4 +23,8 @@ No files, manifests, windows, package metadata, or branding assets are renamed b
    - Leans into speed and technician support while staying broad enough for repair, collection, and analysis workflows.
 
 ## Recommendation
-Use **CaseKit** if the product should feel technician-focused and practical. Use **TriageOne** if the product should stay closest to the current computer-triage identity.
+Preferred direction: **RapidAssist**.
+
+RapidAssist best matches the desired product feel: quick technician help, broad enough for repair and analysis workflows, and friendlier than names that sound limited to evidence collection or triage only.
+
+This is a naming direction only. No application files, manifests, windows, package metadata, or branding assets are renamed by this note.

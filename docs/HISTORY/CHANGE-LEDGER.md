@@ -244,3 +244,5 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0234 | 2026-07-09 | TASK-0065 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for UI regression polish. |
 | CHG-0235 | 2026-07-09 | TASK-0065 | Documentation | +1 | Updated TASK-0065, queue, roadmap, changelog, ledger, punch list, and handoff records for UI regression polish completion. |
 | CHG-0236 | 2026-07-09 | TASK-0065 / TASK-0066 | Task System | +1 | Completed TASK-0065 and activated TASK-0066 as the next single active task for RapidAssist naming selection. |
+| CHG-0237 | 2026-07-09 | TASK-0066 | Documentation | +1 | Recorded RapidAssist as the preferred product naming direction with no app rename. |
+| CHG-0238 | 2026-07-09 | TASK-0066 | Task System | +1 | Completed TASK-0066 with no queued implementation task remaining. |

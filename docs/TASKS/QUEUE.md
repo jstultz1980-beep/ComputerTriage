@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0066-RapidAssist-Naming-Selection` | Codex | Active | Record RapidAssist as the preferred product naming direction without renaming the app yet. |
+| _None_ | _N/A_ | _N/A_ | No active task. |
 
 ## Queued
 
@@ -92,6 +92,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0064-Product-Naming-Options` | Completed | Recorded five candidate product names with rationales and no app rename. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Completed | Expanded deterministic local analysis rules for network, updates, security, services, and domain-health evidence. |
 | `TASK-0065-UI-Regression-Polish` | Completed | Cleaned up visible UI regressions from punch-list items 36 through 46. |
+| `TASK-0066-RapidAssist-Naming-Selection` | Completed | Recorded RapidAssist as the preferred product naming direction with no app rename. |
 
 ## Reconciliation Decision
 
@@ -100,4 +101,4 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0066.
+- Current active task is none.

@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0066 RapidAssist Naming Selection.
+- Recorded RapidAssist as the preferred product naming direction without renaming application files, manifests, windows, package metadata, or branding assets.
 - Completed TASK-0065 UI Regression Polish and activated TASK-0066 RapidAssist Naming Selection.
 - Polished the busy progress indicator, Windows Update service-health/status layout, Directory Domain and Policy actions, Wi-Fi page/status icons, Settings refresh/size controls, Software/Add-Ons placement, and Triage instruction emphasis.
 - Updated toolkit build metadata for TASK-0065.

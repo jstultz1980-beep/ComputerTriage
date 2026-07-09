@@ -153,7 +153,8 @@ Current UI work:
 - TASK-0064 completed product naming options.
 - TASK-0021 completed HEPHAESTUS rule catalog expansion.
 - TASK-0065 completed UI regression polish from the latest punch-list additions.
-- TASK-0066 is active to record RapidAssist as the preferred product naming direction.
+- TASK-0066 completed RapidAssist naming selection.
+- No queued tasks remain.
 
 ## Phase 10 - Release Hardening
 Status: Planned
