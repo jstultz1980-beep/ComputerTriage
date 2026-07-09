@@ -177,6 +177,7 @@ $script:WUActionTimer = $null
 $script:WUActionSession = $null
 $script:WifiStatusLabel = $null
 $script:WifiPageStatusLabel = $null
+$script:WifiPageNetworkInfoLabel = $null
 $script:PsExecProcess = $null
 $script:PsExecTimer = $null
 $script:PsExecFiles = $null
@@ -11012,7 +11013,7 @@ function Build-WindowsUpdatePage {
     [void]$leftActions.Controls.Add((New-GUIButton "Uninstall Selected" { Uninstall-SelectedGUIWindowsUpdate }))
 
     $script:WUStatusLabel = New-Object System.Windows.Forms.Label
-    $WUStatusLabel.Text = "Click Check Updates to scan Windows Update."
+    $WUStatusLabel.Text = "Windows Update ready."
     $WUStatusLabel.Dock = "Fill"
     $WUStatusLabel.Height = 34
     $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(12,8,3,3)
@@ -11089,6 +11090,12 @@ function Get-GUIWifiSignalInfo {
         Connected = $false
         Signal = $null
         SSID = ""
+        Profile = ""
+        Radio = ""
+        Channel = ""
+        ReceiveMbps = ""
+        TransmitMbps = ""
+        Authentication = ""
         Detail = "Wi-Fi unavailable"
     }
 
@@ -11106,6 +11113,24 @@ function Get-GUIWifiSignalInfo {
             }
             elseif($line -match '^\s*SSID\s*:\s*(.+)$' -and $line -notmatch 'BSSID'){
                 $info.SSID = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Profile\s*:\s*(.+)$'){
+                $info.Profile = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Radio type\s*:\s*(.+)$'){
+                $info.Radio = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Channel\s*:\s*(.+)$'){
+                $info.Channel = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Receive rate \(Mbps\)\s*:\s*(.+)$'){
+                $info.ReceiveMbps = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Transmit rate \(Mbps\)\s*:\s*(.+)$'){
+                $info.TransmitMbps = $matches[1].Trim()
+            }
+            elseif($line -match '^\s*Authentication\s*:\s*(.+)$'){
+                $info.Authentication = $matches[1].Trim()
             }
             elseif($line -match '^\s*Signal\s*:\s*(\d+)%'){
                 $info.Signal = [int]$matches[1]
@@ -11134,33 +11159,52 @@ function Format-GUIWifiSignalText {
     param($Info)
 
     if(!$Info -or !$Info.Available){
-        return "Wi-Fi: --"
+        return "Wi-Fi: ●"
     }
     if(!$Info.Connected -or $null -eq $Info.Signal){
-        return "Wi-Fi: off"
+        return "Wi-Fi: ●"
     }
 
-    $bars = switch([int]$Info.Signal){
-        {$_ -ge 80} { "####"; break }
-        {$_ -ge 60} { "###-"; break }
-        {$_ -ge 40} { "##--"; break }
-        {$_ -ge 20} { "#---"; break }
-        default { "----" }
+    return "Wi-Fi: ●"
+}
+
+function Get-GUIWifiSignalColor {
+    param($Info)
+
+    if(!$Info -or !$Info.Available -or !$Info.Connected -or $null -eq $Info.Signal){
+        return $script:GUITheme.MutedText
     }
-    return "Wi-Fi: $bars $($Info.Signal)%"
+    if($Info.Signal -ge 60){ return $script:GUITheme.Success }
+    if($Info.Signal -ge 35){ return $script:GUITheme.Warning }
+    return $script:GUITheme.Danger
+}
+
+function Format-GUIWifiNetworkInfoText {
+    param($Info)
+
+    if(!$Info -or !$Info.Available){
+        return "Wireless adapter unavailable."
+    }
+    if(!$Info.Connected -or $null -eq $Info.Signal){
+        return "Wireless adapter available; no connected network."
+    }
+
+    $parts = New-Object System.Collections.ArrayList
+    if($Info.SSID){ [void]$parts.Add("SSID: $($Info.SSID)") }
+    [void]$parts.Add("Signal: $($Info.Signal)%")
+    if($Info.Radio){ [void]$parts.Add("Radio: $($Info.Radio)") }
+    if($Info.Channel){ [void]$parts.Add("Channel: $($Info.Channel)") }
+    if($Info.ReceiveMbps -or $Info.TransmitMbps){ [void]$parts.Add("Link: $($Info.ReceiveMbps)/$($Info.TransmitMbps) Mbps") }
+    if($Info.Authentication){ [void]$parts.Add("Security: $($Info.Authentication)") }
+
+    return ($parts -join "   |   ")
 }
 
 function Update-GUIWifiIndicators {
     $info = Get-GUIWifiSignalInfo
     $text = Format-GUIWifiSignalText -Info $info
-    $color = if($info.Connected -and $null -ne $info.Signal){
-        if($info.Signal -ge 60){ $script:GUITheme.Success }
-        elseif($info.Signal -ge 35){ $script:GUITheme.Warning }
-        else { $script:GUITheme.Danger }
-    }
-    else {
-        $script:GUITheme.MutedText
-    }
+    $color = Get-GUIWifiSignalColor -Info $info
+    $networkText = Format-GUIWifiNetworkInfoText -Info $info
 
     if($script:WifiStatusLabel -and !$script:WifiStatusLabel.IsDisposed){
         $script:WifiStatusLabel.Text = $text
@@ -11171,6 +11215,12 @@ function Update-GUIWifiIndicators {
     if($script:WifiPageStatusLabel -and !$script:WifiPageStatusLabel.IsDisposed){
         $script:WifiPageStatusLabel.Text = $text
         $script:WifiPageStatusLabel.ForeColor = $color
+        if($script:ToolTip){ $script:ToolTip.SetToolTip($script:WifiPageStatusLabel,$info.Detail) }
+    }
+
+    if($script:WifiPageNetworkInfoLabel -and !$script:WifiPageNetworkInfoLabel.IsDisposed){
+        $script:WifiPageNetworkInfoLabel.Text = $networkText
+        $script:WifiPageNetworkInfoLabel.ForeColor = if($info.Connected){ $script:GUITheme.Text } else { $script:GUITheme.MutedText }
     }
 }
 
@@ -11188,17 +11238,26 @@ function Get-GUIWindowsUpdateServiceHealth {
     }
 
     $bad = @($states | Where-Object { $_.Status -notin @("Running","Stopped") -or $_.Status -eq "Missing" })
+    $disabled = @()
+    foreach($state in $states){
+        try {
+            $cim = Get-CimInstance -ClassName Win32_Service -Filter "Name='$($state.Name)'" -ErrorAction Stop
+            if($cim -and $cim.StartMode -eq "Disabled"){ $disabled += $state.Name }
+        }
+        catch {}
+    }
     $runningCore = @($states | Where-Object { $_.Name -eq "wuauserv" -and $_.Status -eq "Running" }).Count -gt 0
     $allText = ($states | ForEach-Object { "$($_.Name)=$($_.Status)" }) -join "; "
 
-    if($bad.Count -gt 0){
-        return [pscustomobject]@{Text="WU services need review";Color=$script:GUITheme.Warning;Detail=$allText}
+    if($bad.Count -gt 0 -or $disabled.Count -gt 0){
+        $detail = if($disabled.Count -gt 0){"$allText; disabled=$($disabled -join ', ')"}else{$allText}
+        return [pscustomobject]@{Text="Repair recommended";Color=$script:GUITheme.Warning;Detail=$detail;RepairRecommended=$true}
     }
     if($runningCore){
-        return [pscustomobject]@{Text="WU service healthy";Color=$script:GUITheme.Success;Detail=$allText}
+        return [pscustomobject]@{Text="WU service healthy";Color=$script:GUITheme.Success;Detail=$allText;RepairRecommended=$false}
     }
 
-    return [pscustomobject]@{Text="WU service idle";Color=$script:GUITheme.MutedText;Detail=$allText}
+    return [pscustomobject]@{Text="WU service idle";Color=$script:GUITheme.MutedText;Detail=$allText;RepairRecommended=$false}
 }
 
 function Update-GUIWindowsUpdateHealthIndicator {
@@ -11209,6 +11268,10 @@ function Update-GUIWindowsUpdateHealthIndicator {
     $health = Get-GUIWindowsUpdateServiceHealth
     $script:WUHealthLabel.Text = $health.Text
     $script:WUHealthLabel.ForeColor = $health.Color
+    if($health.RepairRecommended -and $script:WUStatusLabel -and !$script:WUStatusLabel.IsDisposed){
+        $script:WUStatusLabel.Text = "Windows Update service repair is recommended."
+        $script:WUStatusLabel.ForeColor = $script:GUITheme.Warning
+    }
     if($script:ToolTip){
         $script:ToolTip.SetToolTip($script:WUHealthLabel,$health.Detail)
     }
@@ -11728,11 +11791,12 @@ function Build-WiFiToolsPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.RowCount = 2
+    $layout.RowCount = 3
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $Page.Controls.Add($layout)
 
     $statusPanel = New-Object System.Windows.Forms.Panel
@@ -11743,27 +11807,31 @@ function Build-WiFiToolsPage {
 
     $script:WifiPageStatusLabel = New-Object System.Windows.Forms.Label
     $WifiPageStatusLabel.Dock = "Right"
-    $WifiPageStatusLabel.Width = 190
+    $WifiPageStatusLabel.Width = 82
     $WifiPageStatusLabel.TextAlign = "MiddleRight"
-    $WifiPageStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",9,[System.Drawing.FontStyle]::Bold)
-    $WifiPageStatusLabel.Text = "Wi-Fi: --"
+    $WifiPageStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",11,[System.Drawing.FontStyle]::Bold)
+    $WifiPageStatusLabel.Text = "Wi-Fi: ●"
     $WifiPageStatusLabel.ForeColor = $script:GUITheme.MutedText
     $statusPanel.Controls.Add($WifiPageStatusLabel)
 
-    $hint = New-GUILabel "Wi-Fi tools"
-    $hint.Dock = "Fill"
-    $hint.TextAlign = "MiddleLeft"
-    $hint.ForeColor = $script:GUITheme.MutedText
-    $statusPanel.Controls.Add($hint)
-
     $catalogPage = New-Object System.Windows.Forms.TabPage
-    Build-GUICatalogToolsPage -Page $catalogPage -Tab "Wi-Fi" -Title "Wi-Fi Tools"
+    Build-GUICatalogToolsPage -Page $catalogPage -Tab "Wi-Fi" -Title "Tools"
     if($catalogPage.Controls.Count -gt 0){
         $content = $catalogPage.Controls[0]
         $catalogPage.Controls.Remove($content)
         $content.Dock = "Fill"
         $layout.Controls.Add($content,0,1)
     }
+
+    $script:WifiPageNetworkInfoLabel = New-Object System.Windows.Forms.Label
+    $WifiPageNetworkInfoLabel.Dock = "Fill"
+    $WifiPageNetworkInfoLabel.AutoEllipsis = $true
+    $WifiPageNetworkInfoLabel.TextAlign = "MiddleLeft"
+    $WifiPageNetworkInfoLabel.Font = New-Object System.Drawing.Font("Segoe UI",9)
+    $WifiPageNetworkInfoLabel.ForeColor = $script:GUITheme.MutedText
+    $WifiPageNetworkInfoLabel.Padding = New-Object System.Windows.Forms.Padding(10,0,10,0)
+    $WifiPageNetworkInfoLabel.Text = "Wireless adapter status unavailable."
+    $layout.Controls.Add($WifiPageNetworkInfoLabel,0,2)
 
     Update-GUIWifiIndicators
 }
@@ -16134,11 +16202,11 @@ function Build-Form {
     $StatusLabel.Text = "Ready"
     $StatusLabel.Spring = $true
     $script:WifiStatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
-    $WifiStatusLabel.Text = "Wi-Fi: --"
+    $WifiStatusLabel.Text = "Wi-Fi: ●"
     $WifiStatusLabel.Spring = $false
     $WifiStatusLabel.ForeColor = $script:GUITheme.MutedText
     $WifiStatusLabel.Margin = New-Object System.Windows.Forms.Padding(8,0,12,0)
-    $WifiStatusLabel.ToolTipText = "Wi-Fi signal strength"
+    $WifiStatusLabel.ToolTipText = "Wi-Fi status"
     $script:GUIBusyLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
     $GUIBusyLabel.Text = "Working"
     $GUIBusyLabel.Visible = $false

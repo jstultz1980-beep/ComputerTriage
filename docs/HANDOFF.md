@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0069
+HANDOFF-0070
 
 ## Current Task
-TASK-0057-WiFi-And-Windows-Status-Polish
+TASK-0058-Settings-And-Control-Polish
 
 ## Current Owner
 Codex
@@ -54,7 +54,9 @@ TASK-0055 completed the shared embedded output pattern and converted Quick Targe
 
 TASK-0056 completed Triage guided workflow polish.
 
-Implementation work may resume under the single active task: TASK-0057 Wi-Fi And Windows Status Polish.
+TASK-0057 completed Wi-Fi and Windows status polish.
+
+Implementation work may resume under the single active task: TASK-0058 Settings And Control Polish.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -78,15 +80,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 4 / 25 | No |
-| Task System | 11 / 25 | No |
+| Documentation | 5 / 25 | No |
+| Task System | 12 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 13 / 25 | No |
+| UI | 14 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 4 / 25 | No |
-| Validation/Test Framework | 10 / 25 | No |
+| Build System | 5 / 25 | No |
+| Validation/Test Framework | 11 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -109,30 +111,28 @@ Recently completed work:
 - TASK-0061 completed Directory page layout polish and reconciled new punch-list items into queued tasks.
 - TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 - TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
+- TASK-0057 completed Wi-Fi and Windows status polish.
 
 Current active work:
-- TASK-0057 is active for Wi-Fi and Windows status polish.
+- TASK-0058 is active for Settings and control polish.
 
 Queued implementation/design work, in recommended order:
-- TASK-0058 Settings And Control Polish.
 - TASK-0062 Computer Data Push Pull.
 - TASK-0063 Add Ons Concept.
 - TASK-0064 Product Naming Options.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0057-WiFi-And-Windows-Status-Polish`
+`TASK-0058-Settings-And-Control-Polish`
 
 Scope summary:
-- Remove instruction text from the Windows Update tab.
-- Make Windows Update service health indicate when repair is recommended.
-- Remove Wi-Fi on/off clutter from the Wi-Fi tab.
-- Change the status-bar Wi-Fi display to a grey/green/yellow/red LED indicator.
-- Add bottom-of-page Wi-Fi network information when available.
-- Remove the redundant `Wi-Fi Tools` label.
+- Change the Settings page refresh size button to a circular refresh icon.
+- Make tab ordering more compact and slick.
+- Remove the Registered Commands display.
+- Make the logo easier to see.
+- Reduce button font/physical size where appropriate.
 
 ## Queued Work
-- `TASK-0058-Settings-And-Control-Polish` owned by Codex.
 - `TASK-0062-Computer-Data-Push-Pull` owned by Codex.
 - `TASK-0063-Add-Ons-Concept` owned by Codex.
 - `TASK-0064-Product-Naming-Options` owned by Codex.
@@ -240,9 +240,19 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0057 as the next implementation task.
+- Completed TASK-0057 Wi-Fi And Windows Status Polish.
+- Removed Windows Update instruction-style status text and added repair-recommended service health.
+- Replaced status-bar Wi-Fi text with a grey/green/yellow/red LED-style indicator.
+- Added bottom Wi-Fi network details and removed redundant Wi-Fi page labels.
+- Marked punch-list items 16, 17, 18, 19, 20, and 29 complete.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0058 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0057 only.
+No active audit gate. Implementation may continue under TASK-0058 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -257,7 +267,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0056: Polish Triage workflow
+TASK-0057: Polish Wi-Fi and Windows status
 ```
 
 ## Next Bot Prompt
@@ -275,37 +285,37 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0057-WiFi-And-Windows-Status-Polish.md
+7. docs/TASKS/TASK-0058-Settings-And-Control-Polish.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0057-WiFi-And-Windows-Status-Polish.
+- Active task: TASK-0058-Settings-And-Control-Polish.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
-- Audit threshold is now `25 / 25`; UI is `13 / 25`, so no audit is currently required.
+- Audit threshold is now `25 / 25`; UI is `14 / 25`, so no audit is currently required.
 - TASK-0060 was archived before execution because the raised threshold cleared the gate.
 - `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - TASK-0061 completed Directory page layout polish.
 - New punch-list items 32, 33, and 34 are queued as TASK-0062, TASK-0063, and TASK-0064.
 - TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 - TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
-- Next queued implementation tasks after TASK-0057 are TASK-0058, TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
+- TASK-0057 completed Wi-Fi and Windows status polish.
+- Next queued implementation tasks after TASK-0058 are TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0057 only.
+Execute TASK-0058 only.
 
 Scope:
-- Remove the instruction text from the Windows Update tab.
-- Make Windows Update service health indicate when repair is recommended.
-- Remove Wi-Fi on/off clutter from the Wi-Fi tab.
-- Change the status-bar Wi-Fi display to a grey/green/yellow/red LED indicator.
-- Add bottom-of-page Wi-Fi network information when available.
-- Remove the redundant `Wi-Fi Tools` label.
+- Change the Settings page refresh size button to a circular refresh icon.
+- Make tab ordering more compact and slick.
+- Remove the Registered Commands display.
+- Make the logo easier to see.
+- Reduce button font/physical size where appropriate.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -317,9 +327,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Windows Update status is compact and actionable.
-- Wi-Fi status bar uses a clear LED indicator.
-- Wi-Fi page shows useful connection information without redundant labels.
+- Settings controls are clearer and less bulky.
+- Tab/header chrome feels more compact.
+- Registered Commands display is removed from normal UI.
 - Parser, smoke, and button-smoke validation pass.
 
 When done, provide:

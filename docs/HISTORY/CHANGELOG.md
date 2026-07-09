@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0057 Wi-Fi And Windows Status Polish and activated TASK-0058 Settings And Control Polish.
+- Made Windows Update health surface `Repair recommended` when required services are missing, disabled, or in an unexpected state.
+- Replaced Wi-Fi status text with a colored LED-style indicator and added bottom Wi-Fi network details to the Wi-Fi page.
+- Removed redundant Wi-Fi page labels and updated toolkit build metadata for TASK-0057.
 - Completed TASK-0056 Triage Guided Workflow Polish and activated TASK-0057 Wi-Fi And Windows Status Polish.
 - Replaced the visible Triage catalog/Technician Notes area with guided Collect, Review, and Submit workflow sections.
 - Preserved top-row Quick Triage, Full Triage, Cancel Run, status/progress, Latest Run, Bundle Folder, and Validate Setup access.

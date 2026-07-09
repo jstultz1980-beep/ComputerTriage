@@ -212,3 +212,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0202 | 2026-07-09 | TASK-0056 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Triage guided workflow polish. |
 | CHG-0203 | 2026-07-09 | TASK-0056 | Documentation | +1 | Updated TASK-0056, queue, roadmap, changelog, ledger, punch list, and handoff records for Triage workflow completion. |
 | CHG-0204 | 2026-07-09 | TASK-0056 / TASK-0057 | Task System | +1 | Completed TASK-0056 and activated TASK-0057 as the next single active implementation task. |
+| CHG-0205 | 2026-07-09 | TASK-0057 | UI | +1 | Polished Windows Update repair status and Wi-Fi LED/network status presentation. |
+| CHG-0206 | 2026-07-09 | TASK-0057 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Wi-Fi and Windows status polish. |
+| CHG-0207 | 2026-07-09 | TASK-0057 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Wi-Fi and Windows status polish. |
+| CHG-0208 | 2026-07-09 | TASK-0057 | Documentation | +1 | Updated TASK-0057, queue, roadmap, changelog, ledger, punch list, and handoff records for Wi-Fi and Windows status completion. |
+| CHG-0209 | 2026-07-09 | TASK-0057 / TASK-0058 | Task System | +1 | Completed TASK-0057 and activated TASK-0058 as the next single active implementation task. |

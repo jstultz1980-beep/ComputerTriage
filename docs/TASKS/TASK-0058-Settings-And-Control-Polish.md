@@ -1,7 +1,7 @@
 # TASK-0058 - Settings And Control Polish
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
