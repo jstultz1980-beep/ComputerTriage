@@ -232,3 +232,5 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0222 | 2026-07-09 | TASK-0063 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the Add-Ons concept. |
 | CHG-0223 | 2026-07-09 | TASK-0063 | Documentation | +1 | Updated TASK-0063, queue, roadmap, changelog, ledger, punch list, and handoff records for Add-Ons concept completion. |
 | CHG-0224 | 2026-07-09 | TASK-0063 / TASK-0064 | Task System | +1 | Completed TASK-0063 and activated TASK-0064 as the next single active implementation task. |
+| CHG-0225 | 2026-07-09 | TASK-0064 | Documentation | +1 | Recorded five product naming options with rationales and no application rename. |
+| CHG-0226 | 2026-07-09 | TASK-0064 / TASK-0021 | Task System | +1 | Completed TASK-0064 and activated TASK-0021 as the next single active implementation task. |

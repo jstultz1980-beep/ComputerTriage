@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0064-Product-Naming-Options`
+- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -145,9 +145,9 @@ Current UI work:
 - TASK-0058 completed Settings and control polish.
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
-- TASK-0064 is active for product naming options.
-- The consolidated queued order after TASK-0064 is:
-  1. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- TASK-0064 completed product naming options.
+- TASK-0021 is active for HEPHAESTUS rule catalog expansion.
+- No queued tasks remain after the active HEPHAESTUS task.
 
 ## Phase 10 - Release Hardening
 Status: Planned

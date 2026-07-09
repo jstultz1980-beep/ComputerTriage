@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0064 Product Naming Options and activated TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- Added `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` with five candidate names and rationales.
+- No application files, manifests, windows, package metadata, or branding assets were renamed.
 - Completed TASK-0063 Add Ons Concept and activated TASK-0064 Product Naming Options.
 - Added a Software-page Add-Ons popup for installable/extract-needed programs while preserving existing Software sections.
 - Shared safe software resource links between Software and the Add-Ons concept popup.

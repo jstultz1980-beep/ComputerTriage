@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0073
+HANDOFF-0074
 
 ## Current Task
-TASK-0064-Product-Naming-Options
+TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion
 
 ## Current Owner
 Codex
@@ -62,7 +62,9 @@ TASK-0062 completed computer data push/pull.
 
 TASK-0063 completed Add-Ons concept testing.
 
-Implementation work may resume under the single active task: TASK-0064 Product Naming Options.
+TASK-0064 completed product naming options.
+
+Implementation work may resume under the single active task: TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -86,8 +88,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 8 / 25 | No |
-| Task System | 15 / 25 | No |
+| Documentation | 9 / 25 | No |
+| Task System | 16 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
@@ -121,24 +123,26 @@ Recently completed work:
 - TASK-0058 completed Settings and control polish.
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
+- TASK-0064 completed product naming options.
 
 Current active work:
-- TASK-0064 is active for product naming options.
+- TASK-0021 is active for HEPHAESTUS rule catalog expansion.
 
 Queued implementation/design work, in recommended order:
-- TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- No queued tasks remain after the active HEPHAESTUS task.
 
 ## Active Task
-`TASK-0064-Product-Naming-Options`
+`TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion`
 
 Scope summary:
-- Produce five name options that fit a portable single-computer diagnostic toolkit.
-- Prefer names that support technician trust, speed, and analysis without sounding like a generic network scanner.
-- Record the options for user selection before any app-wide rename.
-- Do not rename files, manifests, windows, or package metadata before the user chooses a name.
+- Add or refine deterministic rules for common workstation and server troubleshooting signals.
+- Prioritize service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
+- Prefer structured evidence already collected by HEPHAESTUS before adding new collectors.
+- Keep findings specific, explainable, and tied to supporting evidence.
+- Preserve the existing HEPHAESTUS and ARGUS evidence contract.
 
 ## Queued Work
-- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
+- None.
 
 ## Validation Completed For This Update
 - Consolidated outstanding tasks into a smaller logical sequence.
@@ -280,9 +284,14 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0064 as the next implementation task.
+- Completed TASK-0064 Product Naming Options.
+- Added `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` with five candidate names and rationales.
+- Confirmed no application files, manifests, windows, package metadata, or branding assets were renamed.
+- Marked punch-list item 34 complete.
+- Activated TASK-0021 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0064 only.
+No active audit gate. Implementation may continue under TASK-0021 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -297,7 +306,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0063: Add Add-Ons concept popup
+TASK-0064: Record product naming options
 ```
 
 ## Next Bot Prompt
@@ -315,12 +324,12 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0064-Product-Naming-Options.md
+7. docs/TASKS/TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0064-Product-Naming-Options.
+- Active task: TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
@@ -334,20 +343,22 @@ Current task state:
 - TASK-0058 completed Settings and control polish.
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
-- Next queued implementation task after TASK-0064 is TASK-0021.
+- TASK-0064 completed product naming options.
+- No queued tasks remain after TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0064 only.
+Execute TASK-0021 only.
 
 Scope:
-- Produce five name options that fit a portable single-computer diagnostic toolkit.
-- Prefer names that support technician trust, speed, and analysis without sounding like a generic network scanner.
-- Record the options for user selection before any app-wide rename.
-- Do not rename files, manifests, windows, or package metadata before the user chooses a name.
+- Add or refine deterministic rules for common workstation and server troubleshooting signals.
+- Prioritize service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
+- Prefer structured evidence already collected by HEPHAESTUS before adding new collectors.
+- Keep findings specific, explainable, and tied to supporting evidence.
+- Preserve the existing HEPHAESTUS and ARGUS evidence contract.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -359,9 +370,11 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Five product-name suggestions are recorded.
-- Each suggestion has a short rationale.
-- No application rename happens in this task unless explicitly requested later.
+- New rules produce deterministic findings with clear evidence references.
+- Rules avoid generic "needs review" wording when a more specific recommendation is possible.
+- Existing HEPHAESTUS output schema remains compatible with ARGUS.
+- Local analysis validation passes against at least one existing triage bundle.
+- PowerShell parse, smoke, and relevant analysis validation pass.
 
 When done, provide:
 - Concise summary of implementation performed.
