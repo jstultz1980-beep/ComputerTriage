@@ -1164,10 +1164,10 @@ function Set-GUIButtonChrome {
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
     $Button.Font = if($Compact){
-        New-Object System.Drawing.Font("Segoe UI",8.25,[System.Drawing.FontStyle]::Bold)
+        New-Object System.Drawing.Font("Segoe UI",8,[System.Drawing.FontStyle]::Bold)
     }
     else{
-        New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
+        New-Object System.Drawing.Font("Segoe UI",8.25,[System.Drawing.FontStyle]::Bold)
     }
     $Button.FlatAppearance.BorderSize = 1
     $Button.FlatAppearance.BorderColor = if($Subtle){$script:GUITheme.Border}else{$script:GUITheme.Accent}
@@ -1175,9 +1175,9 @@ function Set-GUIButtonChrome {
     $Button.FlatAppearance.MouseDownBackColor = $script:GUITheme.AccentDark
     $Button.BackColor = if($Subtle){$script:GUITheme.Page}else{$script:GUITheme.AccentDark}
     $Button.ForeColor = if($Subtle){$script:GUITheme.Text}else{[System.Drawing.Color]::White}
-    $Button.Padding = New-Object System.Windows.Forms.Padding(10,0,10,1)
+    $Button.Padding = New-Object System.Windows.Forms.Padding(8,0,8,1)
 
-    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){6}else{8})
+    Set-GUIRoundedCorners -Control $Button -Radius $(if($Compact){5}else{7})
 }
 
 function Set-GUIHeaderIconButtonChrome {
@@ -1212,7 +1212,7 @@ function Set-GUITabButtonChrome {
     $Button.FlatStyle = "Flat"
     $Button.UseVisualStyleBackColor = $false
     $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
-    $Button.Font = New-Object System.Drawing.Font("Segoe UI",8.75,[System.Drawing.FontStyle]::Bold)
+    $Button.Font = New-Object System.Drawing.Font("Segoe UI",8.25,[System.Drawing.FontStyle]::Bold)
     $Button.FlatAppearance.BorderSize = 1
     $Button.FlatAppearance.BorderColor = if($Selected){$script:GUITheme.Accent}else{$script:GUITheme.Border}
     $Button.FlatAppearance.MouseOverBackColor = if($Selected){$script:GUITheme.AccentDark}else{$script:GUITheme.HeaderMuted}
@@ -9502,6 +9502,12 @@ function Get-GUITabDisplayText {
         "Software Keys" = "Keys"
         "Infrastructure" = "Infra"
         "Sysinternals" = "SysTools"
+        "Processes" = "Proc"
+        "Directory" = "Dir"
+        "Discovery" = "Discover"
+        "Robocopy" = "Robo"
+        "Software" = "Apps"
+        "Clean Up" = "Clean"
     }
 
     if($aliases.ContainsKey($Name)){
@@ -9521,10 +9527,10 @@ function Update-GUIStaticTabStripLayout {
         return
     }
 
-    $rows = 3
+    $rows = 2
     $columns = [Math]::Max(1,[Math]::Ceiling($visibleButtons.Count / $rows))
     $availableWidth = [Math]::Max(960,$script:StaticTabStrip.ClientSize.Width - 8)
-    $buttonWidth = [Math]::Max(96,[Math]::Floor($availableWidth / $columns) - 8)
+    $buttonWidth = [Math]::Max(76,[Math]::Floor($availableWidth / $columns) - 6)
 
     foreach($entry in $script:TabButtons.GetEnumerator()){
         $button = $entry.Value
@@ -9534,8 +9540,8 @@ function Update-GUIStaticTabStripLayout {
 
         $button.Text = Get-GUITabDisplayText -Name $entry.Key
         $button.Width = $buttonWidth
-        $button.Height = 30
-        $button.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
+        $button.Height = 28
+        $button.Margin = New-Object System.Windows.Forms.Padding(3,3,3,3)
         if($script:ToolTip){
             $script:ToolTip.SetToolTip($button,$entry.Key)
         }
@@ -9587,9 +9593,9 @@ function Add-GUIStaticTabStrip {
         $button = New-Object System.Windows.Forms.Button
         $button.Text = Get-GUITabDisplayText -Name $page.Text
         $button.Tag = $page
-        $button.Width = 118
-        $button.Height = 30
-        $button.Margin = New-Object System.Windows.Forms.Padding(4,4,4,4)
+        $button.Width = 92
+        $button.Height = 28
+        $button.Margin = New-Object System.Windows.Forms.Padding(3,3,3,3)
         Set-GUITabButtonChrome -Button $button -Selected:$false
         $button.Add_Click({
             param($sender,$eventArgs)
@@ -9862,9 +9868,9 @@ function New-GUIButton {
     $button = New-Object System.Windows.Forms.Button
     $button.Text = $Text
     $button.Tag = $Action
-    $button.Width = 154
-    $button.Height = 34
-    $button.Margin = New-Object System.Windows.Forms.Padding(5,4,5,4)
+    $button.Width = 142
+    $button.Height = 32
+    $button.Margin = New-Object System.Windows.Forms.Padding(4,3,4,3)
     $button.TextAlign = "MiddleCenter"
     Set-GUIButtonChrome -Button $button
     $button.Add_Click({
@@ -15737,9 +15743,13 @@ function Build-SettingsPage {
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
     $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,0)
 
-    $sizeRefreshButton = New-GUIButton "Refresh Size" { Start-GUIToolkitSizeRefresh }
-    $sizeRefreshButton.Dock = "Fill"
-    $sizeRefreshButton.Width = 0
+    $sizeRefreshButton = New-GUIButton "↻" { Start-GUIToolkitSizeRefresh }
+    $sizeRefreshButton.Dock = "Right"
+    $sizeRefreshButton.Width = 38
+    $sizeRefreshButton.Height = 30
+    $sizeRefreshButton.Margin = New-Object System.Windows.Forms.Padding(4,3,0,3)
+    Set-GUIButtonChrome -Button $sizeRefreshButton -Compact -Subtle
+    $sizeRefreshButton.Font = New-Object System.Drawing.Font("Segoe UI Symbol",12,[System.Drawing.FontStyle]::Bold)
     $maintenanceLayout.Controls.Add($sizeRefreshButton,1,0)
 
     $toolkitAppsButton = New-GUIButton "App Manager" { Show-GUICustomToolsWindow }
@@ -15843,7 +15853,7 @@ function Set-GUIFallbackButtonToolTips {
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
         "Transfer Client Data" = "Copy reports, profiles, triage runs, logs, and diagnostic outputs into another Network Toolkit copy without copying apps or program files."
-        "Refresh Size" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
+        "↻" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
         "Scan Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
         "Copy Key" = "Copy the selected license or registration value to the clipboard."
         "Key Report" = "Open the latest confidential Software Key Finder HTML report."
@@ -15926,7 +15936,7 @@ function Build-Form {
     $root.BackColor = $script:GUITheme.Shell
     $script:RootLayout = $root
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
-    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,76))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,26))) | Out-Null
     $Form.Controls.Add($root)
@@ -15947,8 +15957,8 @@ function Build-Form {
     $root.Controls.Add($header,0,0)
 
     $logo = New-Object System.Windows.Forms.PictureBox
-    $logo.Location = New-Object System.Drawing.Point(12,13)
-    $logo.Size = New-Object System.Drawing.Size(52,52)
+    $logo.Location = New-Object System.Drawing.Point(10,10)
+    $logo.Size = New-Object System.Drawing.Size(62,62)
     $logo.SizeMode = "Zoom"
     $logoPath = Join-Path $GuiRoot "J4S_logo.png"
     if(Test-Path $logoPath){
@@ -15978,7 +15988,7 @@ function Build-Form {
 
     $title = New-Object System.Windows.Forms.Label
     $title.Text = "Network Toolkit"
-    $title.Location = New-Object System.Drawing.Point(76,14)
+    $title.Location = New-Object System.Drawing.Point(86,14)
     $title.Size = New-Object System.Drawing.Size(270,30)
     $title.Font = New-Object System.Drawing.Font("Segoe UI Semilight",18,[System.Drawing.FontStyle]::Bold)
     $title.ForeColor = [System.Drawing.Color]::White
@@ -15987,7 +15997,7 @@ function Build-Form {
 
     $subtitle = New-Object System.Windows.Forms.Label
     $subtitle.Text = "Portable technician console"
-    $subtitle.Location = New-Object System.Drawing.Point(80,46)
+    $subtitle.Location = New-Object System.Drawing.Point(90,46)
     $subtitle.Size = New-Object System.Drawing.Size(235,20)
     $subtitle.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $subtitle.ForeColor = $script:GUITheme.HeaderMuted
@@ -16029,7 +16039,7 @@ function Build-Form {
     $tabStrip.Dock = "Fill"
     $tabStrip.WrapContents = $true
     $tabStrip.AutoScroll = $false
-    $tabStrip.Padding = New-Object System.Windows.Forms.Padding(0,6,0,8)
+    $tabStrip.Padding = New-Object System.Windows.Forms.Padding(0,4,0,5)
     $tabStrip.BackColor = $script:GUITheme.Strip
     $script:StaticTabStrip = $tabStrip
     $root.Controls.Add($tabStrip,0,1)
@@ -16325,7 +16335,6 @@ Register-GUIExceptionHandlers
 Build-Form
 Add-GUILog "Loaded GUI launcher from $GuiRoot"
 Add-GUILog "Using shared toolkit from $SharedToolkitRoot"
-Add-GUILog ("Registered commands: {0}" -f $script:Commands.Count)
 if($script:GUIStartupStopwatch){
     $script:GUIStartupStopwatch.Stop()
     Add-GUILog ("GUI shell initialized in {0} ms" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)

@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0058 Settings And Control Polish and activated TASK-0062 Computer Data Push Pull.
+- Compacted shared button styling, shortened the static tab strip to two rows, and enlarged the header logo.
+- Replaced Settings `Refresh Size` with a circular-arrow icon button and removed registered-command startup log noise.
+- Updated toolkit build metadata for TASK-0058.
 - Completed TASK-0057 Wi-Fi And Windows Status Polish and activated TASK-0058 Settings And Control Polish.
 - Made Windows Update health surface `Repair recommended` when required services are missing, disabled, or in an unexpected state.
 - Replaced Wi-Fi status text with a colored LED-style indicator and added bottom Wi-Fi network details to the Wi-Fi page.

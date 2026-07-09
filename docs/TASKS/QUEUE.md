@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0058-Settings-And-Control-Polish` | Codex | Active | Tighten Settings controls, status bar noise, logo sizing, and button sizing. |
+| `TASK-0062-Computer-Data-Push-Pull` | Codex | Active | Add a technician-safe push/pull workflow for computer diagnostic data between toolkit copies. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0062-Computer-Data-Push-Pull` | Codex | Queued | Add a technician-safe push/pull workflow for computer diagnostic data between toolkit copies. |
 | `TASK-0063-Add-Ons-Concept` | Codex | Queued | Prototype a clearer Add-Ons experience for installable non-portable programs. |
 | `TASK-0064-Product-Naming-Options` | Codex | Queued | Record five better product-name options before any rename work. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
@@ -87,6 +86,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0055-Shared-Embedded-Output-Pattern` | Completed | Added shared embedded command-output helpers and converted Quick Target Checks to use them. |
 | `TASK-0056-Triage-Guided-Workflow-Polish` | Completed | Replaced the visible Triage catalog/notes area with a guided collect, review, and submit workflow. |
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Completed | Polished Windows Update repair status and Wi-Fi LED/network status presentation. |
+| `TASK-0058-Settings-And-Control-Polish` | Completed | Compacted Settings controls, tab strip, header logo, shared buttons, and removed registered-command startup noise. |
 
 ## Reconciliation Decision
 
@@ -95,4 +95,4 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0058.
+- Current active task is TASK-0062.

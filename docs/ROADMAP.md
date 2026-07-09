@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0058-Settings-And-Control-Polish`
+- `TASK-0062-Computer-Data-Push-Pull`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -142,12 +142,12 @@ Current UI work:
 - TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 - TASK-0056 completed Triage guided workflow polish.
 - TASK-0057 completed Wi-Fi and Windows status polish.
-- TASK-0058 is active for Settings and control polish.
-- The consolidated queued order after TASK-0058 is:
-  1. TASK-0062 Computer Data Push Pull.
-  2. TASK-0063 Add Ons Concept.
-  3. TASK-0064 Product Naming Options.
-  4. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- TASK-0058 completed Settings and control polish.
+- TASK-0062 is active for computer data push/pull.
+- The consolidated queued order after TASK-0062 is:
+  1. TASK-0063 Add Ons Concept.
+  2. TASK-0064 Product Naming Options.
+  3. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

@@ -1,7 +1,7 @@
 # TASK-0058 - Settings And Control Polish
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -29,8 +29,16 @@ Tighten remaining general GUI control polish items from the punch list.
 - ARGUS or HEPHAESTUS changes.
 
 ## Acceptance Criteria
-- [ ] Settings controls are more compact and visually consistent.
-- [ ] Registered Commands is no longer shown in the main status bar.
-- [ ] Header logo is easier to recognize.
-- [ ] Shared button sizing is improved without clipping labels.
-- [ ] Parser, smoke, and button-smoke validation pass.
+- [x] Settings controls are more compact and visually consistent.
+- [x] Registered Commands is no longer shown in the main status bar.
+- [x] Header logo is easier to recognize.
+- [x] Shared button sizing is improved without clipping labels.
+- [x] Parser, smoke, and button-smoke validation pass.
+
+## Completion Notes
+- Replaced Settings `Refresh Size` text with a compact circular-arrow icon button and tooltip.
+- Reduced shared button and tab button font/spacing metrics.
+- Changed the static tab strip from three rows to two compact rows with shorter tab labels.
+- Increased the header logo from 52px to 62px and shifted title/subtitle text to preserve spacing.
+- Removed the normal startup live-log line that displayed the registered command count.
+- Updated toolkit build metadata and validated parser, smoke, and button-smoke checks.

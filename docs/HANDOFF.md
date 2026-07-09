@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0070
+HANDOFF-0071
 
 ## Current Task
-TASK-0058-Settings-And-Control-Polish
+TASK-0062-Computer-Data-Push-Pull
 
 ## Current Owner
 Codex
@@ -56,7 +56,9 @@ TASK-0056 completed Triage guided workflow polish.
 
 TASK-0057 completed Wi-Fi and Windows status polish.
 
-Implementation work may resume under the single active task: TASK-0058 Settings And Control Polish.
+TASK-0058 completed Settings and control polish.
+
+Implementation work may resume under the single active task: TASK-0062 Computer Data Push Pull.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -80,15 +82,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 5 / 25 | No |
-| Task System | 12 / 25 | No |
+| Documentation | 6 / 25 | No |
+| Task System | 13 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 14 / 25 | No |
+| UI | 15 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 5 / 25 | No |
-| Validation/Test Framework | 11 / 25 | No |
+| Build System | 6 / 25 | No |
+| Validation/Test Framework | 12 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -112,28 +114,27 @@ Recently completed work:
 - TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 - TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
 - TASK-0057 completed Wi-Fi and Windows status polish.
+- TASK-0058 completed Settings and control polish.
 
 Current active work:
-- TASK-0058 is active for Settings and control polish.
+- TASK-0062 is active for computer data push/pull.
 
 Queued implementation/design work, in recommended order:
-- TASK-0062 Computer Data Push Pull.
 - TASK-0063 Add Ons Concept.
 - TASK-0064 Product Naming Options.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0058-Settings-And-Control-Polish`
+`TASK-0062-Computer-Data-Push-Pull`
 
 Scope summary:
-- Change the Settings page refresh size button to a circular refresh icon.
-- Make tab ordering more compact and slick.
-- Remove the Registered Commands display.
-- Make the logo easier to see.
-- Reduce button font/physical size where appropriate.
+- Extend the existing client-data transfer concept into a technician-safe push/pull workflow.
+- Preserve source data unless the user explicitly chooses otherwise.
+- Validate toolkit destinations and sources before transfer.
+- Transfer computer diagnostic/client data only.
+- Keep app binaries, portable tools, development files, and deployment/update mechanics out of scope.
 
 ## Queued Work
-- `TASK-0062-Computer-Data-Push-Pull` owned by Codex.
 - `TASK-0063-Add-Ons-Concept` owned by Codex.
 - `TASK-0064-Product-Naming-Options` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
@@ -250,9 +251,18 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0058 as the next implementation task.
+- Completed TASK-0058 Settings And Control Polish.
+- Replaced Settings `Refresh Size` with a compact circular-arrow icon button.
+- Compacted shared button and static tab-strip metrics, enlarged the header logo, and removed the registered-command startup live-log line.
+- Marked punch-list items 21, 22, 23, 26, and 28 complete.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0062 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0058 only.
+No active audit gate. Implementation may continue under TASK-0062 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -267,7 +277,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0057: Polish Wi-Fi and Windows status
+TASK-0058: Polish Settings and controls
 ```
 
 ## Next Bot Prompt
@@ -285,15 +295,15 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0058-Settings-And-Control-Polish.md
+7. docs/TASKS/TASK-0062-Computer-Data-Push-Pull.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0058-Settings-And-Control-Polish.
+- Active task: TASK-0062-Computer-Data-Push-Pull.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
-- Audit threshold is now `25 / 25`; UI is `14 / 25`, so no audit is currently required.
+- Audit threshold is now `25 / 25`; UI is `15 / 25`, so no audit is currently required.
 - TASK-0060 was archived before execution because the raised threshold cleared the gate.
 - `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - TASK-0061 completed Directory page layout polish.
@@ -301,21 +311,22 @@ Current task state:
 - TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 - TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
 - TASK-0057 completed Wi-Fi and Windows status polish.
-- Next queued implementation tasks after TASK-0058 are TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
+- TASK-0058 completed Settings and control polish.
+- Next queued implementation tasks after TASK-0062 are TASK-0063, TASK-0064, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0058 only.
+Execute TASK-0062 only.
 
 Scope:
-- Change the Settings page refresh size button to a circular refresh icon.
-- Make tab ordering more compact and slick.
-- Remove the Registered Commands display.
-- Make the logo easier to see.
-- Reduce button font/physical size where appropriate.
+- Extend the existing client-data transfer concept into a technician-safe push/pull workflow.
+- Preserve source data unless the user explicitly chooses otherwise.
+- Validate toolkit destinations and sources before transfer.
+- Transfer computer diagnostic/client data only.
+- Keep app binaries, portable tools, development files, and deployment/update mechanics out of scope.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -327,9 +338,10 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Settings controls are clearer and less bulky.
-- Tab/header chrome feels more compact.
-- Registered Commands display is removed from normal UI.
+- Technician can choose push or pull direction for computer/client data transfer.
+- Source and destination toolkit paths are validated before transfer.
+- Only diagnostic/client data is transferred.
+- Transfer summary/manifest is available after completion.
 - Parser, smoke, and button-smoke validation pass.
 
 When done, provide:

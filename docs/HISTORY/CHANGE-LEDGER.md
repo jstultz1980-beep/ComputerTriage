@@ -217,3 +217,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0207 | 2026-07-09 | TASK-0057 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Wi-Fi and Windows status polish. |
 | CHG-0208 | 2026-07-09 | TASK-0057 | Documentation | +1 | Updated TASK-0057, queue, roadmap, changelog, ledger, punch list, and handoff records for Wi-Fi and Windows status completion. |
 | CHG-0209 | 2026-07-09 | TASK-0057 / TASK-0058 | Task System | +1 | Completed TASK-0057 and activated TASK-0058 as the next single active implementation task. |
+| CHG-0210 | 2026-07-09 | TASK-0058 | UI | +1 | Compacted shared buttons and tab strip, enlarged the header logo, replaced Settings size refresh with an icon button, and removed registered-command startup noise. |
+| CHG-0211 | 2026-07-09 | TASK-0058 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Settings and control polish. |
+| CHG-0212 | 2026-07-09 | TASK-0058 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Settings and control polish. |
+| CHG-0213 | 2026-07-09 | TASK-0058 | Documentation | +1 | Updated TASK-0058, queue, roadmap, changelog, ledger, punch list, and handoff records for Settings/control completion. |
+| CHG-0214 | 2026-07-09 | TASK-0058 / TASK-0062 | Task System | +1 | Completed TASK-0058 and activated TASK-0062 as the next single active implementation task. |
