@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0069 Triage Text Driven Workflow.
+- Removed the old Triage top action buttons/progress field, made Quick/Full Triage link actions in Step 1, moved Cancel Run into Step 1, and changed Review actions to explanatory links.
+- Updated toolkit build metadata for TASK-0069.
 - Completed TASK-0068 Triage Instructions And WU LED.
 - Added a separate Windows Update Service Health LED and converted Triage collect/submit instructions to compact rich-text quick-reference entries.
 - Updated toolkit build metadata for TASK-0068.

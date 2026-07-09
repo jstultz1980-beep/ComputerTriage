@@ -95,6 +95,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0066-RapidAssist-Naming-Selection` | Completed | Recorded RapidAssist as the preferred product naming direction with no app rename. |
 | `TASK-0067-UI-Feedback-Corrections` | Completed | Corrected status-bar activity, Windows Update status/health, Settings size refresh, and Triage instruction weighting. |
 | `TASK-0068-Triage-Instructions-And-WU-LED` | Completed | Refined Triage instruction formatting and made Windows Update health use a separate visible LED. |
+| `TASK-0069-Triage-Text-Driven-Workflow` | Completed | Moved Triage page actions into instructional links and removed the old top action row. |
 
 ## Reconciliation Decision
 

@@ -136,6 +136,7 @@ $script:TriageCompletionHandled = $false
 $script:TriageToolGrid = $null
 $script:TriageStatusLabel = $null
 $script:TriageProgressBar = $null
+$script:TriageCancelButton = $null
 $script:TriageLogBox = $null
 $script:TriageLatestRunPath = $null
 $script:TriageLatestBundlePath = $null
@@ -9903,6 +9904,28 @@ function New-GUIInstructionBox {
     return $box
 }
 
+function New-GUILinkAction {
+    param(
+        [string]$Text,
+        [scriptblock]$Action
+    )
+
+    $link = New-Object System.Windows.Forms.LinkLabel
+    $link.Text = $Text
+    $link.AutoSize = $true
+    $link.LinkColor = $script:GUITheme.AccentDark
+    $link.ActiveLinkColor = $script:GUITheme.Accent
+    $link.VisitedLinkColor = $script:GUITheme.AccentDark
+    $link.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $link.Margin = New-Object System.Windows.Forms.Padding(0,0,6,0)
+    $link.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $link.Add_LinkClicked({
+        param($sender,$args)
+        & $Action
+    }.GetNewClosure())
+    return $link
+}
+
 function New-GUITextBox {
     param([string]$Text = "")
 
@@ -13009,6 +13032,13 @@ function Set-GUITriageStatusText {
     }
 }
 
+function Update-GUITriageRunControls {
+    $isRunning = ($script:TriageProcess -and !$script:TriageProcess.HasExited)
+    if($script:TriageCancelButton -and !$script:TriageCancelButton.IsDisposed){
+        $script:TriageCancelButton.Visible = [bool]$isRunning
+    }
+}
+
 function Start-GUITriageStatusRefresh {
     if($script:TriageStatusRefreshTimer){
         try { $script:TriageStatusRefreshTimer.Stop(); $script:TriageStatusRefreshTimer.Dispose() } catch {}
@@ -13234,6 +13264,7 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
     $script:TriageRunStartedAt = Get-Date
     $script:TriageProcess = Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -PassThru
     Set-GUITriageStatusText "$Profile triage running..."
+    Update-GUITriageRunControls
     if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee; $script:TriageProgressBar.MarqueeAnimationSpeed = 30 }
     if($SelectedToolIds -and $SelectedToolIds.Count -gt 0){
         Add-GUITriageLogLine "Started $Profile triage for selected tools: $($SelectedToolIds -join ', ')."
@@ -13268,6 +13299,7 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
         $script:TriageProcess = $null
         $script:TriageResultPath = $null
         Stop-GUIBusyIndicator
+        Update-GUITriageRunControls
         if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
         try {
             if([string]::IsNullOrWhiteSpace($resultPath)){
@@ -13330,6 +13362,7 @@ function Stop-GUITriageRun {
     $script:TriageProcess = $null
     $script:TriageResultPath = $null
     Stop-GUIBusyIndicator
+    Update-GUITriageRunControls
     if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
 }
 
@@ -13406,49 +13439,18 @@ function Build-TriagePage {
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($layout)
-
-    $actionLayout = New-Object System.Windows.Forms.TableLayoutPanel
-    $actionLayout.Dock = "Fill"
-    $actionLayout.ColumnCount = 5
-    $actionLayout.RowCount = 1
-    $actionLayout.Padding = New-Object System.Windows.Forms.Padding(0,6,0,6)
-    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
-    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,150))) | Out-Null
-    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
-    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
-    $actionLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.Controls.Add($actionLayout,0,0)
-    $layout.SetColumnSpan($actionLayout,3)
-
-    $quickButton = New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }
-    $quickButton.Dock = "Fill"
-    $quickButton.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
-    $actionLayout.Controls.Add($quickButton,0,0)
-
-    $fullButton = New-GUIButton "Full Triage" { Start-GUITriageRun -Profile "Full" }
-    $fullButton.Dock = "Fill"
-    $fullButton.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
-    $actionLayout.Controls.Add($fullButton,1,0)
-
-    $cancelButton = New-GUIButton "Cancel Run" { Stop-GUITriageRun }
-    $cancelButton.Dock = "Fill"
-    $cancelButton.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
-    $actionLayout.Controls.Add($cancelButton,2,0)
 
     $script:TriageStatusLabel = New-GUILabel "Ready."
     $TriageStatusLabel.Dock = "Fill"
     $TriageStatusLabel.TextAlign = "MiddleLeft"
     $TriageStatusLabel.ForeColor = $script:GUITheme.MutedText
-    $actionLayout.Controls.Add($TriageStatusLabel,3,0)
-
-    $script:TriageProgressBar = New-Object System.Windows.Forms.ProgressBar
-    $TriageProgressBar.Dock = "Fill"
-    $TriageProgressBar.Margin = New-Object System.Windows.Forms.Padding(8,8,0,8)
-    $actionLayout.Controls.Add($TriageProgressBar,4,0)
+    $TriageStatusLabel.Margin = New-Object System.Windows.Forms.Padding(0,0,0,6)
+    $layout.Controls.Add($TriageStatusLabel,0,0)
+    $layout.SetColumnSpan($TriageStatusLabel,3)
+    $script:TriageProgressBar = $null
 
     $script:TriageToolGrid = New-Object System.Windows.Forms.DataGridView
     $TriageToolGrid.ReadOnly = $true
@@ -13479,17 +13481,58 @@ function Build-TriagePage {
     $runLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $runLayout.Dock = "Fill"
     $runLayout.ColumnCount = 1
-    $runLayout.RowCount = 1
+    $runLayout.RowCount = 2
     $runLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
     $runGroup.Controls.Add($runLayout)
 
-    $collectBox = New-GUIInstructionBox -Entries @(
-        @{Heading="Quick Triage";Body="default first pass for walk-up diagnostics; fastest useful evidence set."},
-        @{Heading="Full Triage";Body="use after Quick Triage or when escalation needs deeper local evidence."},
-        @{Heading="Watch status";Body="leave the toolkit open until completion; the dialog points to the latest run."}
-    )
-    $runLayout.Controls.Add($collectBox,0,0)
+    $collectPanel = New-Object System.Windows.Forms.TableLayoutPanel
+    $collectPanel.Dock = "Fill"
+    $collectPanel.ColumnCount = 1
+    $collectPanel.RowCount = 3
+    $collectPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $collectPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $collectPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runLayout.Controls.Add($collectPanel,0,0)
+
+    $quickAction = New-Object System.Windows.Forms.FlowLayoutPanel
+    $quickAction.Dock = "Fill"
+    $quickAction.FlowDirection = "LeftToRight"
+    $quickAction.WrapContents = $true
+    $quickAction.Margin = New-Object System.Windows.Forms.Padding(0,0,0,2)
+    [void]$quickAction.Controls.Add((New-GUILinkAction -Text "Quick Triage" -Action { Start-GUITriageRun -Profile "Quick" }))
+    $quickText = New-GUILabel "default first pass; fastest useful evidence set."
+    $quickText.AutoSize = $true
+    $quickText.Dock = "None"
+    $quickText.ForeColor = $script:GUITheme.MutedText
+    [void]$quickAction.Controls.Add($quickText)
+    $collectPanel.Controls.Add($quickAction,0,0)
+
+    $fullAction = New-Object System.Windows.Forms.FlowLayoutPanel
+    $fullAction.Dock = "Fill"
+    $fullAction.FlowDirection = "LeftToRight"
+    $fullAction.WrapContents = $true
+    $fullAction.Margin = New-Object System.Windows.Forms.Padding(0,0,0,2)
+    [void]$fullAction.Controls.Add((New-GUILinkAction -Text "Full Triage" -Action { Start-GUITriageRun -Profile "Full" }))
+    $fullText = New-GUILabel "deeper local evidence for escalation or unresolved issues."
+    $fullText.AutoSize = $true
+    $fullText.Dock = "None"
+    $fullText.ForeColor = $script:GUITheme.MutedText
+    [void]$fullAction.Controls.Add($fullText)
+    $collectPanel.Controls.Add($fullAction,0,1)
+
+    $watchText = New-GUILabel "Leave the toolkit open until completion. The status bar and completion dialog identify the latest run."
+    $watchText.Dock = "Fill"
+    $watchText.TextAlign = "TopLeft"
+    $watchText.ForeColor = $script:GUITheme.MutedText
+    $collectPanel.Controls.Add($watchText,0,2)
+
+    $script:TriageCancelButton = New-GUIButton "Cancel Run" { Stop-GUITriageRun }
+    $script:TriageCancelButton.Dock = "Left"
+    $script:TriageCancelButton.Width = 120
+    $script:TriageCancelButton.Visible = $false
+    $runLayout.Controls.Add($script:TriageCancelButton,0,1)
 
     $reviewGroup = New-Object System.Windows.Forms.GroupBox
     $reviewGroup.Text = "2. Review"
@@ -13500,29 +13543,48 @@ function Build-TriagePage {
     $reviewLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $reviewLayout.Dock = "Fill"
     $reviewLayout.ColumnCount = 1
-    $reviewLayout.RowCount = 4
+    $reviewLayout.RowCount = 3
     $reviewLayout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $reviewGroup.Controls.Add($reviewLayout)
 
-    foreach($button in @(
-        (New-GUIButton "Latest Run" { Open-GUITriageLatestRun }),
-        (New-GUIButton "Bundle Folder" { Open-GUITriageBundleFolder }),
-        (New-GUIButton "Validate Setup" { Invoke-GUITriageValidation })
-    )){
-        $button.Dock = "Fill"
-        $button.Margin = New-Object System.Windows.Forms.Padding(0,0,0,6)
-        [void]$reviewLayout.Controls.Add($button)
-    }
+    $latestReview = New-Object System.Windows.Forms.FlowLayoutPanel
+    $latestReview.Dock = "Fill"
+    $latestReview.FlowDirection = "LeftToRight"
+    $latestReview.WrapContents = $true
+    [void]$latestReview.Controls.Add((New-GUILinkAction -Text "Latest Run" -Action { Open-GUITriageLatestRun }))
+    $latestText = New-GUILabel "opens the newest collection folder."
+    $latestText.AutoSize = $true
+    $latestText.Dock = "None"
+    $latestText.ForeColor = $script:GUITheme.MutedText
+    [void]$latestReview.Controls.Add($latestText)
+    $reviewLayout.Controls.Add($latestReview,0,0)
 
-    $reviewTip = New-GUILabel "Latest Run opens the newest collection folder. Bundle Folder opens the ZIP location used for handoff or AI review."
-    $reviewTip.Dock = "Fill"
-    $reviewTip.ForeColor = $script:GUITheme.MutedText
-    $reviewTip.TextAlign = "TopLeft"
-    $reviewLayout.Controls.Add($reviewTip,0,3)
+    $bundleReview = New-Object System.Windows.Forms.FlowLayoutPanel
+    $bundleReview.Dock = "Fill"
+    $bundleReview.FlowDirection = "LeftToRight"
+    $bundleReview.WrapContents = $true
+    [void]$bundleReview.Controls.Add((New-GUILinkAction -Text "Bundle Folder" -Action { Open-GUITriageBundleFolder }))
+    $bundleText = New-GUILabel "opens the ZIP location used for handoff or AI review."
+    $bundleText.AutoSize = $true
+    $bundleText.Dock = "None"
+    $bundleText.ForeColor = $script:GUITheme.MutedText
+    [void]$bundleReview.Controls.Add($bundleText)
+    $reviewLayout.Controls.Add($bundleReview,0,1)
+
+    $validateReview = New-Object System.Windows.Forms.FlowLayoutPanel
+    $validateReview.Dock = "Fill"
+    $validateReview.FlowDirection = "LeftToRight"
+    $validateReview.WrapContents = $true
+    [void]$validateReview.Controls.Add((New-GUILinkAction -Text "Validate Setup" -Action { Invoke-GUITriageValidation }))
+    $validateText = New-GUILabel "checks that required folders, manifests, and tools are ready."
+    $validateText.AutoSize = $true
+    $validateText.Dock = "None"
+    $validateText.ForeColor = $script:GUITheme.MutedText
+    [void]$validateReview.Controls.Add($validateText)
+    $reviewLayout.Controls.Add($validateReview,0,2)
 
     $submitGroup = New-Object System.Windows.Forms.GroupBox
     $submitGroup.Text = "3. Submit"
@@ -13546,6 +13608,7 @@ function Build-TriagePage {
     $submitLayout.Controls.Add($submitBox,0,0)
 
     Start-GUITriageStatusRefresh
+    Update-GUITriageRunControls
 }
 
 function Build-ChocolateyPage {

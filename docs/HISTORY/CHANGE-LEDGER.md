@@ -256,3 +256,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0246 | 2026-07-09 | TASK-0068 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for TASK-0068. |
 | CHG-0247 | 2026-07-09 | TASK-0068 | Documentation | +1 | Updated TASK-0068, queue, roadmap, changelog, ledger, punch list, and handoff records. |
 | CHG-0248 | 2026-07-09 | TASK-0068 | Task System | +1 | Completed TASK-0068 with Wi-Fi hardware verification remaining open. |
+| CHG-0249 | 2026-07-09 | TASK-0069 | UI | +1 | Reworked Triage into text-driven actions, removed the old top action row/progress field, moved Cancel Run into Step 1, and changed Review actions to links. |
+| CHG-0250 | 2026-07-09 | TASK-0069 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Triage text-driven workflow. |
+| CHG-0251 | 2026-07-09 | TASK-0069 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for TASK-0069. |
+| CHG-0252 | 2026-07-09 | TASK-0069 | Documentation | +1 | Updated TASK-0069, queue, roadmap, changelog, ledger, punch list, and handoff records. |
+| CHG-0253 | 2026-07-09 | TASK-0069 | Task System | +1 | Completed TASK-0069 with Wi-Fi hardware verification remaining open. |

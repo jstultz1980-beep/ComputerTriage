@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709153301,
-    "SourceUpdatedAt":  "2026-07-09T15:33:01.6023498-05:00",
-    "ReleaseNotes":  "Refined Triage instructions and Windows Update health LED display."
+    "Build":  20260709155714,
+    "SourceUpdatedAt":  "2026-07-09T15:57:14.7581176-05:00",
+    "ReleaseNotes":  "Reworked Triage page into text-driven workflow actions."
 }

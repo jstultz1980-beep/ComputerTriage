@@ -59,3 +59,7 @@
 53. Wi-Fi status-bar behavior still needs testing on a computer with Wi-Fi.
 54. ~~Windows Update Service Health status is not showing the LED clearly.~~
 55. ~~Triage instruction text is clunky; improve the format while keeping headings bold and body text regular.~~
+56. ~~Triage page circled field is the old progress bar; remove it from the page.~~
+57. ~~Triage page Quick Triage and Full Triage should be text action items in Step 1 instead of top buttons.~~
+58. ~~Triage page Cancel Run should be inside Step 1 and invisible unless a run is active.~~
+59. ~~Triage page Review actions should be links with explanations instead of buttons.~~

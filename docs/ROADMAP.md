@@ -156,6 +156,7 @@ Current UI work:
 - TASK-0066 completed RapidAssist naming selection.
 - TASK-0067 completed UI feedback corrections from user verification.
 - TASK-0068 completed Triage instruction and Windows Update LED refinement.
+- TASK-0069 completed Triage text-driven workflow refinement.
 - Wi-Fi status-bar behavior still needs verification on a computer with Wi-Fi.
 
 ## Phase 10 - Release Hardening
