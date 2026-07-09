@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0079
+HANDOFF-0081
 
 ## Current Task
 None
@@ -74,6 +74,8 @@ TASK-0067 completed UI feedback corrections from TASK-0065 testing.
 
 Wi-Fi status-bar behavior remains a punch-list verification item for a computer with Wi-Fi hardware.
 
+TASK-0068 completed Triage instruction formatting and Windows Update health LED refinement.
+
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
 Do not clean unrelated files.
@@ -96,15 +98,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 13 / 25 | No |
-| Task System | 20 / 25 | No |
+| Documentation | 14 / 25 | No |
+| Task System | 21 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 19 / 25 | No |
+| UI | 20 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 11 / 25 | No |
-| Validation/Test Framework | 17 / 25 | No |
+| Build System | 12 / 25 | No |
+| Validation/Test Framework | 18 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -136,6 +138,7 @@ Recently completed work:
 - TASK-0065 completed UI regression polish from punch-list items 36 through 46.
 - TASK-0066 completed RapidAssist naming selection.
 - TASK-0067 completed UI feedback corrections.
+- TASK-0068 completed Triage instruction and Windows Update LED refinement.
 
 Current active work:
 - None.
@@ -165,6 +168,14 @@ Scope summary:
   - `App/ToolKit-GUI/ToolKit-GUI.ps1`
   - `App/NetworkToolkit/Utilities/TriageService.ps1`
 - Direct triage setup validation passed via `TriageService.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Completed TASK-0068 Triage Instructions And WU LED.
+- Marked punch-list items 54 and 55 complete.
+- Added a separate Windows Update Service Health LED label.
+- Converted Triage collect/submit instructions to compact rich-text quick-reference entries.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0047 for the requested status-bar version/build placement slice.
@@ -349,7 +360,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0067: Correct UI feedback polish
+TASK-0068: Refine Triage instructions and WU LED
 ```
 
 ## Next Bot Prompt
@@ -390,6 +401,7 @@ Current task state:
 - TASK-0065 completed UI regression polish from punch-list items 36 through 46.
 - TASK-0066 completed RapidAssist naming selection.
 - TASK-0067 completed UI feedback corrections from user verification.
+- TASK-0068 completed Triage instruction formatting and Windows Update health LED refinement.
 - Punch-list item 53 remains open for Wi-Fi status-bar verification on a computer with Wi-Fi hardware.
 - No queued tasks remain.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.

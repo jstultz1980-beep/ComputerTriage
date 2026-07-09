@@ -172,6 +172,7 @@ $script:WUPendingUpdates = @()
 $script:WUInstalledUpdates = @()
 $script:WUHistory = @()
 $script:WUHealthLabel = $null
+$script:WUHealthLedLabel = $null
 $script:WUActionProcess = $null
 $script:WUActionTimer = $null
 $script:WUActionSession = $null
@@ -9860,6 +9861,48 @@ function New-GUILabel {
     return $label
 }
 
+function New-GUIInstructionBox {
+    param(
+        [object[]]$Entries,
+        [string]$Footer = ""
+    )
+
+    $box = New-Object System.Windows.Forms.RichTextBox
+    $box.Dock = "Fill"
+    $box.ReadOnly = $true
+    $box.BorderStyle = "None"
+    $box.TabStop = $false
+    $box.ScrollBars = "None"
+    $box.DetectUrls = $false
+    $box.BackColor = $script:GUITheme.Page
+    $box.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+    $box.ForeColor = $script:GUITheme.MutedText
+
+    $headingFont = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $bodyFont = New-Object System.Drawing.Font("Segoe UI Semilight",9)
+
+    foreach($entry in @($Entries)){
+        if($box.TextLength -gt 0){ $box.AppendText("`r`n") }
+        $box.SelectionFont = $headingFont
+        $box.SelectionColor = $script:GUITheme.Text
+        $box.AppendText([string]$entry.Heading)
+        $box.SelectionFont = $bodyFont
+        $box.SelectionColor = $script:GUITheme.MutedText
+        $box.AppendText(" - $($entry.Body)")
+    }
+
+    if($Footer){
+        $box.AppendText("`r`n`r`n")
+        $box.SelectionFont = $bodyFont
+        $box.SelectionColor = $script:GUITheme.MutedText
+        $box.AppendText($Footer)
+    }
+
+    $box.SelectionStart = 0
+    $box.SelectionLength = 0
+    return $box
+}
+
 function New-GUITextBox {
     param([string]$Text = "")
 
@@ -11055,14 +11098,32 @@ function Build-WindowsUpdatePage {
     [void]$top.Controls.Add($WUStatusLabel,0,1)
     $top.SetColumnSpan($WUStatusLabel,3)
 
+    $healthPanel = New-Object System.Windows.Forms.FlowLayoutPanel
+    $healthPanel.Dock = "Fill"
+    $healthPanel.FlowDirection = "RightToLeft"
+    $healthPanel.WrapContents = $false
+    $healthPanel.AutoScroll = $false
+    $healthPanel.Margin = New-Object System.Windows.Forms.Padding(0)
+    $healthPanel.Padding = New-Object System.Windows.Forms.Padding(0,9,4,0)
+    [void]$top.Controls.Add($healthPanel,1,0)
+
     $script:WUHealthLabel = New-Object System.Windows.Forms.Label
-    $WUHealthLabel.Dock = "Fill"
+    $WUHealthLabel.AutoSize = $true
     $WUHealthLabel.Text = "Windows Update Service Health"
-    $WUHealthLabel.TextAlign = "MiddleRight"
-    $WUHealthLabel.AutoEllipsis = $true
+    $WUHealthLabel.TextAlign = "MiddleLeft"
     $WUHealthLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",8.5,[System.Drawing.FontStyle]::Bold)
-    $WUHealthLabel.ForeColor = $script:GUITheme.MutedText
-    [void]$top.Controls.Add($WUHealthLabel,1,0)
+    $WUHealthLabel.ForeColor = $script:GUITheme.Text
+    $WUHealthLabel.Margin = New-Object System.Windows.Forms.Padding(0,1,6,0)
+    [void]$healthPanel.Controls.Add($WUHealthLabel)
+
+    $script:WUHealthLedLabel = New-Object System.Windows.Forms.Label
+    $WUHealthLedLabel.AutoSize = $true
+    $WUHealthLedLabel.Text = [string]([char]0x25CF)
+    $WUHealthLedLabel.TextAlign = "MiddleCenter"
+    $WUHealthLedLabel.Font = New-Object System.Drawing.Font("Segoe UI",12,[System.Drawing.FontStyle]::Bold)
+    $WUHealthLedLabel.ForeColor = $script:GUITheme.MutedText
+    $WUHealthLedLabel.Margin = New-Object System.Windows.Forms.Padding(0,0,6,0)
+    [void]$healthPanel.Controls.Add($WUHealthLedLabel)
 
     $repairButton = New-GUIButton "Repair Windows Update" { Invoke-GUIWindowsUpdateRepair }
     $repairButton.Width = 180
@@ -11293,8 +11354,12 @@ function Update-GUIWindowsUpdateHealthIndicator {
     }
 
     $health = Get-GUIWindowsUpdateServiceHealth
-    $script:WUHealthLabel.Text = "{0} {1}: {2}" -f ([char]0x25CF),$health.Text,$health.StateText
-    $script:WUHealthLabel.ForeColor = $health.Color
+    if($script:WUHealthLedLabel -and !$script:WUHealthLedLabel.IsDisposed){
+        $script:WUHealthLedLabel.Text = [string]([char]0x25CF)
+        $script:WUHealthLedLabel.ForeColor = $health.Color
+    }
+    $script:WUHealthLabel.Text = "{0}: {1}" -f $health.Text,$health.StateText
+    $script:WUHealthLabel.ForeColor = $script:GUITheme.Text
     $script:WUHealthLabel.Tag = $health
     if($health.RepairRecommended -and $script:WUStatusLabel -and !$script:WUStatusLabel.IsDisposed){
         $script:WUStatusLabel.Text = "Windows Update service repair is recommended."
@@ -11302,6 +11367,9 @@ function Update-GUIWindowsUpdateHealthIndicator {
     }
     if($script:ToolTip){
         $script:ToolTip.SetToolTip($script:WUHealthLabel,("{0}: {1}. {2}" -f $health.Text,$health.StateText,$health.Detail))
+        if($script:WUHealthLedLabel -and !$script:WUHealthLedLabel.IsDisposed){
+            $script:ToolTip.SetToolTip($script:WUHealthLedLabel,("{0}: {1}. {2}" -f $health.Text,$health.StateText,$health.Detail))
+        }
     }
 }
 
@@ -13411,56 +13479,17 @@ function Build-TriagePage {
     $runLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $runLayout.Dock = "Fill"
     $runLayout.ColumnCount = 1
-    $runLayout.RowCount = 3
+    $runLayout.RowCount = 1
     $runLayout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
-    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $runGroup.Controls.Add($runLayout)
 
-    $quickStep = New-Object System.Windows.Forms.TableLayoutPanel
-    $quickStep.Dock = "Fill"
-    $quickStep.ColumnCount = 1
-    $quickStep.RowCount = 2
-    $quickStep.Margin = New-Object System.Windows.Forms.Padding(0)
-    $quickStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,22))) | Out-Null
-    $quickStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $quickHeading = New-GUILabel "Quick Triage"
-    $quickHeading.Dock = "Fill"
-    $quickHeading.TextAlign = "BottomLeft"
-    $quickHeading.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
-    $quickBody = New-GUILabel "Use first for normal walk-up diagnostics. It collects the core evidence package with the least waiting."
-    $quickBody.Dock = "Fill"
-    $quickBody.TextAlign = "TopLeft"
-    $quickBody.ForeColor = $script:GUITheme.MutedText
-    [void]$quickStep.Controls.Add($quickHeading,0,0)
-    [void]$quickStep.Controls.Add($quickBody,0,1)
-    $runLayout.Controls.Add($quickStep,0,0)
-
-    $fullStep = New-Object System.Windows.Forms.TableLayoutPanel
-    $fullStep.Dock = "Fill"
-    $fullStep.ColumnCount = 1
-    $fullStep.RowCount = 2
-    $fullStep.Margin = New-Object System.Windows.Forms.Padding(0)
-    $fullStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,22))) | Out-Null
-    $fullStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $fullHeading = New-GUILabel "Full Triage"
-    $fullHeading.Dock = "Fill"
-    $fullHeading.TextAlign = "BottomLeft"
-    $fullHeading.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
-    $fullBody = New-GUILabel "Use when Quick Triage does not explain the issue or escalation needs deeper local evidence."
-    $fullBody.Dock = "Fill"
-    $fullBody.TextAlign = "TopLeft"
-    $fullBody.ForeColor = $script:GUITheme.MutedText
-    [void]$fullStep.Controls.Add($fullHeading,0,0)
-    [void]$fullStep.Controls.Add($fullBody,0,1)
-    $runLayout.Controls.Add($fullStep,0,1)
-
-    $collectTip = New-GUILabel "Keep the toolkit open until the progress bar stops. The completion dialog will point to the newest run and bundle."
-    $collectTip.Dock = "Fill"
-    $collectTip.ForeColor = $script:GUITheme.MutedText
-    $collectTip.TextAlign = "TopLeft"
-    $runLayout.Controls.Add($collectTip,0,2)
+    $collectBox = New-GUIInstructionBox -Entries @(
+        @{Heading="Quick Triage";Body="default first pass for walk-up diagnostics; fastest useful evidence set."},
+        @{Heading="Full Triage";Body="use after Quick Triage or when escalation needs deeper local evidence."},
+        @{Heading="Watch status";Body="leave the toolkit open until completion; the dialog points to the latest run."}
+    )
+    $runLayout.Controls.Add($collectBox,0,0)
 
     $reviewGroup = New-Object System.Windows.Forms.GroupBox
     $reviewGroup.Text = "2. Review"
@@ -13504,30 +13533,17 @@ function Build-TriagePage {
     $submitLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $submitLayout.Dock = "Fill"
     $submitLayout.ColumnCount = 1
-    $submitLayout.RowCount = 3
+    $submitLayout.RowCount = 1
     $submitLayout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
-    $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $submitGroup.Controls.Add($submitLayout)
 
-    $bundleStep = New-GUILabel "Attach the ZIP bundle`r`nThe bundle name includes the computer and timestamp so it is easier to identify after upload."
-    $bundleStep.Dock = "Fill"
-    $bundleStep.ForeColor = $script:GUITheme.MutedText
-    $bundleStep.TextAlign = "TopLeft"
-    $submitLayout.Controls.Add($bundleStep,0,0)
-
-    $promptStep = New-GUILabel "Use the included prompt`r`nSubmit the ZIP with the generated prompt when requesting AI analysis or escalation review."
-    $promptStep.Dock = "Fill"
-    $promptStep.ForeColor = $script:GUITheme.MutedText
-    $promptStep.TextAlign = "TopLeft"
-    $submitLayout.Controls.Add($promptStep,0,1)
-
-    $finishStep = New-GUILabel "Save the response with the ticket or case notes. If more evidence is requested, return here and run Full Triage."
-    $finishStep.Dock = "Fill"
-    $finishStep.ForeColor = $script:GUITheme.MutedText
-    $finishStep.TextAlign = "TopLeft"
-    $submitLayout.Controls.Add($finishStep,0,2)
+    $submitBox = New-GUIInstructionBox -Entries @(
+        @{Heading="Attach ZIP";Body="use the generated bundle; its name includes computer and timestamp."},
+        @{Heading="Include prompt";Body="send the included prompt with the bundle for AI or escalation review."},
+        @{Heading="Save result";Body="store the response in the ticket; rerun Full Triage if more evidence is needed."}
+    )
+    $submitLayout.Controls.Add($submitBox,0,0)
 
     Start-GUITriageStatusRefresh
 }

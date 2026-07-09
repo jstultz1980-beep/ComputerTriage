@@ -251,3 +251,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0241 | 2026-07-09 | TASK-0067 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for UI feedback corrections. |
 | CHG-0242 | 2026-07-09 | TASK-0067 | Documentation | +1 | Updated TASK-0067, queue, roadmap, changelog, ledger, punch list, and handoff records for UI feedback corrections. |
 | CHG-0243 | 2026-07-09 | TASK-0067 | Task System | +1 | Completed TASK-0067 with only external Wi-Fi hardware verification remaining on the punch list. |
+| CHG-0244 | 2026-07-09 | TASK-0068 | UI | +1 | Added a separate Windows Update Service Health LED and refined Triage instruction text into compact quick-reference entries. |
+| CHG-0245 | 2026-07-09 | TASK-0068 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Triage instruction and WU LED refinement. |
+| CHG-0246 | 2026-07-09 | TASK-0068 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for TASK-0068. |
+| CHG-0247 | 2026-07-09 | TASK-0068 | Documentation | +1 | Updated TASK-0068, queue, roadmap, changelog, ledger, punch list, and handoff records. |
+| CHG-0248 | 2026-07-09 | TASK-0068 | Task System | +1 | Completed TASK-0068 with Wi-Fi hardware verification remaining open. |
