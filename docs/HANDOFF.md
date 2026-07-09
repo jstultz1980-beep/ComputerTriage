@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0067
+HANDOFF-0068
 
 ## Current Task
-TASK-0055-Shared-Embedded-Output-Pattern
+TASK-0056-Triage-Guided-Workflow-Polish
 
 ## Current Owner
 Codex
@@ -50,7 +50,9 @@ The audit threshold was raised from 10 changes to 25 changes. TASK-0060 was arch
 
 TASK-0061 completed Directory page layout polish.
 
-Implementation work may resume under the single active task: TASK-0055 Shared Embedded Output Pattern.
+TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
+
+Implementation work may resume under the single active task: TASK-0056 Triage Guided Workflow Polish.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -74,15 +76,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 2 / 25 | No |
-| Task System | 9 / 25 | No |
+| Documentation | 3 / 25 | No |
+| Task System | 10 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 11 / 25 | No |
+| UI | 12 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 2 / 25 | No |
-| Validation/Test Framework | 8 / 25 | No |
+| Build System | 3 / 25 | No |
+| Validation/Test Framework | 9 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -103,12 +105,12 @@ Recently completed work:
 - TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
 - TASK-0054 completed Directory domain identity and AD health status, then activated the next UI audit gate.
 - TASK-0061 completed Directory page layout polish and reconciled new punch-list items into queued tasks.
+- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
 
 Current active work:
-- TASK-0055 is active for the shared embedded output pattern.
+- TASK-0056 is active for Triage guided workflow polish.
 
 Queued implementation/design work, in recommended order:
-- TASK-0056 Triage Guided Workflow Polish.
 - TASK-0057 Wi-Fi And Windows Status Polish.
 - TASK-0058 Settings And Control Polish.
 - TASK-0062 Computer Data Push Pull.
@@ -117,16 +119,16 @@ Queued implementation/design work, in recommended order:
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0055-Shared-Embedded-Output-Pattern`
+`TASK-0056-Triage-Guided-Workflow-Polish`
 
 Scope summary:
-- Define reusable GUI helpers for compact input row, action buttons, output pane, status updates, and optional output-folder handoff.
-- Prefer non-modal success handling.
-- Preserve clear error output and tool usage logging.
-- Identify first conversion candidates from Analyze, Network, Infrastructure, and Wi-Fi.
+- Keep Quick Triage and Full Triage as the primary actions.
+- Remove or de-emphasize Technician Notes.
+- Replace catalog-heavy layout with concise workflow instructions.
+- Preserve access to latest run and bundle folder.
+- Ensure triage bundles remain descriptively named.
 
 ## Queued Work
-- `TASK-0056-Triage-Guided-Workflow-Polish` owned by Codex.
 - `TASK-0057-WiFi-And-Windows-Status-Polish` owned by Codex.
 - `TASK-0058-Settings-And-Control-Polish` owned by Codex.
 - `TASK-0062-Computer-Data-Push-Pull` owned by Codex.
@@ -220,9 +222,16 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0055 as the next implementation task.
+- Completed TASK-0055 Shared Embedded Output Pattern.
+- Added reusable embedded command-output helpers and converted Quick Target Checks to use them.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0056 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0055 only.
+No active audit gate. Implementation may continue under TASK-0056 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -237,7 +246,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0061: Polish Directory page layout
+TASK-0055: Add shared embedded output helper
 ```
 
 ## Next Bot Prompt
@@ -255,12 +264,12 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0055-Shared-Embedded-Output-Pattern.md
+7. docs/TASKS/TASK-0056-Triage-Guided-Workflow-Polish.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0055-Shared-Embedded-Output-Pattern.
+- Active task: TASK-0056-Triage-Guided-Workflow-Polish.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `10 / 25`, so no audit is currently required.
@@ -268,20 +277,22 @@ Current task state:
 - `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - TASK-0061 completed Directory page layout polish.
 - New punch-list items 32, 33, and 34 are queued as TASK-0062, TASK-0063, and TASK-0064.
-- Next queued implementation tasks after TASK-0055 are TASK-0056, TASK-0057, TASK-0058, TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
+- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
+- Next queued implementation tasks after TASK-0056 are TASK-0057, TASK-0058, TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0055 only.
+Execute TASK-0056 only.
 
 Scope:
-- Define reusable GUI helpers for compact input row, action buttons, output pane, status updates, and optional output-folder handoff.
-- Prefer non-modal success handling.
-- Preserve clear error output and tool usage logging.
-- Identify first conversion candidates from Analyze, Network, Infrastructure, and Wi-Fi.
+- Keep Quick Triage and Full Triage as the primary actions.
+- Remove or de-emphasize Technician Notes.
+- Replace catalog-heavy layout with concise workflow instructions.
+- Preserve access to latest run and bundle folder.
+- Ensure triage bundles remain descriptively named.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -293,9 +304,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- A shared helper pattern exists for embedded command output.
-- At least one low-risk console-driven tool uses the shared pattern.
-- External GUI tools still launch externally.
+- Triage tab presents a clear run, bundle, submit flow.
+- Technician Notes no longer waste page space.
+- Tool catalog noise is reduced or hidden from normal workflow.
 - Parser, smoke, and button-smoke validation pass.
 
 When done, provide:

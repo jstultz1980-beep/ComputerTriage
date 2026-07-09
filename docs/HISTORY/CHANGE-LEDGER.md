@@ -202,3 +202,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0192 | 2026-07-09 | TASK-0061 / TASK-0062..TASK-0064 | Roadmap/Backlog | +1 | Reconciled new punch-list items into queued tasks for computer data transfer, Add-Ons concept testing, and naming options. |
 | CHG-0193 | 2026-07-09 | TASK-0061 / TASK-0055 | Documentation | +1 | Updated TASK-0061, queue, roadmap, changelog, ledger, punch list, and handoff records for Directory layout completion. |
 | CHG-0194 | 2026-07-09 | TASK-0061 / TASK-0055 | Task System | +1 | Completed TASK-0061 and activated TASK-0055 as the next single active implementation task. |
+| CHG-0195 | 2026-07-09 | TASK-0055 | UI | +1 | Added reusable embedded command-output helpers and converted Quick Target Checks to use them. |
+| CHG-0196 | 2026-07-09 | TASK-0055 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the shared embedded output pattern. |
+| CHG-0197 | 2026-07-09 | TASK-0055 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the shared embedded output pattern. |
+| CHG-0198 | 2026-07-09 | TASK-0055 | Documentation | +1 | Updated TASK-0055, queue, roadmap, changelog, ledger, and handoff records for shared embedded output completion. |
+| CHG-0199 | 2026-07-09 | TASK-0055 / TASK-0056 | Task System | +1 | Completed TASK-0055 and activated TASK-0056 as the next single active implementation task. |

@@ -106,7 +106,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0055-Shared-Embedded-Output-Pattern`
+- `TASK-0056-Triage-Guided-Workflow-Polish`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -139,15 +139,15 @@ Current UI work:
 - TASK-0054 completed Directory domain identity and AD health status.
 - The audit threshold was raised from 10 changes to 25 changes, so TASK-0060 was archived before execution.
 - TASK-0061 completed Directory page layout polish from the punch list.
-- TASK-0055 is active for the shared embedded output pattern.
+- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
+- TASK-0056 is active for Triage guided workflow polish.
 - The consolidated queued order is:
-  1. TASK-0056 Triage Guided Workflow Polish.
-  2. TASK-0057 Wi-Fi And Windows Status Polish.
-  3. TASK-0058 Settings And Control Polish.
-  4. TASK-0062 Computer Data Push Pull.
-  5. TASK-0063 Add Ons Concept.
-  6. TASK-0064 Product Naming Options.
-  7. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+  1. TASK-0057 Wi-Fi And Windows Status Polish.
+  2. TASK-0058 Settings And Control Polish.
+  3. TASK-0062 Computer Data Push Pull.
+  4. TASK-0063 Add Ons Concept.
+  5. TASK-0064 Product Naming Options.
+  6. TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Phase 10 - Release Hardening
 Status: Planned

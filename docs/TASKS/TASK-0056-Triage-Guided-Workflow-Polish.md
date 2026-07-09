@@ -1,7 +1,7 @@
 # TASK-0056 - Triage Guided Workflow Polish
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

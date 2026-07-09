@@ -2645,58 +2645,94 @@ function Get-GUIQuickPort {
     return $port
 }
 
-function Set-GUIQuickOutput {
+function Set-GUIEmbeddedCommandOutput {
     param(
+        [System.Windows.Forms.TextBox]$OutputBox,
         [string]$Title,
-        [string]$Text
+        [string]$Text,
+        [int]$RuleWidth = 70
     )
 
-    if(!$script:QuickOutputBox){
+    if(!$OutputBox -or $OutputBox.IsDisposed){
         return
     }
 
     $stamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $script:QuickOutputBox.Text = "[$stamp] $Title`r`n" + ("=" * [Math]::Min(70,[Math]::Max(10,$Title.Length))) + "`r`n`r`n" + $Text.Trim()
-    $script:QuickOutputBox.SelectionStart = $script:QuickOutputBox.TextLength
-    $script:QuickOutputBox.ScrollToCaret()
+    $OutputBox.Text = "[$stamp] $Title`r`n" + ("=" * [Math]::Min($RuleWidth,[Math]::Max(10,$Title.Length))) + "`r`n`r`n" + $Text.Trim()
+    $OutputBox.SelectionStart = $OutputBox.TextLength
+    $OutputBox.ScrollToCaret()
 }
 
-function Start-GUIQuickEmbeddedCommand {
+function Stop-GUIEmbeddedCommandState {
+    param(
+        [string]$TimerVariable,
+        [string]$ProcessVariable,
+        [string]$FilesVariable
+    )
+
+    $timer = Get-Variable -Name $TimerVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+    if($timer){
+        try {
+            $timer.Stop()
+            $timer.Dispose()
+        }
+        catch {}
+        Set-Variable -Name $TimerVariable -Scope Script -Value $null
+    }
+
+    $process = Get-Variable -Name $ProcessVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+    if($process -and !$process.HasExited){
+        try { $process.Kill() } catch {}
+    }
+    Set-Variable -Name $FilesVariable -Scope Script -Value $null
+}
+
+function Start-GUIEmbeddedCommand {
     param(
         [string]$Title,
-        [string]$Command
+        [string]$Command,
+        [System.Windows.Forms.TextBox]$OutputBox,
+        [string]$SessionName = "_EmbeddedCommands",
+        [string]$TimerVariable,
+        [string]$ProcessVariable,
+        [string]$FilesVariable,
+        [string]$DialogTitle = "Embedded Output",
+        [string]$RunningMessage = "A command is still running. Stop it and run the new command?",
+        [string]$LogPrefix = "Embedded command"
     )
 
     if(!$Command){
         return
     }
 
-    if($script:QuickOutputTimer){
+    $existingTimer = Get-Variable -Name $TimerVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+    if($existingTimer){
         try {
-            $script:QuickOutputTimer.Stop()
-            $script:QuickOutputTimer.Dispose()
+            $existingTimer.Stop()
+            $existingTimer.Dispose()
         }
         catch {}
-        $script:QuickOutputTimer = $null
+        Set-Variable -Name $TimerVariable -Scope Script -Value $null
     }
 
-    if($script:QuickOutputProcess -and !$script:QuickOutputProcess.HasExited){
+    $existingProcess = Get-Variable -Name $ProcessVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+    if($existingProcess -and !$existingProcess.HasExited){
         $choice = [System.Windows.Forms.MessageBox]::Show(
-            "A quick target check is still running. Stop it and run the new check?",
-            "Quick Target Checks",
+            $RunningMessage,
+            $DialogTitle,
             [System.Windows.Forms.MessageBoxButtons]::YesNo,
             [System.Windows.Forms.MessageBoxIcon]::Question
         )
 
         if($choice -ne [System.Windows.Forms.DialogResult]::Yes){
-            Add-GUILog "Quick target check still running."
+            Add-GUILog "$LogPrefix still running."
             return
         }
 
-        try { $script:QuickOutputProcess.Kill() } catch {}
+        try { $existingProcess.Kill() } catch {}
     }
 
-    $sessionRoot = Join-Path (Get-NTKTempOutputRoot) "_QuickChecks"
+    $sessionRoot = Join-Path (Get-NTKTempOutputRoot) $SessionName
     if(!(Test-Path $sessionRoot)){
         New-Item -ItemType Directory -Path $sessionRoot -Force | Out-Null
     }
@@ -2705,8 +2741,8 @@ function Start-GUIQuickEmbeddedCommand {
     $stdout = Join-Path $sessionRoot "$token.out.txt"
     $stderr = Join-Path $sessionRoot "$token.err.txt"
 
-    Set-GUIQuickOutput -Title $Title -Text "Running..."
-    Add-GUILog "Running quick check: $Title"
+    Set-GUIEmbeddedCommandOutput -OutputBox $OutputBox -Title $Title -Text "Running..."
+    Add-GUILog ("{0}: {1}" -f $LogPrefix,$Title)
 
     try {
         $process = Start-Process `
@@ -2717,9 +2753,9 @@ function Start-GUIQuickEmbeddedCommand {
             -RedirectStandardError $stderr `
             -PassThru
 
-        $script:QuickOutputProcess = $process
+        Set-Variable -Name $ProcessVariable -Scope Script -Value $process
         Start-GUIBusyIndicator -Message $Title
-        $script:QuickOutputFiles = @{
+        Set-Variable -Name $FilesVariable -Scope Script -Value @{
             Title = $Title
             StdOut = $stdout
             StdErr = $stderr
@@ -2728,43 +2764,74 @@ function Start-GUIQuickEmbeddedCommand {
         $timer = New-Object System.Windows.Forms.Timer
         $timer.Interval = 500
         $timer.Add_Tick({
-            if(!$script:QuickOutputProcess){
-                $script:QuickOutputTimer.Stop()
-                $script:QuickOutputTimer.Dispose()
-                $script:QuickOutputTimer = $null
+            $currentTimer = Get-Variable -Name $TimerVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            $currentProcess = Get-Variable -Name $ProcessVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            $currentFiles = Get-Variable -Name $FilesVariable -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            if(!$currentProcess){
+                $currentTimer.Stop()
+                $currentTimer.Dispose()
+                Set-Variable -Name $TimerVariable -Scope Script -Value $null
                 Stop-GUIBusyIndicator
                 return
             }
 
-            if($script:QuickOutputProcess.HasExited){
-                $script:QuickOutputTimer.Stop()
-                $script:QuickOutputTimer.Dispose()
-                $script:QuickOutputTimer = $null
+            if($currentProcess.HasExited){
+                $currentTimer.Stop()
+                $currentTimer.Dispose()
+                Set-Variable -Name $TimerVariable -Scope Script -Value $null
 
-                $outText = if(Test-Path $script:QuickOutputFiles.StdOut){ Get-Content -Raw -Path $script:QuickOutputFiles.StdOut -ErrorAction SilentlyContinue }else{ "" }
-                $errText = if(Test-Path $script:QuickOutputFiles.StdErr){ Get-Content -Raw -Path $script:QuickOutputFiles.StdErr -ErrorAction SilentlyContinue }else{ "" }
-                $exitCode = $script:QuickOutputProcess.ExitCode
+                $outText = if(Test-Path $currentFiles.StdOut){ Get-Content -Raw -Path $currentFiles.StdOut -ErrorAction SilentlyContinue }else{ "" }
+                $errText = if(Test-Path $currentFiles.StdErr){ Get-Content -Raw -Path $currentFiles.StdErr -ErrorAction SilentlyContinue }else{ "" }
+                $exitCode = $currentProcess.ExitCode
                 $combined = @(
                     if($outText){ $outText.TrimEnd() }
                     if($errText){ "ERROR OUTPUT:`r`n" + $errText.TrimEnd() }
                     "Exit code: $exitCode"
                 ) -join "`r`n`r`n"
 
-                Set-GUIQuickOutput -Title $script:QuickOutputFiles.Title -Text $combined
-                Add-GUILog "Quick check completed: $($script:QuickOutputFiles.Title)"
-                $script:QuickOutputProcess = $null
-                $script:QuickOutputFiles = $null
+                Set-GUIEmbeddedCommandOutput -OutputBox $OutputBox -Title $currentFiles.Title -Text $combined
+                Add-GUILog ("{0} completed: {1}" -f $LogPrefix,$currentFiles.Title)
+                Set-Variable -Name $ProcessVariable -Scope Script -Value $null
+                Set-Variable -Name $FilesVariable -Scope Script -Value $null
                 Stop-GUIBusyIndicator
             }
-        })
+        }.GetNewClosure())
 
-        $script:QuickOutputTimer = $timer
+        Set-Variable -Name $TimerVariable -Scope Script -Value $timer
         $timer.Start()
     }
     catch {
-        Set-GUIQuickOutput -Title $Title -Text "Failed to start.`r`n`r`n$($_.Exception.Message)"
-        Add-GUILog "Quick check failed to start: $($_.Exception.Message)"
+        Set-GUIEmbeddedCommandOutput -OutputBox $OutputBox -Title $Title -Text "Failed to start.`r`n`r`n$($_.Exception.Message)"
+        Add-GUILog "$LogPrefix failed to start: $($_.Exception.Message)"
     }
+}
+
+function Set-GUIQuickOutput {
+    param(
+        [string]$Title,
+        [string]$Text
+    )
+
+    Set-GUIEmbeddedCommandOutput -OutputBox $script:QuickOutputBox -Title $Title -Text $Text
+}
+
+function Start-GUIQuickEmbeddedCommand {
+    param(
+        [string]$Title,
+        [string]$Command
+    )
+
+    Start-GUIEmbeddedCommand `
+        -Title $Title `
+        -Command $Command `
+        -OutputBox $script:QuickOutputBox `
+        -SessionName "_QuickChecks" `
+        -TimerVariable "QuickOutputTimer" `
+        -ProcessVariable "QuickOutputProcess" `
+        -FilesVariable "QuickOutputFiles" `
+        -DialogTitle "Quick Target Checks" `
+        -RunningMessage "A quick target check is still running. Stop it and run the new check?" `
+        -LogPrefix "Quick check"
 }
 
 function Invoke-GUIQuickTcping {

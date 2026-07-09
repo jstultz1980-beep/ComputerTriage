@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0055 Shared Embedded Output Pattern and activated TASK-0056 Triage Guided Workflow Polish.
+- Added reusable embedded command-output helpers and converted Quick Target Checks to use them.
+- Updated toolkit build metadata for TASK-0055.
 - Completed TASK-0061 Directory Page Layout Polish and activated TASK-0055 Shared Embedded Output Pattern.
 - Compacted the Directory page status area, removed the Directory refresh button, and preserved domain/policy actions and tools.
 - Added queued tasks for computer data push/pull, Add-Ons concept testing, and product naming options from new punch-list entries.

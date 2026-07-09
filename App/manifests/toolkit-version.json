@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709081734,
-    "SourceUpdatedAt":  "2026-07-09T08:17:34.5575569-05:00",
-    "ReleaseNotes":  "Polished Directory page layout and removed Directory refresh button."
+    "Build":  20260709082259,
+    "SourceUpdatedAt":  "2026-07-09T08:22:59.4655021-05:00",
+    "ReleaseNotes":  "Added shared embedded command output helper and converted Quick Target Checks to use it."
 }
