@@ -154,7 +154,8 @@ Current UI work:
 - TASK-0021 completed HEPHAESTUS rule catalog expansion.
 - TASK-0065 completed UI regression polish from the latest punch-list additions.
 - TASK-0066 completed RapidAssist naming selection.
-- No queued tasks remain.
+- TASK-0067 completed UI feedback corrections from user verification.
+- Wi-Fi status-bar behavior still needs verification on a computer with Wi-Fi.
 
 ## Phase 10 - Release Hardening
 Status: Planned

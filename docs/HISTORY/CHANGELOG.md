@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0067 UI Feedback Corrections.
+- Replaced the blank status-bar progress box with fixed-width `Working` and spinner labels, restored the Windows Update status row, made Windows Update Service Health show explicit state text, changed Settings toolkit-size refresh to an inline icon, and split Triage instruction heading/body weights.
+- Updated toolkit build metadata for TASK-0067.
 - Completed TASK-0066 RapidAssist Naming Selection.
 - Recorded RapidAssist as the preferred product naming direction without renaming application files, manifests, windows, package metadata, or branding assets.
 - Completed TASK-0065 UI Regression Polish and activated TASK-0066 RapidAssist Naming Selection.

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709093728,
-    "SourceUpdatedAt":  "2026-07-09T09:37:28.5536271-05:00",
-    "ReleaseNotes":  "Polished UI regressions from the latest punch-list pass."
+    "Build":  20260709133102,
+    "SourceUpdatedAt":  "2026-07-09T13:31:02.5579110-05:00",
+    "ReleaseNotes":  "Corrected UI feedback from the latest polish pass."
 }

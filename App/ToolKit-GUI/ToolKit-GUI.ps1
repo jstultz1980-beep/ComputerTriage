@@ -200,10 +200,11 @@ $script:DriverUpdateGrid = $null
 $script:DriverUpdateStatusLabel = $null
 $script:GUIBusyCount = 0
 $script:GUIBusyLabel = $null
+$script:GUIBusySpinnerLabel = $null
 $script:GUIBusyProgress = $null
 $script:GUIBusyTimer = $null
 $script:GUIBusyFrame = 0
-$script:GUIBusyFrames = @("Working |","Working /","Working -","Working \\")
+$script:GUIBusyFrames = @("|","/","-","\")
 $script:SafeRunnerSessions = New-Object System.Collections.ArrayList
 $script:RootLayout = $null
 $script:HeaderPanel = $null
@@ -1695,14 +1696,15 @@ function Start-GUIBusyIndicator {
 
     $script:GUIBusyCount++
     if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
-        $script:GUIBusyLabel.Text = "$Message..."
+        $script:GUIBusyLabel.Text = "Working"
         $script:GUIBusyLabel.Visible = $true
     }
+    if($script:GUIBusySpinnerLabel -and !$script:GUIBusySpinnerLabel.IsDisposed){
+        $script:GUIBusySpinnerLabel.Text = $script:GUIBusyFrames[$script:GUIBusyFrame]
+        $script:GUIBusySpinnerLabel.Visible = $true
+    }
     if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
-        $script:GUIBusyProgress.Visible = $true
-        $script:GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
-        $script:GUIBusyProgress.MarqueeAnimationSpeed = 28
-        $script:GUIBusyProgress.Value = 0
+        $script:GUIBusyProgress.Visible = $false
     }
     try { [System.Windows.Forms.Application]::DoEvents() } catch {}
 
@@ -1718,12 +1720,10 @@ function Start-GUIBusyIndicator {
         }
 
         $script:GUIBusyFrame = ($script:GUIBusyFrame + 1) % $script:GUIBusyFrames.Count
-        $script:GUIBusyLabel.Text = $script:GUIBusyFrames[$script:GUIBusyFrame]
-        if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
-            $script:GUIBusyProgress.Visible = $true
-            $script:GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
-            $script:GUIBusyProgress.MarqueeAnimationSpeed = 28
-            try { $script:GUIBusyProgress.ProgressBar.Refresh() } catch {}
+        $script:GUIBusyLabel.Text = "Working"
+        if($script:GUIBusySpinnerLabel -and !$script:GUIBusySpinnerLabel.IsDisposed){
+            $script:GUIBusySpinnerLabel.Text = $script:GUIBusyFrames[$script:GUIBusyFrame]
+            $script:GUIBusySpinnerLabel.Visible = $true
         }
     })
     $script:GUIBusyTimer = $timer
@@ -1750,6 +1750,9 @@ function Stop-GUIBusyIndicator {
     }
     if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
         $script:GUIBusyLabel.Visible = $false
+    }
+    if($script:GUIBusySpinnerLabel -and !$script:GUIBusySpinnerLabel.IsDisposed){
+        $script:GUIBusySpinnerLabel.Visible = $false
     }
 }
 
@@ -11009,7 +11012,7 @@ function Build-WindowsUpdatePage {
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,82))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,52))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,48))) | Out-Null
     $Page.Controls.Add($layout)
@@ -11023,7 +11026,7 @@ function Build-WindowsUpdatePage {
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::AutoSize))) | Out-Null
     $top.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
-    $top.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $top.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,30))) | Out-Null
     $layout.Controls.Add($top,0,0)
     $layout.SetColumnSpan($top,2)
 
@@ -11044,8 +11047,8 @@ function Build-WindowsUpdatePage {
     $script:WUStatusLabel = New-Object System.Windows.Forms.Label
     $WUStatusLabel.Text = "Windows Update ready."
     $WUStatusLabel.Dock = "Fill"
-    $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,3,4,0)
-    $WUStatusLabel.TextAlign = "MiddleLeft"
+    $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,2,4,0)
+    $WUStatusLabel.TextAlign = "MiddleCenter"
     $WUStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI",9.5)
     $WUStatusLabel.ForeColor = $script:GUITheme.MutedText
     $WUStatusLabel.AutoEllipsis = $true
@@ -11188,19 +11191,6 @@ function Get-GUIWifiSignalInfo {
 function Format-GUIWifiSignalText {
     param($Info)
 
-    if(!$Info -or !$Info.Available){
-        return "Wi-Fi: ●"
-    }
-    if(!$Info.Connected -or $null -eq $Info.Signal){
-        return "Wi-Fi: ●"
-    }
-
-    return "Wi-Fi: ●"
-}
-
-function Format-GUIWifiSignalText {
-    param($Info)
-
     $dot = [string]([char]0x25CF)
     return "Wi-Fi: $dot"
 }
@@ -11303,7 +11293,7 @@ function Update-GUIWindowsUpdateHealthIndicator {
     }
 
     $health = Get-GUIWindowsUpdateServiceHealth
-    $script:WUHealthLabel.Text = "{0}  {1}" -f ([char]0x25CF),$health.Text
+    $script:WUHealthLabel.Text = "{0} {1}: {2}" -f ([char]0x25CF),$health.Text,$health.StateText
     $script:WUHealthLabel.ForeColor = $health.Color
     $script:WUHealthLabel.Tag = $health
     if($health.RepairRecommended -and $script:WUStatusLabel -and !$script:WUStatusLabel.IsDisposed){
@@ -11856,7 +11846,7 @@ function Build-WiFiToolsPage {
     $WifiPageStatusLabel.Width = 82
     $WifiPageStatusLabel.TextAlign = "MiddleRight"
     $WifiPageStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",11,[System.Drawing.FontStyle]::Bold)
-    $WifiPageStatusLabel.Text = "Wi-Fi: ●"
+    $WifiPageStatusLabel.Text = "Wi-Fi: $([string]([char]0x25CF))"
     $WifiPageStatusLabel.ForeColor = $script:GUITheme.MutedText
     $statusPanel.Controls.Add($WifiPageStatusLabel)
 
@@ -13428,18 +13418,42 @@ function Build-TriagePage {
     $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $runGroup.Controls.Add($runLayout)
 
-    $quickStep = New-GUILabel "Quick Triage`r`nUse first for normal walk-up diagnostics. It collects the core evidence package with the least waiting."
+    $quickStep = New-Object System.Windows.Forms.TableLayoutPanel
     $quickStep.Dock = "Fill"
-    $quickStep.ForeColor = $script:GUITheme.MutedText
-    $quickStep.TextAlign = "TopLeft"
-    $quickStep.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $quickStep.ColumnCount = 1
+    $quickStep.RowCount = 2
+    $quickStep.Margin = New-Object System.Windows.Forms.Padding(0)
+    $quickStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,22))) | Out-Null
+    $quickStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $quickHeading = New-GUILabel "Quick Triage"
+    $quickHeading.Dock = "Fill"
+    $quickHeading.TextAlign = "BottomLeft"
+    $quickHeading.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $quickBody = New-GUILabel "Use first for normal walk-up diagnostics. It collects the core evidence package with the least waiting."
+    $quickBody.Dock = "Fill"
+    $quickBody.TextAlign = "TopLeft"
+    $quickBody.ForeColor = $script:GUITheme.MutedText
+    [void]$quickStep.Controls.Add($quickHeading,0,0)
+    [void]$quickStep.Controls.Add($quickBody,0,1)
     $runLayout.Controls.Add($quickStep,0,0)
 
-    $fullStep = New-GUILabel "Full Triage`r`nUse when Quick Triage does not explain the issue or escalation needs deeper local evidence."
+    $fullStep = New-Object System.Windows.Forms.TableLayoutPanel
     $fullStep.Dock = "Fill"
-    $fullStep.ForeColor = $script:GUITheme.MutedText
-    $fullStep.TextAlign = "TopLeft"
-    $fullStep.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $fullStep.ColumnCount = 1
+    $fullStep.RowCount = 2
+    $fullStep.Margin = New-Object System.Windows.Forms.Padding(0)
+    $fullStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,22))) | Out-Null
+    $fullStep.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $fullHeading = New-GUILabel "Full Triage"
+    $fullHeading.Dock = "Fill"
+    $fullHeading.TextAlign = "BottomLeft"
+    $fullHeading.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $fullBody = New-GUILabel "Use when Quick Triage does not explain the issue or escalation needs deeper local evidence."
+    $fullBody.Dock = "Fill"
+    $fullBody.TextAlign = "TopLeft"
+    $fullBody.ForeColor = $script:GUITheme.MutedText
+    [void]$fullStep.Controls.Add($fullHeading,0,0)
+    [void]$fullStep.Controls.Add($fullBody,0,1)
     $runLayout.Controls.Add($fullStep,0,1)
 
     $collectTip = New-GUILabel "Keep the toolkit open until the progress bar stops. The completion dialog will point to the newest run and bundle."
@@ -15906,23 +15920,34 @@ function Build-SettingsPage {
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $maintenanceGroup.Controls.Add($maintenanceLayout)
 
+    $sizeRow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $sizeRow.Dock = "Fill"
+    $sizeRow.FlowDirection = "LeftToRight"
+    $sizeRow.WrapContents = $false
+    $sizeRow.AutoScroll = $false
+    $sizeRow.Margin = New-Object System.Windows.Forms.Padding(0)
+    $sizeRow.Padding = New-Object System.Windows.Forms.Padding(0,6,0,0)
+    $maintenanceLayout.Controls.Add($sizeRow,0,0)
+    $maintenanceLayout.SetColumnSpan($sizeRow,2)
+
     $script:ToolkitSizeLabel = New-GUILabel "Toolkit size: calculating..."
-    $ToolkitSizeLabel.Dock = "Fill"
+    $ToolkitSizeLabel.AutoSize = $true
+    $ToolkitSizeLabel.Dock = "None"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
-    $ToolkitSizeLabel.AutoSize = $false
-    $ToolkitSizeLabel.AutoEllipsis = $true
-    $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,0)
+    $ToolkitSizeLabel.Margin = New-Object System.Windows.Forms.Padding(0,0,4,0)
+    $sizeRow.Controls.Add($ToolkitSizeLabel)
 
-    $sizeRefreshButton = New-GUIButton "↻" { Start-GUIToolkitSizeRefresh }
-    $sizeRefreshButton.Text = [string]([char]0x21BB)
-    $sizeRefreshButton.Dock = "Right"
-    $sizeRefreshButton.Width = 38
-    $sizeRefreshButton.Height = 30
-    $sizeRefreshButton.Margin = New-Object System.Windows.Forms.Padding(4,3,0,3)
-    Set-GUIButtonChrome -Button $sizeRefreshButton -Compact -Subtle
-    $sizeRefreshButton.Font = New-Object System.Drawing.Font("Segoe UI Symbol",12,[System.Drawing.FontStyle]::Bold)
-    $maintenanceLayout.Controls.Add($sizeRefreshButton,1,0)
+    $sizeRefreshIcon = New-Object System.Windows.Forms.Label
+    $sizeRefreshIcon.AutoSize = $true
+    $sizeRefreshIcon.Text = [string]([char]0x21BB)
+    $sizeRefreshIcon.Font = New-Object System.Drawing.Font("Segoe UI Symbol",10,[System.Drawing.FontStyle]::Bold)
+    $sizeRefreshIcon.ForeColor = $script:GUITheme.AccentDark
+    $sizeRefreshIcon.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $sizeRefreshIcon.Margin = New-Object System.Windows.Forms.Padding(2,0,0,0)
+    $sizeRefreshIcon.Add_Click({ Start-GUIToolkitSizeRefresh })
+    if($script:ToolTip){ $script:ToolTip.SetToolTip($sizeRefreshIcon,"Recalculate toolkit size.") }
+    $sizeRow.Controls.Add($sizeRefreshIcon)
 
     $toolkitAppsButton = New-GUIButton "App Manager" { Show-GUICustomToolsWindow }
     $toolkitAppsButton.Dock = "Fill"
@@ -16025,7 +16050,7 @@ function Set-GUIFallbackButtonToolTips {
         "Reset Defaults" = "Restore the default Settings tab choices. Click Apply Settings to save them."
         "Remove Client Data" = "Permanently remove collected client reports, profiles, diagnostic output, dumps, and logs after two confirmations."
         "Transfer Client Data" = "Copy reports, profiles, triage runs, logs, and diagnostic outputs into another Network Toolkit copy without copying apps or program files."
-        "↻" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
+        "$([string]([char]0x21BB))" = "Recalculate the portable toolkit size, excluding Git metadata and any Release package folder."
         "Scan Computer" = "Scan local Windows, Office, and application registration locations for recoverable license entries."
         "Copy Key" = "Copy the selected license or registration value to the clipboard."
         "Key Report" = "Open the latest confidential Software Key Finder HTML report."
@@ -16383,16 +16408,27 @@ function Build-Form {
     $script:StatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
     $StatusLabel.Text = "Ready"
     $StatusLabel.Spring = $true
+    $StatusLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
     $script:WifiStatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
-    $WifiStatusLabel.Text = "Wi-Fi: ●"
+    $WifiStatusLabel.Text = "Wi-Fi: $([string]([char]0x25CF))"
     $WifiStatusLabel.Spring = $false
     $WifiStatusLabel.ForeColor = $script:GUITheme.MutedText
     $WifiStatusLabel.Margin = New-Object System.Windows.Forms.Padding(8,0,12,0)
     $WifiStatusLabel.ToolTipText = "Wi-Fi status"
     $script:GUIBusyLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
     $GUIBusyLabel.Text = "Working"
+    $GUIBusyLabel.AutoSize = $false
+    $GUIBusyLabel.Width = 62
+    $GUIBusyLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleRight
     $GUIBusyLabel.Visible = $false
     $GUIBusyLabel.ForeColor = $script:GUITheme.AccentDark
+    $script:GUIBusySpinnerLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
+    $GUIBusySpinnerLabel.Text = "|"
+    $GUIBusySpinnerLabel.AutoSize = $false
+    $GUIBusySpinnerLabel.Width = 18
+    $GUIBusySpinnerLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $GUIBusySpinnerLabel.Visible = $false
+    $GUIBusySpinnerLabel.ForeColor = $script:GUITheme.AccentDark
     $script:GUIBusyProgress = New-Object System.Windows.Forms.ToolStripProgressBar
     $GUIBusyProgress.Width = 96
     $GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
@@ -16403,7 +16439,7 @@ function Build-Form {
     $status.Items.Add($StatusLabel) | Out-Null
     $status.Items.Add($WifiStatusLabel) | Out-Null
     $status.Items.Add($GUIBusyLabel) | Out-Null
-    $status.Items.Add($GUIBusyProgress) | Out-Null
+    $status.Items.Add($GUIBusySpinnerLabel) | Out-Null
     $root.Controls.Add($status,0,3)
     Update-GUIToolkitVersionLabel
 

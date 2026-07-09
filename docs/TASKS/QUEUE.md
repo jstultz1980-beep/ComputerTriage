@@ -93,6 +93,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Completed | Expanded deterministic local analysis rules for network, updates, security, services, and domain-health evidence. |
 | `TASK-0065-UI-Regression-Polish` | Completed | Cleaned up visible UI regressions from punch-list items 36 through 46. |
 | `TASK-0066-RapidAssist-Naming-Selection` | Completed | Recorded RapidAssist as the preferred product naming direction with no app rename. |
+| `TASK-0067-UI-Feedback-Corrections` | Completed | Corrected status-bar activity, Windows Update status/health, Settings size refresh, and Triage instruction weighting. |
 
 ## Reconciliation Decision
 

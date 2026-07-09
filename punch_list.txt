@@ -50,4 +50,10 @@
 44. ~~Remove the Wifi Indicator from the top right of the wifi page.~~
 45. ~~The Wifi Indicator Icon got messed up.~~
 46. ~~Quick Triage Instructions: make the headings for each step bold.~~
-47. 
+47. ~~Status/Working indicator still does not visibly indicate work and its text/indicator shifts horizontally.~~
+48. ~~Windows Update Service Health does not visibly indicate state.~~
+49. ~~Windows Update status message under the buttons is missing or too compressed.~~
+50. ~~Settings toolkit-size refresh should be an inline icon immediately to the right of the size text, not a button.~~
+51. ~~Toolkit size must remain one line without wrapping.~~
+52. ~~Triage instruction headings should be bold, but the body paragraphs should remain regular weight.~~
+53. Wi-Fi status-bar behavior still needs testing on a computer with Wi-Fi.

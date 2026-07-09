@@ -246,3 +246,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0236 | 2026-07-09 | TASK-0065 / TASK-0066 | Task System | +1 | Completed TASK-0065 and activated TASK-0066 as the next single active task for RapidAssist naming selection. |
 | CHG-0237 | 2026-07-09 | TASK-0066 | Documentation | +1 | Recorded RapidAssist as the preferred product naming direction with no app rename. |
 | CHG-0238 | 2026-07-09 | TASK-0066 | Task System | +1 | Completed TASK-0066 with no queued implementation task remaining. |
+| CHG-0239 | 2026-07-09 | TASK-0067 | UI | +1 | Corrected status-bar activity, Windows Update status/health display, Settings toolkit-size refresh layout, and Triage instruction heading weight. |
+| CHG-0240 | 2026-07-09 | TASK-0067 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for UI feedback corrections. |
+| CHG-0241 | 2026-07-09 | TASK-0067 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for UI feedback corrections. |
+| CHG-0242 | 2026-07-09 | TASK-0067 | Documentation | +1 | Updated TASK-0067, queue, roadmap, changelog, ledger, punch list, and handoff records for UI feedback corrections. |
+| CHG-0243 | 2026-07-09 | TASK-0067 | Task System | +1 | Completed TASK-0067 with only external Wi-Fi hardware verification remaining on the punch list. |
