@@ -4,7 +4,7 @@ This ledger records accepted engineering changes that increment subsystem audit 
 
 A subsystem counter reaching `25 / 25` requires a new audit before additional implementation work continues.
 
-After an audit is completed, the audited subsystem counter resets to `0 / 10` and the audit completion is recorded here.
+After an audit is completed, the audited subsystem counter resets to `0 / 25` and the audit completion is recorded here.
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
@@ -195,3 +195,4 @@ After an audit is completed, the audited subsystem counter resets to `0 / 10` an
 | CHG-0185 | 2026-07-05 | PROJECT / TASK-0060 / TASK-0061 | Repository Governance | +1 | Raised the audit gate threshold from 10 changes to 25 changes. |
 | CHG-0186 | 2026-07-05 | TASK-0060 / TASK-0061 | Task System | +1 | Archived TASK-0060 because the raised threshold cleared the audit gate and activated TASK-0061 for Directory page layout polish. |
 | CHG-0187 | 2026-07-05 | TASK-0061 | Roadmap/Backlog | +1 | Mapped new Directory punch-list feedback into TASK-0061 and moved it before shared embedded-output work. |
+| CHG-0188 | 2026-07-09 | PROJECT | Repository Governance | +1 | Added the `Next 25` prompt shortcut rule and corrected the forward-looking audit reset text to `0 / 25`. |

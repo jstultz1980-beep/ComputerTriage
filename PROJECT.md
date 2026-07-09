@@ -13,6 +13,13 @@ section. That prompt must tell the next bot to read repository files in the
 required startup order, follow the active task listed in `docs/HANDOFF.md`, and
 ignore chat history unless the same information exists in the repository.
 
+## Prompt Shortcut Rule
+When the user prompts exactly or substantially with `Next 25`, treat it as this reusable instruction:
+
+```text
+Read the project source-of-truth files first. Check punch_list.txt for new additions, merge any additions into the existing task list or create focused tasks if needed, reorder the task queue into the most logical implementation sequence, then proceed through tasks until the next 25-change audit gate is reached. Do not stop for user testing between tasks. Hold the full "Test This" list until stopped at the audit gate. Commit each completed task locally, but do not push unless explicitly asked.
+```
+
 ## Required Startup Sequence
 1. Read this file.
 2. Read `docs/PROJECT-CHARTER.md`.
@@ -69,7 +76,7 @@ A subsystem change is an accepted engineering change that materially affects tha
 When any subsystem counter reaches `25 / 25`, no new implementation work may begin until a new audit task is completed.
 
 After the audit is completed:
-1. The audited subsystem counter resets to `0 / 10`.
+1. The audited subsystem counter resets to `0 / 25`.
 2. `docs/HANDOFF.md` is updated.
 3. `docs/HISTORY/CHANGE-LEDGER.md` records the audit completion.
 4. Normal task work may resume.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-09
+- Added the `Next 25` prompt shortcut rule for punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
+- Corrected forward-looking audit reset wording to `0 / 25`.
+
 ## 2026-07-05
 - Raised the audit gate threshold from 10 changes to 25 changes and cleared the UI audit gate that had been triggered at 10/10.
 - Added TASK-0061 Directory Page Layout Polish for new Directory punch-list feedback and moved it ahead of shared embedded-output work.

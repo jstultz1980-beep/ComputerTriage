@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0065
+HANDOFF-0066
 
 ## Current Task
 TASK-0061-Directory-Page-Layout-Polish
@@ -46,6 +46,8 @@ TASK-0054 completed the Directory domain identity and AD health status page.
 
 The audit threshold was raised from 10 changes to 25 changes. TASK-0060 was archived before execution because UI is now `10 / 25`, not at the audit threshold.
 
+`Next 25` is now a project prompt shortcut for reading source-of-truth files, reconciling new punch-list additions into tasks, reordering the queue, completing tasks until the next 25-change audit gate, holding the full user test list until stopped, committing locally, and not pushing unless explicitly requested.
+
 Implementation work may resume under the single active task: TASK-0061 Directory Page Layout Polish.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
@@ -68,7 +70,7 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 4 / 25 | No |
+| Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
 | Documentation | 1 / 25 | No |
 | Task System | 8 / 25 | No |
@@ -201,6 +203,8 @@ Scope summary:
 - Archived TASK-0060 before execution because UI is now `10 / 25`.
 - Added TASK-0061 for Directory page layout feedback from punch-list items 30 and 31.
 - Activated TASK-0061 as the next implementation task.
+- Added the `Next 25` prompt shortcut rule to `PROJECT.md`.
+- Corrected forward-looking audit reset wording to `0 / 25`.
 
 ## Blockers
 No active audit gate. Implementation may continue under TASK-0061 only.
@@ -219,6 +223,7 @@ GitHub sync note:
 ## Recommended Commit Message
 ```text
 PROJECT: Raise audit gate to 25 changes
+PROJECT: Add Next 25 prompt shortcut
 ```
 
 ## Next Bot Prompt
@@ -246,6 +251,7 @@ Current task state:
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `10 / 25`, so no audit is currently required.
 - TASK-0060 was archived before execution because the raised threshold cleared the gate.
+- `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - Next queued implementation tasks after TASK-0061 are TASK-0055 through TASK-0058, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
