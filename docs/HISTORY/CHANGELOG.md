@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0056 Triage Guided Workflow Polish and activated TASK-0057 Wi-Fi And Windows Status Polish.
+- Replaced the visible Triage catalog/Technician Notes area with guided Collect, Review, and Submit workflow sections.
+- Preserved top-row Quick Triage, Full Triage, Cancel Run, status/progress, Latest Run, Bundle Folder, and Validate Setup access.
+- Updated toolkit build metadata for TASK-0056.
 - Completed TASK-0055 Shared Embedded Output Pattern and activated TASK-0056 Triage Guided Workflow Polish.
 - Added reusable embedded command-output helpers and converted Quick Target Checks to use them.
 - Updated toolkit build metadata for TASK-0055.

@@ -1,7 +1,7 @@
 # TASK-0057 - Wi-Fi And Windows Status Polish
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

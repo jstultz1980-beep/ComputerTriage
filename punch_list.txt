@@ -27,8 +27,8 @@
 21. Change the refresh size button on the settings page to the refresh circular arrow.
 22. Make the Tab ordering more compact and slick.
 23. Get rid of the Registered Commands display.
-24. We need to fix the flow of the Triage Page. The instructions should be on the page in such a way that it guides the user through the triage process.
-25. Triage page Technician Notes can go away.
+24. ~~We need to fix the flow of the Triage Page. The instructions should be on the page in such a way that it guides the user through the triage process.~~
+25. ~~Triage page Technician Notes can go away.~~
 26. Make the logo a bit bigger. It is hard to make it out being that small.
 27. ~~Every tab has lag the first time i load it after launch. We need to be constantly trying to reduce the lag.~~
 28. Buttons need to have a smaller font so that their physical size on the page can shrink.

@@ -1,7 +1,7 @@
 # TASK-0056 - Triage Guided Workflow Polish
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -26,7 +26,14 @@ Make the Triage tab guide a junior technician through the intended collection wo
 - ARGUS or HEPHAESTUS changes.
 
 ## Acceptance Criteria
-- [ ] Triage tab presents a clear run, bundle, submit flow.
-- [ ] Technician Notes no longer waste page space.
-- [ ] Tool catalog noise is reduced or hidden from normal workflow.
-- [ ] Parser, smoke, and button-smoke validation pass.
+- [x] Triage tab presents a clear run, bundle, submit flow.
+- [x] Technician Notes no longer waste page space.
+- [x] Tool catalog noise is reduced or hidden from normal workflow.
+- [x] Parser, smoke, and button-smoke validation pass.
+
+## Completion Notes
+- Replaced the visible catalog-first Triage page body with `Collect`, `Review`, and `Submit` workflow sections.
+- Kept Quick Triage, Full Triage, Cancel Run, status text, and progress at the top of the tab.
+- Preserved Latest Run, Bundle Folder, and Validate Setup access.
+- Removed the visible Technician Notes area and kept the backing catalog grid hidden for existing status refresh plumbing.
+- Updated toolkit build metadata and validated parser, smoke, and button-smoke checks.

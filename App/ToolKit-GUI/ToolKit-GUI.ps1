@@ -13228,14 +13228,14 @@ function Build-TriagePage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.ColumnCount = 2
-    $layout.RowCount = 3
+    $layout.ColumnCount = 3
+    $layout.RowCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(12)
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,64))) | Out-Null
-    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,36))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,34))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
+    $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,72))) | Out-Null
     $Page.Controls.Add($layout)
 
     $actionLayout = New-Object System.Windows.Forms.TableLayoutPanel
@@ -13250,7 +13250,7 @@ function Build-TriagePage {
     $actionLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
     $actionLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($actionLayout,0,0)
-    $layout.SetColumnSpan($actionLayout,2)
+    $layout.SetColumnSpan($actionLayout,3)
 
     $quickButton = New-GUIButton "Quick Triage" { Start-GUITriageRun -Profile "Quick" }
     $quickButton.Dock = "Fill"
@@ -13278,13 +13278,7 @@ function Build-TriagePage {
     $TriageProgressBar.Margin = New-Object System.Windows.Forms.Padding(8,8,0,8)
     $actionLayout.Controls.Add($TriageProgressBar,4,0)
 
-    $toolGroup = New-Object System.Windows.Forms.GroupBox
-    $toolGroup.Text = "Triage Tool Catalog"
-    $toolGroup.Dock = "Fill"
-    $layout.Controls.Add($toolGroup,0,1)
-
     $script:TriageToolGrid = New-Object System.Windows.Forms.DataGridView
-    $TriageToolGrid.Dock = "Fill"
     $TriageToolGrid.ReadOnly = $true
     $TriageToolGrid.AllowUserToAddRows = $false
     $TriageToolGrid.AllowUserToDeleteRows = $false
@@ -13302,24 +13296,58 @@ function Build-TriagePage {
     $TriageToolGrid.Columns["Executables"].FillWeight = 10
     $TriageToolGrid.Columns["Source"].FillWeight = 18
     $TriageToolGrid.Columns["Notes"].FillWeight = 34
-    $toolGroup.Controls.Add($TriageToolGrid)
+    $TriageToolGrid.Visible = $false
 
-    $workflowGroup = New-Object System.Windows.Forms.GroupBox
-    $workflowGroup.Text = "Output And AI Workflow"
-    $workflowGroup.Dock = "Fill"
-    $layout.Controls.Add($workflowGroup,1,1)
+    $runGroup = New-Object System.Windows.Forms.GroupBox
+    $runGroup.Text = "1. Collect"
+    $runGroup.Dock = "Fill"
+    $runGroup.Margin = New-Object System.Windows.Forms.Padding(0,0,8,0)
+    $layout.Controls.Add($runGroup,0,1)
 
-    $workflowLayout = New-Object System.Windows.Forms.TableLayoutPanel
-    $workflowLayout.Dock = "Fill"
-    $workflowLayout.ColumnCount = 2
-    $workflowLayout.RowCount = 3
-    $workflowLayout.Padding = New-Object System.Windows.Forms.Padding(12,14,12,12)
-    $workflowLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $workflowLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $workflowLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,36))) | Out-Null
-    $workflowLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,36))) | Out-Null
-    $workflowLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $workflowGroup.Controls.Add($workflowLayout)
+    $runLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $runLayout.Dock = "Fill"
+    $runLayout.ColumnCount = 1
+    $runLayout.RowCount = 3
+    $runLayout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $runLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $runGroup.Controls.Add($runLayout)
+
+    $quickStep = New-GUILabel "Quick Triage`r`nUse first for normal walk-up diagnostics. It collects the core evidence package with the least waiting."
+    $quickStep.Dock = "Fill"
+    $quickStep.ForeColor = $script:GUITheme.MutedText
+    $quickStep.TextAlign = "TopLeft"
+    $runLayout.Controls.Add($quickStep,0,0)
+
+    $fullStep = New-GUILabel "Full Triage`r`nUse when Quick Triage does not explain the issue or escalation needs deeper local evidence."
+    $fullStep.Dock = "Fill"
+    $fullStep.ForeColor = $script:GUITheme.MutedText
+    $fullStep.TextAlign = "TopLeft"
+    $runLayout.Controls.Add($fullStep,0,1)
+
+    $collectTip = New-GUILabel "Keep the toolkit open until the progress bar stops. The completion dialog will point to the newest run and bundle."
+    $collectTip.Dock = "Fill"
+    $collectTip.ForeColor = $script:GUITheme.MutedText
+    $collectTip.TextAlign = "TopLeft"
+    $runLayout.Controls.Add($collectTip,0,2)
+
+    $reviewGroup = New-Object System.Windows.Forms.GroupBox
+    $reviewGroup.Text = "2. Review"
+    $reviewGroup.Dock = "Fill"
+    $reviewGroup.Margin = New-Object System.Windows.Forms.Padding(4,0,4,0)
+    $layout.Controls.Add($reviewGroup,1,1)
+
+    $reviewLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $reviewLayout.Dock = "Fill"
+    $reviewLayout.ColumnCount = 1
+    $reviewLayout.RowCount = 4
+    $reviewLayout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $reviewLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $reviewGroup.Controls.Add($reviewLayout)
 
     foreach($button in @(
         (New-GUIButton "Latest Run" { Open-GUITriageLatestRun }),
@@ -13327,29 +13355,49 @@ function Build-TriagePage {
         (New-GUIButton "Validate Setup" { Invoke-GUITriageValidation })
     )){
         $button.Dock = "Fill"
-        $button.Margin = New-Object System.Windows.Forms.Padding(4,0,4,5)
-        [void]$workflowLayout.Controls.Add($button)
+        $button.Margin = New-Object System.Windows.Forms.Padding(0,0,0,6)
+        [void]$reviewLayout.Controls.Add($button)
     }
 
-    $aiInstructions = New-GUILabel "Suggested flow:`r`n1. Run Quick Triage first; use Full Triage when escalation needs more evidence.`r`n2. Open Bundle Folder after completion.`r`n3. Submit the ZIP bundle to AI with the included prompt for deeper review."
-    $aiInstructions.Dock = "Fill"
-    $aiInstructions.ForeColor = $script:GUITheme.MutedText
-    $aiInstructions.TextAlign = "TopLeft"
-    $workflowLayout.SetColumnSpan($aiInstructions,2)
-    $workflowLayout.Controls.Add($aiInstructions,0,2)
+    $reviewTip = New-GUILabel "Latest Run opens the newest collection folder. Bundle Folder opens the ZIP location used for handoff or AI review."
+    $reviewTip.Dock = "Fill"
+    $reviewTip.ForeColor = $script:GUITheme.MutedText
+    $reviewTip.TextAlign = "TopLeft"
+    $reviewLayout.Controls.Add($reviewTip,0,3)
 
-    $noteGroup = New-Object System.Windows.Forms.GroupBox
-    $noteGroup.Text = "Technician Notes"
-    $noteGroup.Dock = "Fill"
-    $layout.SetColumnSpan($noteGroup,2)
-    $layout.Controls.Add($noteGroup,0,2)
+    $submitGroup = New-Object System.Windows.Forms.GroupBox
+    $submitGroup.Text = "3. Submit"
+    $submitGroup.Dock = "Fill"
+    $submitGroup.Margin = New-Object System.Windows.Forms.Padding(8,0,0,0)
+    $layout.Controls.Add($submitGroup,2,1)
 
-    $note = New-GUILabel "Quick Triage is the default walk-up workflow. Full Triage is for deeper collection when Quick Triage does not explain the issue or when escalation needs more evidence."
-    $note.Dock = "Fill"
-    $note.Margin = New-Object System.Windows.Forms.Padding(12,12,12,12)
-    $note.ForeColor = $script:GUITheme.MutedText
-    $note.TextAlign = "MiddleLeft"
-    $noteGroup.Controls.Add($note)
+    $submitLayout = New-Object System.Windows.Forms.TableLayoutPanel
+    $submitLayout.Dock = "Fill"
+    $submitLayout.ColumnCount = 1
+    $submitLayout.RowCount = 3
+    $submitLayout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $submitLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $submitGroup.Controls.Add($submitLayout)
+
+    $bundleStep = New-GUILabel "Attach the ZIP bundle`r`nThe bundle name includes the computer and timestamp so it is easier to identify after upload."
+    $bundleStep.Dock = "Fill"
+    $bundleStep.ForeColor = $script:GUITheme.MutedText
+    $bundleStep.TextAlign = "TopLeft"
+    $submitLayout.Controls.Add($bundleStep,0,0)
+
+    $promptStep = New-GUILabel "Use the included prompt`r`nSubmit the ZIP with the generated prompt when requesting AI analysis or escalation review."
+    $promptStep.Dock = "Fill"
+    $promptStep.ForeColor = $script:GUITheme.MutedText
+    $promptStep.TextAlign = "TopLeft"
+    $submitLayout.Controls.Add($promptStep,0,1)
+
+    $finishStep = New-GUILabel "Save the response with the ticket or case notes. If more evidence is requested, return here and run Full Triage."
+    $finishStep.Dock = "Fill"
+    $finishStep.ForeColor = $script:GUITheme.MutedText
+    $finishStep.TextAlign = "TopLeft"
+    $submitLayout.Controls.Add($finishStep,0,2)
 
     Start-GUITriageStatusRefresh
 }

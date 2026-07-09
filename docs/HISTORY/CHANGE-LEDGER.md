@@ -207,3 +207,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0197 | 2026-07-09 | TASK-0055 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the shared embedded output pattern. |
 | CHG-0198 | 2026-07-09 | TASK-0055 | Documentation | +1 | Updated TASK-0055, queue, roadmap, changelog, ledger, and handoff records for shared embedded output completion. |
 | CHG-0199 | 2026-07-09 | TASK-0055 / TASK-0056 | Task System | +1 | Completed TASK-0055 and activated TASK-0056 as the next single active implementation task. |
+| CHG-0200 | 2026-07-09 | TASK-0056 | UI | +1 | Reworked the Triage tab body into guided Collect, Review, and Submit sections while hiding normal-view catalog noise and removing Technician Notes. |
+| CHG-0201 | 2026-07-09 | TASK-0056 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Triage guided workflow polish. |
+| CHG-0202 | 2026-07-09 | TASK-0056 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Triage guided workflow polish. |
+| CHG-0203 | 2026-07-09 | TASK-0056 | Documentation | +1 | Updated TASK-0056, queue, roadmap, changelog, ledger, punch list, and handoff records for Triage workflow completion. |
+| CHG-0204 | 2026-07-09 | TASK-0056 / TASK-0057 | Task System | +1 | Completed TASK-0056 and activated TASK-0057 as the next single active implementation task. |
