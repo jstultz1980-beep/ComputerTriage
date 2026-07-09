@@ -1,7 +1,7 @@
 # TASK-0064 - Product Naming Options
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

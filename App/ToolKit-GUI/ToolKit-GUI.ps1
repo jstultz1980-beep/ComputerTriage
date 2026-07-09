@@ -13719,6 +13719,82 @@ function Get-GUISoftwareInstallableTools {
     return @($tools)
 }
 
+function Add-GUISoftwareResourceLinks {
+    param(
+        [System.Windows.Forms.FlowLayoutPanel]$Panel,
+        [switch]$IncludeLabel
+    )
+
+    if($IncludeLabel){
+        $resourceLabel = New-GUILabel "Safe software resources:"
+        $resourceLabel.Width = 132
+        $resourceLabel.TextAlign = 'MiddleLeft'
+        [void]$Panel.Controls.Add($resourceLabel)
+    }
+
+    foreach($resource in @(@{Text='PortableApps.com';Url='https://portableapps.com/apps'},@{Text='Ninite';Url='https://ninite.com/'},@{Text='Chocolatey Search';Url='https://community.chocolatey.org/packages'})){
+        $link = New-Object System.Windows.Forms.LinkLabel
+        $link.Text = $resource.Text
+        $link.AutoSize = $true
+        $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)
+        $link.Tag = $resource.Url
+        $link.Add_LinkClicked({ param($sender,$args) Start-Process $sender.Tag })
+        [void]$Panel.Controls.Add($link)
+    }
+}
+
+function Show-GUIAddOnsConceptWindow {
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Add-Ons"
+    $form.StartPosition = "CenterParent"
+    $form.Size = New-Object System.Drawing.Size(840,520)
+    $form.MinimumSize = New-Object System.Drawing.Size(760,440)
+    $form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $form.BackColor = $script:GUITheme.Page
+    if(Test-Path $GuiIconPath){
+        $form.Icon = New-Object System.Drawing.Icon($GuiIconPath)
+    }
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.RowCount = 3
+    $layout.ColumnCount = 1
+    $layout.Padding = New-Object System.Windows.Forms.Padding(12)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,54))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $form.Controls.Add($layout)
+
+    $intro = New-GUILabel "Installable or extract-needed programs stored in the toolkit. Portable launchers stay on the Software page."
+    $intro.Dock = "Fill"
+    $intro.TextAlign = "MiddleLeft"
+    $intro.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($intro,0,0)
+
+    $toolPanel = New-Object System.Windows.Forms.Panel
+    $toolPanel.Dock = "Fill"
+    $toolPanel.BackColor = $script:GUITheme.Page
+    $layout.Controls.Add($toolPanel,0,1)
+
+    Add-GUICompactToolGrid -Page $toolPanel -Title "Add-Ons: Installable / Extract Needed" -Tools @(Get-GUISoftwareInstallableTools) -Columns 2 -HideSectionHeaders
+
+    $resources = New-Object System.Windows.Forms.FlowLayoutPanel
+    $resources.Dock = "Fill"
+    $resources.WrapContents = $false
+    $resources.Padding = New-Object System.Windows.Forms.Padding(6,7,6,4)
+    $resources.BackColor = $script:GUITheme.Page
+    $layout.Controls.Add($resources,0,2)
+
+    $close = New-GUIButton "Close" { $form.Close() }
+    $close.Width = 90
+    [void]$resources.Controls.Add($close)
+    Add-GUISoftwareResourceLinks -Panel $resources -IncludeLabel
+
+    Apply-GUIThemeToControl -Control $form
+    [void]$form.ShowDialog($script:Form)
+    $form.Dispose()
+}
+
 function Set-GUISoftwareToolSections {
     param([object[]]$Tools)
 
@@ -13792,19 +13868,10 @@ function Build-SoftwareToolsPage {
     $resources.WrapContents = $false
     $resources.Padding = New-Object System.Windows.Forms.Padding(12,6,12,4)
     $resources.BackColor = $script:GUITheme.Page
-    $resourceLabel = New-GUILabel "Safe software resources:"
-    $resourceLabel.Width = 132
-    $resourceLabel.TextAlign = 'MiddleLeft'
-    [void]$resources.Controls.Add($resourceLabel)
-    foreach($resource in @(@{Text='PortableApps.com';Url='https://portableapps.com/apps'},@{Text='Ninite';Url='https://ninite.com/'},@{Text='Chocolatey Search';Url='https://community.chocolatey.org/packages'})){
-        $link = New-Object System.Windows.Forms.LinkLabel
-        $link.Text = $resource.Text
-        $link.AutoSize = $true
-        $link.Margin = New-Object System.Windows.Forms.Padding(12,6,0,0)
-        $link.Tag = $resource.Url
-        $link.Add_LinkClicked({ param($sender,$args) Start-Process $sender.Tag })
-        [void]$resources.Controls.Add($link)
-    }
+    $addOnsButton = New-GUIButton "Add-Ons" { Show-GUIAddOnsConceptWindow }
+    $addOnsButton.Width = 100
+    [void]$resources.Controls.Add($addOnsButton)
+    Add-GUISoftwareResourceLinks -Panel $resources -IncludeLabel
     [void]$layout.Controls.Add($resources,0,2)
 }
 

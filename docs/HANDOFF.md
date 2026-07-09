@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0072
+HANDOFF-0073
 
 ## Current Task
-TASK-0063-Add-Ons-Concept
+TASK-0064-Product-Naming-Options
 
 ## Current Owner
 Codex
@@ -60,7 +60,9 @@ TASK-0058 completed Settings and control polish.
 
 TASK-0062 completed computer data push/pull.
 
-Implementation work may resume under the single active task: TASK-0063 Add-Ons Concept.
+TASK-0063 completed Add-Ons concept testing.
+
+Implementation work may resume under the single active task: TASK-0064 Product Naming Options.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -84,15 +86,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 7 / 25 | No |
-| Task System | 14 / 25 | No |
+| Documentation | 8 / 25 | No |
+| Task System | 15 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 16 / 25 | No |
+| UI | 17 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 7 / 25 | No |
-| Validation/Test Framework | 13 / 25 | No |
+| Build System | 8 / 25 | No |
+| Validation/Test Framework | 14 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -118,25 +120,24 @@ Recently completed work:
 - TASK-0057 completed Wi-Fi and Windows status polish.
 - TASK-0058 completed Settings and control polish.
 - TASK-0062 completed computer data push/pull.
+- TASK-0063 completed Add-Ons concept testing.
 
 Current active work:
-- TASK-0063 is active for Add-Ons concept testing.
+- TASK-0064 is active for product naming options.
 
 Queued implementation/design work, in recommended order:
-- TASK-0064 Product Naming Options.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0063-Add-Ons-Concept`
+`TASK-0064-Product-Naming-Options`
 
 Scope summary:
-- Separate installable/non-portable programs from launchable portable applications.
-- Test whether Add-Ons should be a tab, popup, or another focused UI surface.
-- Preserve the Software tab's launchable/installable placement rules until the new concept proves better.
-- Keep current install/extract-needed information visible enough for technician use.
+- Produce five name options that fit a portable single-computer diagnostic toolkit.
+- Prefer names that support technician trust, speed, and analysis without sounding like a generic network scanner.
+- Record the options for user selection before any app-wide rename.
+- Do not rename files, manifests, windows, or package metadata before the user chooses a name.
 
 ## Queued Work
-- `TASK-0064-Product-Naming-Options` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 
 ## Validation Completed For This Update
@@ -270,9 +271,18 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - Activated TASK-0063 as the next implementation task.
+- Completed TASK-0063 Add Ons Concept.
+- Added a testable Add-Ons popup from the Software page for installable/extract-needed programs.
+- Preserved the existing Software page launchable/installable sections for comparison.
+- Marked punch-list item 33 complete.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0064 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0063 only.
+No active audit gate. Implementation may continue under TASK-0064 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -287,7 +297,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0062: Add computer data push pull
+TASK-0063: Add Add-Ons concept popup
 ```
 
 ## Next Bot Prompt
@@ -305,15 +315,15 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0063-Add-Ons-Concept.md
+7. docs/TASKS/TASK-0064-Product-Naming-Options.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0063-Add-Ons-Concept.
+- Active task: TASK-0064-Product-Naming-Options.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
-- Audit threshold is now `25 / 25`; UI is `16 / 25`, so no audit is currently required.
+- Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
 - TASK-0060 was archived before execution because the raised threshold cleared the gate.
 - `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - TASK-0061 completed Directory page layout polish.
@@ -323,20 +333,21 @@ Current task state:
 - TASK-0057 completed Wi-Fi and Windows status polish.
 - TASK-0058 completed Settings and control polish.
 - TASK-0062 completed computer data push/pull.
-- Next queued implementation tasks after TASK-0063 are TASK-0064, then TASK-0021.
+- TASK-0063 completed Add-Ons concept testing.
+- Next queued implementation task after TASK-0064 is TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0063 only.
+Execute TASK-0064 only.
 
 Scope:
-- Separate installable/non-portable programs from launchable portable applications.
-- Test whether Add-Ons should be a tab, popup, or another focused UI surface.
-- Preserve the Software tab's launchable/installable placement rules until the new concept proves better.
-- Keep current install/extract-needed information visible enough for technician use.
+- Produce five name options that fit a portable single-computer diagnostic toolkit.
+- Prefer names that support technician trust, speed, and analysis without sounding like a generic network scanner.
+- Record the options for user selection before any app-wide rename.
+- Do not rename files, manifests, windows, or package metadata before the user chooses a name.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -348,10 +359,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Add-Ons concept separates installable/non-portable programs from portable launchers.
-- The chosen surface can be tested without disrupting existing Software workflows.
-- Current install/extract-needed information remains accessible.
-- Parser, smoke, and button-smoke validation pass.
+- Five product-name suggestions are recorded.
+- Each suggestion has a short rationale.
+- No application rename happens in this task unless explicitly requested later.
 
 When done, provide:
 - Concise summary of implementation performed.

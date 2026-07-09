@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0063-Add-Ons-Concept` | Codex | Active | Prototype a clearer Add-Ons experience for installable non-portable programs. |
+| `TASK-0064-Product-Naming-Options` | Codex | Active | Record five better product-name options before any rename work. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0064-Product-Naming-Options` | Codex | Queued | Record five better product-name options before any rename work. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
 ## Consolidated Plan
@@ -87,6 +86,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Completed | Polished Windows Update repair status and Wi-Fi LED/network status presentation. |
 | `TASK-0058-Settings-And-Control-Polish` | Completed | Compacted Settings controls, tab strip, header logo, shared buttons, and removed registered-command startup noise. |
 | `TASK-0062-Computer-Data-Push-Pull` | Completed | Added Push/Pull direction selection to the technician-safe client/computer data transfer workflow. |
+| `TASK-0063-Add-Ons-Concept` | Completed | Added a testable Add-Ons popup for installable/extract-needed programs while preserving Software workflows. |
 
 ## Reconciliation Decision
 
@@ -95,4 +95,4 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0063.
+- Current active task is TASK-0064.

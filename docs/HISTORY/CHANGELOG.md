@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0063 Add Ons Concept and activated TASK-0064 Product Naming Options.
+- Added a Software-page Add-Ons popup for installable/extract-needed programs while preserving existing Software sections.
+- Shared safe software resource links between Software and the Add-Ons concept popup.
+- Updated toolkit build metadata for TASK-0063.
 - Completed TASK-0062 Computer Data Push Pull and activated TASK-0063 Add Ons Concept.
 - Reworked Transfer Client Data into a Push/Pull computer-data dialog while preserving the existing diagnostic-data allow-list and manifest output.
 - Validated fake push and pull transfers, parser checks, GUI smoke, and button-smoke.

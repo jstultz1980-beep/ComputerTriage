@@ -36,5 +36,5 @@
 30. ~~Directory Page layout looks like shit and I have to scroll down.~~
 31. ~~Directory page, refresh button can go away.~~
 32. ~~Add an option to push or pull computer data between toolkits. Similar to the update deployed toolkit but for computer data.~~
-33. Installable programs that are not portable should have their own tab called Add-Ons. This could be a popup, it does not actually be a tab. I would like to test this concept and see how it works.
+33. ~~Installable programs that are not portable should have their own tab called Add-Ons. This could be a popup, it does not actually be a tab. I would like to test this concept and see how it works.~~
 34. This Program needs a better name. Come up with 5 suggestions.

@@ -1,7 +1,7 @@
 # TASK-0063 - Add Ons Concept
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -24,7 +24,14 @@ Prototype a clearer Add-Ons experience for installable programs that are not por
 - Removing the existing Software tab until a tested replacement is accepted.
 
 ## Acceptance Criteria
-- [ ] Add-Ons concept separates installable/non-portable programs from portable launchers.
-- [ ] The chosen surface can be tested without disrupting existing Software workflows.
-- [ ] Current install/extract-needed information remains accessible.
-- [ ] Parser, smoke, and button-smoke validation pass.
+- [x] Add-Ons concept separates installable/non-portable programs from portable launchers.
+- [x] The chosen surface can be tested without disrupting existing Software workflows.
+- [x] Current install/extract-needed information remains accessible.
+- [x] Parser, smoke, and button-smoke validation pass.
+
+## Completion Notes
+- Added a testable Add-Ons popup launched from the Software page.
+- The popup shows installable/extract-needed programs separately from launchable portable applications.
+- Kept the existing Software page launchable/installable sections intact for comparison.
+- Shared safe software resource links between the Software footer and Add-Ons popup.
+- Updated toolkit build metadata and validated parser, smoke, and button-smoke checks.

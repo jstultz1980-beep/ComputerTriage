@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709084058,
-    "SourceUpdatedAt":  "2026-07-09T08:40:58.8116870-05:00",
-    "ReleaseNotes":  "Added push and pull direction selection for computer data transfer."
+    "Build":  20260709084356,
+    "SourceUpdatedAt":  "2026-07-09T08:43:56.6728577-05:00",
+    "ReleaseNotes":  "Added a testable Add-Ons popup for installable and extract-needed programs."
 }

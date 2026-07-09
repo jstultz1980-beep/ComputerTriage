@@ -227,3 +227,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0217 | 2026-07-09 | TASK-0062 | Validation/Test Framework | +1 | Validated fake push/pull client-data transfers, parser checks, GUI smoke, and button-smoke behavior. |
 | CHG-0218 | 2026-07-09 | TASK-0062 | Documentation | +1 | Updated TASK-0062, queue, roadmap, changelog, ledger, punch list, and handoff records for computer data push/pull completion. |
 | CHG-0219 | 2026-07-09 | TASK-0062 / TASK-0063 | Task System | +1 | Completed TASK-0062 and activated TASK-0063 as the next single active implementation task. |
+| CHG-0220 | 2026-07-09 | TASK-0063 | UI | +1 | Added a testable Add-Ons popup for installable/extract-needed programs while preserving existing Software workflows. |
+| CHG-0221 | 2026-07-09 | TASK-0063 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for the Add-Ons concept. |
+| CHG-0222 | 2026-07-09 | TASK-0063 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for the Add-Ons concept. |
+| CHG-0223 | 2026-07-09 | TASK-0063 | Documentation | +1 | Updated TASK-0063, queue, roadmap, changelog, ledger, punch list, and handoff records for Add-Ons concept completion. |
+| CHG-0224 | 2026-07-09 | TASK-0063 / TASK-0064 | Task System | +1 | Completed TASK-0063 and activated TASK-0064 as the next single active implementation task. |
