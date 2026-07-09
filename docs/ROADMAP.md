@@ -81,7 +81,7 @@ Completion basis:
 - Validation confirmed JSON outputs parse and deterministic findings are labeled separately from ARGUS inference.
 
 ## Phase 06 - HEPHAESTUS Rule Catalog Expansion
-Status: Planned
+Status: Completed
 
 Expand deterministic rule coverage after the v1 vertical slice exists and validates.
 
@@ -89,6 +89,11 @@ Planned future capabilities:
 - Broader service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
 - Additional normalized JSON outputs.
 - More robust timeline correlation.
+
+Completion basis:
+- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` completed the next deterministic rule expansion.
+- Added explainable rules for APIPA network evidence, Windows Update service repair signals, endpoint protection disabled signals, stopped automatic services, and domain secure-channel/logon failures.
+- Existing HEPHAESTUS output paths remain compatible with ARGUS.
 
 ## Phase 07 - ARGUS Evidence Normalization
 Status: Planned
@@ -106,7 +111,7 @@ Status: Active
 Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
 
 Current active task:
-- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion`
+- None.
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
@@ -146,8 +151,8 @@ Current UI work:
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
 - TASK-0064 completed product naming options.
-- TASK-0021 is active for HEPHAESTUS rule catalog expansion.
-- No queued tasks remain after the active HEPHAESTUS task.
+- TASK-0021 completed HEPHAESTUS rule catalog expansion.
+- No queued tasks remain.
 
 ## Phase 10 - Release Hardening
 Status: Planned

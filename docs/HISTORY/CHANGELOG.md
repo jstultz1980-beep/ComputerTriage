@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- Added deterministic local-analysis rules for APIPA network evidence, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain trust/logon failures.
+- Validated the local analysis engine against the existing AI-Bundles folder and synthetic evidence covering all new rule IDs.
+- Updated toolkit build metadata for TASK-0021.
 - Completed TASK-0064 Product Naming Options and activated TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 - Added `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` with five candidate names and rationales.
 - No application files, manifests, windows, package metadata, or branding assets were renamed.

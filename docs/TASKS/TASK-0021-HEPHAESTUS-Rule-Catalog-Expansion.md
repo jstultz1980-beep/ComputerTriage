@@ -1,7 +1,7 @@
 # TASK-0021 - HEPHAESTUS Rule Catalog Expansion
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -23,8 +23,16 @@ Expand deterministic HEPHAESTUS rule coverage after the v1 local analysis slice 
 - Whole-network inventory or RMM behavior.
 
 ## Acceptance Criteria
-- [ ] New rules produce deterministic findings with clear evidence references.
-- [ ] Rules avoid generic "needs review" wording when a more specific recommendation is possible.
-- [ ] Existing HEPHAESTUS output schema remains compatible with ARGUS.
-- [ ] Local analysis validation passes against at least one existing triage bundle.
-- [ ] PowerShell parse, smoke, and relevant analysis validation pass.
+- [x] New rules produce deterministic findings with clear evidence references.
+- [x] Rules avoid generic "needs review" wording when a more specific recommendation is possible.
+- [x] Existing HEPHAESTUS output schema remains compatible with ARGUS.
+- [x] Local analysis validation passes against at least one existing triage bundle.
+- [x] PowerShell parse, smoke, and relevant analysis validation pass.
+
+## Completion Notes
+- Added `App/NetworkToolkit/Core/LocalAnalysisRules.ps1` as a companion rule-catalog expansion loaded after the existing local analysis engine.
+- Added deterministic text/JSON evidence rules for APIPA network addresses, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain secure-channel/logon failures.
+- Preserved the existing HEPHAESTUS output shape and ARGUS-facing artifact paths.
+- Validated against the existing `App/NetworkToolkit/Exports/AI-Bundles` folder.
+- Validated synthetic evidence for all newly added rule IDs.
+- Parser, GUI smoke, and button-smoke validation passed.

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709084356,
-    "SourceUpdatedAt":  "2026-07-09T08:43:56.6728577-05:00",
-    "ReleaseNotes":  "Added a testable Add-Ons popup for installable and extract-needed programs."
+    "Build":  20260709085221,
+    "SourceUpdatedAt":  "2026-07-09T08:52:21.5506079-05:00",
+    "ReleaseNotes":  "Expanded HEPHAESTUS deterministic local analysis rules."
 }

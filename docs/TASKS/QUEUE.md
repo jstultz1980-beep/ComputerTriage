@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Active | Expand deterministic rules after the v1 vertical slice exists and validates. |
+| _None_ | _N/A_ | _N/A_ | No active task. |
 
 ## Queued
 
@@ -88,6 +88,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0062-Computer-Data-Push-Pull` | Completed | Added Push/Pull direction selection to the technician-safe client/computer data transfer workflow. |
 | `TASK-0063-Add-Ons-Concept` | Completed | Added a testable Add-Ons popup for installable/extract-needed programs while preserving Software workflows. |
 | `TASK-0064-Product-Naming-Options` | Completed | Recorded five candidate product names with rationales and no app rename. |
+| `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Completed | Expanded deterministic local analysis rules for network, updates, security, services, and domain-health evidence. |
 
 ## Reconciliation Decision
 
@@ -96,4 +97,4 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0021.
+- Current active task is none.

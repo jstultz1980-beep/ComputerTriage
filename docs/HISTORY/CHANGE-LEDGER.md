@@ -234,3 +234,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0224 | 2026-07-09 | TASK-0063 / TASK-0064 | Task System | +1 | Completed TASK-0063 and activated TASK-0064 as the next single active implementation task. |
 | CHG-0225 | 2026-07-09 | TASK-0064 | Documentation | +1 | Recorded five product naming options with rationales and no application rename. |
 | CHG-0226 | 2026-07-09 | TASK-0064 / TASK-0021 | Task System | +1 | Completed TASK-0064 and activated TASK-0021 as the next single active implementation task. |
+| CHG-0227 | 2026-07-09 | TASK-0021 | HEPHAESTUS | +1 | Added deterministic local-analysis rules for network APIPA, Windows Update repair signals, endpoint protection, stopped automatic services, and domain trust/logon failures. |
+| CHG-0228 | 2026-07-09 | TASK-0021 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for HEPHAESTUS rule expansion. |
+| CHG-0229 | 2026-07-09 | TASK-0021 | Validation/Test Framework | +1 | Validated parser checks, existing AI-Bundles local analysis, synthetic rule coverage, GUI smoke, and button-smoke behavior. |
+| CHG-0230 | 2026-07-09 | TASK-0021 | Documentation | +1 | Updated TASK-0021, queue, roadmap, changelog, ledger, and handoff records for HEPHAESTUS rule expansion completion. |
+| CHG-0231 | 2026-07-09 | TASK-0021 | Task System | +1 | Completed TASK-0021 with no queued implementation task remaining. |

@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0074
+HANDOFF-0075
 
 ## Current Task
-TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion
+None
 
 ## Current Owner
 Codex
@@ -64,7 +64,9 @@ TASK-0063 completed Add-Ons concept testing.
 
 TASK-0064 completed product naming options.
 
-Implementation work may resume under the single active task: TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+TASK-0021 completed HEPHAESTUS rule catalog expansion.
+
+No queued implementation task remains. New work should begin by reconciling fresh requests into a new focused task before implementation.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -88,15 +90,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 9 / 25 | No |
-| Task System | 16 / 25 | No |
-| HEPHAESTUS | 3 / 25 | No |
+| Documentation | 10 / 25 | No |
+| Task System | 17 / 25 | No |
+| HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
 | UI | 17 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 8 / 25 | No |
-| Validation/Test Framework | 14 / 25 | No |
+| Build System | 9 / 25 | No |
+| Validation/Test Framework | 15 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -124,22 +126,20 @@ Recently completed work:
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
 - TASK-0064 completed product naming options.
+- TASK-0021 completed HEPHAESTUS rule catalog expansion.
 
 Current active work:
-- TASK-0021 is active for HEPHAESTUS rule catalog expansion.
+- None.
 
 Queued implementation/design work, in recommended order:
-- No queued tasks remain after the active HEPHAESTUS task.
+- None.
 
 ## Active Task
-`TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion`
+None.
 
 Scope summary:
-- Add or refine deterministic rules for common workstation and server troubleshooting signals.
-- Prioritize service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
-- Prefer structured evidence already collected by HEPHAESTUS before adding new collectors.
-- Keep findings specific, explainable, and tied to supporting evidence.
-- Preserve the existing HEPHAESTUS and ARGUS evidence contract.
+- No active task remains.
+- Before new implementation work, create or activate a focused task from new user requests or roadmap direction.
 
 ## Queued Work
 - None.
@@ -289,9 +289,20 @@ Scope summary:
 - Confirmed no application files, manifests, windows, package metadata, or branding assets were renamed.
 - Marked punch-list item 34 complete.
 - Activated TASK-0021 as the next implementation task.
+- Completed TASK-0021 HEPHAESTUS Rule Catalog Expansion.
+- Added `App/NetworkToolkit/Core/LocalAnalysisRules.ps1` as the deterministic rule catalog expansion loaded after the existing local analysis engine.
+- Added rules for APIPA network evidence, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain secure-channel/logon failures.
+- Preserved existing HEPHAESTUS/ARGUS artifact paths and output shape.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `LocalAnalysisEngine.ps1`, `LocalAnalysisRules.ps1`, and `App/NetworkToolkit.ps1`.
+- Existing AI-Bundles local analysis validation passed.
+- Synthetic evidence validation covered all new rule IDs.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- No queued task remains.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0021 only.
+No active audit gate. No queued implementation task remains.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -306,7 +317,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0064: Record product naming options
+TASK-0021: Expand HEPHAESTUS rules
 ```
 
 ## Next Bot Prompt
@@ -324,12 +335,11 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion.md
-8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
+7. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks where possible or create a new focused task before changing code.
 
 Current task state:
-- docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion.
+- docs/HANDOFF.md and docs/TASKS/QUEUE.md list no Active task.
+- Active task: None.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
@@ -344,21 +354,15 @@ Current task state:
 - TASK-0062 completed computer data push/pull.
 - TASK-0063 completed Add-Ons concept testing.
 - TASK-0064 completed product naming options.
-- No queued tasks remain after TASK-0021.
+- TASK-0021 completed HEPHAESTUS rule catalog expansion.
+- No queued tasks remain.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0021 only.
-
-Scope:
-- Add or refine deterministic rules for common workstation and server troubleshooting signals.
-- Prioritize service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
-- Prefer structured evidence already collected by HEPHAESTUS before adding new collectors.
-- Keep findings specific, explainable, and tied to supporting evidence.
-- Preserve the existing HEPHAESTUS and ARGUS evidence contract.
+Do not begin implementation until a new focused task is created or activated from fresh user direction.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -370,11 +374,7 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- New rules produce deterministic findings with clear evidence references.
-- Rules avoid generic "needs review" wording when a more specific recommendation is possible.
-- Existing HEPHAESTUS output schema remains compatible with ARGUS.
-- Local analysis validation passes against at least one existing triage bundle.
-- PowerShell parse, smoke, and relevant analysis validation pass.
+- New task scope must define its own validation before code changes.
 
 When done, provide:
 - Concise summary of implementation performed.
