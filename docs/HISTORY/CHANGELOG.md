@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0065 UI Regression Polish and activated TASK-0066 RapidAssist Naming Selection.
+- Polished the busy progress indicator, Windows Update service-health/status layout, Directory Domain and Policy actions, Wi-Fi page/status icons, Settings refresh/size controls, Software/Add-Ons placement, and Triage instruction emphasis.
+- Updated toolkit build metadata for TASK-0065.
 - Completed TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 - Added deterministic local-analysis rules for APIPA network evidence, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain trust/logon failures.
 - Validated the local analysis engine against the existing AI-Bundles folder and synthetic evidence covering all new rule IDs.

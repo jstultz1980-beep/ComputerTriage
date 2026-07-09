@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0075
+HANDOFF-0076
 
 ## Current Task
-None
+TASK-0066-RapidAssist-Naming-Selection
 
 ## Current Owner
 Codex
@@ -66,7 +66,9 @@ TASK-0064 completed product naming options.
 
 TASK-0021 completed HEPHAESTUS rule catalog expansion.
 
-No queued implementation task remains. New work should begin by reconciling fresh requests into a new focused task before implementation.
+TASK-0065 completed UI regression polish from punch-list items 36 through 46.
+
+TASK-0066 is active to record RapidAssist as the preferred product naming direction without renaming the app yet.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -90,15 +92,15 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 10 / 25 | No |
-| Task System | 17 / 25 | No |
+| Documentation | 11 / 25 | No |
+| Task System | 18 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 17 / 25 | No |
+| UI | 18 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 9 / 25 | No |
-| Validation/Test Framework | 15 / 25 | No |
+| Build System | 10 / 25 | No |
+| Validation/Test Framework | 16 / 25 | No |
 | Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
@@ -127,19 +129,20 @@ Recently completed work:
 - TASK-0063 completed Add-Ons concept testing.
 - TASK-0064 completed product naming options.
 - TASK-0021 completed HEPHAESTUS rule catalog expansion.
+- TASK-0065 completed UI regression polish from punch-list items 36 through 46.
 
 Current active work:
-- None.
+- TASK-0066 is active for RapidAssist naming selection.
 
 Queued implementation/design work, in recommended order:
 - None.
 
 ## Active Task
-None.
+`TASK-0066-RapidAssist-Naming-Selection`
 
 Scope summary:
-- No active task remains.
-- Before new implementation work, create or activate a focused task from new user requests or roadmap direction.
+- Record RapidAssist as the preferred product naming direction.
+- Do not rename application windows, manifests, package metadata, file paths, or branding assets.
 
 ## Queued Work
 - None.
@@ -300,9 +303,17 @@ Scope summary:
 - GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 - No queued task remains.
+- Reconciled punch-list items 35 through 46 into TASK-0065 and TASK-0066.
+- Completed TASK-0065 UI Regression Polish.
+- Marked punch-list items 36 through 46 complete.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0066 as the next implementation task.
 
 ## Blockers
-No active audit gate. No queued implementation task remains.
+No active audit gate. Implementation may continue under TASK-0066 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -317,7 +328,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0021: Expand HEPHAESTUS rules
+TASK-0065: Polish UI regressions
 ```
 
 ## Next Bot Prompt
@@ -335,11 +346,12 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks where possible or create a new focused task before changing code.
+7. docs/TASKS/TASK-0066-RapidAssist-Naming-Selection.md
+8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks where possible before changing code.
 
 Current task state:
-- docs/HANDOFF.md and docs/TASKS/QUEUE.md list no Active task.
-- Active task: None.
+- docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
+- Active task: TASK-0066-RapidAssist-Naming-Selection.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
@@ -355,14 +367,19 @@ Current task state:
 - TASK-0063 completed Add-Ons concept testing.
 - TASK-0064 completed product naming options.
 - TASK-0021 completed HEPHAESTUS rule catalog expansion.
-- No queued tasks remain.
+- TASK-0065 completed UI regression polish from punch-list items 36 through 46.
+- No queued tasks remain after TASK-0066.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Do not begin implementation until a new focused task is created or activated from fresh user direction.
+Execute TASK-0066 only.
+
+Scope:
+- Update the product naming options document to identify RapidAssist as the preferred option.
+- Do not rename application windows, manifests, package metadata, file paths, or branding assets.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -374,7 +391,8 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- New task scope must define its own validation before code changes.
+- Documentation/task-state consistency should be verified.
+- Confirm no app rename was performed.
 
 When done, provide:
 - Concise summary of implementation performed.

@@ -38,3 +38,16 @@
 32. ~~Add an option to push or pull computer data between toolkits. Similar to the update deployed toolkit but for computer data.~~
 33. ~~Installable programs that are not portable should have their own tab called Add-Ons. This could be a popup, it does not actually be a tab. I would like to test this concept and see how it works.~~
 34. ~~This Program needs a better name. Come up with 5 suggestions.~~
+35. I like RapidAssist for a new name. 
+36. ~~The progress bar has no animation, it stays blank, always.~~
+37. ~~Installable Programs Stored in Toolkit on Apps page is redundant with the Add ons popup. Keep the popup remove the other.~~
+38. ~~Make the WU Health Read "Windows Update Service Health" The healt should be indicated by a 3 color led.~~
+39. ~~Make Windows Update repair capture confirmation if it is not indicated that a repair is needed.~~
+40. ~~Domain and Policy on the DIr page has gotten smushed.~~
+41. ~~Windows Update Status message text box is too small. Can we move the button row up a little and make the status message live under that row and be wider?~~
+42. ~~Refresh icon is jacked up.~~
+43. ~~Toolkit size info line is wrapping. I do not want that.~~
+44. ~~Remove the Wifi Indicator from the top right of the wifi page.~~
+45. ~~The Wifi Indicator Icon got messed up.~~
+46. ~~Quick Triage Instructions: make the headings for each step bold.~~
+47. 

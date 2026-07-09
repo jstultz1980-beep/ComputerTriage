@@ -1702,6 +1702,7 @@ function Start-GUIBusyIndicator {
         $script:GUIBusyProgress.Visible = $true
         $script:GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
         $script:GUIBusyProgress.MarqueeAnimationSpeed = 28
+        $script:GUIBusyProgress.Value = 0
     }
     try { [System.Windows.Forms.Application]::DoEvents() } catch {}
 
@@ -1718,6 +1719,12 @@ function Start-GUIBusyIndicator {
 
         $script:GUIBusyFrame = ($script:GUIBusyFrame + 1) % $script:GUIBusyFrames.Count
         $script:GUIBusyLabel.Text = $script:GUIBusyFrames[$script:GUIBusyFrame]
+        if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
+            $script:GUIBusyProgress.Visible = $true
+            $script:GUIBusyProgress.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee
+            $script:GUIBusyProgress.MarqueeAnimationSpeed = 28
+            try { $script:GUIBusyProgress.ProgressBar.Refresh() } catch {}
+        }
     })
     $script:GUIBusyTimer = $timer
     $timer.Start()
@@ -1738,6 +1745,7 @@ function Stop-GUIBusyIndicator {
         $script:GUIBusyTimer = $null
     }
     if($script:GUIBusyProgress -and !$script:GUIBusyProgress.IsDisposed){
+        $script:GUIBusyProgress.MarqueeAnimationSpeed = 0
         $script:GUIBusyProgress.Visible = $false
     }
     if($script:GUIBusyLabel -and !$script:GUIBusyLabel.IsDisposed){
@@ -10850,6 +10858,20 @@ function Invoke-GUIWindowsUpdateRepairStep {
 }
 
 function Invoke-GUIWindowsUpdateRepair {
+    $repairHealth = Get-GUIWindowsUpdateServiceHealth
+    if($repairHealth -and -not $repairHealth.RepairRecommended){
+        $notNeededConfirm = [System.Windows.Forms.MessageBox]::Show(
+            "Windows Update repair is not currently indicated.`r`n`r`nCurrent status: $($repairHealth.StateText).`r`n`r`nRun the repair anyway?",
+            "Repair Windows Update",
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Question
+        )
+        if($notNeededConfirm -ne [System.Windows.Forms.DialogResult]::Yes){
+            Set-GUIWUStatus "Windows Update repair skipped; service health does not currently indicate repair."
+            return
+        }
+    }
+
     $confirm = [System.Windows.Forms.MessageBox]::Show(
         "Repair Windows Update now?`r`n`r`nThis will stop Windows Update services, rename the update download/cache folders, reset common update network settings, restart services, and then rescan updates.`r`n`r`nIt will not install updates.",
         "Repair Windows Update",
@@ -10995,12 +11017,13 @@ function Build-WindowsUpdatePage {
     $top = New-Object System.Windows.Forms.TableLayoutPanel
     $top.Dock = "Fill"
     $top.Padding = New-Object System.Windows.Forms.Padding(4)
-    $top.ColumnCount = 4
-    $top.RowCount = 1
+    $top.ColumnCount = 3
+    $top.RowCount = 2
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::AutoSize))) | Out-Null
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,170))) | Out-Null
     $top.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::AutoSize))) | Out-Null
+    $top.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $top.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.Controls.Add($top,0,0)
     $layout.SetColumnSpan($top,2)
 
@@ -11021,27 +11044,28 @@ function Build-WindowsUpdatePage {
     $script:WUStatusLabel = New-Object System.Windows.Forms.Label
     $WUStatusLabel.Text = "Windows Update ready."
     $WUStatusLabel.Dock = "Fill"
-    $WUStatusLabel.Height = 34
-    $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(12,8,3,3)
+    $WUStatusLabel.Margin = New-Object System.Windows.Forms.Padding(4,3,4,0)
     $WUStatusLabel.TextAlign = "MiddleLeft"
     $WUStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI",9.5)
     $WUStatusLabel.ForeColor = $script:GUITheme.MutedText
-    [void]$top.Controls.Add($WUStatusLabel,1,0)
+    $WUStatusLabel.AutoEllipsis = $true
+    [void]$top.Controls.Add($WUStatusLabel,0,1)
+    $top.SetColumnSpan($WUStatusLabel,3)
 
     $script:WUHealthLabel = New-Object System.Windows.Forms.Label
     $WUHealthLabel.Dock = "Fill"
-    $WUHealthLabel.Text = "WU service unknown"
-    $WUHealthLabel.TextAlign = "MiddleCenter"
+    $WUHealthLabel.Text = "Windows Update Service Health"
+    $WUHealthLabel.TextAlign = "MiddleRight"
     $WUHealthLabel.AutoEllipsis = $true
     $WUHealthLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",8.5,[System.Drawing.FontStyle]::Bold)
     $WUHealthLabel.ForeColor = $script:GUITheme.MutedText
-    [void]$top.Controls.Add($WUHealthLabel,2,0)
+    [void]$top.Controls.Add($WUHealthLabel,1,0)
 
     $repairButton = New-GUIButton "Repair Windows Update" { Invoke-GUIWindowsUpdateRepair }
     $repairButton.Width = 180
     $repairButton.Margin = New-Object System.Windows.Forms.Padding(8,5,0,5)
     Set-GUIButtonChrome -Button $repairButton -Subtle
-    [void]$top.Controls.Add($repairButton,3,0)
+    [void]$top.Controls.Add($repairButton,2,0)
 
     $pendingGroup = New-Object System.Windows.Forms.GroupBox
     $pendingGroup.Text = "Pending Updates"
@@ -11174,6 +11198,13 @@ function Format-GUIWifiSignalText {
     return "Wi-Fi: ●"
 }
 
+function Format-GUIWifiSignalText {
+    param($Info)
+
+    $dot = [string]([char]0x25CF)
+    return "Wi-Fi: $dot"
+}
+
 function Get-GUIWifiSignalColor {
     param($Info)
 
@@ -11257,13 +11288,13 @@ function Get-GUIWindowsUpdateServiceHealth {
 
     if($bad.Count -gt 0 -or $disabled.Count -gt 0){
         $detail = if($disabled.Count -gt 0){"$allText; disabled=$($disabled -join ', ')"}else{$allText}
-        return [pscustomobject]@{Text="Repair recommended";Color=$script:GUITheme.Warning;Detail=$detail;RepairRecommended=$true}
+        return [pscustomobject]@{Text="Windows Update Service Health";StateText="Repair recommended";State="Warning";Color=$script:GUITheme.Warning;Detail=$detail;RepairRecommended=$true}
     }
     if($runningCore){
-        return [pscustomobject]@{Text="WU service healthy";Color=$script:GUITheme.Success;Detail=$allText;RepairRecommended=$false}
+        return [pscustomobject]@{Text="Windows Update Service Health";StateText="Healthy";State="Ok";Color=$script:GUITheme.Success;Detail=$allText;RepairRecommended=$false}
     }
 
-    return [pscustomobject]@{Text="WU service idle";Color=$script:GUITheme.MutedText;Detail=$allText;RepairRecommended=$false}
+    return [pscustomobject]@{Text="Windows Update Service Health";StateText="Idle";State="Unknown";Color=$script:GUITheme.MutedText;Detail=$allText;RepairRecommended=$false}
 }
 
 function Update-GUIWindowsUpdateHealthIndicator {
@@ -11272,14 +11303,15 @@ function Update-GUIWindowsUpdateHealthIndicator {
     }
 
     $health = Get-GUIWindowsUpdateServiceHealth
-    $script:WUHealthLabel.Text = $health.Text
+    $script:WUHealthLabel.Text = "{0}  {1}" -f ([char]0x25CF),$health.Text
     $script:WUHealthLabel.ForeColor = $health.Color
+    $script:WUHealthLabel.Tag = $health
     if($health.RepairRecommended -and $script:WUStatusLabel -and !$script:WUStatusLabel.IsDisposed){
         $script:WUStatusLabel.Text = "Windows Update service repair is recommended."
         $script:WUStatusLabel.ForeColor = $script:GUITheme.Warning
     }
     if($script:ToolTip){
-        $script:ToolTip.SetToolTip($script:WUHealthLabel,$health.Detail)
+        $script:ToolTip.SetToolTip($script:WUHealthLabel,("{0}: {1}. {2}" -f $health.Text,$health.StateText,$health.Detail))
     }
 }
 
@@ -11489,7 +11521,7 @@ function Build-DirectoryToolsPage {
     $root.Padding = New-Object System.Windows.Forms.Padding(8)
     $root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
-    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,70))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($root)
 
@@ -11535,7 +11567,7 @@ function Build-DirectoryToolsPage {
     Add-GUIDirectoryStatusCell -Layout $summary -Column 5 -Row 1 -Label "DC DNS SRV" -Value $status.DCSrvLookup
 
     $actionGroup = New-Object System.Windows.Forms.GroupBox
-    $actionGroup.Text = "Domain And Policy Actions"
+    $actionGroup.Text = "Domain And Policy"
     $actionGroup.Dock = "Fill"
     $actionGroup.Padding = New-Object System.Windows.Forms.Padding(8)
     $actionGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
@@ -11544,11 +11576,19 @@ function Build-DirectoryToolsPage {
     $actions = New-Object System.Windows.Forms.FlowLayoutPanel
     $actions.Dock = "Fill"
     $actions.FlowDirection = "LeftToRight"
-    $actions.WrapContents = $false
+    $actions.WrapContents = $true
+    $actions.AutoScroll = $false
+    $actions.Padding = New-Object System.Windows.Forms.Padding(0,2,0,0)
     $actionGroup.Controls.Add($actions)
-    [void]$actions.Controls.Add((New-GUIToolButton -Text "Domain Logon Health" -FunctionName "Invoke-DomainLogonHealth"))
-    [void]$actions.Controls.Add((New-GUIToolButton -Text "GPO Health" -FunctionName "Invoke-GPOHealth"))
-    [void]$actions.Controls.Add((New-GUIButton -Text "GPResult HTML" -Action { Start-GUIGPResultReport }))
+    foreach($button in @(
+        (New-GUIToolButton -Text "Domain Logon" -FunctionName "Invoke-DomainLogonHealth"),
+        (New-GUIToolButton -Text "GPO Health" -FunctionName "Invoke-GPOHealth"),
+        (New-GUIButton -Text "GPResult HTML" -Action { Start-GUIGPResultReport })
+    )){
+        $button.Width = 126
+        $button.Margin = New-Object System.Windows.Forms.Padding(0,0,8,4)
+        [void]$actions.Controls.Add($button)
+    }
 
     $toolsPanel = New-Object System.Windows.Forms.Panel
     $toolsPanel.Dock = "Fill"
@@ -11797,10 +11837,9 @@ function Build-WiFiToolsPage {
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
-    $layout.RowCount = 3
+    $layout.RowCount = 2
     $layout.ColumnCount = 1
     $layout.Padding = New-Object System.Windows.Forms.Padding(10)
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $Page.Controls.Add($layout)
@@ -11810,6 +11849,7 @@ function Build-WiFiToolsPage {
     $statusPanel.BackColor = $script:GUITheme.Page
     $statusPanel.Padding = New-Object System.Windows.Forms.Padding(10,6,10,6)
     $layout.Controls.Add($statusPanel,0,0)
+    $statusPanel.Visible = $false
 
     $script:WifiPageStatusLabel = New-Object System.Windows.Forms.Label
     $WifiPageStatusLabel.Dock = "Right"
@@ -11826,7 +11866,7 @@ function Build-WiFiToolsPage {
         $content = $catalogPage.Controls[0]
         $catalogPage.Controls.Remove($content)
         $content.Dock = "Fill"
-        $layout.Controls.Add($content,0,1)
+        $layout.Controls.Add($content,0,0)
     }
 
     $script:WifiPageNetworkInfoLabel = New-Object System.Windows.Forms.Label
@@ -11837,7 +11877,7 @@ function Build-WiFiToolsPage {
     $WifiPageNetworkInfoLabel.ForeColor = $script:GUITheme.MutedText
     $WifiPageNetworkInfoLabel.Padding = New-Object System.Windows.Forms.Padding(10,0,10,0)
     $WifiPageNetworkInfoLabel.Text = "Wireless adapter status unavailable."
-    $layout.Controls.Add($WifiPageNetworkInfoLabel,0,2)
+    $layout.Controls.Add($WifiPageNetworkInfoLabel,0,1)
 
     Update-GUIWifiIndicators
 }
@@ -13392,12 +13432,14 @@ function Build-TriagePage {
     $quickStep.Dock = "Fill"
     $quickStep.ForeColor = $script:GUITheme.MutedText
     $quickStep.TextAlign = "TopLeft"
+    $quickStep.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
     $runLayout.Controls.Add($quickStep,0,0)
 
     $fullStep = New-GUILabel "Full Triage`r`nUse when Quick Triage does not explain the issue or escalation needs deeper local evidence."
     $fullStep.Dock = "Fill"
     $fullStep.ForeColor = $script:GUITheme.MutedText
     $fullStep.TextAlign = "TopLeft"
+    $fullStep.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
     $runLayout.Controls.Add($fullStep,0,1)
 
     $collectTip = New-GUILabel "Keep the toolkit open until the progress bar stops. The completion dialog will point to the newest run and bundle."
@@ -13838,11 +13880,10 @@ function Build-SoftwareToolsPage {
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
     $layout.ColumnCount = 1
-    $layout.RowCount = 3
+    $layout.RowCount = 2
     $layout.Padding = New-Object System.Windows.Forms.Padding(8)
     $layout.BackColor = $script:GUITheme.Page
-    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,70)))
-    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,150)))
+    [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100)))
     [void]$layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40)))
     [void]$layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100)))
     $Page.Controls.Add($layout)
@@ -13855,14 +13896,6 @@ function Build-SoftwareToolsPage {
     $launchableTools = @(Set-GUISoftwareToolSections -Tools @(Get-GUIToolsForTab -Tab "Software"))
     Add-GUICompactToolGrid -Page $launchPanel -Title "Launchable Portable Apps" -Tools $launchableTools -Columns 4
 
-    $installPanel = New-Object System.Windows.Forms.Panel
-    $installPanel.Dock = "Fill"
-    $installPanel.BackColor = $script:GUITheme.Page
-    [void]$layout.Controls.Add($installPanel,0,1)
-
-    $installableTools = @(Get-GUISoftwareInstallableTools)
-    Add-GUICompactToolGrid -Page $installPanel -Title "Installable Programs Stored In Toolkit" -Tools $installableTools -Columns 3 -HideSectionHeaders
-
     $resources = New-Object System.Windows.Forms.FlowLayoutPanel
     $resources.Dock = "Fill"
     $resources.WrapContents = $false
@@ -13872,7 +13905,7 @@ function Build-SoftwareToolsPage {
     $addOnsButton.Width = 100
     [void]$resources.Controls.Add($addOnsButton)
     Add-GUISoftwareResourceLinks -Panel $resources -IncludeLabel
-    [void]$layout.Controls.Add($resources,0,2)
+    [void]$layout.Controls.Add($resources,0,1)
 }
 
 function Refresh-GUISoftwareKeyFinderResults {
@@ -15877,9 +15910,12 @@ function Build-SettingsPage {
     $ToolkitSizeLabel.Dock = "Fill"
     $ToolkitSizeLabel.TextAlign = "MiddleLeft"
     $ToolkitSizeLabel.ForeColor = $script:GUITheme.MutedText
+    $ToolkitSizeLabel.AutoSize = $false
+    $ToolkitSizeLabel.AutoEllipsis = $true
     $maintenanceLayout.Controls.Add($ToolkitSizeLabel,0,0)
 
     $sizeRefreshButton = New-GUIButton "↻" { Start-GUIToolkitSizeRefresh }
+    $sizeRefreshButton.Text = [string]([char]0x21BB)
     $sizeRefreshButton.Dock = "Right"
     $sizeRefreshButton.Width = 38
     $sizeRefreshButton.Height = 30

@@ -239,3 +239,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0229 | 2026-07-09 | TASK-0021 | Validation/Test Framework | +1 | Validated parser checks, existing AI-Bundles local analysis, synthetic rule coverage, GUI smoke, and button-smoke behavior. |
 | CHG-0230 | 2026-07-09 | TASK-0021 | Documentation | +1 | Updated TASK-0021, queue, roadmap, changelog, ledger, and handoff records for HEPHAESTUS rule expansion completion. |
 | CHG-0231 | 2026-07-09 | TASK-0021 | Task System | +1 | Completed TASK-0021 with no queued implementation task remaining. |
+| CHG-0232 | 2026-07-09 | TASK-0065 | UI | +1 | Polished visible UI regressions for progress animation, Software/Add-Ons placement, Windows Update health/status layout, Directory actions, Wi-Fi indicators, Settings refresh/size display, and Triage instructions. |
+| CHG-0233 | 2026-07-09 | TASK-0065 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for UI regression polish. |
+| CHG-0234 | 2026-07-09 | TASK-0065 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for UI regression polish. |
+| CHG-0235 | 2026-07-09 | TASK-0065 | Documentation | +1 | Updated TASK-0065, queue, roadmap, changelog, ledger, punch list, and handoff records for UI regression polish completion. |
+| CHG-0236 | 2026-07-09 | TASK-0065 / TASK-0066 | Task System | +1 | Completed TASK-0065 and activated TASK-0066 as the next single active task for RapidAssist naming selection. |
