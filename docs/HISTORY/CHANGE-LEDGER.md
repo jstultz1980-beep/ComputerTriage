@@ -222,3 +222,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0212 | 2026-07-09 | TASK-0058 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Settings and control polish. |
 | CHG-0213 | 2026-07-09 | TASK-0058 | Documentation | +1 | Updated TASK-0058, queue, roadmap, changelog, ledger, punch list, and handoff records for Settings/control completion. |
 | CHG-0214 | 2026-07-09 | TASK-0058 / TASK-0062 | Task System | +1 | Completed TASK-0058 and activated TASK-0062 as the next single active implementation task. |
+| CHG-0215 | 2026-07-09 | TASK-0062 | UI | +1 | Reworked Transfer Client Data into a Push/Pull computer-data dialog while preserving the diagnostic-data allow-list and manifest output. |
+| CHG-0216 | 2026-07-09 | TASK-0062 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for computer data push/pull. |
+| CHG-0217 | 2026-07-09 | TASK-0062 | Validation/Test Framework | +1 | Validated fake push/pull client-data transfers, parser checks, GUI smoke, and button-smoke behavior. |
+| CHG-0218 | 2026-07-09 | TASK-0062 | Documentation | +1 | Updated TASK-0062, queue, roadmap, changelog, ledger, punch list, and handoff records for computer data push/pull completion. |
+| CHG-0219 | 2026-07-09 | TASK-0062 / TASK-0063 | Task System | +1 | Completed TASK-0062 and activated TASK-0063 as the next single active implementation task. |

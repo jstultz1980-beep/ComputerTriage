@@ -14815,64 +14815,83 @@ function Invoke-GUIRemoveClientData {
 }
 
 function Show-GUIClientDataTransfer {
-    $sourceRoot = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
+    $runningRoot = Split-Path -Parent (Split-Path -Parent $SharedToolkitRoot)
 
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Transfer Client Data"
+    $form.Text = "Push Or Pull Computer Data"
     $form.StartPosition = "CenterParent"
-    $form.Size = New-Object System.Drawing.Size(720,340)
-    $form.MinimumSize = New-Object System.Drawing.Size(720,340)
+    $form.Size = New-Object System.Drawing.Size(780,430)
+    $form.MinimumSize = New-Object System.Drawing.Size(780,430)
     $form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $form.BackColor = $script:GUITheme.Page
 
     $layout = New-Object System.Windows.Forms.TableLayoutPanel
     $layout.Dock = "Fill"
     $layout.ColumnCount = 3
-    $layout.RowCount = 6
+    $layout.RowCount = 7
     $layout.Padding = New-Object System.Windows.Forms.Padding(18)
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,130))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Absolute,95))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,40))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,32))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,34))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
-    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,1))) | Out-Null
     $form.Controls.Add($layout)
 
-    $sourceLabel = New-GUILabel "Source"
-    $layout.Controls.Add($sourceLabel,0,0)
-    $sourceValue = New-GUILabel $sourceRoot
-    $sourceValue.Dock = "Fill"
-    $sourceValue.ForeColor = $script:GUITheme.MutedText
-    $layout.Controls.Add($sourceValue,1,0)
-    $layout.SetColumnSpan($sourceValue,2)
+    $modeLabel = New-GUILabel "Direction"
+    $layout.Controls.Add($modeLabel,0,0)
 
-    $destinationLabel = New-GUILabel "Destination"
-    $layout.Controls.Add($destinationLabel,0,1)
+    $pullCheck = New-Object System.Windows.Forms.CheckBox
+    $pullCheck.Dock = "Fill"
+    $pullCheck.Text = "Pull data into this toolkit from the selected toolkit"
+    $pullCheck.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $layout.Controls.Add($pullCheck,1,0)
+    $layout.SetColumnSpan($pullCheck,2)
 
-    $destinationBox = New-Object System.Windows.Forms.TextBox
-    $destinationBox.Dock = "Fill"
-    $destinationBox.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
-    $destinationBox.BackColor = $script:GUITheme.InputBack
-    $destinationBox.ForeColor = $script:GUITheme.InputText
-    $layout.Controls.Add($destinationBox,1,1)
+    $otherLabel = New-GUILabel "Other toolkit"
+    $layout.Controls.Add($otherLabel,0,1)
+
+    $otherBox = New-Object System.Windows.Forms.TextBox
+    $otherBox.Dock = "Fill"
+    $otherBox.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $otherBox.BackColor = $script:GUITheme.InputBack
+    $otherBox.ForeColor = $script:GUITheme.InputText
+    $layout.Controls.Add($otherBox,1,1)
 
     $browse = New-GUIButton "Browse" {
         $picker = New-Object System.Windows.Forms.FolderBrowserDialog
-        $picker.Description = "Select the destination Network Toolkit root or App folder."
+        $picker.Description = "Select the other Network Toolkit root or App folder."
         if($picker.ShowDialog($form) -eq [System.Windows.Forms.DialogResult]::OK){
-            $destinationBox.Text = $picker.SelectedPath
+            $otherBox.Text = $picker.SelectedPath
         }
     }
     $browse.Dock = "Fill"
     $layout.Controls.Add($browse,2,1)
 
+    $sourceLabel = New-GUILabel "Source"
+    $layout.Controls.Add($sourceLabel,0,2)
+    $sourceValue = New-GUILabel $runningRoot
+    $sourceValue.Dock = "Fill"
+    $sourceValue.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($sourceValue,1,2)
+    $layout.SetColumnSpan($sourceValue,2)
+
+    $destinationLabel = New-GUILabel "Destination"
+    $layout.Controls.Add($destinationLabel,0,3)
+    $destinationValue = New-GUILabel "Select the other toolkit."
+    $destinationValue.Dock = "Fill"
+    $destinationValue.ForeColor = $script:GUITheme.MutedText
+    $layout.Controls.Add($destinationValue,1,3)
+    $layout.SetColumnSpan($destinationValue,2)
+
     $hint = New-GUILabel "Only client diagnostic data is copied. Application code, portable tools, custom apps, Git data, and release/build files are excluded."
     $hint.Dock = "Fill"
     $hint.ForeColor = $script:GUITheme.MutedText
-    $layout.Controls.Add($hint,0,2)
+    $layout.Controls.Add($hint,0,4)
     $layout.SetColumnSpan($hint,3)
 
     $summaryBox = New-Object System.Windows.Forms.TextBox
@@ -14883,43 +14902,87 @@ function Show-GUIClientDataTransfer {
     $summaryBox.Font = New-Object System.Drawing.Font("Consolas",9)
     $summaryBox.BackColor = $script:GUITheme.ConsoleBack
     $summaryBox.ForeColor = $script:GUITheme.ConsoleText
-    $summaryBox.Text = "Enter or browse to the destination toolkit, then click Validate."
-    $layout.Controls.Add($summaryBox,0,3)
+    $summaryBox.Text = "Choose Push or Pull, select the other toolkit, then click Validate."
+    $layout.Controls.Add($summaryBox,0,5)
     $layout.SetColumnSpan($summaryBox,3)
 
     $buttons = New-Object System.Windows.Forms.FlowLayoutPanel
     $buttons.Dock = "Fill"
     $buttons.FlowDirection = "RightToLeft"
     $buttons.WrapContents = $false
-    $layout.Controls.Add($buttons,0,4)
+    $layout.Controls.Add($buttons,0,6)
     $layout.SetColumnSpan($buttons,3)
 
     $cancel = New-GUIButton "Close" { $form.Close() }
     $cancel.Width = 90
-    $transfer = New-GUIButton "Transfer" { }
-    $transfer.Width = 110
+    $transfer = New-GUIButton "Push Data" { }
+    $transfer.Width = 120
     $validate = New-GUIButton "Validate" { }
     $validate.Width = 100
     [void]$buttons.Controls.Add($cancel)
     [void]$buttons.Controls.Add($transfer)
     [void]$buttons.Controls.Add($validate)
 
+    $getTransferPlan = {
+        $otherText = $otherBox.Text.Trim()
+        if([string]::IsNullOrWhiteSpace($otherText)){
+            throw "Type or browse to the other toolkit first."
+        }
+
+        $otherRoot = Resolve-NTKDeploymentRoot -Path $otherText
+        if($pullCheck.Checked){
+            return [pscustomobject]@{
+                Mode = "Pull"
+                SourceRoot = $otherRoot
+                DestinationRoot = $runningRoot
+                OtherRoot = $otherRoot
+            }
+        }
+
+        return [pscustomobject]@{
+            Mode = "Push"
+            SourceRoot = $runningRoot
+            DestinationRoot = $otherRoot
+            OtherRoot = $otherRoot
+        }
+    }
+
+    $refreshPlanLabels = {
+        try {
+            $plan = & $getTransferPlan
+            $sourceValue.Text = $plan.SourceRoot
+            $destinationValue.Text = $plan.DestinationRoot
+            $transfer.Text = if($plan.Mode -eq "Pull"){"Pull Data"}else{"Push Data"}
+        }
+        catch {
+            $sourceValue.Text = if($pullCheck.Checked){"Select the other toolkit."}else{$runningRoot}
+            $destinationValue.Text = if($pullCheck.Checked){$runningRoot}else{"Select the other toolkit."}
+            $transfer.Text = if($pullCheck.Checked){"Pull Data"}else{"Push Data"}
+        }
+    }
+
+    $pullCheck.Add_CheckedChanged({ & $refreshPlanLabels })
+    $otherBox.Add_TextChanged({ & $refreshPlanLabels })
+    & $refreshPlanLabels
+
     $validate.Add_Click({
         try {
-            $destinationRoot = Resolve-NTKDeploymentRoot -Path $destinationBox.Text.Trim()
-            $sourceFiles = @(Get-NTKClientDataFileList -DeploymentRoot $sourceRoot)
-            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $destinationRoot
+            $plan = & $getTransferPlan
+            $sourceFiles = @(Get-NTKClientDataFileList -DeploymentRoot $plan.SourceRoot)
+            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $plan.DestinationRoot
             $bytes = [int64](@($sourceFiles | Measure-Object -Property Length -Sum).Sum)
             $summaryBox.Text = @(
-                "Destination valid: $destinationRoot",
+                "Direction: $($plan.Mode)",
+                "Source valid: $($plan.SourceRoot)",
+                "Destination valid: $($plan.DestinationRoot)",
                 "Source client files: $($sourceFiles.Count)",
                 "Source client size: $([math]::Round(($bytes / 1MB),2)) MB",
                 "Destination already has client data: $destinationHasData",
                 "",
                 "Included roots:",
-                ((Get-NTKClientDataTransferRoots -DeploymentRoot $sourceRoot | ForEach-Object { " - $($_.RelativePath)" }) -join "`r`n")
+                ((Get-NTKClientDataTransferRoots -DeploymentRoot $plan.SourceRoot | ForEach-Object { " - $($_.RelativePath)" }) -join "`r`n")
             ) -join "`r`n"
-            Add-GUILog "Client data transfer destination validated: $destinationRoot"
+            Add-GUILog "Client data transfer validated: $($plan.Mode) $($plan.SourceRoot) -> $($plan.DestinationRoot)"
         }
         catch {
             $summaryBox.Text = "Validation failed:`r`n$($_.Exception.Message)"
@@ -14928,18 +14991,12 @@ function Show-GUIClientDataTransfer {
     })
 
     $transfer.Add_Click({
-        $destinationText = $destinationBox.Text.Trim()
-        if([string]::IsNullOrWhiteSpace($destinationText)){
-            [System.Windows.Forms.MessageBox]::Show("Type or browse to a destination toolkit first.","Transfer Client Data",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
-            return
-        }
-
         try {
-            $destinationRoot = Resolve-NTKDeploymentRoot -Path $destinationText
-            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $destinationRoot
+            $plan = & $getTransferPlan
+            $destinationHasData = Test-NTKClientDataDestinationHasData -DestinationRoot $plan.DestinationRoot
             if($destinationHasData){
                 $choice = [System.Windows.Forms.MessageBox]::Show(
-                    "The destination already contains client diagnostic data.`r`n`r`nDestination:`r`n$destinationRoot`r`n`r`nTransfer will merge and overwrite matching client-data files only. Continue?",
+                    "The destination already contains client diagnostic data.`r`n`r`nDirection: $($plan.Mode)`r`nDestination:`r`n$($plan.DestinationRoot)`r`n`r`nTransfer will merge and overwrite matching client-data files only. Continue?",
                     "Confirm Client Data Merge",
                     [System.Windows.Forms.MessageBoxButtons]::YesNo,
                     [System.Windows.Forms.MessageBoxIcon]::Warning
@@ -14950,11 +15007,23 @@ function Show-GUIClientDataTransfer {
                 }
             }
 
-            Add-GUILog "Client data transfer started: $sourceRoot -> $destinationRoot"
-            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action "Started" -Detail ("Source={0}; Destination={1}" -f $sourceRoot,$destinationRoot)
-            $manifest = Copy-NTKClientData -SourceRoot $sourceRoot -DestinationRoot $destinationRoot -Force:$destinationHasData
+            $confirm = [System.Windows.Forms.MessageBox]::Show(
+                "$($plan.Mode) client diagnostic data?`r`n`r`nSource:`r`n$($plan.SourceRoot)`r`n`r`nDestination:`r`n$($plan.DestinationRoot)`r`n`r`nSource data is preserved.",
+                "Confirm Client Data Transfer",
+                [System.Windows.Forms.MessageBoxButtons]::YesNo,
+                [System.Windows.Forms.MessageBoxIcon]::Question
+            )
+            if($confirm -ne [System.Windows.Forms.DialogResult]::Yes){
+                Add-GUILog "Client data $($plan.Mode.ToLowerInvariant()) cancelled."
+                return
+            }
+
+            Add-GUILog "Client data $($plan.Mode.ToLowerInvariant()) started: $($plan.SourceRoot) -> $($plan.DestinationRoot)"
+            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action "$($plan.Mode)Started" -Detail ("Source={0}; Destination={1}" -f $plan.SourceRoot,$plan.DestinationRoot)
+            $manifest = Copy-NTKClientData -SourceRoot $plan.SourceRoot -DestinationRoot $plan.DestinationRoot -Force:$destinationHasData
             $summaryBox.Text = @(
-                "Transfer $($manifest.Status).",
+                "$($plan.Mode) transfer $($manifest.Status).",
+                "Source: $($manifest.SourceRoot)",
                 "Destination: $($manifest.DestinationRoot)",
                 "Files copied: $($manifest.CopiedFileCount) / $($manifest.SourceFileCount)",
                 "Size copied: $($manifest.CopiedSizeMB) MB",
@@ -14962,12 +15031,12 @@ function Show-GUIClientDataTransfer {
                 "Failures: $(@($manifest.Failures).Count)"
             ) -join "`r`n"
 
-            Add-GUILog "Client data transfer completed: $($manifest.CopiedFileCount) file(s), $($manifest.CopiedSizeMB) MB"
-            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action $manifest.Status -Detail ("Destination={0}; Files={1}; Manifest={2}" -f $manifest.DestinationRoot,$manifest.CopiedFileCount,$manifest.ManifestPath)
+            Add-GUILog "Client data $($plan.Mode.ToLowerInvariant()) completed: $($manifest.CopiedFileCount) file(s), $($manifest.CopiedSizeMB) MB"
+            Write-GUIToolUsageLog -Tool "Client Data Transfer" -Action "$($plan.Mode)$($manifest.Status)" -Detail ("Source={0}; Destination={1}; Files={2}; Manifest={3}" -f $manifest.SourceRoot,$manifest.DestinationRoot,$manifest.CopiedFileCount,$manifest.ManifestPath)
 
             $icon = if(@($manifest.Failures).Count -gt 0){[System.Windows.Forms.MessageBoxIcon]::Warning}else{[System.Windows.Forms.MessageBoxIcon]::Information}
             [System.Windows.Forms.MessageBox]::Show(
-                "Client data transfer $($manifest.Status.ToLower()).`r`n`r`nFiles copied: $($manifest.CopiedFileCount)`r`nSize copied: $($manifest.CopiedSizeMB) MB`r`n`r`nManifest:`r`n$($manifest.ManifestPath)",
+                "$($plan.Mode) client data transfer $($manifest.Status.ToLower()).`r`n`r`nFiles copied: $($manifest.CopiedFileCount)`r`nSize copied: $($manifest.CopiedSizeMB) MB`r`n`r`nManifest:`r`n$($manifest.ManifestPath)",
                 "Transfer Client Data",
                 [System.Windows.Forms.MessageBoxButtons]::OK,
                 $icon

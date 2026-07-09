@@ -1,7 +1,7 @@
 # TASK-0062 - Computer Data Push Pull
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -25,8 +25,15 @@ Add an option to push or pull collected computer/client data between toolkit cop
 - Network discovery or whole-fleet data collection.
 
 ## Acceptance Criteria
-- [ ] Technician can choose push or pull direction for computer/client data transfer.
-- [ ] Source and destination toolkit paths are validated before transfer.
-- [ ] Only diagnostic/client data is transferred.
-- [ ] Transfer summary/manifest is available after completion.
-- [ ] Parser, smoke, and button-smoke validation pass.
+- [x] Technician can choose push or pull direction for computer/client data transfer.
+- [x] Source and destination toolkit paths are validated before transfer.
+- [x] Only diagnostic/client data is transferred.
+- [x] Transfer summary/manifest is available after completion.
+- [x] Parser, smoke, and button-smoke validation pass.
+
+## Completion Notes
+- Reworked the Settings client-data transfer dialog into a Push/Pull computer-data workflow.
+- Push copies diagnostic/client data from this toolkit to the selected toolkit.
+- Pull copies diagnostic/client data from the selected toolkit into this toolkit.
+- Preserved the existing allow-listed client-data copy helper, manifest output, source preservation, and merge confirmation.
+- Validated fake push and pull transfers, parser checks, GUI smoke, and button-smoke.

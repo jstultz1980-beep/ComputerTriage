@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0062 Computer Data Push Pull and activated TASK-0063 Add Ons Concept.
+- Reworked Transfer Client Data into a Push/Pull computer-data dialog while preserving the existing diagnostic-data allow-list and manifest output.
+- Validated fake push and pull transfers, parser checks, GUI smoke, and button-smoke.
+- Updated toolkit build metadata for TASK-0062.
 - Completed TASK-0058 Settings And Control Polish and activated TASK-0062 Computer Data Push Pull.
 - Compacted shared button styling, shortened the static tab strip to two rows, and enlarged the header logo.
 - Replaced Settings `Refresh Size` with a circular-arrow icon button and removed registered-command startup log noise.
