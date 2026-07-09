@@ -1,7 +1,7 @@
 # TASK-0055 - Shared Embedded Output Pattern
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

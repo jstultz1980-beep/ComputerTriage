@@ -11350,10 +11350,10 @@ function Build-DirectoryToolsPage {
     $root.Dock = "Fill"
     $root.ColumnCount = 1
     $root.RowCount = 3
-    $root.Padding = New-Object System.Windows.Forms.Padding(10)
+    $root.Padding = New-Object System.Windows.Forms.Padding(8)
     $root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
-    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,178))) | Out-Null
-    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,68))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,118))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,58))) | Out-Null
     $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $Page.Controls.Add($root)
 
@@ -11362,20 +11362,19 @@ function Build-DirectoryToolsPage {
     $summaryGroup = New-Object System.Windows.Forms.GroupBox
     $summaryGroup.Text = "Directory Status"
     $summaryGroup.Dock = "Fill"
-    $summaryGroup.Padding = New-Object System.Windows.Forms.Padding(10)
+    $summaryGroup.Padding = New-Object System.Windows.Forms.Padding(8,6,8,8)
     $summaryGroup.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
     $root.Controls.Add($summaryGroup,0,0)
 
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
     $summary.Dock = "Fill"
-    $summary.ColumnCount = 3
-    $summary.RowCount = 3
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.33))) | Out-Null
-    $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,33.34))) | Out-Null
-    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
-    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $summary.ColumnCount = 6
+    $summary.RowCount = 2
+    for($i = 0; $i -lt 6; $i++){
+        $summary.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,16.67))) | Out-Null
+    }
+    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,28))) | Out-Null
+    $summary.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
     $summaryGroup.Controls.Add($summary)
 
     $banner = New-Object System.Windows.Forms.Label
@@ -11390,14 +11389,14 @@ function Build-DirectoryToolsPage {
         default { $script:GUITheme.MutedText }
     }
     $summary.Controls.Add($banner,0,0)
-    $summary.SetColumnSpan($banner,3)
+    $summary.SetColumnSpan($banner,6)
 
     Add-GUIDirectoryStatusCell -Layout $summary -Column 0 -Row 1 -Label "Join state" -Value $status.JoinState
     Add-GUIDirectoryStatusCell -Layout $summary -Column 1 -Row 1 -Label "Domain" -Value $status.Domain
     Add-GUIDirectoryStatusCell -Layout $summary -Column 2 -Row 1 -Label "Logon DC" -Value $status.LogonDC
-    Add-GUIDirectoryStatusCell -Layout $summary -Column 0 -Row 2 -Label "Secure channel" -Value $status.SecureChannel
-    Add-GUIDirectoryStatusCell -Layout $summary -Column 1 -Row 2 -Label "AD site" -Value $status.ADSite
-    Add-GUIDirectoryStatusCell -Layout $summary -Column 2 -Row 2 -Label "DC DNS SRV" -Value $status.DCSrvLookup
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 3 -Row 1 -Label "Secure channel" -Value $status.SecureChannel
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 4 -Row 1 -Label "AD site" -Value $status.ADSite
+    Add-GUIDirectoryStatusCell -Layout $summary -Column 5 -Row 1 -Label "DC DNS SRV" -Value $status.DCSrvLookup
 
     $actionGroup = New-Object System.Windows.Forms.GroupBox
     $actionGroup.Text = "Domain And Policy Actions"
@@ -11414,21 +11413,13 @@ function Build-DirectoryToolsPage {
     [void]$actions.Controls.Add((New-GUIToolButton -Text "Domain Logon Health" -FunctionName "Invoke-DomainLogonHealth"))
     [void]$actions.Controls.Add((New-GUIToolButton -Text "GPO Health" -FunctionName "Invoke-GPOHealth"))
     [void]$actions.Controls.Add((New-GUIButton -Text "GPResult HTML" -Action { Start-GUIGPResultReport }))
-    [void]$actions.Controls.Add((New-GUIButton -Text "Refresh Status" -Action {
-        if($script:MainTabs){
-            $directoryPage = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Directory" } | Select-Object -First 1
-            if($directoryPage){
-                Build-DirectoryToolsPage -Page $directoryPage
-            }
-        }
-    }))
 
     $toolsPanel = New-Object System.Windows.Forms.Panel
     $toolsPanel.Dock = "Fill"
     $root.Controls.Add($toolsPanel,0,2)
 
     $tools = @(Get-GUIToolsForTab -Tab "Directory")
-    Add-GUICompactToolGrid -Page $toolsPanel -Title "Directory Tool Catalog" -Tools $tools -Columns 4
+    Add-GUICompactToolGrid -Page $toolsPanel -Title "Directory Tools" -Tools $tools -Columns 4
 }
 
 function Get-GUIDriverUpdateInventory {

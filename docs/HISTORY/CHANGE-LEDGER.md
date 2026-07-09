@@ -196,3 +196,9 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0186 | 2026-07-05 | TASK-0060 / TASK-0061 | Task System | +1 | Archived TASK-0060 because the raised threshold cleared the audit gate and activated TASK-0061 for Directory page layout polish. |
 | CHG-0187 | 2026-07-05 | TASK-0061 | Roadmap/Backlog | +1 | Mapped new Directory punch-list feedback into TASK-0061 and moved it before shared embedded-output work. |
 | CHG-0188 | 2026-07-09 | PROJECT | Repository Governance | +1 | Added the `Next 25` prompt shortcut rule and corrected the forward-looking audit reset text to `0 / 25`. |
+| CHG-0189 | 2026-07-09 | TASK-0061 | UI | +1 | Compacted the Directory page status area into a shorter single-row summary and removed the Directory refresh button. |
+| CHG-0190 | 2026-07-09 | TASK-0061 | Build System | +1 | Updated toolkit build metadata using `App/Update-ToolkitVersion.ps1` for Directory layout polish. |
+| CHG-0191 | 2026-07-09 | TASK-0061 | Validation/Test Framework | +1 | Validated parser checks, GUI smoke, and button-smoke behavior for Directory layout polish. |
+| CHG-0192 | 2026-07-09 | TASK-0061 / TASK-0062..TASK-0064 | Roadmap/Backlog | +1 | Reconciled new punch-list items into queued tasks for computer data transfer, Add-Ons concept testing, and naming options. |
+| CHG-0193 | 2026-07-09 | TASK-0061 / TASK-0055 | Documentation | +1 | Updated TASK-0061, queue, roadmap, changelog, ledger, punch list, and handoff records for Directory layout completion. |
+| CHG-0194 | 2026-07-09 | TASK-0061 / TASK-0055 | Task System | +1 | Completed TASK-0061 and activated TASK-0055 as the next single active implementation task. |

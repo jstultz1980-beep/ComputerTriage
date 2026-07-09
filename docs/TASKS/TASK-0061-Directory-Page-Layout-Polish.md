@@ -1,7 +1,7 @@
 # TASK-0061 - Directory Page Layout Polish
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -25,7 +25,19 @@ Fix the Directory page layout follow-up from the punch list after TASK-0054.
 - Punch-list item 31 maps here: remove the Directory page refresh button.
 
 ## Acceptance Criteria
-- [ ] Directory page layout is compact and does not require unnecessary vertical scrolling at normal window size.
-- [ ] Refresh Status button is removed.
-- [ ] TASK-0054 Directory status and action capabilities remain available.
-- [ ] Parser, smoke, and button-smoke validation pass.
+- [x] Directory page layout is compact and does not require unnecessary vertical scrolling at normal window size.
+- [x] Refresh Status button is removed.
+- [x] TASK-0054 Directory status and action capabilities remain available.
+- [x] Parser, smoke, and button-smoke validation pass.
+
+## Completion Notes
+- Reduced the Directory page fixed top area by compacting the status summary into a single six-field row.
+- Removed the Directory page `Refresh Status` button.
+- Kept Domain Logon Health, GPO Health, GPResult HTML, and Directory tool access visible.
+- Marked punch-list items 30 and 31 complete.
+
+## Validation
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1`.
+- PowerShell parser validation passed for `App/NetworkToolkit.ps1`.
+- GUI smoke test passed through `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed through `App/NetworkToolkit.ps1 -ButtonSmokeTest`.

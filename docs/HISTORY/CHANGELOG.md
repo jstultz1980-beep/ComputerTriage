@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-09
+- Completed TASK-0061 Directory Page Layout Polish and activated TASK-0055 Shared Embedded Output Pattern.
+- Compacted the Directory page status area, removed the Directory refresh button, and preserved domain/policy actions and tools.
+- Added queued tasks for computer data push/pull, Add-Ons concept testing, and product naming options from new punch-list entries.
+- Updated toolkit build metadata for TASK-0061.
 - Added the `Next 25` prompt shortcut rule for punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
 - Corrected forward-looking audit reset wording to `0 / 25`.
 

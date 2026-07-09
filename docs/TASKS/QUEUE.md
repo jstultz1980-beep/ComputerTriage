@@ -9,28 +9,32 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0061-Directory-Page-Layout-Polish` | Codex | Active | Fix the latest Directory page layout feedback and remove the page refresh button. |
+| `TASK-0055-Shared-Embedded-Output-Pattern` | Codex | Active | Create the shared embedded output pattern based on Quick Target Checks and convert the first low-risk tool. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0055-Shared-Embedded-Output-Pattern` | Codex | Queued | Create the shared embedded output pattern based on Quick Target Checks and convert the first low-risk tool. |
 | `TASK-0056-Triage-Guided-Workflow-Polish` | Codex | Queued | Make Triage guide the run, bundle, submit workflow without catalog clutter. |
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Codex | Queued | Complete Wi-Fi and Windows Update status polish from the punch list. |
 | `TASK-0058-Settings-And-Control-Polish` | Codex | Queued | Tighten Settings controls, status bar noise, logo sizing, and button sizing. |
+| `TASK-0062-Computer-Data-Push-Pull` | Codex | Queued | Add a technician-safe push/pull workflow for computer diagnostic data between toolkit copies. |
+| `TASK-0063-Add-Ons-Concept` | Codex | Queued | Prototype a clearer Add-Ons experience for installable non-portable programs. |
+| `TASK-0064-Product-Naming-Options` | Codex | Queued | Record five better product-name options before any rename work. |
 | `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Codex | Queued | Expand deterministic rules after the v1 vertical slice exists and validates. |
 
 ## Consolidated Plan
 
-The remaining work is intentionally ordered from immediate user feedback to shared UI foundation, page-specific polish, then analysis-engine depth:
+The remaining work is intentionally ordered from shared UI foundation to page-specific polish, data movement, Add-Ons concept testing, naming, then analysis-engine depth:
 
-1. `TASK-0061-Directory-Page-Layout-Polish` handles punch-list items 30 and 31.
-2. `TASK-0055-Shared-Embedded-Output-Pattern` creates the common embedded command-output pattern before more pages are converted.
-3. `TASK-0056-Triage-Guided-Workflow-Polish` handles punch-list items 24 and 25.
-4. `TASK-0057-WiFi-And-Windows-Status-Polish` handles punch-list items 16, 17, 18, 19, 20, and 29.
-5. `TASK-0058-Settings-And-Control-Polish` handles punch-list items 21, 22, 23, 26, and 28.
-6. `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` resumes deterministic analysis-rule depth after the current GUI cleanup pass.
+1. `TASK-0055-Shared-Embedded-Output-Pattern` creates the common embedded command-output pattern before more pages are converted.
+2. `TASK-0056-Triage-Guided-Workflow-Polish` handles punch-list items 24 and 25.
+3. `TASK-0057-WiFi-And-Windows-Status-Polish` handles punch-list items 16, 17, 18, 19, 20, and 29.
+4. `TASK-0058-Settings-And-Control-Polish` handles punch-list items 21, 22, 23, 26, and 28.
+5. `TASK-0062-Computer-Data-Push-Pull` handles punch-list item 32.
+6. `TASK-0063-Add-Ons-Concept` handles punch-list item 33.
+7. `TASK-0064-Product-Naming-Options` handles punch-list item 34.
+8. `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` resumes deterministic analysis-rule depth after the current GUI cleanup pass.
 
 ## Completed / Historical
 
@@ -83,6 +87,7 @@ The remaining work is intentionally ordered from immediate user feedback to shar
 | `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
 | `TASK-0054-Directory-Domain-Status-Page` | Completed | Added Directory domain identity and AD health status summary with visible Domain Logon Health, GPO Health, and GPResult actions. |
 | `TASK-0060-UI-Counter-Audit` | Archived | Superseded before execution when the audit threshold changed from 10 changes to 25 changes. |
+| `TASK-0061-Directory-Page-Layout-Polish` | Completed | Compacted the Directory page status area, removed the Directory refresh button, and preserved domain/policy actions. |
 
 ## Reconciliation Decision
 
@@ -91,4 +96,4 @@ The remaining work is intentionally ordered from immediate user feedback to shar
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is TASK-0061.
+- Current active task is TASK-0055.

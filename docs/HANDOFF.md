@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0066
+HANDOFF-0067
 
 ## Current Task
-TASK-0061-Directory-Page-Layout-Polish
+TASK-0055-Shared-Embedded-Output-Pattern
 
 ## Current Owner
 Codex
@@ -48,7 +48,9 @@ The audit threshold was raised from 10 changes to 25 changes. TASK-0060 was arch
 
 `Next 25` is now a project prompt shortcut for reading source-of-truth files, reconciling new punch-list additions into tasks, reordering the queue, completing tasks until the next 25-change audit gate, holding the full user test list until stopped, committing locally, and not pushing unless explicitly requested.
 
-Implementation work may resume under the single active task: TASK-0061 Directory Page Layout Polish.
+TASK-0061 completed Directory page layout polish.
+
+Implementation work may resume under the single active task: TASK-0055 Shared Embedded Output Pattern.
 
 Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
 Do not download or install tools.
@@ -72,16 +74,16 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 5 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 1 / 25 | No |
-| Task System | 8 / 25 | No |
+| Documentation | 2 / 25 | No |
+| Task System | 9 / 25 | No |
 | HEPHAESTUS | 3 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
-| UI | 10 / 25 | No |
+| UI | 11 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 1 / 25 | No |
-| Validation/Test Framework | 7 / 25 | No |
-| Roadmap/Backlog | 5 / 25 | No |
+| Build System | 2 / 25 | No |
+| Validation/Test Framework | 8 / 25 | No |
+| Roadmap/Backlog | 6 / 25 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
@@ -100,31 +102,36 @@ Recently completed work:
 - TASK-0033 completed tab-by-tab direction and embedded-tool planning, created follow-on implementation tasks, and activated the audit gate.
 - TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
 - TASK-0054 completed Directory domain identity and AD health status, then activated the next UI audit gate.
+- TASK-0061 completed Directory page layout polish and reconciled new punch-list items into queued tasks.
 
 Current active work:
-- TASK-0061 is active for Directory page layout polish from the latest punch-list feedback.
+- TASK-0055 is active for the shared embedded output pattern.
 
 Queued implementation/design work, in recommended order:
-- TASK-0055 Shared Embedded Output Pattern.
 - TASK-0056 Triage Guided Workflow Polish.
 - TASK-0057 Wi-Fi And Windows Status Polish.
 - TASK-0058 Settings And Control Polish.
+- TASK-0062 Computer Data Push Pull.
+- TASK-0063 Add Ons Concept.
+- TASK-0064 Product Naming Options.
 - TASK-0021 HEPHAESTUS Rule Catalog Expansion.
 
 ## Active Task
-`TASK-0061-Directory-Page-Layout-Polish`
+`TASK-0055-Shared-Embedded-Output-Pattern`
 
 Scope summary:
-- Make the Directory page fit better without requiring unnecessary vertical scrolling.
-- Remove the Directory page Refresh Status button.
-- Preserve the domain identity, secure channel, AD site, logon DC, DNS SRV, Domain Logon Health, GPO Health, GPResult, and Directory tool access created in TASK-0054.
-- Keep Directory focused on AD/domain identity and policy health, not generic Network or Infrastructure troubleshooting.
+- Define reusable GUI helpers for compact input row, action buttons, output pane, status updates, and optional output-folder handoff.
+- Prefer non-modal success handling.
+- Preserve clear error output and tool usage logging.
+- Identify first conversion candidates from Analyze, Network, Infrastructure, and Wi-Fi.
 
 ## Queued Work
-- `TASK-0055-Shared-Embedded-Output-Pattern` owned by Codex.
 - `TASK-0056-Triage-Guided-Workflow-Polish` owned by Codex.
 - `TASK-0057-WiFi-And-Windows-Status-Polish` owned by Codex.
 - `TASK-0058-Settings-And-Control-Polish` owned by Codex.
+- `TASK-0062-Computer-Data-Push-Pull` owned by Codex.
+- `TASK-0063-Add-Ons-Concept` owned by Codex.
+- `TASK-0064-Product-Naming-Options` owned by Codex.
 - `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` owned by Codex.
 
 ## Validation Completed For This Update
@@ -205,9 +212,17 @@ Scope summary:
 - Activated TASK-0061 as the next implementation task.
 - Added the `Next 25` prompt shortcut rule to `PROJECT.md`.
 - Corrected forward-looking audit reset wording to `0 / 25`.
+- Reconciled punch-list items 32, 33, and 34 into TASK-0062, TASK-0063, and TASK-0064.
+- Completed TASK-0061 Directory Page Layout Polish.
+- Marked punch-list items 30 and 31 complete.
+- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
+- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
+- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Activated TASK-0055 as the next implementation task.
 
 ## Blockers
-No active audit gate. Implementation may continue under TASK-0061 only.
+No active audit gate. Implementation may continue under TASK-0055 only.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -222,8 +237,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-PROJECT: Raise audit gate to 25 changes
-PROJECT: Add Next 25 prompt shortcut
+TASK-0061: Polish Directory page layout
 ```
 
 ## Next Bot Prompt
@@ -241,31 +255,33 @@ Read these repository files in order:
 4. docs/ROADMAP.md
 5. docs/HANDOFF.md
 6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0061-Directory-Page-Layout-Polish.md
+7. docs/TASKS/TASK-0055-Shared-Embedded-Output-Pattern.md
 8. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks before changing code.
 
 Current task state:
 - docs/HANDOFF.md and docs/TASKS/QUEUE.md list exactly one Active task.
-- Active task: TASK-0061-Directory-Page-Layout-Polish.
+- Active task: TASK-0055-Shared-Embedded-Output-Pattern.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `10 / 25`, so no audit is currently required.
 - TASK-0060 was archived before execution because the raised threshold cleared the gate.
 - `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
-- Next queued implementation tasks after TASK-0061 are TASK-0055 through TASK-0058, then TASK-0021.
+- TASK-0061 completed Directory page layout polish.
+- New punch-list items 32, 33, and 34 are queued as TASK-0062, TASK-0063, and TASK-0064.
+- Next queued implementation tasks after TASK-0055 are TASK-0056, TASK-0057, TASK-0058, TASK-0062, TASK-0063, TASK-0064, then TASK-0021.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Execute TASK-0061 only.
+Execute TASK-0055 only.
 
 Scope:
-- Make the Directory page fit better without requiring unnecessary vertical scrolling.
-- Remove the Directory page Refresh Status button.
-- Preserve the domain identity, secure channel, AD site, logon DC, DNS SRV, Domain Logon Health, GPO Health, GPResult, and Directory tool access created in TASK-0054.
-- Keep Directory focused on AD/domain identity and policy health, not generic Network or Infrastructure troubleshooting.
+- Define reusable GUI helpers for compact input row, action buttons, output pane, status updates, and optional output-folder handoff.
+- Prefer non-modal success handling.
+- Preserve clear error output and tool usage logging.
+- Identify first conversion candidates from Analyze, Network, Infrastructure, and Wi-Fi.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.
@@ -277,9 +293,9 @@ Do not:
 - Use chat history as source of truth unless the same information exists in the repository.
 
 Validation expectations:
-- Directory page layout is compact and does not require unnecessary vertical scrolling at normal window size.
-- Refresh Status button is removed.
-- TASK-0054 Directory status and action capabilities remain available.
+- A shared helper pattern exists for embedded command output.
+- At least one low-risk console-driven tool uses the shared pattern.
+- External GUI tools still launch externally.
 - Parser, smoke, and button-smoke validation pass.
 
 When done, provide:

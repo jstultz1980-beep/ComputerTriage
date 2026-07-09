@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260705185607,
-    "SourceUpdatedAt":  "2026-07-05T18:56:07.9601287-05:00",
-    "ReleaseNotes":  "Added Directory domain identity and AD health status page."
+    "Build":  20260709081734,
+    "SourceUpdatedAt":  "2026-07-09T08:17:34.5575569-05:00",
+    "ReleaseNotes":  "Polished Directory page layout and removed Directory refresh button."
 }
