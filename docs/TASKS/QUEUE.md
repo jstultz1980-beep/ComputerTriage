@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0081-Task-System-Counter-Audit` | Codex | Active | Audit task-state consistency because Task System reached `25 / 25` after TASK-0072. |
+| _None_ | _N/A_ | _N/A_ | No active task. |
 
 ## Queued
 
@@ -106,6 +106,7 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 | `TASK-0070-Local-GitHub-Reconciliation` | Completed | Audited local `master` against `origin/master`, recorded `0 behind / 28 ahead` after reconciliation, closed Wi-Fi hardware verification, and performed no push. |
 | `TASK-0071-Finish-Line-Project-Plan` | Completed | Created the finish-line plan and queued TASK-0072 through TASK-0080 for ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation. |
 | `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Completed | Defined ARGUS product behavior, evidence domains, citation/confidence rules, output contract, and next implementation scope. |
+| `TASK-0081-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached `25 / 25`, reset only the Task System counter, and documented unreconciled ADR-0003 file-access drift. |
 
 ## Reconciliation Decision
 

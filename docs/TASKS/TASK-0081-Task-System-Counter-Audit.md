@@ -1,7 +1,7 @@
 # TASK-0081 - Task System Counter Audit
 
 ## Status
-Active
+Completed
 
 ## Owner
 Codex
@@ -24,7 +24,15 @@ Audit task-state consistency because the Task System counter reached the `25 / 2
 - Cleaning unrelated runtime logs or importing untracked tools.
 
 ## Acceptance Criteria
-- [ ] Queue and handoff agree on the single active audit task.
-- [ ] Completed and queued task states are internally consistent.
-- [ ] Task System counter is reset only after the audit is complete.
-- [ ] Known unrelated drift remains excluded or is reconciled under explicit audit scope.
+- [x] Queue and handoff agree on the single active audit task.
+- [x] Completed and queued task states are internally consistent.
+- [x] Task System counter is reset only after the audit is complete.
+- [x] Known unrelated drift remains excluded or is reconciled under explicit audit scope.
+
+## Completion Notes
+- Verified `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agreed that TASK-0081 was the only active task before completion.
+- Verified TASK-0072 is completed and TASK-0073 through TASK-0080 remain queued in finish-line order.
+- Reset only the Task System counter from `25 / 25` to `0 / 25`.
+- Confirmed `App/manifests/custom-tools.json`, `App/NetworkToolkit/LatencyMon/`, and `App/NetworkToolkit/Logs/` remain excluded.
+- Confirmed the committed repository version of ADR-0003 is accepted, but the local working-tree ADR-0003 file still contains stale proposed text.
+- Attempted `git restore`, patch replacement, in-place patching, and PowerShell write-back for ADR-0003; Windows denied replacement/writes with unlink/access errors. The drift remains unstaged and documented for follow-up once the file handle or permission issue is cleared.

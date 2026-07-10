@@ -82,7 +82,7 @@ The user then explicitly requested a repo sync. `master` was pushed to GitHub an
 
 TASK-0071 completed the finish-line project plan. The remaining work is now queued as TASK-0072 through TASK-0080.
 
-TASK-0072 completed ARGUS product definition and evidence mapping. TASK-0081 is now active because Task System reached `25 / 25`.
+TASK-0072 completed ARGUS product definition and evidence mapping. TASK-0081 completed the required Task System counter audit and reset only the Task System counter.
 
 Wi-Fi status-bar behavior has now been verified by the user on hardware with Wi-Fi.
 
@@ -108,8 +108,8 @@ docs/HISTORY/CHANGE-LEDGER.md
 |---|---:|---|
 | Repository Governance | 7 / 25 | No |
 | Architecture | 2 / 25 | No |
-| Documentation | 18 / 25 | No |
-| Task System | 25 / 25 | Yes |
+| Documentation | 19 / 25 | No |
+| Task System | 0 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 3 / 25 | No |
 | Reporting | 1 / 25 | No |
@@ -122,7 +122,7 @@ docs/HISTORY/CHANGE-LEDGER.md
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree that TASK-0081 is the single active audit task.
+Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree that no task is active and TASK-0073 is the next queued implementation task.
 
 Recently completed work:
 - TASK-0045 completed Print page polish.
@@ -153,9 +153,10 @@ Recently completed work:
 - TASK-0070 completed local GitHub reconciliation and closed the Wi-Fi hardware verification punch-list item.
 - TASK-0071 completed finish-line project planning and queued the remaining release path.
 - TASK-0072 completed ARGUS product definition and evidence mapping.
+- TASK-0081 completed the required Task System counter audit after TASK-0072.
 
 Current active work:
-- TASK-0081 Task System Counter Audit.
+- None.
 
 Queued implementation/design work, in recommended order:
 - TASK-0073 ARGUS Evidence Normalization Implementation.
@@ -171,15 +172,15 @@ GitHub reconciliation:
 - Remote: `https://github.com/jstultz1980-beep/ComputerTriage.git`.
 - Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync.
 - Reconciliation report: `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md`.
-- TASK-0071 and TASK-0072 are local-only commits unless explicitly pushed after completion.
+- TASK-0071, TASK-0072, and TASK-0081 are local-only commits unless explicitly pushed after completion.
 
 ## Active Task
-`TASK-0081-Task-System-Counter-Audit`
+None.
 
 Scope summary:
-- Task System reached `25 / 25`.
-- No new implementation work may begin until TASK-0081 audits task-state consistency and resets only the Task System counter.
-- TASK-0073 remains queued behind the audit gate.
+- Task System audit gate is clear.
+- Next recommended task is `TASK-0073-ARGUS-Evidence-Normalization-Implementation`.
+- No implementation task is active until explicitly started.
 
 ## Queued Work
 - `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
@@ -238,6 +239,10 @@ Scope summary:
 - Defined ARGUS evidence domains, trust order, output contract, citation model, confidence language, unsupported-inference behavior, and implementation plans for TASK-0073/TASK-0074.
 - Confirmed committed ADR-0003 is accepted; known stale local ADR-0003 working-tree drift remains unstaged for deliberate audit reconciliation.
 - Activated TASK-0081 because Task System reached `25 / 25`.
+- Completed TASK-0081 Task System Counter Audit.
+- Verified handoff/queue consistency and queued TASK-0073 through TASK-0080 order.
+- Reset only the Task System counter from `25 / 25` to `0 / 25`.
+- Attempted to reconcile stale local ADR-0003 drift through `git restore`, patch replacement, in-place patching, and PowerShell write-back; Windows denied file replacement/writes. The stale ADR-0003 working-tree drift remains unstaged and must be handled once the file handle or permission issue is cleared.
 - Activated TASK-0047 for the requested status-bar version/build placement slice.
 - Moved toolkit version/build to the bottom-left status bar and removed the duplicate Settings-page version display.
 - Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
@@ -403,7 +408,7 @@ Scope summary:
 - Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
 
 ## Blockers
-Active audit gate: TASK-0081 must complete before ARGUS implementation begins.
+No active audit gate. TASK-0073 is the next queued implementation task.
 
 Known working-tree drift remains excluded unless a future task explicitly owns it.
 
@@ -411,14 +416,14 @@ Known working-tree drift remains excluded unless a future task explicitly owns i
 Known working-tree noise:
 - `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder and should not be deleted, imported, or committed unless a future task explicitly handles it.
 - Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
-- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has shown local stale/locked drift during ARGUS work. Do not stage it unless a future task explicitly updates the accepted ADR.
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has local stale proposed-text drift. TASK-0081 confirmed the committed repository version is accepted, but Windows denied restore/write attempts. Do not stage the stale drift; restore it to the committed accepted version once the file handle or permission issue clears.
 
 GitHub sync note:
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 ## Recommended Commit Message
 ```text
-TASK-0072: Define ARGUS product evidence map
+TASK-0081: Complete task system audit
 ```
 
 ## Next Bot Prompt
@@ -439,8 +444,8 @@ Read these repository files in order:
 7. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks where possible or create a new focused task before changing code.
 
 Current task state:
-- docs/HANDOFF.md and docs/TASKS/QUEUE.md list TASK-0081 as the only Active task.
-- Active task: TASK-0081 Task System Counter Audit.
+- docs/HANDOFF.md and docs/TASKS/QUEUE.md list no Active task.
+- Active task: None.
 - Owner: Codex.
 - TASK-0054 completed the Directory domain identity and AD health status page.
 - Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
@@ -465,17 +470,18 @@ Current task state:
 - TASK-0071 completed the finish-line project plan and queued TASK-0072 through TASK-0080.
 - TASK-0072 completed ARGUS product definition and evidence mapping.
 - `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md` defines ARGUS evidence domains, output contract, citation model, confidence language, unsupported-inference behavior, and TASK-0073/TASK-0074 implementation boundaries.
-- Task System is now `25 / 25`; TASK-0081 is the active audit gate.
+- TASK-0081 completed the Task System counter audit and reset Task System to `0 / 25`.
 - Punch-list item 53 is complete; Wi-Fi status-bar behavior was verified on hardware with Wi-Fi.
-- Next implementation task after audit: TASK-0073 ARGUS Evidence Normalization Implementation.
-- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync. TASK-0071 and TASK-0072 may be local-only commits if they have not been pushed after completion.
+- Next recommended implementation task: TASK-0073 ARGUS Evidence Normalization Implementation.
+- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync. TASK-0071, TASK-0072, and TASK-0081 may be local-only commits if they have not been pushed after completion.
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` still has stale local proposed-text drift. TASK-0081 attempted restore/write operations, but Windows denied file replacement/writes. Do not stage that drift.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
 - Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
 
 Your job:
-Complete TASK-0081 before beginning any new implementation.
+Do not begin implementation until TASK-0073 is explicitly activated from the queue.
 
 Do not:
 - Modify ARGUS or HEPHAESTUS.

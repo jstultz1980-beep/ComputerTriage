@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-10
+- Completed TASK-0081 Task System Counter Audit.
+- Verified handoff/queue consistency, completed TASK-0072 state, and queued TASK-0073 through TASK-0080 order.
+- Reset only the Task System counter from `25 / 25` to `0 / 25`.
+- Attempted to reconcile stale local ADR-0003 drift, but Windows denied file replacement/writes; the drift remains unstaged and documented for follow-up.
 - Completed TASK-0072 ARGUS Product Definition And Evidence Map.
 - Added `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md` with ARGUS evidence domains, trust order, output contract, citation model, confidence language, unsupported-inference rules, and implementation plans for TASK-0073/TASK-0074.
 - Updated TASK-0073 and TASK-0074 scopes to consume the TASK-0072 design.
