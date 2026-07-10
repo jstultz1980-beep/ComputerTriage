@@ -269,3 +269,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0259 | 2026-07-10 | TASK-0071 | Documentation | +1 | Added the finish-line project plan and updated handoff/changelog documentation. |
 | CHG-0260 | 2026-07-10 | TASK-0071 | Task System | +1 | Created and completed TASK-0071 and queued TASK-0072 through TASK-0080 as the remaining finish-line task sequence. |
 | CHG-0261 | 2026-07-10 | TASK-0071 | Roadmap/Backlog | +1 | Updated roadmap and backlog to promote ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation work into the finish-line queue. |
+| CHG-0262 | 2026-07-10 | TASK-0072 | Architecture | +1 | Defined ARGUS product responsibility, evidence domain map, output contract, citation model, confidence language, and unsupported-inference rules. |
+| CHG-0263 | 2026-07-10 | TASK-0072 | ARGUS | +1 | Converted ARGUS from foundation-summary scope into an implementation-ready normalization and recommendation plan. |
+| CHG-0264 | 2026-07-10 | TASK-0072 | Documentation | +1 | Added ARGUS product definition design and updated roadmap, finish plan, changelog, and task records. |
+| CHG-0265 | 2026-07-10 | TASK-0072 / TASK-0081 | Task System | +1 | Completed TASK-0072 and activated TASK-0081 because the Task System counter reached `25 / 25`. |

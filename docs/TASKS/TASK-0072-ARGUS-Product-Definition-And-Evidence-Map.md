@@ -1,7 +1,7 @@
 # TASK-0072 - ARGUS Product Definition And Evidence Map
 
 ## Status
-Queued
+Completed
 
 ## Owner
 Codex
@@ -21,7 +21,14 @@ Define the finished ARGUS behavior and evidence map before expanding implementat
 - Report styling.
 
 ## Acceptance Criteria
-- [ ] ARGUS evidence-domain map exists.
-- [ ] ARGUS output contract is defined for the next implementation task.
-- [ ] Confidence and citation rules are documented.
-- [ ] ADR-0003 status inconsistency is resolved or explicitly queued.
+- [x] ARGUS evidence-domain map exists.
+- [x] ARGUS output contract is defined for the next implementation task.
+- [x] Confidence and citation rules are documented.
+- [x] ADR-0003 status inconsistency is resolved or explicitly queued.
+
+## Completion Notes
+- Added `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`.
+- Defined ARGUS as the cited explanation layer over HEPHAESTUS deterministic outputs, not a general chat or whole-network analysis layer.
+- Defined evidence domains, trust order, confidence language, citation schema, unsupported-inference behavior, and the next output contract.
+- Scoped TASK-0073 to produce `ARGUS/normalized-analysis.json` and scoped TASK-0074 to consume that model for diagnostic groups and recommendations.
+- Confirmed the committed ADR-0003 version is already `Accepted`; the current working-tree ADR difference is known stale local drift and remains unstaged for the audit gate to reconcile deliberately.

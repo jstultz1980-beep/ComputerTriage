@@ -59,11 +59,16 @@ The first release candidate is ready when:
 ### 1. TASK-0072 - ARGUS Product Definition And Evidence Map
 Define the finished ARGUS behavior before adding more code.
 
+Status: Completed.
+
 Deliverables:
 - ARGUS evidence-domain map.
 - Input/output contract cleanup.
 - Confidence, citation, and unsupported-inference rules.
 - Decision on whether ADR-0003 needs status/text reconciliation.
+
+Output:
+- `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`
 
 ### 2. TASK-0073 - ARGUS Evidence Normalization Implementation
 Build the next ARGUS loaders and normalized analysis model.

@@ -101,9 +101,11 @@ Status: Queued
 Make ARGUS a trustworthy product layer rather than only a foundation command.
 
 Planned tasks:
-- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map`
 - `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
 - `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
+
+Completed planning:
+- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` created `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`.
 
 Completion target:
 - ARGUS has a defined evidence map, confidence/citation rules, normalized intermediate model, grouped diagnostic themes, and technician recommendations.
@@ -195,7 +197,7 @@ Completion target:
 The active finish-line plan is `docs/PROJECT-FINISH-PLAN.md`.
 
 Near-release priority:
-1. Complete ARGUS product definition and evidence map.
+1. Complete the required Task System audit gate.
 2. Implement ARGUS normalization.
 3. Add event grouping and recommendations.
 4. Finish report output.

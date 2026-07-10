@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-07-10
+- Completed TASK-0072 ARGUS Product Definition And Evidence Map.
+- Added `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md` with ARGUS evidence domains, trust order, output contract, citation model, confidence language, unsupported-inference rules, and implementation plans for TASK-0073/TASK-0074.
+- Updated TASK-0073 and TASK-0074 scopes to consume the TASK-0072 design.
+- Activated TASK-0081 Task System Counter Audit because Task System reached `25 / 25`.
 - Completed TASK-0071 Finish Line Project Plan.
 - Added `docs/PROJECT-FINISH-PLAN.md` to define the remaining release path.
 - Queued TASK-0072 through TASK-0080 for ARGUS product definition, ARGUS normalization, event grouping/recommendations, reporting, Analyze UI integration, first-render tab performance, embedded-tool trust/EDR-safe distribution, release packaging/update hardening, and release-candidate validation.

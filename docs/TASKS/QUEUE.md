@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| _None_ | _N/A_ | _N/A_ | No active task. |
+| `TASK-0081-Task-System-Counter-Audit` | Codex | Active | Audit task-state consistency because Task System reached `25 / 25` after TASK-0072. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Codex | Queued | Define finished ARGUS behavior, evidence domains, confidence/citation rules, and ADR cleanup needs. |
 | `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Codex | Queued | Implement ARGUS loaders and normalized intermediate model from the product definition. |
 | `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Codex | Queued | Group symptoms/events and produce confidence-scored technician recommendations with citations. |
 | `TASK-0075-Reporting-Finish-Pass` | Codex | Queued | Make technician and escalation reports useful outside the GUI. |
@@ -106,6 +105,7 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 | `TASK-0069-Triage-Text-Driven-Workflow` | Completed | Moved Triage page actions into instructional links and removed the old top action row. |
 | `TASK-0070-Local-GitHub-Reconciliation` | Completed | Audited local `master` against `origin/master`, recorded `0 behind / 28 ahead` after reconciliation, closed Wi-Fi hardware verification, and performed no push. |
 | `TASK-0071-Finish-Line-Project-Plan` | Completed | Created the finish-line plan and queued TASK-0072 through TASK-0080 for ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation. |
+| `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Completed | Defined ARGUS product behavior, evidence domains, citation/confidence rules, output contract, and next implementation scope. |
 
 ## Reconciliation Decision
 
