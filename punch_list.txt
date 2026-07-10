@@ -56,7 +56,7 @@
 50. ~~Settings toolkit-size refresh should be an inline icon immediately to the right of the size text, not a button.~~
 51. ~~Toolkit size must remain one line without wrapping.~~
 52. ~~Triage instruction headings should be bold, but the body paragraphs should remain regular weight.~~
-53. Wi-Fi status-bar behavior still needs testing on a computer with Wi-Fi.
+53. ~~Wi-Fi status-bar behavior still needs testing on a computer with Wi-Fi.~~
 54. ~~Windows Update Service Health status is not showing the LED clearly.~~
 55. ~~Triage instruction text is clunky; improve the format while keeping headings bold and body text regular.~~
 56. ~~Triage page circled field is the old progress bar; remove it from the page.~~

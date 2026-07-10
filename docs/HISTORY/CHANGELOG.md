@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-10
+- Completed TASK-0070 Local GitHub Reconciliation.
+- Fetched `origin` and confirmed local `master` was `0 behind / 27 ahead` before the reconciliation commit and `0 behind / 28 ahead` after it.
+- Added `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md` with the local-ahead commit list, committed-file delta, known working-tree drift, and sync recommendation.
+- Marked the Wi-Fi hardware verification punch-list item complete based on user confirmation and reconciled the roadmap note.
+- No push was performed.
+
 ## 2026-07-09
 - Completed TASK-0069 Triage Text Driven Workflow.
 - Removed the old Triage top action buttons/progress field, made Quick/Full Triage link actions in Step 1, moved Cancel Run into Step 1, and changed Review actions to explanatory links.
