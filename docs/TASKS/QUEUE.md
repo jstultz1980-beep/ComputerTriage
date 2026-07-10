@@ -15,21 +15,29 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| _None_ | _N/A_ | _N/A_ | No queued tasks remain after the active task. |
+| `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Codex | Queued | Define finished ARGUS behavior, evidence domains, confidence/citation rules, and ADR cleanup needs. |
+| `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Codex | Queued | Implement ARGUS loaders and normalized intermediate model from the product definition. |
+| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Codex | Queued | Group symptoms/events and produce confidence-scored technician recommendations with citations. |
+| `TASK-0075-Reporting-Finish-Pass` | Codex | Queued | Make technician and escalation reports useful outside the GUI. |
+| `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Queued | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
+| `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag. |
+| `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
+| `TASK-0079-Release-Packaging-And-Update-Hardening` | Codex | Queued | Validate portable release, deployment, update, client-data preservation, and release artifact layout. |
+| `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Run final release-candidate validation and produce release-ready docs. |
 
 ## Consolidated Plan
 
-The remaining work is intentionally ordered from shared UI foundation to page-specific polish, data movement, Add-Ons concept testing, naming, then analysis-engine depth:
+The remaining work is now a finish-line sequence rather than a punch-list cleanup pass:
 
-1. `TASK-0056-Triage-Guided-Workflow-Polish` handles punch-list items 24 and 25.
-2. `TASK-0057-WiFi-And-Windows-Status-Polish` handles punch-list items 16, 17, 18, 19, 20, and 29.
-3. `TASK-0058-Settings-And-Control-Polish` handles punch-list items 21, 22, 23, 26, and 28.
-4. `TASK-0062-Computer-Data-Push-Pull` handles punch-list item 32.
-5. `TASK-0063-Add-Ons-Concept` handles punch-list item 33.
-6. `TASK-0064-Product-Naming-Options` handles punch-list item 34.
-7. `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` resumes deterministic analysis-rule depth after the current GUI cleanup pass.
-8. `TASK-0065-UI-Regression-Polish` handles punch-list items 36 through 46.
-9. `TASK-0066-RapidAssist-Naming-Selection` handles punch-list item 35.
+1. Define ARGUS product behavior and evidence map.
+2. Implement ARGUS evidence normalization.
+3. Add ARGUS event grouping and recommendations.
+4. Finish technician/escalation reporting.
+5. Integrate the Analyze workflow into the GUI.
+6. Reduce first-render tab switching lag.
+7. Document embedded-tool trust and EDR-safe distribution.
+8. Harden release packaging and update behavior.
+9. Run release-candidate validation and documentation.
 
 ## Completed / Historical
 
@@ -97,6 +105,7 @@ The remaining work is intentionally ordered from shared UI foundation to page-sp
 | `TASK-0068-Triage-Instructions-And-WU-LED` | Completed | Refined Triage instruction formatting and made Windows Update health use a separate visible LED. |
 | `TASK-0069-Triage-Text-Driven-Workflow` | Completed | Moved Triage page actions into instructional links and removed the old top action row. |
 | `TASK-0070-Local-GitHub-Reconciliation` | Completed | Audited local `master` against `origin/master`, recorded `0 behind / 28 ahead` after reconciliation, closed Wi-Fi hardware verification, and performed no push. |
+| `TASK-0071-Finish-Line-Project-Plan` | Completed | Created the finish-line plan and queued TASK-0072 through TASK-0080 for ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation. |
 
 ## Reconciliation Decision
 

@@ -265,3 +265,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0255 | 2026-07-10 | TASK-0070 | Documentation | +1 | Added the local GitHub reconciliation report and refreshed handoff/changelog records. |
 | CHG-0256 | 2026-07-10 | TASK-0070 | Task System | +1 | Created and completed TASK-0070 and closed the Wi-Fi hardware verification punch-list item. |
 | CHG-0257 | 2026-07-10 | TASK-0070 | Roadmap/Backlog | +1 | Reconciled the roadmap note for Wi-Fi hardware verification after user confirmation. |
+| CHG-0258 | 2026-07-10 | TASK-0071 | Repository Governance | +1 | Reconciled the handoff GitHub sync state after the user explicitly requested repo sync and local/GitHub matched at `e882044`. |
+| CHG-0259 | 2026-07-10 | TASK-0071 | Documentation | +1 | Added the finish-line project plan and updated handoff/changelog documentation. |
+| CHG-0260 | 2026-07-10 | TASK-0071 | Task System | +1 | Created and completed TASK-0071 and queued TASK-0072 through TASK-0080 as the remaining finish-line task sequence. |
+| CHG-0261 | 2026-07-10 | TASK-0071 | Roadmap/Backlog | +1 | Updated roadmap and backlog to promote ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation work into the finish-line queue. |

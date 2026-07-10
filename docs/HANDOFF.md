@@ -76,7 +76,11 @@ TASK-0068 completed Triage instruction formatting and Windows Update health LED 
 
 TASK-0069 completed Triage text-driven workflow refinement.
 
-TASK-0070 completed local GitHub reconciliation. Local `master` is `0 behind / 28 ahead` of `origin/master` after the reconciliation commit; no push was performed.
+TASK-0070 completed local GitHub reconciliation. Local `master` was `0 behind / 28 ahead` of `origin/master` after the reconciliation commit.
+
+The user then explicitly requested a repo sync. `master` was pushed to GitHub and local/GitHub matched at commit `e882044`.
+
+TASK-0071 completed the finish-line project plan. The remaining work is now queued as TASK-0072 through TASK-0080.
 
 Wi-Fi status-bar behavior has now been verified by the user on hardware with Wi-Fi.
 
@@ -100,10 +104,10 @@ docs/HISTORY/CHANGE-LEDGER.md
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 6 / 25 | No |
+| Repository Governance | 7 / 25 | No |
 | Architecture | 1 / 25 | No |
-| Documentation | 16 / 25 | No |
-| Task System | 23 / 25 | No |
+| Documentation | 17 / 25 | No |
+| Task System | 24 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 2 / 25 | No |
 | Reporting | 1 / 25 | No |
@@ -111,12 +115,12 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 25 | No |
 | Build System | 13 / 25 | No |
 | Validation/Test Framework | 19 / 25 | No |
-| Roadmap/Backlog | 7 / 25 | No |
+| Roadmap/Backlog | 8 / 25 | No |
 
 ## Current State
 The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
 
-Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one active task.
+Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree that no task is active and TASK-0072 is the next recommended queued task.
 
 Recently completed work:
 - TASK-0045 completed Print page polish.
@@ -145,28 +149,45 @@ Recently completed work:
 - TASK-0068 completed Triage instruction and Windows Update LED refinement.
 - TASK-0069 completed Triage text-driven workflow refinement.
 - TASK-0070 completed local GitHub reconciliation and closed the Wi-Fi hardware verification punch-list item.
+- TASK-0071 completed finish-line project planning and queued the remaining release path.
 
 Current active work:
 - None.
 
 Queued implementation/design work, in recommended order:
-- None.
+- TASK-0072 ARGUS Product Definition And Evidence Map.
+- TASK-0073 ARGUS Evidence Normalization Implementation.
+- TASK-0074 ARGUS Event Grouping And Recommendations.
+- TASK-0075 Reporting Finish Pass.
+- TASK-0076 Analyze Workflow UI Integration.
+- TASK-0077 First Render Tab Performance Hardening.
+- TASK-0078 Embedded Tool Trust And EDR Safe Distribution.
+- TASK-0079 Release Packaging And Update Hardening.
+- TASK-0080 Release Candidate Validation And Documentation.
 
 GitHub reconciliation:
 - Remote: `https://github.com/jstultz1980-beep/ComputerTriage.git`.
-- Local `master` is `0 behind / 28 ahead` of `origin/master` after the 2026-07-10 reconciliation commit.
+- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync.
 - Reconciliation report: `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md`.
-- No push has been performed.
+- TASK-0071 is a new local planning commit unless it has been explicitly pushed after completion.
 
 ## Active Task
 None.
 
 Scope summary:
 - No active task remains.
-- Before new implementation work, create or activate a focused task from new user requests or roadmap direction.
+- Next recommended task is `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map`.
 
 ## Queued Work
-- None.
+- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map`
+- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
+- `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
+- `TASK-0075-Reporting-Finish-Pass`
+- `TASK-0076-Analyze-Workflow-UI-Integration`
+- `TASK-0077-First-Render-Tab-Performance-Hardening`
+- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution`
+- `TASK-0079-Release-Packaging-And-Update-Hardening`
+- `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
 ## Validation Completed For This Update
 - Consolidated outstanding tasks into a smaller logical sequence.
@@ -205,6 +226,11 @@ Scope summary:
 - Added `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md`.
 - Marked punch-list item 53 complete based on user Wi-Fi hardware verification.
 - No push was performed.
+- User later requested repo sync; pushed local `master` to GitHub and confirmed `origin/master...master` was `0 / 0` at `e882044`.
+- Completed TASK-0071 Finish Line Project Plan.
+- Added `docs/PROJECT-FINISH-PLAN.md`.
+- Queued TASK-0072 through TASK-0080 as the remaining finish-line work.
+- Updated roadmap/backlog/queue/handoff to make ARGUS planning, reporting, Analyze integration, tab performance, EDR-safe distribution, packaging, and release validation explicit.
 - Activated TASK-0047 for the requested status-bar version/build placement slice.
 - Moved toolkit version/build to the bottom-left status bar and removed the duplicate Settings-page version display.
 - Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
@@ -385,7 +411,7 @@ GitHub sync note:
 
 ## Recommended Commit Message
 ```text
-TASK-0070: Audit local GitHub reconciliation
+TASK-0071: Add finish-line project plan
 ```
 
 ## Next Bot Prompt
@@ -429,9 +455,10 @@ Current task state:
 - TASK-0068 completed Triage instruction formatting and Windows Update health LED refinement.
 - TASK-0069 completed Triage text-driven workflow refinement.
 - TASK-0070 completed local GitHub reconciliation.
+- TASK-0071 completed the finish-line project plan and queued TASK-0072 through TASK-0080.
 - Punch-list item 53 is complete; Wi-Fi status-bar behavior was verified on hardware with Wi-Fi.
-- No queued tasks remain.
-- Local `master` is `0 behind / 28 ahead` of `origin/master`; no push has been performed.
+- Next recommended task: TASK-0072 ARGUS Product Definition And Evidence Map.
+- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync. TASK-0071 may be a new local-only planning commit if it has not been pushed after completion.
 - `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
 - `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
 - Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.

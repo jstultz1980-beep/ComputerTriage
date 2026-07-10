@@ -96,19 +96,33 @@ Completion basis:
 - Existing HEPHAESTUS output paths remain compatible with ARGUS.
 
 ## Phase 07 - ARGUS Evidence Normalization
-Status: Planned
+Status: Queued
 
-Add ARGUS-side evidence loading, trust boundaries, and explanation logic after the foundation implementation is validated.
+Make ARGUS a trustworthy product layer rather than only a foundation command.
+
+Planned tasks:
+- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map`
+- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
+- `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
+
+Completion target:
+- ARGUS has a defined evidence map, confidence/citation rules, normalized intermediate model, grouped diagnostic themes, and technician recommendations.
 
 ## Phase 08 - Reporting
-Status: Planned
+Status: Queued
 
-Improve technician and executive reporting after deterministic findings and normalized outputs exist.
+Improve technician, escalation, and release-facing reports after deterministic findings and ARGUS outputs are useful.
+
+Planned task:
+- `TASK-0075-Reporting-Finish-Pass`
+
+Completion target:
+- Reports are readable outside the GUI, cite evidence limitations, and support technician handoff or escalation review.
 
 ## Phase 09 - UI Integration
-Status: Active
+Status: Queued
 
-Add Collect and Analyze workflow integration after collection, local analysis, and reporting contracts are stable.
+Connect Collect, Analyze, ARGUS, and Reports into a normal technician workflow, then address remaining performance friction.
 
 Current active task:
 - None.
@@ -159,7 +173,34 @@ Current UI work:
 - TASK-0069 completed Triage text-driven workflow refinement.
 - Wi-Fi status-bar behavior has been verified on hardware with Wi-Fi.
 
-## Phase 10 - Release Hardening
-Status: Planned
+Planned tasks:
+- `TASK-0076-Analyze-Workflow-UI-Integration`
+- `TASK-0077-First-Render-Tab-Performance-Hardening`
 
-Validation, packaging, documentation, and release preparation.
+## Phase 10 - Release Hardening
+Status: Queued
+
+Validation, packaging, documentation, embedded-tool trust handling, and release preparation.
+
+Planned tasks:
+- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution`
+- `TASK-0079-Release-Packaging-And-Update-Hardening`
+- `TASK-0080-Release-Candidate-Validation-And-Documentation`
+
+Completion target:
+- First release candidate has validated workflows, documented known limitations, package/update confidence, and a defensible antivirus/EDR posture based on provenance and allowlisting rather than evasion.
+
+## Finish-Line Plan
+
+The active finish-line plan is `docs/PROJECT-FINISH-PLAN.md`.
+
+Near-release priority:
+1. Complete ARGUS product definition and evidence map.
+2. Implement ARGUS normalization.
+3. Add event grouping and recommendations.
+4. Finish report output.
+5. Integrate Analyze workflow into the GUI.
+6. Measure and reduce first-render tab lag.
+7. Document embedded-tool trust and EDR-safe distribution.
+8. Harden packaging/update behavior.
+9. Run release-candidate validation and documentation.
