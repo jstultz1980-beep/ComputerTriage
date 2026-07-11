@@ -20,21 +20,32 @@ When the user prompts exactly or substantially with `Next 25`, treat it as this 
 Read the project source-of-truth files first. Check punch_list.txt for new additions, merge any additions into the existing task list or create focused tasks if needed, reorder the task queue into the most logical implementation sequence, then proceed through tasks until the next 25-change audit gate is reached. Do not stop for user testing between tasks. Hold the full "Test This" list until stopped at the audit gate. Commit each completed task locally, but do not push unless explicitly asked.
 ```
 
+## Codex CLI Resume Work Rule
+When the user prompts exactly or substantially with `Resume Work`, Codex CLI must treat it as this reusable instruction:
+
+```text
+Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, verify no 25/25 audit gate blocks implementation, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. Do not push unless explicitly requested.
+```
+
+`Resume Work` is not permission to choose unrelated work, bypass audit gates, clean unrelated drift, or expand task scope.
+
 ## Required Startup Sequence
-1. Read this file.
-2. Read `docs/PROJECT-CHARTER.md`.
-3. Read `docs/ARCHITECTURE.md`.
-4. Read `docs/ROADMAP.md`.
-5. Read `docs/HANDOFF.md`.
-6. Read the active task document listed in `docs/HANDOFF.md`.
-7. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
-8. Perform only the work assigned in the active task.
-9. Validate the work.
-10. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
-11. Update the active task document.
-12. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next
-    task or for creating the next task from the user's next request.
-13. Commit all related changes.
+1. Read `AGENTS.md` when operating through Codex CLI.
+2. Read this file.
+3. Read `docs/PROJECT-CHARTER.md`.
+4. Read `docs/ARCHITECTURE.md`.
+5. Read `docs/ROADMAP.md`.
+6. Read `docs/HANDOFF.md`.
+7. Read `docs/TASKS/QUEUE.md` and verify it agrees with the handoff.
+8. Read the active task document listed in `docs/HANDOFF.md`.
+9. Read every ADR, design, plan, review, manifest, and code file referenced by the active task.
+10. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
+11. Perform only the work assigned in the active task.
+12. Validate the work.
+13. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
+14. Update the active task document.
+15. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next task or for creating the next task from the user's next request.
+16. Commit all related changes.
 
 ## Core Rule
 No implementation work may begin unless there is an active task document under `docs/TASKS`.
@@ -104,8 +115,8 @@ Computer Triage Toolkit.
 Primary goal: rapid, portable, single-computer Windows diagnostics, analysis, explanation, and reporting.
 
 ## Components
-- HEPHAESTUS: evidence collection
-- ARGUS: evidence analysis and explanation
+- HEPHAESTUS: evidence collection and deterministic local analysis
+- ARGUS: cited evidence analysis, explanation, grouping, and technician guidance
 - Reporting: technician and executive outputs
 
 ## Non-Goals
