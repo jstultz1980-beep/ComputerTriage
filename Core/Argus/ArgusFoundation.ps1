@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 # ArgusFoundation.ps1
 # ARGUS Foundation - Minimal Contract Validation and Summary Slice
 # =====================================================================
@@ -468,21 +468,31 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         })
     }
 
+    $normalizedModule = Join-Path $PSScriptRoot "ArgusNormalization.ps1"
+    if(!(Test-Path $normalizedModule)){
+        throw "ARGUS normalization module not found: $normalizedModule"
+    }
+    . $normalizedModule
+
     $validation = New-ARGUSInputValidation -BundleRoot $BundleRoot -Artifacts $artifacts -NormalizedArtifacts $normalizedArtifacts
     $summary = New-ARGUSAnalysisSummary -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
+    $normalizedAnalysis = New-ARGUSNormalizedAnalysis -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
 
     $validationPath = Join-Path $argusRoot "input-validation.json"
     $summaryPath = Join-Path $argusRoot "analysis-summary.json"
+    $normalizedPath = Join-Path $argusRoot "normalized-analysis.json"
     $reportPath = Join-Path $argusRoot "report.md"
 
     Write-ARGUSJsonFile -Path $validationPath -InputObject $validation
     Write-ARGUSJsonFile -Path $summaryPath -InputObject $summary
+    Write-ARGUSJsonFile -Path $normalizedPath -InputObject $normalizedAnalysis
     Write-ARGUSMarkdownReport -Path $reportPath -Validation $validation -Summary $summary
 
     Write-Host "ARGUS Foundation completed." -ForegroundColor Green
     Write-Host "Bundle root: $BundleRoot"
     Write-Host "ARGUS root: $argusRoot"
     Write-Host "Input validation: $($validation.status)"
+    Write-Host "Normalized analysis: $normalizedPath"
 
     return [pscustomobject]@{
         Status = "Completed"
@@ -491,6 +501,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         InputValidationStatus = $validation.status
         InputValidationMode = $validation.mode
         Findings = @($summary.prioritizedDeterministicFindings).Count
+        NormalizedAnalysis = $normalizedPath
         Report = $reportPath
     }
 }
+

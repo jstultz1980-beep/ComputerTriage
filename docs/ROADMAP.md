@@ -1,4 +1,4 @@
-# Roadmap
+﻿# Roadmap
 
 ## Phase 00 - Foundation Zero
 Status: Completed
@@ -96,16 +96,15 @@ Completion basis:
 - Existing HEPHAESTUS output paths remain compatible with ARGUS.
 
 ## Phase 07 - ARGUS Evidence Normalization
-Status: Paused For ChatGPT Review
+Status: Active
 
 Make ARGUS a trustworthy product layer rather than only a foundation command.
 
-Current active review gate:
-- `TASK-0082-ChatGPT-Governance-Handoff-Review`
-
-Planned tasks:
-- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
+Current active task:
 - `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
+
+Completed work:
+- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
 
 Completed planning:
 - `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` created `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`.

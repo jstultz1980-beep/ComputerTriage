@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260709155714,
-    "SourceUpdatedAt":  "2026-07-09T15:57:14.7581176-05:00",
-    "ReleaseNotes":  "Reworked Triage page into text-driven workflow actions."
+    "Build":  20260710201945,
+    "SourceUpdatedAt":  "2026-07-10T20:19:45.5301668-05:00",
+    "ReleaseNotes":  "Added ARGUS normalization loaders and normalized-analysis output with explicit domain, fact, gap, and citation records."
 }

@@ -279,3 +279,8 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0269 | 2026-07-10 | TASK-0082 | Task System | +1 | Created and activated TASK-0082 as the only active task while keeping TASK-0073 through TASK-0080 queued. |
 | CHG-0270 | 2026-07-10 | TASK-0082 | Documentation | +1 | Rewrote the handoff for ChatGPT with completed-work history, exact changed-file list, validation, drift, blockers, counters, and a fresh Next Bot Prompt. |
 | CHG-0271 | 2026-07-10 | TASK-0082 | Roadmap/Backlog | +1 | Paused Phase 07 for ChatGPT governance and ARGUS design review before ARGUS normalization implementation begins. |
+| CHG-0272 | 2026-07-10 | TASK-0073 | ARGUS | +1 | Added structured ARGUS normalization loaders and `ARGUS/normalized-analysis.json` with domain, fact, gap, and citation records. |
+| CHG-0273 | 2026-07-10 | TASK-0073 | Build System | +1 | Updated toolkit build metadata for ARGUS evidence normalization. |
+| CHG-0274 | 2026-07-10 | TASK-0073 | Validation/Test Framework | +1 | Validated PowerShell parsing, the existing bundle, and normalized artifact structure. |
+| CHG-0275 | 2026-07-10 | TASK-0073 | Documentation | +1 | Recorded TASK-0073 completion and ARGUS normalization validation evidence. |
+| CHG-0276 | 2026-07-10 | TASK-0073 / TASK-0074 | Task System | +1 | Completed TASK-0073 and activated TASK-0074 as the single active task. |

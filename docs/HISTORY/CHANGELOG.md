@@ -2,10 +2,10 @@
 
 ## 2026-07-10
 - Completed TASK-0083 Codex CLI Resume Work Protocol.
-- Added root `AGENTS.md` as the Codex CLI entry point.
-- Added `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` with the complete Programmer/Project Custodian operating model, startup sequence, stop conditions, drift preservation, validation, commit, and reporting rules.
-- Added the `Resume Work` shortcut to `PROJECT.md` and preserved TASK-0073 as the single active implementation task.
-- Updated handoff and queue so Codex CLI can resume from repository instructions without a manually copied task prompt.
+- Added root `AGENTS.md` and `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` so Codex can resume from tracked repository state.
+- Completed TASK-0073 ARGUS Evidence Normalization Implementation.
+- Added structured ARGUS domain, fact, gap, and citation records in `ARGUS/normalized-analysis.json` while preserving deterministic evidence boundaries.
+- Validated PowerShell parsing and the existing AI bundle, then activated TASK-0074 Event Grouping And Recommendations.
 - Completed TASK-0082 ChatGPT Governance Handoff Review.
 - Reviewed the Codex-only work stretch, governance state, finish-line plan, ARGUS product definition, and TASK-0073/TASK-0074 scopes.
 - Confirmed no blocking architecture findings.
