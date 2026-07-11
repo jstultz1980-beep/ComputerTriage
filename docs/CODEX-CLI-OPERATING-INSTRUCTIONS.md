@@ -12,6 +12,7 @@ ChatGPT owns:
 - Audit gates and subsystem counter decisions.
 - Architecture/design reviews and acceptance decisions.
 - Final review of scope drift or unresolved design conflicts.
+- Remediation of blockers reported through `docs/ERROR-HANDOFF.md`.
 
 ### Codex — Programmer and Implementation Agent
 
@@ -22,7 +23,7 @@ Codex owns:
 - Maintaining task work logs and completion evidence.
 - Updating required governance/history/build files.
 - Creating clear commits.
-- Reporting blockers instead of inventing architecture or expanding scope.
+- Reporting genuine blockers through the cloud error-handoff document instead of leaving them only in terminal output.
 
 ## Repository Authority
 
@@ -59,11 +60,12 @@ Read in this order:
 5. `docs/ROADMAP.md`
 6. `docs/HANDOFF.md`
 7. `docs/TASKS/QUEUE.md`
-8. The Active task named by both handoff and queue
-9. Every ADR, design, review, plan, manifest, and code file referenced by the Active task
-10. `punch_list.txt`, when present
+8. `docs/ERROR-HANDOFF.md`
+9. The Active task named by both handoff and queue
+10. Every ADR, design, review, plan, manifest, and code file referenced by the Active task
+11. `punch_list.txt`, when present
 
-Do not start implementation until this sequence is complete.
+If `docs/ERROR-HANDOFF.md` has `Status: Blocked`, do not start implementation. Tell the user to prompt the Project Custodian with `Address Errors`.
 
 ### 3. Verify governance before implementation
 
@@ -75,8 +77,9 @@ Confirm:
 - No subsystem is at the `25 / 25` audit gate, unless the Active task is the required audit.
 - Known working-tree drift is documented.
 - The requested work is within Active-task scope.
+- No unresolved blocker is recorded in `docs/ERROR-HANDOFF.md`.
 
-If any check fails, stop implementation and report the conflict. Do not create an informal workaround.
+If any check fails, use the Error Handoff Procedure below. Do not create an informal workaround.
 
 ### 4. Reconcile new user requests
 
@@ -100,7 +103,7 @@ Follow:
 - Audit counter rule.
 
 Do not clean or refactor unrelated code.
-Do not modify HEPHAESTUS, ARGUS, reporting, GUI, deployment, or embedded-tool behavior unless the Active task owns that subsystem.
+Do not modify collection, deterministic analysis, ARGUS, reporting, GUI, deployment, or embedded-tool behavior unless the Active task owns that subsystem.
 
 ### 6. Preserve known drift
 
@@ -151,7 +154,12 @@ Normal rule:
 - Commit locally.
 - Do not push unless the user explicitly requests it.
 
-When the user requests a push:
+Exception for blockers:
+- A complete blocker report in `docs/ERROR-HANDOFF.md` must be committed and pushed immediately so the Project Custodian can read it remotely.
+- Push only the blocker report and minimum supporting governance changes needed to make it understandable.
+- Do not include unrelated implementation work or drift in that push.
+
+When the user requests a normal push:
 - Verify staged files belong to the task.
 - Exclude known unrelated drift.
 - Push the intended branch.
@@ -170,18 +178,62 @@ Report:
 - Known drift preserved.
 - Remaining blockers or required user tests.
 
+## Error Handoff Procedure
+
+When a genuine blocker or stop condition occurs:
+
+1. Stop implementation safely.
+2. Preserve incomplete work and unrelated drift.
+3. Open `docs/ERROR-HANDOFF.md`.
+4. Replace the current contents with a complete report containing:
+   - `Status: Blocked`
+   - Reporting agent
+   - Active task
+   - Unique error ID
+   - Severity
+   - Concise summary
+   - Exact blocking condition
+   - Evidence and command output
+   - Files and repository state involved
+   - Actions already attempted
+   - Why safe continuation is impossible
+   - Exact Project Custodian decision needed
+   - Recommended remediation
+   - Working-tree drift preserved
+   - Timestamp
+5. Commit the report using:
+   `BLOCKED <TASK-ID>: Record error handoff for Project Custodian`
+6. Push the blocker-report commit to the cloud repository. This push is pre-authorized.
+7. Tell the user: `The blocker has been recorded and pushed. Prompt ChatGPT with: Address Errors.`
+8. Do not continue until the cloud report is resolved and the user enters `Resume Work`.
+
+Do not use this procedure for routine implementation decisions or errors that are safely correctable inside the Active task.
+
+## `Address Errors` Project Custodian Workflow
+
+When the user prompts ChatGPT with `Address Errors`, the Project Custodian will:
+- Read the cloud source-of-truth files and `docs/ERROR-HANDOFF.md`.
+- Investigate the blocker.
+- Correct governance, architecture, scope, sequencing, or documentation conflicts directly when possible.
+- Preserve Codex implementation work and unrelated drift.
+- Create or amend a focused tracked task only when code work is required.
+- Mark the error handoff `Resolved` or `Clear`.
+- Commit and push the remediation.
+- Instruct the user to enter `Resume Work` in Codex.
+
 ## Stop Conditions
 
-Stop and report to the Project Custodian when:
+Stop and use the Error Handoff Procedure when:
 - Handoff and queue disagree.
 - More than one task is Active.
 - No Active task exists and implementation is requested.
-- An audit counter is at `25 / 25`.
+- An audit counter is at `25 / 25` at a task boundary.
 - Required architecture is missing or contradictory.
 - The task would require prohibited scope expansion.
 - A structural script failure triggers the no-patch-stacking rule.
 - Unrelated drift would need to be overwritten.
 - Validation fails outside the Active task’s authorized correction scope.
+- Continuing risks data loss, credentials, security, or repository integrity.
 
 ## Working Relationship
 
