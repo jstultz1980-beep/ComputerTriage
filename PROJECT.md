@@ -24,10 +24,32 @@ Read the project source-of-truth files first. Check punch_list.txt for new addit
 When the user prompts exactly or substantially with `Resume Work`, Codex CLI must treat it as this reusable instruction:
 
 ```text
-Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. A 25/25 audit threshold blocks the next implementation task but does not interrupt an Active task already underway. Do not push unless explicitly requested.
+Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. A 25/25 audit threshold blocks the next implementation task but does not interrupt an Active task already underway. Do not push unless explicitly requested, except for a required blocker report under the Error Handoff Rule.
 ```
 
 `Resume Work` is not permission to choose unrelated work, bypass audit gates, clean unrelated drift, or expand task scope.
+
+## Address Errors Rule
+When the user prompts exactly or substantially with `Address Errors`, ChatGPT must treat it as this reusable instruction:
+
+```text
+Read PROJECT.md, docs/HANDOFF.md, docs/TASKS/QUEUE.md, and docs/ERROR-HANDOFF.md from the cloud repository. Verify the blocker is current and tied to the Active task. Inspect all tracked files needed to understand it. Resolve governance, architecture, scope, sequencing, documentation, or repository-state conflicts directly when possible. Preserve Codex implementation work and unrelated drift. If code work is required, create or amend the smallest appropriate tracked task without discarding current work. Update docs/ERROR-HANDOFF.md with the resolution, update handoff/queue/task records when state changes, commit and push the remediation, then instruct the user to tell Codex: Resume Work.
+```
+
+`Address Errors` is a Project Custodian workflow. It is not permission to perform unrelated feature work.
+
+## Error Handoff Rule
+`docs/ERROR-HANDOFF.md` is the canonical cloud blocker handoff from Codex to the Project Custodian.
+
+When Codex reaches a genuine blocker or required stop condition, it must:
+1. Preserve current implementation work and unrelated working-tree drift.
+2. Record the complete blocker in `docs/ERROR-HANDOFF.md`.
+3. Include the Active task, exact error, evidence, affected files, attempted actions, why continuation is unsafe, and the required Project Custodian decision.
+4. Commit the blocker report.
+5. Push the blocker-report commit to the cloud repository. This limited push is explicitly authorized even when normal task commits are local-only.
+6. Tell the user the error handoff is available, then wait for `Address Errors`.
+
+A blocker must never exist only in terminal output, chat, or an unpushed local commit.
 
 ## Active Task Non-Interruption Rule
 Read `docs/GOVERNANCE/NON-INTERRUPTION-GUARDRAIL.md`.
@@ -62,13 +84,14 @@ A new ChatGPT request is not by itself an immediate-stop condition.
 7. Read `docs/TASKS/QUEUE.md` and verify it agrees with the handoff.
 8. Read the active task document listed in `docs/HANDOFF.md`.
 9. Read every ADR, design, plan, review, manifest, and code file referenced by the active task.
-10. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
-11. Perform only the work assigned in the active task.
-12. Validate the work.
-13. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
-14. Update the active task document.
-15. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next task or for creating the next task from the user's next request.
-16. Commit all related changes.
+10. Read `docs/ERROR-HANDOFF.md`. If its status is `Blocked`, do not begin implementation; report that the Project Custodian must run `Address Errors`.
+11. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
+12. Perform only the work assigned in the active task.
+13. Validate the work.
+14. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
+15. Update the active task document.
+16. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next task or for creating the next task from the user's next request.
+17. Commit all related changes.
 
 ## Core Rule
 No implementation work may begin unless there is an active task document under `docs/TASKS`.
@@ -134,13 +157,15 @@ Normal implementation tasks may be committed locally, but should not be pushed t
 
 Repository GitHub sync should happen during the 25-change audit/refactor checkpoint, or sooner only when the user asks for a push.
 
+Exception: a blocker report in `docs/ERROR-HANDOFF.md` and its minimum required supporting governance changes must be pushed immediately so the Project Custodian can address it.
+
 ## Product
 Computer Triage Toolkit.
 
 Primary goal: rapid, portable, single-computer Windows diagnostics, analysis, explanation, and reporting.
 
 ## Components
-- HEPHAESTUS: evidence collection and deterministic local analysis
+- Evidence Collection and Deterministic Analysis
 - ARGUS: cited evidence analysis, explanation, grouping, and technician guidance
 - Reporting: technician and executive outputs
 
