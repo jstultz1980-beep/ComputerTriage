@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-10
+- Completed TASK-0076 Analyze Workflow UI Integration.
+- Added a guided Analyze page with embedded complete analysis, latest local/technician/escalation report access, bundle access, and explicit missing or limited evidence status.
+- Parser, GUI smoke, and extended button-smoke validation passed; activated TASK-0085 because Documentation reached `25 / 25`.
 - Completed TASK-0075 Reporting Finish Pass.
 - Added standalone `ARGUS/technician-report.md` and `ARGUS/escalation-report.md` outputs with confidence, citations, limitations, diagnostic themes, and structured artifact references.
 - Validated both reports from the current AI bundle and activated TASK-0076 Analyze Workflow UI Integration.

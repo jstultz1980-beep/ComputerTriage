@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260710220044,
-    "SourceUpdatedAt":  "2026-07-10T22:00:44.4414329-05:00",
-    "ReleaseNotes":  "Added standalone ARGUS technician and escalation reports with confidence, citations, and evidence limitations."
+    "Build":  20260710221124,
+    "SourceUpdatedAt":  "2026-07-10T22:11:24.7161090-05:00",
+    "ReleaseNotes":  "Added a guided Analyze workflow with embedded complete analysis, report access, and explicit evidence status."
 }

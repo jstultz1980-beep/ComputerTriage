@@ -11396,9 +11396,162 @@ function Update-GUIWindowsUpdateHealthIndicator {
     }
 }
 
+function Get-GUIAnalyzeBundleRoot {
+    if(!$NTKPaths -or !$NTKPaths.Exports -or !(Test-Path -LiteralPath $NTKPaths.Exports)){
+        return $null
+    }
+
+    $candidates = @()
+    if((Test-Path (Join-Path $NTKPaths.Exports "Analysis")) -or (Test-Path (Join-Path $NTKPaths.Exports "Metadata"))){
+        $candidates += Get-Item -LiteralPath $NTKPaths.Exports
+    }
+    $candidates += Get-ChildItem -LiteralPath $NTKPaths.Exports -Directory -Recurse -ErrorAction SilentlyContinue |
+        Where-Object { (Test-Path (Join-Path $_.FullName "Analysis")) -or (Test-Path (Join-Path $_.FullName "Metadata")) }
+
+    $latest = @($candidates | Sort-Object LastWriteTime -Descending | Select-Object -First 1)
+    if($latest.Count -eq 0){ return $null }
+    return $latest[0].FullName
+}
+
+function Get-GUIAnalyzeArtifactPath {
+    param([Parameter(Mandatory=$true)][string]$RelativePath)
+    $bundle = Get-GUIAnalyzeBundleRoot
+    if(!$bundle){ return $null }
+    $path = Join-Path $bundle $RelativePath
+    if(Test-Path -LiteralPath $path){ return $path }
+    return $null
+}
+
+function Update-GUIAnalyzeWorkflowStatus {
+    if(!$script:AnalyzeStatusLabel -or $script:AnalyzeStatusLabel.IsDisposed){ return }
+    $bundle = Get-GUIAnalyzeBundleRoot
+    if(!$bundle){
+        $script:AnalyzeStatusLabel.Text = "No analysis bundle found. Run Triage first, then run Complete Analysis."
+        $script:AnalyzeStatusLabel.ForeColor = $script:GUITheme.Warning
+        return
+    }
+
+    $validationPath = Join-Path $bundle "ARGUS\input-validation.json"
+    $technicianPath = Join-Path $bundle "ARGUS\technician-report.md"
+    $analysisPath = Join-Path $bundle "Analysis\report.html"
+    if(!(Test-Path -LiteralPath $analysisPath)){
+        $script:AnalyzeStatusLabel.Text = "Bundle found, but local analysis is missing. Run Complete Analysis."
+        $script:AnalyzeStatusLabel.ForeColor = $script:GUITheme.Warning
+        return
+    }
+    if(!(Test-Path -LiteralPath $validationPath) -or !(Test-Path -LiteralPath $technicianPath)){
+        $script:AnalyzeStatusLabel.Text = "Local analysis exists, but ARGUS reports are missing. Run Complete Analysis."
+        $script:AnalyzeStatusLabel.ForeColor = $script:GUITheme.Warning
+        return
+    }
+
+    try {
+        $validation = Get-Content -LiteralPath $validationPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $state = [string]$validation.status
+        $mode = [string]$validation.mode
+        $script:AnalyzeStatusLabel.Text = "Latest analysis: $state ($mode mode). Reports are ready."
+        $script:AnalyzeStatusLabel.ForeColor = if($state -eq "valid"){$script:GUITheme.Success}else{$script:GUITheme.Warning}
+        $script:AnalyzeStatusLabel.Tag = $bundle
+    }
+    catch {
+        $script:AnalyzeStatusLabel.Text = "ARGUS status could not be read. Re-run Complete Analysis."
+        $script:AnalyzeStatusLabel.ForeColor = $script:GUITheme.Warning
+    }
+}
+
+function Open-GUIAnalyzeArtifact {
+    param([Parameter(Mandatory=$true)][string]$RelativePath,[Parameter(Mandatory=$true)][string]$Label)
+    $path = Get-GUIAnalyzeArtifactPath -RelativePath $RelativePath
+    if(!$path){
+        Add-GUILog "$Label is not available. Run Complete Analysis first."
+        Update-GUIAnalyzeWorkflowStatus
+        return
+    }
+    Open-NTKOutputFile -Path $path
+    Add-GUILog "Opened $Label`: $path"
+}
+
+function Start-GUICompleteAnalysis {
+    $bundle = Get-GUIAnalyzeBundleRoot
+    if(!$bundle){
+        Add-GUILog "No collected bundle was found. Run Quick or Full Triage before analysis."
+        Update-GUIAnalyzeWorkflowStatus
+        return
+    }
+    $safeBundle = $bundle.Replace("'","''")
+    Start-GUISafeScriptRunner -ToolName "Complete Local And ARGUS Analysis" -Invocation "Invoke-HEPHAESTUSLocalAnalysis -BundleRoot '$safeBundle'; Invoke-ARGUSFoundationAnalysis -BundleRoot '$safeBundle'"
+}
+
 function Build-WindowsToolsPage {
     param([System.Windows.Forms.TabPage]$Page)
-    Build-GUICatalogToolsPage -Page $Page -Tab "Analyze" -Title "Analysis Tools"
+
+    $layout = New-Object System.Windows.Forms.TableLayoutPanel
+    $layout.Dock = "Fill"
+    $layout.ColumnCount = 1
+    $layout.RowCount = 2
+    $layout.Padding = New-Object System.Windows.Forms.Padding(10)
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,205))) | Out-Null
+    $layout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $Page.Controls.Add($layout)
+
+    $workflow = New-Object System.Windows.Forms.GroupBox
+    $workflow.Text = "Collect, Analyze, Review"
+    $workflow.Dock = "Fill"
+    $workflow.Padding = New-Object System.Windows.Forms.Padding(12)
+    $workflow.Font = New-Object System.Drawing.Font("Segoe UI Semilight",10,[System.Drawing.FontStyle]::Bold)
+    $layout.Controls.Add($workflow,0,0)
+
+    $flow = New-Object System.Windows.Forms.TableLayoutPanel
+    $flow.Dock = "Fill"
+    $flow.ColumnCount = 1
+    $flow.RowCount = 4
+    $flow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,38))) | Out-Null
+    $flow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,48))) | Out-Null
+    $flow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
+    $flow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $workflow.Controls.Add($flow)
+
+    $instruction = New-GUILabel "1. Collect with Quick or Full Triage.  2. Run Complete Analysis.  3. Review the technician report or open the escalation handoff."
+    $instruction.Dock = "Fill"
+    $instruction.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $flow.Controls.Add($instruction,0,0)
+
+    $actions = New-Object System.Windows.Forms.FlowLayoutPanel
+    $actions.Dock = "Fill"
+    $actions.WrapContents = $false
+    $run = New-GUIButton "Run Complete Analysis" { Start-GUICompleteAnalysis }
+    $run.Name = "AnalyzeRunCompleteButton"
+    $local = New-GUIButton "Local Report" { Open-GUIAnalyzeArtifact -RelativePath "Analysis\report.html" -Label "local analysis report" }
+    $local.Name = "AnalyzeLocalReportButton"
+    $technician = New-GUIButton "Technician Report" { Open-GUIAnalyzeArtifact -RelativePath "ARGUS\technician-report.md" -Label "technician report" }
+    $technician.Name = "AnalyzeTechnicianReportButton"
+    $escalation = New-GUIButton "Escalation Handoff" { Open-GUIAnalyzeArtifact -RelativePath "ARGUS\escalation-report.md" -Label "escalation handoff" }
+    $escalation.Name = "AnalyzeEscalationReportButton"
+    $folder = New-GUIButton "Open Bundle" { $bundle=Get-GUIAnalyzeBundleRoot; if($bundle){Open-GUIFolder $bundle}else{Update-GUIAnalyzeWorkflowStatus} }
+    $folder.Name = "AnalyzeOpenBundleButton"
+    foreach($button in @($run,$local,$technician,$escalation,$folder)){ Set-GUIButtonChrome -Button $button -Compact; [void]$actions.Controls.Add($button) }
+    $flow.Controls.Add($actions,0,1)
+
+    $script:AnalyzeStatusLabel = New-GUILabel "Checking latest analysis..."
+    $AnalyzeStatusLabel.Name = "AnalyzeWorkflowStatusLabel"
+    $AnalyzeStatusLabel.Dock = "Fill"
+    $AnalyzeStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5,[System.Drawing.FontStyle]::Bold)
+    $flow.Controls.Add($AnalyzeStatusLabel,0,2)
+
+    $refresh = New-GUILabel "Refresh analysis status"
+    $refresh.Name = "AnalyzeRefreshStatusLink"
+    $refresh.Dock = "Left"
+    $refresh.AutoSize = $true
+    $refresh.ForeColor = $script:GUITheme.AccentDark
+    $refresh.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $refresh.Add_Click({ Update-GUIAnalyzeWorkflowStatus })
+    $flow.Controls.Add($refresh,0,3)
+
+    $toolsPanel = New-Object System.Windows.Forms.Panel
+    $toolsPanel.Dock = "Fill"
+    $layout.Controls.Add($toolsPanel,0,1)
+    Add-GUICompactToolGrid -Page $toolsPanel -Title "Advanced Analysis Tools" -Tools @(Get-GUIToolsForTab -Tab "Analyze") -Columns 4
+    Update-GUIAnalyzeWorkflowStatus
 }
 
 function Build-ProcessesToolsPage {
@@ -16751,6 +16904,22 @@ if($ButtonSmokeTest){
             exit 1
         }
 
+    }
+
+    $analyzeTab = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Analyze" } | Select-Object -First 1
+    if($script:BuiltTabs.ContainsKey("Analyze")){ [void]$script:BuiltTabs.Remove("Analyze") }
+    $analyzeTab.Controls.Clear()
+    Build-GUITabIfNeeded -Page $analyzeTab
+    foreach($controlName in @("AnalyzeRunCompleteButton","AnalyzeLocalReportButton","AnalyzeTechnicianReportButton","AnalyzeEscalationReportButton","AnalyzeOpenBundleButton","AnalyzeWorkflowStatusLabel")){
+        if(@($analyzeTab.Controls.Find($controlName,$true)).Count -ne 1){
+            Write-Host "Analyze workflow control missing: $controlName"
+            if($analyzeTab.Controls.Count -gt 0){ Write-Host ("Analyze root: {0}" -f $analyzeTab.Controls[0].Text) }
+            exit 1
+        }
+    }
+    if($script:AnalyzeStatusLabel.Text -eq "Checking latest analysis..."){
+        Write-Host "Analyze workflow status did not resolve."
+        exit 1
     }
 
     Write-Host "Button smoke test completed."

@@ -130,7 +130,11 @@ Status: Active
 Connect Collect, Analyze, ARGUS, and Reports into a normal technician workflow, then address remaining performance friction.
 
 Current active task:
-- `TASK-0076-Analyze-Workflow-UI-Integration`
+- `TASK-0085-Documentation-Counter-Audit`
+
+Implementation status:
+- TASK-0076 completed the guided Analyze workflow.
+- UI implementation is paused at the task boundary until the Documentation `25 / 25` audit completes.
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.

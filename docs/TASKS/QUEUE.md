@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Active | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
+| `TASK-0085-Documentation-Counter-Audit` | Codex | Active | Audit documentation consistency after TASK-0076 brings Documentation to 25/25. |
 
 ## Queued
 
@@ -36,7 +36,7 @@ ARGUS evidence normalization is complete; the remaining work is now a finish-lin
 8. Harden release packaging and update behavior.
 9. Run release-candidate validation and documentation.
 
-The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt TASK-0075 or any other Active task already underway.
+The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt an Active task already underway.
 
 ## Completed / Historical
 
@@ -112,6 +112,7 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 | TASK-0073-ARGUS-Evidence-Normalization-Implementation | Completed | Implemented ARGUS normalization loaders, produced ARGUS/normalized-analysis.json, and validated existing plus synthetic bundle scenarios. |
 | `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative technician recommendations with explicit missing-evidence boundaries. |
 | `TASK-0075-Reporting-Finish-Pass` | Completed | Added standalone technician and escalation reports with confidence, citations, limitations, and structured artifact references. |
+| `TASK-0076-Analyze-Workflow-UI-Integration` | Completed | Added a guided Analyze workflow with embedded complete analysis, report access, bundle access, and explicit missing/limited status. |
 
 ## Reconciliation Decision
 
@@ -120,5 +121,5 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is `TASK-0076-Analyze-Workflow-UI-Integration`.
+- Current active task is `TASK-0085-Documentation-Counter-Audit`.
 

@@ -296,3 +296,9 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0286 | 2026-07-10 | TASK-0075 | Documentation | +1 | Recorded reporting completion, output placement, validation evidence, and the next handoff. |
 | CHG-0287 | 2026-07-10 | TASK-0075 / TASK-0076 | Task System | +1 | Completed TASK-0075 and activated TASK-0076 as the single active task. |
 | CHG-0288 | 2026-07-10 | TASK-0075 | Roadmap/Backlog | +1 | Completed the reporting phase and advanced the finish-line sequence to Analyze workflow UI integration. |
+| CHG-0289 | 2026-07-10 | TASK-0076 | UI | +1 | Added a guided Analyze workflow with embedded complete analysis, report and bundle access, and explicit missing/limited status. |
+| CHG-0290 | 2026-07-10 | TASK-0076 | Build System | +1 | Updated toolkit build metadata for Analyze workflow integration. |
+| CHG-0291 | 2026-07-10 | TASK-0076 | Validation/Test Framework | +1 | Extended button-smoke coverage for Analyze controls and validated parser, GUI smoke, and button-smoke paths. |
+| CHG-0292 | 2026-07-10 | TASK-0076 | Documentation | +1 | Recorded TASK-0076 completion and reached the Documentation `25 / 25` audit threshold. |
+| CHG-0293 | 2026-07-10 | TASK-0076 / TASK-0085 | Task System | +1 | Completed TASK-0076 and activated the required Documentation counter audit before TASK-0077. |
+| CHG-0294 | 2026-07-10 | TASK-0076 | Roadmap/Backlog | +1 | Recorded Analyze workflow completion and the required documentation-audit boundary. |
