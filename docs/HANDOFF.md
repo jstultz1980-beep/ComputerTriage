@@ -1,115 +1,234 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0083
+HANDOFF-0084
 
 ## Current Task
-None
+TASK-0082-ChatGPT-Governance-Handoff-Review
 
 ## Current Owner
-Codex
+ChatGPT
 
 ## Next Owner
 Codex
 
-## How The Handoff Process Works
-This repository is the source of truth for the project. Chat history is useful context only when the same information has been written into the repository.
-
-Another bot should not rely on memory, screenshots, or prior conversation unless those details are captured in tracked project files.
-
-The handoff process has four core files:
-- `PROJECT.md` defines the rules every bot must follow.
-- `docs/HANDOFF.md` explains the current project state and contains the exact `Next Bot Prompt` to give another bot.
-- `docs/TASKS/QUEUE.md` defines the official task queue and lifecycle.
-- The active task file under `docs/TASKS` defines the only work that may be performed.
-
-Only one task may be `Active`.
-
 ## Objective
-TASK-0047 completed status-bar indicators and chrome cleanup.
+Bring ChatGPT fully current through the repository before more implementation begins. This is a governance and design-review handoff only. No implementation task should begin until ChatGPT completes TASK-0082 and either approves TASK-0073 activation or records a corrective task first.
 
-TASK-0044 completed GUI tab performance hardening.
+## Handoff Process
+This repository is the source of truth. Chat history is context only when the same information exists in tracked repository files.
 
-TASK-0053 completed the required Task System counter audit.
+The four primary coordination files are:
+- `PROJECT.md`
+- `docs/HANDOFF.md`
+- `docs/TASKS/QUEUE.md`
+- The single active task file under `docs/TASKS`
 
-TASK-0043 completed the Settings-page client data transfer workflow.
+Only one task may be Active. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` must name the same active task.
 
-TASK-0051 completed the deployment/update development-file exclusion slice.
+## Current Project State
+- Local branch: `master`
+- Remote: `https://github.com/jstultz1980-beep/ComputerTriage.git`
+- Last GitHub sync before this reconciliation: local and `origin/master` matched at `e882044` after the user explicitly requested sync.
+- Local commits completed after that sync before this reconciliation:
+  - `97aec8d TASK-0071: Add finish-line project plan`
+  - `0426a4a TASK-0072: Define ARGUS product evidence map`
+  - `c3be300 TASK-0081: Complete task system audit`
+- This reconciliation creates the active ChatGPT review task and must be pushed after commit because the user explicitly requested it.
+- The audit threshold is `25 / 25` per `PROJECT.md` and the current ledger. Older `10 / 10` language is historical unless it appears in old completed entries.
+- No subsystem counter is currently at the `25 / 25` audit threshold.
 
-TASK-0040 completed the Software tab launchable/installable placement and portable-tool classification slice.
+## Completed Since Previous ChatGPT-Owned Task
+Previous completed ChatGPT-owned task: `TASK-0020-ARGUS-Input-Contract-ADR`.
 
-TASK-0033 completed tab-by-tab direction and embedded-tool planning.
+Completed or archived work recorded since then:
+- `TASK-0035-Documentation-Task-System-Audit`
+- `TASK-0023-ARGUS-Foundation-Implementation`
+- `TASK-0028-Quick-Dx-Compact-Run-Panel`
+- `TASK-0029-Choco-Page-Layout-Refinement`
+- `TASK-0041-UI-Counter-Audit`
+- `TASK-0037-Activity-Page-Running-Tool-Tracking`
+- `TASK-0030-Print-Tab-Data-Path-Cleanup`
+- `TASK-0031-Triage-Page-Simplification`
+- `TASK-0042-Documentation-Counter-Audit`
+- `TASK-0032-Computer-Tab-Summary-Redesign`
+- `TASK-0048-Task-System-Counter-Audit`
+- `TASK-0038-Modern-Control-Style-System`
+- `TASK-0045-Print-Page-Polish`
+- `TASK-0049-UI-Counter-Audit`
+- `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup`
+- `TASK-0052-Documentation-Counter-Audit`
+- `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`
+- `TASK-0044-GUI-Tab-Performance-Hardening`
+- `TASK-0053-Task-System-Counter-Audit`
+- `TASK-0043-Client-Data-Transfer`
+- `TASK-0051-Development-File-Deployment-Exclusions`
+- `TASK-0040-Software-Inventory-And-Placement-Implementation`
+- `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`
+- `TASK-0059-Documentation-Build-Counter-Audit`
+- `TASK-0054-Directory-Domain-Status-Page`
+- `TASK-0060-UI-Counter-Audit` archived after the audit threshold changed to `25 / 25`
+- `TASK-0061-Directory-Page-Layout-Polish`
+- `TASK-0055-Shared-Embedded-Output-Pattern`
+- `TASK-0056-Triage-Guided-Workflow-Polish`
+- `TASK-0057-WiFi-And-Windows-Status-Polish`
+- `TASK-0058-Settings-And-Control-Polish`
+- `TASK-0062-Computer-Data-Push-Pull`
+- `TASK-0063-Add-Ons-Concept`
+- `TASK-0064-Product-Naming-Options`
+- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion`
+- `TASK-0065-UI-Regression-Polish`
+- `TASK-0066-RapidAssist-Naming-Selection`
+- `TASK-0067-UI-Feedback-Corrections`
+- `TASK-0068-Triage-Instructions-And-WU-LED`
+- `TASK-0069-Triage-Text-Driven-Workflow`
+- `TASK-0070-Local-GitHub-Reconciliation`
+- `TASK-0071-Finish-Line-Project-Plan`
+- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map`
+- `TASK-0081-Task-System-Counter-Audit`
 
-TASK-0059 completed the required Documentation and Build System counter audit.
+## Exact Implementation Changes Made
+The repository records the following implementation/design changes since TASK-0020:
+- Added ARGUS foundation command and core foundation implementation with contract validation, deterministic finding prioritization, labeled inference, and report output.
+- Added HEPHAESTUS deterministic rule expansion for APIPA, Windows Update repair signals, endpoint protection, stopped automatic services, and domain trust/logon failures.
+- Added shared client-data transfer utility and Settings workflow for push/pull diagnostic data movement.
+- Added deployment/update exclusion policy and documented development-file exclusions.
+- Reworked multiple GUI pages: Quick Dx, Choco, Activity, Print, Triage, Computer, Directory, Software/Add-Ons, Settings, status bar, Wi-Fi, Windows Update, and shared embedded output behavior.
+- Added slow tab diagnostics and partial first-render hardening; remaining first-render lag is queued as TASK-0077.
+- Added finish-line project plan and ARGUS product definition/evidence map.
+- Added task governance updates, audit-gate updates, punch-list reconciliation, queue consolidation, and history records.
 
-TASK-0054 completed the Directory domain identity and AD health status page.
-
-The audit threshold was raised from 10 changes to 25 changes. TASK-0060 was archived before execution because UI is now `10 / 25`, not at the audit threshold.
-
-`Next 25` is now a project prompt shortcut for reading source-of-truth files, reconciling new punch-list additions into tasks, reordering the queue, completing tasks until the next 25-change audit gate, holding the full user test list until stopped, committing locally, and not pushing unless explicitly requested.
-
-TASK-0061 completed Directory page layout polish.
-
-TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
-
-TASK-0056 completed Triage guided workflow polish.
-
-TASK-0057 completed Wi-Fi and Windows status polish.
-
-TASK-0058 completed Settings and control polish.
-
-TASK-0062 completed computer data push/pull.
-
-TASK-0063 completed Add-Ons concept testing.
-
-TASK-0064 completed product naming options.
-
-TASK-0021 completed HEPHAESTUS rule catalog expansion.
-
-TASK-0065 completed UI regression polish from punch-list items 36 through 46.
-
-TASK-0066 completed RapidAssist naming selection without renaming the app.
-
-TASK-0067 completed UI feedback corrections from TASK-0065 testing.
-
-TASK-0068 completed Triage instruction formatting and Windows Update health LED refinement.
-
-TASK-0069 completed Triage text-driven workflow refinement.
-
-TASK-0070 completed local GitHub reconciliation. Local `master` was `0 behind / 28 ahead` of `origin/master` after the reconciliation commit.
-
-The user then explicitly requested a repo sync. `master` was pushed to GitHub and local/GitHub matched at commit `e882044`.
-
-TASK-0071 completed the finish-line project plan. The remaining work is now queued as TASK-0072 through TASK-0080.
-
-TASK-0072 completed ARGUS product definition and evidence mapping. TASK-0081 completed the required Task System counter audit and reset only the Task System counter.
-
-Wi-Fi status-bar behavior has now been verified by the user on hardware with Wi-Fi.
-
-Do not modify ARGUS, HEPHAESTUS, deployment logic, package installation semantics, or unrelated application areas unless the active task explicitly requires it.
-Do not download or install tools.
-Do not clean unrelated files.
-Do not import, delete, or modify untracked `App/NetworkToolkit/LatencyMon/` unless a future task explicitly handles it.
-
-## Audit State Tracking
-Each subsystem has its own change counter.
-
-When any subsystem reaches `25 / 25` recorded subsystem changes, work must pause and a new audit task must be completed before further implementation work continues.
-
-Change records are tracked in:
+## Exact Files Changed Since TASK-0020
+Derived from tracked repository diff `e48a229..HEAD` before this reconciliation:
 
 ```text
+App/Deploy-NetworkToolkit.ps1
+App/DeploymentExclusions.ps1
+App/NetworkToolkit/Config/ToolCatalog.ps1
+App/NetworkToolkit/Core/ArgusFoundationCommand.ps1
+App/NetworkToolkit/Core/LocalAnalysisRules.ps1
+App/NetworkToolkit/Utilities/ClientDataTransfer.ps1
+App/NetworkToolkit/Utilities/TriageService.ps1
+App/ToolKit-GUI/ToolKit-GUI.ps1
+App/Update-NetworkToolkit.ps1
+App/manifests/custom-tools.json
+App/manifests/toolkit-version.json
+App/manifests/triage-tools.json
+Core/Argus/ArgusFoundation.ps1
+NetworkToolkit.vbs
+PROJECT.md
+docs/BACKLOG.md
+docs/DEPLOYMENT-FILE-INVENTORY.md
+docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md
+docs/DESIGN/PRODUCT-NAMING-OPTIONS.md
+docs/DESIGN/TAB-BY-TAB-EMBEDDING-PLAN.md
+docs/HANDOFF.md
 docs/HISTORY/CHANGE-LEDGER.md
+docs/HISTORY/CHANGELOG.md
+docs/PROJECT-FINISH-PLAN.md
+docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md
+docs/ROADMAP.md
+docs/SOFTWARE-TOOL-CLASSIFICATION.md
+docs/TASKS/OUTSTANDING-AUDIT-20260703.md
+docs/TASKS/QUEUE.md
+docs/TASKS/TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion.md
+docs/TASKS/TASK-0023-ARGUS-Foundation-Implementation.md
+docs/TASKS/TASK-0028-Quick-Dx-Compact-Run-Panel.md
+docs/TASKS/TASK-0029-Choco-Page-Layout-Refinement.md
+docs/TASKS/TASK-0030-Print-Tab-Data-Path-Cleanup.md
+docs/TASKS/TASK-0031-Triage-Page-Simplification.md
+docs/TASKS/TASK-0032-Computer-Tab-Summary-Redesign.md
+docs/TASKS/TASK-0033-Directory-Tab-Direction-And-Embedding-Plan.md
+docs/TASKS/TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan.md
+docs/TASKS/TASK-0034-Embedded-Tool-Experience-Roadmap.md
+docs/TASKS/TASK-0035-Documentation-Task-System-Audit.md
+docs/TASKS/TASK-0036-Page-Health-Indicators.md
+docs/TASKS/TASK-0037-Activity-Page-Running-Tool-Tracking.md
+docs/TASKS/TASK-0038-Modern-Control-Style-System.md
+docs/TASKS/TASK-0039-Software-Tab-Launchable-And-Installable-Inventory.md
+docs/TASKS/TASK-0040-Software-Inventory-And-Placement-Implementation.md
+docs/TASKS/TASK-0041-UI-Counter-Audit.md
+docs/TASKS/TASK-0042-Documentation-Counter-Audit.md
+docs/TASKS/TASK-0043-Client-Data-Transfer.md
+docs/TASKS/TASK-0044-GUI-Tab-Performance-Hardening.md
+docs/TASKS/TASK-0045-Print-Page-Polish.md
+docs/TASKS/TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup.md
+docs/TASKS/TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup.md
+docs/TASKS/TASK-0048-Task-System-Counter-Audit.md
+docs/TASKS/TASK-0049-UI-Counter-Audit.md
+docs/TASKS/TASK-0050-Roadmap-Backlog-Counter-Audit.md
+docs/TASKS/TASK-0051-Development-File-Deployment-Exclusions.md
+docs/TASKS/TASK-0052-Documentation-Counter-Audit.md
+docs/TASKS/TASK-0053-Task-System-Counter-Audit.md
+docs/TASKS/TASK-0054-Directory-Domain-Status-Page.md
+docs/TASKS/TASK-0055-Shared-Embedded-Output-Pattern.md
+docs/TASKS/TASK-0056-Triage-Guided-Workflow-Polish.md
+docs/TASKS/TASK-0057-WiFi-And-Windows-Status-Polish.md
+docs/TASKS/TASK-0058-Settings-And-Control-Polish.md
+docs/TASKS/TASK-0059-Documentation-Build-Counter-Audit.md
+docs/TASKS/TASK-0060-UI-Counter-Audit.md
+docs/TASKS/TASK-0061-Directory-Page-Layout-Polish.md
+docs/TASKS/TASK-0062-Computer-Data-Push-Pull.md
+docs/TASKS/TASK-0063-Add-Ons-Concept.md
+docs/TASKS/TASK-0064-Product-Naming-Options.md
+docs/TASKS/TASK-0065-UI-Regression-Polish.md
+docs/TASKS/TASK-0066-RapidAssist-Naming-Selection.md
+docs/TASKS/TASK-0067-UI-Feedback-Corrections.md
+docs/TASKS/TASK-0068-Triage-Instructions-And-WU-LED.md
+docs/TASKS/TASK-0069-Triage-Text-Driven-Workflow.md
+docs/TASKS/TASK-0070-Local-GitHub-Reconciliation.md
+docs/TASKS/TASK-0071-Finish-Line-Project-Plan.md
+docs/TASKS/TASK-0072-ARGUS-Product-Definition-And-Evidence-Map.md
+docs/TASKS/TASK-0073-ARGUS-Evidence-Normalization-Implementation.md
+docs/TASKS/TASK-0074-ARGUS-Event-Grouping-And-Recommendations.md
+docs/TASKS/TASK-0075-Reporting-Finish-Pass.md
+docs/TASKS/TASK-0076-Analyze-Workflow-UI-Integration.md
+docs/TASKS/TASK-0077-First-Render-Tab-Performance-Hardening.md
+docs/TASKS/TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution.md
+docs/TASKS/TASK-0079-Release-Packaging-And-Update-Hardening.md
+docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md
+docs/TASKS/TASK-0081-Task-System-Counter-Audit.md
+punch_list.txt
 ```
+
+## Validation Performed
+Validation recorded across completed tasks includes:
+- PowerShell parser validation for changed `.ps1` files in implementation tasks.
+- GUI smoke tests through `App/NetworkToolkit.ps1 -SmokeTest`.
+- Button smoke tests through `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
+- Triage manifest/setup validation where triage manifests changed.
+- ARGUS foundation validation against existing HEPHAESTUS bundle artifacts.
+- HEPHAESTUS local-analysis validation against existing AI-Bundles plus synthetic evidence for new rules.
+- Fake push/pull client-data transfer validation.
+- Fake fresh deployment/update exclusion validation.
+- Local/GitHub reconciliation validation in TASK-0070.
+- TASK-0081 task-system audit validation for handoff/queue consistency and audit counter reset.
+
+Validation for this reconciliation is documentation/governance only:
+- Read required source-of-truth files listed in the user request.
+- Verified current queue had no active task before reconciliation.
+- Created TASK-0082 as the single active ChatGPT review task.
+- Updated handoff and queue to agree.
+- Updated roadmap, ledger, and changelog for the ChatGPT handoff gate.
+- No implementation tests were run because no implementation changes were made.
+
+## Known Defects Or Incomplete Work
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has stale local proposed-text drift. TASK-0081 confirmed the committed version is accepted, but Windows denied restore/write attempts. Do not stage this drift.
+- `App/manifests/custom-tools.json` has local runtime/provenance drift. Do not stage unless a future task explicitly owns it.
+- `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder. Do not import, delete, or modify unless a future task explicitly owns it.
+- `App/NetworkToolkit/Logs/` contains untracked runtime logs. Do not commit.
+- First-render tab lag still exists and is queued as TASK-0077.
+- Embedded tools may trigger antivirus/EDR scrutiny. The project direction is provenance, documentation, allowlisting guidance, and safer packaging, not hiding or evasion. This is queued as TASK-0078.
+- ARGUS normalized intermediate model, event grouping, recommendation output, report integration, and Analyze workflow integration are not implemented yet.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 7 / 25 | No |
+| Repository Governance | 8 / 25 | No |
 | Architecture | 2 / 25 | No |
-| Documentation | 19 / 25 | No |
-| Task System | 0 / 25 | No |
+| Documentation | 20 / 25 | No |
+| Task System | 1 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 3 / 25 | No |
 | Reporting | 1 / 25 | No |
@@ -117,390 +236,59 @@ docs/HISTORY/CHANGE-LEDGER.md
 | Plugin Framework | 1 / 25 | No |
 | Build System | 13 / 25 | No |
 | Validation/Test Framework | 19 / 25 | No |
-| Roadmap/Backlog | 8 / 25 | No |
+| Roadmap/Backlog | 9 / 25 | No |
 
-## Current State
-The GitHub remote is configured as `https://github.com/jstultz1980-beep/ComputerTriage.git`. The local `master` branch tracks `origin/master`.
+## Known Working-Tree Drift
+Expected after this reconciliation commit unless separately resolved:
+- Modified: `App/manifests/custom-tools.json`
+- Modified: `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`
+- Untracked: `App/NetworkToolkit/LatencyMon/`
+- Untracked: `App/NetworkToolkit/Logs/`
 
-Foundation governance has been reconciled. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree that no task is active and TASK-0073 is the next queued implementation task.
+## Current Blockers
+- ChatGPT has not yet reviewed the Codex-only project-plan and ARGUS-product work.
+- TASK-0073 must remain queued until TASK-0082 is completed.
+- ADR-0003 local drift cannot currently be restored by Codex because Windows denied file replacement/writes during TASK-0081.
 
-Recently completed work:
-- TASK-0045 completed Print page polish.
-- TASK-0050 completed the required Roadmap/Backlog audit after outstanding tasks were consolidated.
-- TASK-0046 completed Triage page catalog and bundle cleanup.
-- TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
-- TASK-0047 completed status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, and busy indicator clarification.
-- TASK-0043 completed Settings-page client data transfer with destination validation, merge confirmation, client-data-only copying, and manifest output.
-- TASK-0051 completed shared development-file deployment exclusions and validated fake fresh deployment/update scenarios.
-- TASK-0040 completed Software tab launchable/installable placement, Registrar classification, triage manifest cleanup, and LatencyMon classification.
-- TASK-0033 completed tab-by-tab direction and embedded-tool planning, created follow-on implementation tasks, and activated the audit gate.
-- TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
-- TASK-0054 completed Directory domain identity and AD health status, then activated the next UI audit gate.
-- TASK-0061 completed Directory page layout polish and reconciled new punch-list items into queued tasks.
-- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
-- TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
-- TASK-0057 completed Wi-Fi and Windows status polish.
-- TASK-0058 completed Settings and control polish.
-- TASK-0062 completed computer data push/pull.
-- TASK-0063 completed Add-Ons concept testing.
-- TASK-0064 completed product naming options.
-- TASK-0021 completed HEPHAESTUS rule catalog expansion.
-- TASK-0065 completed UI regression polish from punch-list items 36 through 46.
-- TASK-0066 completed RapidAssist naming selection.
-- TASK-0067 completed UI feedback corrections.
-- TASK-0068 completed Triage instruction and Windows Update LED refinement.
-- TASK-0069 completed Triage text-driven workflow refinement.
-- TASK-0070 completed local GitHub reconciliation and closed the Wi-Fi hardware verification punch-list item.
-- TASK-0071 completed finish-line project planning and queued the remaining release path.
-- TASK-0072 completed ARGUS product definition and evidence mapping.
-- TASK-0081 completed the required Task System counter audit after TASK-0072.
-
-Current active work:
-- None.
-
-Queued implementation/design work, in recommended order:
-- TASK-0073 ARGUS Evidence Normalization Implementation.
-- TASK-0074 ARGUS Event Grouping And Recommendations.
-- TASK-0075 Reporting Finish Pass.
-- TASK-0076 Analyze Workflow UI Integration.
-- TASK-0077 First Render Tab Performance Hardening.
-- TASK-0078 Embedded Tool Trust And EDR Safe Distribution.
-- TASK-0079 Release Packaging And Update Hardening.
-- TASK-0080 Release Candidate Validation And Documentation.
-
-GitHub reconciliation:
-- Remote: `https://github.com/jstultz1980-beep/ComputerTriage.git`.
-- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync.
-- Reconciliation report: `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md`.
-- TASK-0071, TASK-0072, and TASK-0081 are local-only commits unless explicitly pushed after completion.
-
-## Active Task
-None.
-
-Scope summary:
-- Task System audit gate is clear.
-- Next recommended task is `TASK-0073-ARGUS-Evidence-Normalization-Implementation`.
-- No implementation task is active until explicitly started.
-
-## Queued Work
-- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
-- `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
-- `TASK-0075-Reporting-Finish-Pass`
-- `TASK-0076-Analyze-Workflow-UI-Integration`
-- `TASK-0077-First-Render-Tab-Performance-Hardening`
-- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution`
-- `TASK-0079-Release-Packaging-And-Update-Hardening`
-- `TASK-0080-Release-Candidate-Validation-And-Documentation`
-
-## Validation Completed For This Update
-- Consolidated outstanding tasks into a smaller logical sequence.
-- Completed TASK-0046 Triage Page Catalog And Bundle Cleanup.
-- Completed TASK-0052 Documentation Counter Audit and reset only the Documentation counter to `0 / 10`.
-- Activated TASK-0044 as the single active task.
-- Added TASK-0051 for development-only deployment/update exclusions.
-- Added the Build Metadata Rule to `PROJECT.md`.
-- Updated `App/manifests/toolkit-version.json` through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for:
-  - `App/ToolKit-GUI/ToolKit-GUI.ps1`
-  - `App/NetworkToolkit/Utilities/TriageService.ps1`
-- Direct triage setup validation passed via `TriageService.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Completed TASK-0068 Triage Instructions And WU LED.
-- Marked punch-list items 54 and 55 complete.
-- Added a separate Windows Update Service Health LED label.
-- Converted Triage collect/submit instructions to compact rich-text quick-reference entries.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Completed TASK-0069 Triage Text Driven Workflow.
-- Marked punch-list items 56 through 59 complete.
-- Removed the old visible Triage progress field and top action buttons.
-- Made Quick Triage and Full Triage link-style actions in Step 1.
-- Moved Cancel Run into Step 1 and made it visible only while a run is active.
-- Changed Step 2 Review actions to explanatory links.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Completed TASK-0070 Local GitHub Reconciliation.
-- Fetched `origin` and confirmed local `master` was `0 behind / 27 ahead` before the reconciliation commit and `0 behind / 28 ahead` after it.
-- Added `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md`.
-- Marked punch-list item 53 complete based on user Wi-Fi hardware verification.
-- No push was performed.
-- User later requested repo sync; pushed local `master` to GitHub and confirmed `origin/master...master` was `0 / 0` at `e882044`.
-- Completed TASK-0071 Finish Line Project Plan.
-- Added `docs/PROJECT-FINISH-PLAN.md`.
-- Queued TASK-0072 through TASK-0080 as the remaining finish-line work.
-- Updated roadmap/backlog/queue/handoff to make ARGUS planning, reporting, Analyze integration, tab performance, EDR-safe distribution, packaging, and release validation explicit.
-- Completed TASK-0072 ARGUS Product Definition And Evidence Map.
-- Added `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`.
-- Defined ARGUS evidence domains, trust order, output contract, citation model, confidence language, unsupported-inference behavior, and implementation plans for TASK-0073/TASK-0074.
-- Confirmed committed ADR-0003 is accepted; known stale local ADR-0003 working-tree drift remains unstaged for deliberate audit reconciliation.
-- Activated TASK-0081 because Task System reached `25 / 25`.
-- Completed TASK-0081 Task System Counter Audit.
-- Verified handoff/queue consistency and queued TASK-0073 through TASK-0080 order.
-- Reset only the Task System counter from `25 / 25` to `0 / 25`.
-- Attempted to reconcile stale local ADR-0003 drift through `git restore`, patch replacement, in-place patching, and PowerShell write-back; Windows denied file replacement/writes. The stale ADR-0003 working-tree drift remains unstaged and must be handled once the file handle or permission issue is cleared.
-- Activated TASK-0047 for the requested status-bar version/build placement slice.
-- Moved toolkit version/build to the bottom-left status bar and removed the duplicate Settings-page version display.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation, GUI smoke test, and button-smoke test passed for the TASK-0047 slice.
-- Fixed header summary clipping so the `Computer` label no longer renders under the title block.
-- Reworked Settings and Help as compact dedicated header icon controls.
-- Updated `punch_list.txt` with Markdown-style strike-through for completed items.
-- Added new punch-list items for first-render tab lag, `NetworkToolkit.vbs` launch delay, and GitHub sync policy.
-- Added the GitHub Sync Rule to `PROJECT.md`; routine work should be committed locally but not pushed until the 10-change audit/refactor checkpoint unless explicitly requested.
-- Moved queued TASK-0033 ownership from ChatGPT to Codex while ChatGPT is not in use.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- Added a status-bar Wi-Fi indicator with connected/off/unknown handling.
-- Added a compact Wi-Fi signal label to the Wi-Fi page.
-- Added a compact Windows Update service-health label to the Windows Update page.
-- Clarified the busy progress indicator purpose and prevented Wi-Fi probing from leaking `netsh` exit codes into smoke tests.
-- Completed TASK-0047 and activated TASK-0044 as the single active task.
-- Read `punch_list.txt` before TASK-0044 work and confirmed items 13 and 14 map to the active performance task.
-- Updated `PROJECT.md` so `punch_list.txt` is read before implementation and re-read before completion.
-- Deferred normal GUI startup tab construction until after the form shell is shown.
-- Deferred startup Wi-Fi probing until after the form is shown.
-- Deferred Activity page CIM/process refresh until after the Activity tab paints.
-- Added GUI startup shell timing diagnostics.
-- Updated `NetworkToolkit.vbs` to use `-NoLogo` and `-NonInteractive` while preserving hidden elevated launch behavior.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation, GUI smoke test, and button-smoke test passed for the TASK-0044 startup performance slice.
-- Punch-list item 27 is covered by active TASK-0044.
-- Remaining punch-list items 16-26 and 28 are Windows Update/Wi-Fi/Settings/Triage/header/control-polish follow-ups and should be reconciled after TASK-0044 or at the next audit/task planning checkpoint.
-- Added shared slow tab-switch/build diagnostics with status-bar feedback.
-- Completed TASK-0044 and marked punch-list items 4, 13, 14, and 27 complete.
-- PowerShell parser validation, GUI smoke test, and button-smoke test passed after the final slow-tab diagnostics pass.
-- Activated TASK-0053 because the Task System counter reached `10 / 10`.
-- Completed TASK-0053 and reset only the Task System counter.
-- Activated TASK-0043 as the next implementation task.
-- Completed TASK-0043 with a reusable client-data transfer helper and Settings-page transfer workflow.
-- Activated TASK-0051 as the next implementation task.
-- Completed TASK-0051 with a shared deployment exclusion helper, deployment inventory, and fake deployment/update validation.
-- Activated TASK-0040 as the next implementation task.
-- Completed TASK-0040 with Software tab launchable/installable placement, Registrar classification, triage manifest cleanup, and LatencyMon classification.
-- Added `docs/SOFTWARE-TOOL-CLASSIFICATION.md` with source notes for Registrar and triage tool classification.
-- Removed Registrar Registry Manager from the Repair-tab launch catalog because only the installer is currently present.
-- Removed Sysinternals Suite and WinAudit from the default and current triage manifests.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation, GUI smoke test, button-smoke test, and triage-manifest validation passed for TASK-0040.
-- Activated TASK-0033 as the next implementation task.
-- Completed TASK-0033 with a tab-by-tab direction and embedding plan.
-- Added `docs/DESIGN/TAB-BY-TAB-EMBEDDING-PLAN.md`.
-- Created follow-on tasks TASK-0054 through TASK-0058.
-- Created and activated TASK-0059 because Documentation and Build System counters reached `10 / 10`.
-- Re-read `punch_list.txt` before completing TASK-0033.
-- Completed TASK-0059 and reset only the Documentation and Build System counters.
-- Activated TASK-0054 as the next implementation task.
-- Consolidated remaining punch-list work into TASK-0055 through TASK-0058 and TASK-0021.
-- Completed TASK-0054 Directory Domain Status Page.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0060 because the UI counter reached `10 / 10`.
-- Raised the audit threshold from 10 changes to 25 changes.
-- Archived TASK-0060 before execution because UI is now `10 / 25`.
-- Added TASK-0061 for Directory page layout feedback from punch-list items 30 and 31.
-- Activated TASK-0061 as the next implementation task.
-- Added the `Next 25` prompt shortcut rule to `PROJECT.md`.
-- Corrected forward-looking audit reset wording to `0 / 25`.
-- Reconciled punch-list items 32, 33, and 34 into TASK-0062, TASK-0063, and TASK-0064.
-- Completed TASK-0061 Directory Page Layout Polish.
-- Marked punch-list items 30 and 31 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0055 as the next implementation task.
-- Completed TASK-0055 Shared Embedded Output Pattern.
-- Added reusable embedded command-output helpers and converted Quick Target Checks to use them.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0056 as the next implementation task.
-- Completed TASK-0056 Triage Guided Workflow Polish.
-- Replaced the visible Triage catalog/Technician Notes body with guided Collect, Review, and Submit workflow sections.
-- Preserved top-row Quick Triage, Full Triage, Cancel Run, status/progress, Latest Run, Bundle Folder, and Validate Setup access.
-- Marked punch-list items 24 and 25 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0057 as the next implementation task.
-- Completed TASK-0057 Wi-Fi And Windows Status Polish.
-- Removed Windows Update instruction-style status text and added repair-recommended service health.
-- Replaced status-bar Wi-Fi text with a grey/green/yellow/red LED-style indicator.
-- Added bottom Wi-Fi network details and removed redundant Wi-Fi page labels.
-- Marked punch-list items 16, 17, 18, 19, 20, and 29 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0058 as the next implementation task.
-- Completed TASK-0058 Settings And Control Polish.
-- Replaced Settings `Refresh Size` with a compact circular-arrow icon button.
-- Compacted shared button and static tab-strip metrics, enlarged the header logo, and removed the registered-command startup live-log line.
-- Marked punch-list items 21, 22, 23, 26, and 28 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0062 as the next implementation task.
-- Completed TASK-0062 Computer Data Push Pull.
-- Reworked Transfer Client Data into a Push/Pull computer-data dialog.
-- Preserved the existing diagnostic/client-data allow-list, manifest output, source preservation, and merge confirmation.
-- Validated fake push and pull transfers using temporary toolkit roots.
-- Marked punch-list item 32 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0063 as the next implementation task.
-- Completed TASK-0063 Add Ons Concept.
-- Added a testable Add-Ons popup from the Software page for installable/extract-needed programs.
-- Preserved the existing Software page launchable/installable sections for comparison.
-- Marked punch-list item 33 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0064 as the next implementation task.
-- Completed TASK-0064 Product Naming Options.
-- Added `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` with five candidate names and rationales.
-- Confirmed no application files, manifests, windows, package metadata, or branding assets were renamed.
-- Marked punch-list item 34 complete.
-- Activated TASK-0021 as the next implementation task.
-- Completed TASK-0021 HEPHAESTUS Rule Catalog Expansion.
-- Added `App/NetworkToolkit/Core/LocalAnalysisRules.ps1` as the deterministic rule catalog expansion loaded after the existing local analysis engine.
-- Added rules for APIPA network evidence, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain secure-channel/logon failures.
-- Preserved existing HEPHAESTUS/ARGUS artifact paths and output shape.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `LocalAnalysisEngine.ps1`, `LocalAnalysisRules.ps1`, and `App/NetworkToolkit.ps1`.
-- Existing AI-Bundles local analysis validation passed.
-- Synthetic evidence validation covered all new rule IDs.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- No queued task remains.
-- Reconciled punch-list items 35 through 46 into TASK-0065 and TASK-0066.
-- Completed TASK-0065 UI Regression Polish.
-- Marked punch-list items 36 through 46 complete.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-- Activated TASK-0066 as the next implementation task.
-- Completed TASK-0066 RapidAssist Naming Selection.
-- Marked punch-list item 35 complete.
-- Updated `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` to record RapidAssist as the preferred naming direction.
-- Confirmed no application files, manifests, windows, package metadata, or branding assets were renamed.
-- No queued task remains.
-- Reconciled user verification feedback into TASK-0067.
-- Completed TASK-0067 UI Feedback Corrections.
-- Marked punch-list items 47 through 52 complete.
-- Left punch-list item 53 open for Wi-Fi verification on hardware with Wi-Fi.
-- Updated toolkit build metadata through `App/Update-ToolkitVersion.ps1`.
-- PowerShell parser validation passed for `App/ToolKit-GUI/ToolKit-GUI.ps1` and `App/NetworkToolkit.ps1`.
-- GUI smoke test passed via `App/NetworkToolkit.ps1 -SmokeTest`.
-- Button smoke test passed via `App/NetworkToolkit.ps1 -ButtonSmokeTest`.
-
-## Blockers
-No active audit gate. TASK-0073 is the next queued implementation task.
-
-Known working-tree drift remains excluded unless a future task explicitly owns it.
-
-## Notes for Next AI
-Known working-tree noise:
-- `App/NetworkToolkit/LatencyMon/` is an untracked local tool folder and should not be deleted, imported, or committed unless a future task explicitly handles it.
-- Runtime custom-tool provenance migration can add timestamp and package metadata drift to `App/manifests/custom-tools.json` during GUI validation. Reset that runtime drift before committing unless the active task explicitly changes the shipped manifest.
-- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` has local stale proposed-text drift. TASK-0081 confirmed the committed repository version is accepted, but Windows denied restore/write attempts. Do not stage the stale drift; restore it to the committed accepted version once the file handle or permission issue clears.
-
-GitHub sync note:
-- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
-
-## Recommended Commit Message
-```text
-TASK-0081: Complete task system audit
-```
+## Next Recommended Task
+Complete `TASK-0082-ChatGPT-Governance-Handoff-Review`. If ChatGPT finds no blockers, activate `TASK-0073-ARGUS-Evidence-Normalization-Implementation` for Codex.
 
 ## Next Bot Prompt
-Copy and paste the following prompt into Codex. Do not create a separate task packet file.
+Copy and paste the following prompt into ChatGPT:
 
 ```text
-You are assisting with the Computer Triage Toolkit repository.
+You are ChatGPT assisting with the Computer Triage Toolkit repository.
 
-The repository is the single source of truth. Chat history is not the source of truth. Do not rely on a separate ChatGPT task packet file.
+The repository is the single source of truth. Do not rely on chat history. Review the current `master` branch of `jstultz1980-beep/ComputerTriage`.
 
-Read these repository files in order:
-1. PROJECT.md
-2. docs/PROJECT-CHARTER.md
-3. docs/ARCHITECTURE.md
-4. docs/ROADMAP.md
-5. docs/HANDOFF.md
-6. docs/TASKS/QUEUE.md
-7. punch_list.txt if it exists, then reconcile new requests into existing tab-based tasks where possible or create a new focused task before changing code.
+Your active task is:
+`docs/TASKS/TASK-0082-ChatGPT-Governance-Handoff-Review.md`
 
-Current task state:
-- docs/HANDOFF.md and docs/TASKS/QUEUE.md list no Active task.
-- Active task: None.
-- Owner: Codex.
-- TASK-0054 completed the Directory domain identity and AD health status page.
-- Audit threshold is now `25 / 25`; UI is `17 / 25`, so no audit is currently required.
-- TASK-0060 was archived before execution because the raised threshold cleared the gate.
-- `Next 25` is a project prompt shortcut for source-of-truth startup, punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
-- TASK-0061 completed Directory page layout polish.
-- New punch-list items 32, 33, and 34 are queued as TASK-0062, TASK-0063, and TASK-0064.
-- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
-- TASK-0056 completed Triage guided workflow polish and removed the visible Technician Notes area.
-- TASK-0057 completed Wi-Fi and Windows status polish.
-- TASK-0058 completed Settings and control polish.
-- TASK-0062 completed computer data push/pull.
-- TASK-0063 completed Add-Ons concept testing.
-- TASK-0064 completed product naming options.
-- TASK-0021 completed HEPHAESTUS rule catalog expansion.
-- TASK-0065 completed UI regression polish from punch-list items 36 through 46.
-- TASK-0066 completed RapidAssist naming selection.
-- TASK-0067 completed UI feedback corrections from user verification.
-- TASK-0068 completed Triage instruction formatting and Windows Update health LED refinement.
-- TASK-0069 completed Triage text-driven workflow refinement.
-- TASK-0070 completed local GitHub reconciliation.
-- TASK-0071 completed the finish-line project plan and queued TASK-0072 through TASK-0080.
-- TASK-0072 completed ARGUS product definition and evidence mapping.
-- `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md` defines ARGUS evidence domains, output contract, citation model, confidence language, unsupported-inference behavior, and TASK-0073/TASK-0074 implementation boundaries.
-- TASK-0081 completed the Task System counter audit and reset Task System to `0 / 25`.
-- Punch-list item 53 is complete; Wi-Fi status-bar behavior was verified on hardware with Wi-Fi.
-- Next recommended implementation task: TASK-0073 ARGUS Evidence Normalization Implementation.
-- Local `master` and `origin/master` were synced at `e882044` after the user explicitly requested repo sync. TASK-0071, TASK-0072, and TASK-0081 may be local-only commits if they have not been pushed after completion.
-- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` still has stale local proposed-text drift. TASK-0081 attempted restore/write operations, but Windows denied file replacement/writes. Do not stage that drift.
-- `punch_list.txt` must be read after each task so new change requests are consolidated into existing tab-based tasks where possible.
-- `punch_list.txt` must also be read before each implementation run so random notes are reconciled into existing tasks before code changes begin.
-- Every accepted implementation change must update `App/manifests/toolkit-version.json` using `App/Update-ToolkitVersion.ps1` unless the active task explicitly changes versioning behavior.
-- Do not push routine task commits to GitHub unless the user explicitly asks. GitHub sync should happen during the 25-change audit/refactor checkpoint.
+Read these files first:
+1. `PROJECT.md`
+2. `docs/PROJECT-CHARTER.md`
+3. `docs/ARCHITECTURE.md`
+4. `docs/ROADMAP.md`
+5. `docs/HANDOFF.md`
+6. `docs/TASKS/QUEUE.md`
+7. `docs/HISTORY/CHANGE-LEDGER.md`
+8. `docs/HISTORY/CHANGELOG.md`
+9. All task files created, activated, completed, or modified since `TASK-0020-ARGUS-Input-Contract-ADR`, especially TASK-0071, TASK-0072, TASK-0081, and TASK-0082.
+10. `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`
 
-Your job:
-Do not begin implementation until TASK-0073 is explicitly activated from the queue.
+Verify:
+- Exactly one task is Active.
+- `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree.
+- Completed work since the previous ChatGPT-owned task is accurately recorded.
+- Current audit counters are accurate under the current `25 / 25` audit rule.
+- No completed work exists only in chat or terminal output.
+- The known working-tree drift is documented and not accidentally staged.
 
-Do not:
-- Modify ARGUS or HEPHAESTUS.
-- Change package installation semantics, deployment, or unrelated GUI areas.
-- Download or install tools.
-- Modify unrelated application code.
-- Clean unrelated files.
-- Import, delete, or modify untracked App/NetworkToolkit/LatencyMon/ unless a future task explicitly handles it.
-- Use chat history as source of truth unless the same information exists in the repository.
-
-Validation expectations:
-- New task scope must define its own validation before code changes.
+Do not begin implementation. Review the Codex-only work, especially the ARGUS product/evidence map and finish-line plan. Then either approve activation of `TASK-0073-ARGUS-Evidence-Normalization-Implementation` for Codex or record the corrective task/docs needed first.
 
 When done, provide:
-- Concise summary of implementation performed.
-- Exact files changed.
-- Validation performed.
-- Test This list for the user.
-- Current active task.
-- Current owner and next owner.
-- Recommended commit message.
+- Findings or confirmation of no blocking findings.
+- Whether TASK-0073 may be activated next.
+- Any required documentation corrections.
+- Current active task, current owner, and next owner.
 ```

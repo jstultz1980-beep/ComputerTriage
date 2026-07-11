@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-10
+- Created and activated TASK-0082 ChatGPT Governance Handoff Review as the single active task.
+- Reconciled the Codex-only work stretch for ChatGPT, including current task state, audit counters, known drift, completed tasks since TASK-0020, and the exact Next Bot Prompt.
+- Updated the roadmap to pause Phase 07 until ChatGPT reviews the ARGUS product/evidence map and approves TASK-0073 activation.
 - Completed TASK-0081 Task System Counter Audit.
 - Verified handoff/queue consistency, completed TASK-0072 state, and queued TASK-0073 through TASK-0080 order.
 - Reset only the Task System counter from `25 / 25` to `0 / 25`.

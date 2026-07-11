@@ -9,7 +9,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| _None_ | _N/A_ | _N/A_ | No active task. |
+| `TASK-0082-ChatGPT-Governance-Handoff-Review` | ChatGPT | Active | Review Codex-only work since the previous ChatGPT-owned task, verify governance state, and decide whether TASK-0073 may begin. |
 
 ## Queued
 
@@ -28,7 +28,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 The remaining work is now a finish-line sequence rather than a punch-list cleanup pass:
 
-1. Define ARGUS product behavior and evidence map.
+1. Complete ChatGPT governance and ARGUS design review.
 2. Implement ARGUS evidence normalization.
 3. Add ARGUS event grouping and recommendations.
 4. Finish technician/escalation reporting.
@@ -115,4 +115,4 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is none.
+- Current active task is `TASK-0082-ChatGPT-Governance-Handoff-Review`.

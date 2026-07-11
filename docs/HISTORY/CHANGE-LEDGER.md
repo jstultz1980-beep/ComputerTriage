@@ -275,3 +275,7 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0265 | 2026-07-10 | TASK-0072 / TASK-0081 | Task System | +1 | Completed TASK-0072 and activated TASK-0081 because the Task System counter reached `25 / 25`. |
 | CHG-0266 | 2026-07-10 | TASK-0081 | Task System | reset to 0 / 25 | Completed the required Task System counter audit and reset only the audited Task System counter. |
 | CHG-0267 | 2026-07-10 | TASK-0081 | Documentation | +1 | Updated audit task, queue, handoff, changelog, and ledger records; documented unresolved ADR-0003 file-access drift. |
+| CHG-0268 | 2026-07-10 | TASK-0082 | Repository Governance | +1 | Reconciled Codex-only work for ChatGPT, restored a single active ChatGPT-owned handoff review gate, and documented current GitHub sync state. |
+| CHG-0269 | 2026-07-10 | TASK-0082 | Task System | +1 | Created and activated TASK-0082 as the only active task while keeping TASK-0073 through TASK-0080 queued. |
+| CHG-0270 | 2026-07-10 | TASK-0082 | Documentation | +1 | Rewrote the handoff for ChatGPT with completed-work history, exact changed-file list, validation, drift, blockers, counters, and a fresh Next Bot Prompt. |
+| CHG-0271 | 2026-07-10 | TASK-0082 | Roadmap/Backlog | +1 | Paused Phase 07 for ChatGPT governance and ARGUS design review before ARGUS normalization implementation begins. |

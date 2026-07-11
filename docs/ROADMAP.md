@@ -96,9 +96,12 @@ Completion basis:
 - Existing HEPHAESTUS output paths remain compatible with ARGUS.
 
 ## Phase 07 - ARGUS Evidence Normalization
-Status: Queued
+Status: Paused For ChatGPT Review
 
 Make ARGUS a trustworthy product layer rather than only a foundation command.
+
+Current active review gate:
+- `TASK-0082-ChatGPT-Governance-Handoff-Review`
 
 Planned tasks:
 - `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
@@ -197,7 +200,7 @@ Completion target:
 The active finish-line plan is `docs/PROJECT-FINISH-PLAN.md`.
 
 Near-release priority:
-1. Complete the required Task System audit gate.
+1. Complete TASK-0082 ChatGPT governance and ARGUS design review.
 2. Implement ARGUS normalization.
 3. Add event grouping and recommendations.
 4. Finish report output.
