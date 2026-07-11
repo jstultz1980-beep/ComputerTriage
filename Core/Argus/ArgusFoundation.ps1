@@ -474,18 +474,28 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     }
     . $normalizedModule
 
+    $recommendationsModule = Join-Path $PSScriptRoot "ArgusRecommendations.ps1"
+    if(!(Test-Path $recommendationsModule)){
+        throw "ARGUS recommendations module not found: $recommendationsModule"
+    }
+    . $recommendationsModule
+
     $validation = New-ARGUSInputValidation -BundleRoot $BundleRoot -Artifacts $artifacts -NormalizedArtifacts $normalizedArtifacts
     $summary = New-ARGUSAnalysisSummary -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
     $normalizedAnalysis = New-ARGUSNormalizedAnalysis -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
-
     $validationPath = Join-Path $argusRoot "input-validation.json"
     $summaryPath = Join-Path $argusRoot "analysis-summary.json"
     $normalizedPath = Join-Path $argusRoot "normalized-analysis.json"
+    $diagnosticGroupsPath = Join-Path $argusRoot "diagnostic-groups.json"
+    $recommendationsPath = Join-Path $argusRoot "recommendations.json"
     $reportPath = Join-Path $argusRoot "report.md"
 
     Write-ARGUSJsonFile -Path $validationPath -InputObject $validation
     Write-ARGUSJsonFile -Path $summaryPath -InputObject $summary
     Write-ARGUSJsonFile -Path $normalizedPath -InputObject $normalizedAnalysis
+    $grouping = Invoke-ARGUSGroupingAndRecommendations -BundleRoot $BundleRoot -NormalizedAnalysisPath $normalizedPath
+    Write-ARGUSJsonFile -Path $diagnosticGroupsPath -InputObject $grouping.DiagnosticGroups
+    Write-ARGUSJsonFile -Path $recommendationsPath -InputObject $grouping.Recommendations
     Write-ARGUSMarkdownReport -Path $reportPath -Validation $validation -Summary $summary
 
     Write-Host "ARGUS Foundation completed." -ForegroundColor Green
@@ -493,6 +503,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-Host "ARGUS root: $argusRoot"
     Write-Host "Input validation: $($validation.status)"
     Write-Host "Normalized analysis: $normalizedPath"
+    Write-Host "Diagnostic groups: $diagnosticGroupsPath"
+    Write-Host "Recommendations: $recommendationsPath"
 
     return [pscustomobject]@{
         Status = "Completed"
@@ -502,6 +514,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         InputValidationMode = $validation.mode
         Findings = @($summary.prioritizedDeterministicFindings).Count
         NormalizedAnalysis = $normalizedPath
+        DiagnosticGroups = $diagnosticGroupsPath
+        Recommendations = $recommendationsPath
         Report = $reportPath
     }
 }

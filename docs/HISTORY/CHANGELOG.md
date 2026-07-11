@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-10
+- Completed TASK-0074 ARGUS Event Grouping And Recommendations.
+- Added `ARGUS/diagnostic-groups.json` and `ARGUS/recommendations.json` with confidence, citations, root-cause candidates, missing-evidence boundaries, and conservative technician actions.
+- Validated the existing bundle plus synthetic normal, limited/gap-only, and problem-heavy scenarios, then activated TASK-0075 Reporting Finish Pass.
 - Completed TASK-0083 Codex CLI Resume Work Protocol.
 - Added root `AGENTS.md` and `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` so Codex can resume from tracked repository state.
 - Completed TASK-0073 ARGUS Evidence Normalization Implementation.

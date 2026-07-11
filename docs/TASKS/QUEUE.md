@@ -9,14 +9,13 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Codex | Active | Turn normalized ARGUS facts into coherent diagnostic groups and technician recommendations. |
+| `TASK-0075-Reporting-Finish-Pass` | Codex | Active | Make technician and escalation reports useful outside the GUI. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
 
-| `TASK-0075-Reporting-Finish-Pass` | Codex | Queued | Make technician and escalation reports useful outside the GUI. |
 | `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Queued | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
 | `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag. |
 | `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
@@ -38,7 +37,7 @@ ARGUS evidence normalization is complete; the remaining work is now a finish-lin
 8. Harden release packaging and update behavior.
 9. Run release-candidate validation and documentation.
 
-The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt TASK-0074 or any other Active task already underway.
+The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt TASK-0075 or any other Active task already underway.
 
 ## Completed / Historical
 
@@ -112,6 +111,7 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 | `TASK-0082-ChatGPT-Governance-Handoff-Review` | Completed | Approved TASK-0073 activation after governance and ARGUS architecture review found no blocking issues. |
 | `TASK-0083-Codex-CLI-Resume-Work-Protocol` | Completed | Added repository-resident Codex CLI instructions and defined the `Resume Work` shortcut. |
 | TASK-0073-ARGUS-Evidence-Normalization-Implementation | Completed | Implemented ARGUS normalization loaders, produced ARGUS/normalized-analysis.json, and validated existing plus synthetic bundle scenarios. |
+| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative technician recommendations with explicit missing-evidence boundaries. |
 
 ## Reconciliation Decision
 
@@ -120,5 +120,5 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`.
+- Current active task is `TASK-0075-Reporting-Finish-Pass`.
 

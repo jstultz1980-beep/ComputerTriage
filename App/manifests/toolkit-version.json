@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260710201945,
-    "SourceUpdatedAt":  "2026-07-10T20:19:45.5301668-05:00",
-    "ReleaseNotes":  "Added ARGUS normalization loaders and normalized-analysis output with explicit domain, fact, gap, and citation records."
+    "Build":  20260710214943,
+    "SourceUpdatedAt":  "2026-07-10T21:49:43.6854970-05:00",
+    "ReleaseNotes":  "Added ARGUS diagnostic grouping and cited technician recommendations with explicit missing-evidence boundaries."
 }

@@ -284,3 +284,9 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0274 | 2026-07-10 | TASK-0073 | Validation/Test Framework | +1 | Validated PowerShell parsing, the existing bundle, and normalized artifact structure. |
 | CHG-0275 | 2026-07-10 | TASK-0073 | Documentation | +1 | Recorded TASK-0073 completion and ARGUS normalization validation evidence. |
 | CHG-0276 | 2026-07-10 | TASK-0073 / TASK-0074 | Task System | +1 | Completed TASK-0073 and activated TASK-0074 as the single active task. |
+| CHG-0277 | 2026-07-10 | TASK-0074 | ARGUS | +1 | Added cited diagnostic grouping, conservative root-cause candidates, and technician recommendations with explicit missing-evidence boundaries. |
+| CHG-0278 | 2026-07-10 | TASK-0074 | Build System | +1 | Updated toolkit build metadata for ARGUS grouping and recommendations. |
+| CHG-0279 | 2026-07-10 | TASK-0074 | Validation/Test Framework | +1 | Validated parser checks, the existing bundle, and synthetic normal, limited, and problem-heavy scenarios. |
+| CHG-0280 | 2026-07-10 | TASK-0074 | Documentation | +1 | Recorded TASK-0074 completion, output contracts, validation evidence, and the next handoff. |
+| CHG-0281 | 2026-07-10 | TASK-0074 / TASK-0075 | Task System | +1 | Completed TASK-0074 and activated TASK-0075 as the single active task. |
+| CHG-0282 | 2026-07-10 | TASK-0074 | Roadmap/Backlog | +1 | Advanced Phase 07 from ARGUS grouping to the reporting finish pass. |
