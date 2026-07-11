@@ -60,6 +60,19 @@ New requests may be recorded for later reconciliation, but the current Active ta
 
 Only the user’s explicit cancellation/pause, a material safety or security risk, repository corruption, or a genuine blocker in the Active task may stop work immediately.
 
+## Blocked-Error Handoff
+
+Read and follow `docs/ERROR-HANDOFF.md`.
+
+If Codex reaches a genuine blocker or stop condition:
+- Do not leave the blocker only in terminal output or chat.
+- Write a complete blocker report to `docs/ERROR-HANDOFF.md`.
+- Commit the report and push that blocker-report commit to the cloud repository. This limited push is authorized even when normal task commits are local-only.
+- Preserve unrelated drift and incomplete implementation work.
+- Tell the user the blocker is recorded and pushed, then wait for the Project Custodian.
+
+When the user tells ChatGPT `Address Errors`, the Project Custodian reads the cloud error handoff, remediates the tracked conflict, commits and pushes the resolution, and returns control to Codex through `Resume Work`.
+
 ## Authority
 
 - Repository state controls execution.
@@ -74,4 +87,4 @@ Only the user’s explicit cancellation/pause, a material safety or security ris
   6. User’s current request
   7. Chat history
 
-If a conflict cannot be resolved from tracked files, stop and report it to the Project Custodian. Do not invent a resolution.
+If a conflict cannot be resolved from tracked files, stop and report it through `docs/ERROR-HANDOFF.md`. Do not invent a resolution.
