@@ -20,6 +20,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Queued | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
 | `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag. |
 | `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
+| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | ChatGPT | Queued | Freeze development at the scheduled boundary and perform a very verbose start-to-finish audit before packaging. |
 | `TASK-0079-Release-Packaging-And-Update-Hardening` | Codex | Queued | Validate portable release, deployment, update, client-data preservation, and release artifact layout. |
 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Run final release-candidate validation and produce release-ready docs. |
 
@@ -33,8 +34,12 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 4. Integrate the Analyze workflow into the GUI.
 5. Reduce first-render tab switching lag.
 6. Document embedded-tool trust and EDR-safe distribution.
-7. Harden release packaging and update behavior.
-8. Run release-candidate validation and documentation.
+7. Freeze development and complete the full codebase architecture/quality audit.
+8. Resolve audit-created release blockers through focused remediation tasks.
+9. Harden release packaging and update behavior.
+10. Run release-candidate validation and documentation.
+
+The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt TASK-0073 or any other Active task already underway.
 
 ## Completed / Historical
 
