@@ -9,13 +9,12 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0082-ChatGPT-Governance-Handoff-Review` | ChatGPT | Active | Review Codex-only work since the previous ChatGPT-owned task, verify governance state, and decide whether TASK-0073 may begin. |
+| `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Codex | Active | Implement ARGUS loaders and normalized intermediate model from the approved TASK-0072 product definition. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Codex | Queued | Implement ARGUS loaders and normalized intermediate model from the product definition. |
 | `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Codex | Queued | Group symptoms/events and produce confidence-scored technician recommendations with citations. |
 | `TASK-0075-Reporting-Finish-Pass` | Codex | Queued | Make technician and escalation reports useful outside the GUI. |
 | `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Queued | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
@@ -28,15 +27,14 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 The remaining work is now a finish-line sequence rather than a punch-list cleanup pass:
 
-1. Complete ChatGPT governance and ARGUS design review.
-2. Implement ARGUS evidence normalization.
-3. Add ARGUS event grouping and recommendations.
-4. Finish technician/escalation reporting.
-5. Integrate the Analyze workflow into the GUI.
-6. Reduce first-render tab switching lag.
-7. Document embedded-tool trust and EDR-safe distribution.
-8. Harden release packaging and update behavior.
-9. Run release-candidate validation and documentation.
+1. Implement ARGUS evidence normalization.
+2. Add ARGUS event grouping and recommendations.
+3. Finish technician/escalation reporting.
+4. Integrate the Analyze workflow into the GUI.
+5. Reduce first-render tab switching lag.
+6. Document embedded-tool trust and EDR-safe distribution.
+7. Harden release packaging and update behavior.
+8. Run release-candidate validation and documentation.
 
 ## Completed / Historical
 
@@ -89,7 +87,7 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 | `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
 | `TASK-0054-Directory-Domain-Status-Page` | Completed | Added Directory domain identity and AD health status summary with visible Domain Logon Health, GPO Health, and GPResult actions. |
 | `TASK-0060-UI-Counter-Audit` | Archived | Superseded before execution when the audit threshold changed from 10 changes to 25 changes. |
-| `TASK-0061-Directory-Page-Layout-Polish` | Completed | Compacted the Directory page status area, removed the Directory refresh button, and preserved domain/policy actions. |
+| `TASK-0061-Directory-Page-Layout-Polish` | Completed | Compacted the Directory page status area into a shorter single-row summary and removed the Directory refresh button. |
 | `TASK-0055-Shared-Embedded-Output-Pattern` | Completed | Added shared embedded command-output helpers and converted Quick Target Checks to use them. |
 | `TASK-0056-Triage-Guided-Workflow-Polish` | Completed | Replaced the visible Triage catalog/notes area with a guided collect, review, and submit workflow. |
 | `TASK-0057-WiFi-And-Windows-Status-Polish` | Completed | Polished Windows Update repair status and Wi-Fi LED/network status presentation. |
@@ -107,6 +105,7 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 | `TASK-0071-Finish-Line-Project-Plan` | Completed | Created the finish-line plan and queued TASK-0072 through TASK-0080 for ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation. |
 | `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Completed | Defined ARGUS product behavior, evidence domains, citation/confidence rules, output contract, and next implementation scope. |
 | `TASK-0081-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached `25 / 25`, reset only the Task System counter, and documented unreconciled ADR-0003 file-access drift. |
+| `TASK-0082-ChatGPT-Governance-Handoff-Review` | Completed | Approved TASK-0073 activation after governance and ARGUS architecture review found no blocking issues. |
 
 ## Reconciliation Decision
 
@@ -115,4 +114,4 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is `TASK-0082-ChatGPT-Governance-Handoff-Review`.
+- Current active task is `TASK-0073-ARGUS-Evidence-Normalization-Implementation`.
