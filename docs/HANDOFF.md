@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0085
+HANDOFF-0086
 
 ## Current Task
 TASK-0073-ARGUS-Evidence-Normalization-Implementation
@@ -13,35 +13,47 @@ Codex
 Codex
 
 ## Objective
-TASK-0082 completed the ChatGPT governance and ARGUS architecture review. No blocking findings were identified. Codex may now implement TASK-0073 using the approved ARGUS product definition and accepted ADR-0003.
+Codex may implement TASK-0073 using the approved ARGUS product definition and accepted ADR-0003. The repository now contains a durable Codex CLI operating protocol: the user may enter `Resume Work`, and Codex must rebuild context from tracked repository instructions and execute only the Active task.
 
 ## Source Of Truth
 The repository is the source of truth. Chat history, screenshots, and terminal-only notes are not authoritative unless recorded in tracked repository files.
 
 Exactly one task may be Active. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` must agree.
 
+## Roles
+- ChatGPT is the Project Custodian and architecture/governance owner.
+- Codex is the Programmer and implementation agent.
+- ChatGPT controls architecture, governance, task activation, audit decisions, and implementation readiness through tracked repository updates.
+- Codex controls implementation details within the approved Active task and must report blockers rather than expanding scope.
+
+## Codex CLI Resume Work Protocol
+Repository instruction files:
+- `AGENTS.md`
+- `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`
+- `PROJECT.md`
+
+When the user enters `Resume Work`, Codex must:
+1. Read `AGENTS.md` and the detailed CLI operating instructions.
+2. Follow the complete startup sequence in `PROJECT.md`.
+3. Verify the handoff and queue agree on exactly one Active task.
+4. Check audit counters and preserve documented working-tree drift.
+5. Read the Active task and all referenced design/ADR/code files.
+6. Execute only the Active task.
+7. Validate, update required records, commit locally, and report results.
+8. Push only when explicitly requested.
+
+`Resume Work` is not permission to clean unrelated drift, bypass an audit gate, select unrelated work, or expand task scope.
+
 ## Current Project State
 - TASK-0071 completed the finish-line plan.
 - TASK-0072 completed the ARGUS product definition and evidence map.
 - TASK-0081 completed the Task System `25 / 25` audit and reset only that counter.
-- TASK-0082 completed the ChatGPT governance and architecture review.
-- TASK-0073 is now the single active implementation task.
+- TASK-0082 completed the ChatGPT governance and architecture review and approved TASK-0073.
+- TASK-0083 added the repository-resident Codex CLI `Resume Work` protocol.
+- TASK-0073 is the single active implementation task.
 - TASK-0074 through TASK-0080 remain queued in finish-line order.
 
 ## TASK-0082 Review Decision
-ChatGPT reviewed:
-- `PROJECT.md`
-- `docs/PROJECT-CHARTER.md`
-- `docs/ARCHITECTURE.md`
-- `docs/ROADMAP.md`
-- `docs/HANDOFF.md`
-- `docs/TASKS/QUEUE.md`
-- `docs/HISTORY/CHANGE-LEDGER.md`
-- `docs/HISTORY/CHANGELOG.md`
-- TASK-0071, TASK-0072, TASK-0073, TASK-0074, TASK-0081, and TASK-0082
-- `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`
-- Accepted ADR-0003
-
 Findings:
 - HEPHAESTUS and ARGUS responsibilities are correctly separated.
 - HEPHAESTUS collects evidence and performs deterministic local analysis.
@@ -79,10 +91,10 @@ Codex must not add:
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 8 / 25 | No |
+| Repository Governance | 9 / 25 | No |
 | Architecture | 3 / 25 | No |
-| Documentation | 21 / 25 | No |
-| Task System | 2 / 25 | No |
+| Documentation | 22 / 25 | No |
+| Task System | 3 / 25 | No |
 | HEPHAESTUS | 4 / 25 | No |
 | ARGUS | 4 / 25 | No |
 | Reporting | 1 / 25 | No |
@@ -108,62 +120,20 @@ None.
 
 ## Recommended Commit Message
 ```text
-TASK-0082: Complete ChatGPT governance handoff review
+TASK-0083: Add Codex CLI Resume Work protocol
 ```
 
 ## Next Bot Prompt
-Copy and paste the following prompt into Codex:
+For Codex CLI, the user may now enter:
 
 ```text
-You are assisting with the Computer Triage Toolkit repository.
+Resume Work
+```
 
-The repository is the single source of truth. Do not rely on chat history unless the same information exists in tracked repository files.
+Codex must then follow `AGENTS.md`, `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`, and the startup sequence in `PROJECT.md`.
 
-Read these files first:
-1. PROJECT.md
-2. docs/PROJECT-CHARTER.md
-3. docs/ARCHITECTURE.md
-4. docs/ROADMAP.md
-5. docs/HANDOFF.md
-6. docs/TASKS/QUEUE.md
-7. docs/TASKS/TASK-0073-ARGUS-Evidence-Normalization-Implementation.md
-8. docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md
-9. docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md
-10. Core/Argus/ArgusFoundation.ps1
+Expanded intent for TASK-0073:
 
-Current state:
-- TASK-0082 is complete.
-- ChatGPT approved TASK-0073 activation with no blocking architecture findings.
-- TASK-0073 is the only Active task.
-- Owner: Codex.
-- No subsystem is at the 25/25 audit gate.
-
-Complete TASK-0073 only.
-
-Scope:
-- Add ARGUS-side structured loaders for selected HEPHAESTUS outputs.
-- Preserve existing ARGUS foundation outputs.
-- Add ARGUS/normalized-analysis.json.
-- Produce domain, fact, gap, and citation records defined in the TASK-0072 product definition.
-- Preserve deterministic evidence labels and trust boundaries.
-- Represent missing or weak evidence explicitly.
-- Validate against the existing latest bundle, a synthetic normal bundle, and a synthetic limited/missing-evidence bundle.
-- Update toolkit build metadata for accepted implementation changes.
-- Update the task, queue, handoff, ledger, changelog, and roadmap when complete.
-
-Do not:
-- Add event grouping or recommendations; those belong to TASK-0074.
-- Add report styling or UI integration.
-- Add broad AI orchestration.
-- Modify HEPHAESTUS collectors.
-- Stage or clean known unrelated working-tree drift.
-- Touch App/NetworkToolkit/LatencyMon/ or App/NetworkToolkit/Logs/.
-
-When complete, provide:
-- Commit hash.
-- Exact files changed.
-- Validation performed.
-- Current active task.
-- Current owner and next owner.
-- Recommended next task.
+```text
+Resume Work. Execute only TASK-0073-ARGUS-Evidence-Normalization-Implementation. Preserve the known working-tree drift. Do not implement TASK-0074 scope. Commit locally and do not push unless explicitly requested.
 ```
