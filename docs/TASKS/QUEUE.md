@@ -1,4 +1,4 @@
-﻿# Task Queue
+# Task Queue
 
 This file is the task-state source of truth alongside `docs/HANDOFF.md`.
 
@@ -9,117 +9,45 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0085-Documentation-Counter-Audit` | Codex | Active | Audit documentation consistency after TASK-0076 brings Documentation to 25/25. |
+| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | ChatGPT | Active | Freeze implementation and perform the complete read-only architecture, code-quality, security, performance, validation, deployment, and governance audit. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-
-| `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag. |
+| `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag after audit remediation priorities are resolved. |
 | `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
-| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | ChatGPT | Queued | Freeze development at the scheduled boundary and perform a very verbose start-to-finish audit before packaging. |
 | `TASK-0079-Release-Packaging-And-Update-Hardening` | Codex | Queued | Validate portable release, deployment, update, client-data preservation, and release artifact layout. |
 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Run final release-candidate validation and produce release-ready docs. |
 
 ## Consolidated Plan
 
-ARGUS evidence normalization is complete; the remaining work is now a finish-line sequence rather than a punch-list cleanup pass:
+The current development freeze sequence is:
 
-1. Add ARGUS event grouping and recommendations.
-2. Finish technician/escalation reporting.
-3. Integrate the Analyze workflow into the GUI.
-4. Reduce first-render tab switching lag.
-5. Document embedded-tool trust and EDR-safe distribution.
-6. Freeze development and complete the full codebase architecture/quality audit.
-7. Resolve audit-created release blockers through focused remediation tasks.
-8. Harden release packaging and update behavior.
-9. Run release-candidate validation and documentation.
+1. Complete TASK-0084 full-codebase architecture and quality audit.
+2. Create and execute focused remediation tasks for accepted Critical and High findings.
+3. Reassess the placement and scope of TASK-0077 and TASK-0078 against audit findings.
+4. Harden release packaging/update behavior under TASK-0079.
+5. Run release-candidate validation and documentation under TASK-0080.
 
-The full-codebase audit is intentionally queued after TASK-0078 and before TASK-0079. It must not interrupt an Active task already underway.
+No implementation task may become Active while TASK-0084 is underway unless the Project Custodian explicitly creates a narrowly scoped audit-support task required to obtain evidence. Audit-support work must not repair application code.
 
-## Completed / Historical
+## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
-| `TASK-0010-Classify-Drift-And-Status-Report` | Completed | Historical TASK-0010. This number is already used and must not be reused for Foundation Audit. |
-| `TASK-0010-Foundation-Audit` | Archived | Local governance-prep task created from an invalid duplicate TASK-0010 reference; superseded by completed TASK-0011 and REVIEW-0001. |
-| `TASK-0011-Foundation-Audit` | Completed | Actual tracked Foundation Audit task. It supersedes the untracked/incorrect `TASK-0010-Foundation-Audit` reference. |
-| `TASK-0012-Phase-Transition-Readiness` | Completed | Transitioned from Foundation Zero to Phase 01. |
-| `TASK-0013-Header-Tool-Search` | Completed | GUI header tool search. |
-| `TASK-0014-DHCP-Sleuth-Restoration` | Completed | DHCP Sleuth restoration per handoff history. |
-| `TASK-0015-Header-Search-Tab-Mapping-Correction` | Completed | Search tab mapping correction per handoff history. |
-| `TASK-0016-Tool-Source-Of-Truth-Correction` | Completed | GUI tool registry/source-of-truth correction per handoff history. |
-| `TASK-0017-Triage-Manual-Run-Validation` | Completed | Existing smoke and button-smoke validation passed; runtime drift was documented and excluded. |
-| `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` | Completed | Design, ADRs, and focused TASK-0019 implementation scope completed. |
-| `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` | Completed | Minimal vertical slice implemented and validated locally; required artifacts generated and smoke tests passed. |
-| `TASK-0020-ARGUS-Input-Contract-ADR` | Completed | ADR-0003 accepted; ARGUS input contract, trust model, and focused TASK-0023 implementation scope finalized. |
-| `TASK-0023-ARGUS-Foundation-Implementation` | Completed | Minimal ARGUS foundation slice implemented and validated against HEPHAESTUS Local Analysis artifacts. |
-| `TASK-0024-Quick-Dx-Layout-Adjustment` | Completed | Adjusted Quick Diagnosis tab layout so Quick Target Checks owns the full left column and Quick Diagnosis controls are compacted into the right column. |
-| `TASK-0025-Quick-Dx-Last-Scan-Label-Fix` | Completed | Fixed the clipped Last Quick Diagnosis label in the compact right-column Quick Diagnosis block. |
-| `TASK-0026-Quick-Dx-Fixed-Internet-Targets` | Completed | Replaced the editable Quick Diagnosis internet target with a fixed primary/backup target chain. |
-| `TASK-0027-GUI-Polish-QuickDx-Header-Choco-Theme` | Completed | Polished Quick Dx spacing, header health badge space, Choco layout, surface gradient/texture, and added Terminal Dark. |
-| `TASK-0035-Documentation-Task-System-Audit` | Completed | Audited documentation/task-state consistency, reset audited counters, and cleared the implementation gate. |
-| `TASK-0028-Quick-Dx-Compact-Run-Panel` | Completed | Removed the visible Quick Dx internet target chain and compacted the run panel while preserving internal fallback targets. |
-| `TASK-0029-Choco-Page-Layout-Refinement` | Completed | Reworked the Choco status area into a compact strip with readable action buttons and preserved existing package-management behavior. |
-| `TASK-0041-UI-Counter-Audit` | Completed | Audited recent UI task work, reset the UI counter, and cleared the implementation gate. |
-| `TASK-0037-Activity-Page-Running-Tool-Tracking` | Completed | Added Activity Network gauge, fixed-height running-process list, compact controls, and slower refresh interval. |
-| `TASK-0030-Print-Tab-Data-Path-Cleanup` | Completed | Removed the visible print queue data-folder path and preserved print queue maintenance output behavior. |
-| `TASK-0031-Triage-Page-Simplification` | Completed | Simplified the Triage tab to Quick Triage and Full Triage, removed normal-view advanced collector clutter, and replaced the live log with concise status/output access. |
-| `TASK-0032-Computer-Tab-Summary-Redesign` | Completed | Reworked the Computer tab around a richer current-computer summary with LED indicators and a compact profile table. |
-| `TASK-0038-Modern-Control-Style-System` | Completed | Cleaned up header Settings/Help controls, reduced the crown/elevation icon, and preserved shared rounded button styling. |
-| `TASK-0042-Documentation-Counter-Audit` | Completed | Audited documentation/task-state consistency after the Documentation counter reached 10/10 and reset the audited counter. |
-| `TASK-0045-Print-Page-Polish` | Completed | Removed the redundant Print diagnostics subheading and fixed clipped Print Queue discovery controls. |
-| `TASK-0046-Triage-Page-Catalog-And-Bundle-Cleanup` | Completed | Simplified the Triage action row, removed visible catalog noise, removed the visible manifest export action, and made bundle names more descriptive. |
-| `TASK-0048-Task-System-Counter-Audit` | Completed | Audited task-state consistency after the Task System counter reached 10/10 and reset the audited counter. |
-| `TASK-0049-UI-Counter-Audit` | Completed | Audited UI task history after the UI counter reached 10/10 and reset the audited counter. |
-| `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup` | Completed | Added status-bar Wi-Fi, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build. |
-| `TASK-0044-GUI-Tab-Performance-Hardening` | Completed | Deferred startup tab construction, deferred Activity refresh, trimmed VBS launch flags, and added slow tab diagnostics. |
-| `TASK-0053-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached 10/10 and reset only the audited counter. |
-| `TASK-0043-Client-Data-Transfer` | Completed | Added Settings workflow to validate a destination toolkit, transfer client diagnostic data only, and write a transfer manifest. |
-| `TASK-0051-Development-File-Deployment-Exclusions` | Completed | Added shared deployment exclusion policy, documented dev-only files, and validated fake fresh deployment/update exclusions. |
-| `TASK-0040-Software-Inventory-And-Placement-Implementation` | Completed | Split Software tab launchable/installable areas, classified Registrar and LatencyMon, and removed non-portable/redundant triage entries. |
-| `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan` | Completed | Decided Directory/Network/Infrastructure boundaries, selected Quick Target Checks as the preferred embedded-output pattern, and created follow-on implementation tasks. |
-| `TASK-0022-HEPHAESTUS-Portable-Tool-Classification` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
-| `TASK-0034-Embedded-Tool-Experience-Roadmap` | Archived | Consolidated into `TASK-0033-Tab-By-Tab-Direction-And-Embedding-Plan`. |
-| `TASK-0036-Page-Health-Indicators` | Archived | Consolidated into `TASK-0047-Status-Bar-Indicators-And-Chrome-Cleanup`. |
-| `TASK-0039-Software-Tab-Launchable-And-Installable-Inventory` | Archived | Consolidated into `TASK-0040-Software-Inventory-And-Placement-Implementation`. |
-| `TASK-0050-Roadmap-Backlog-Counter-Audit` | Completed | Audited roadmap/backlog consistency after task consolidation reached 10/10 and reset the audited counter. |
-| `TASK-0052-Documentation-Counter-Audit` | Completed | Audited documentation consistency after TASK-0046/build metadata updates reached 10/10 and reset the audited counter. |
-| `TASK-0059-Documentation-Build-Counter-Audit` | Completed | Audited TASK-0033 documentation and build metadata changes, reset only the Documentation and Build System counters, and cleared the implementation gate. |
-| `TASK-0054-Directory-Domain-Status-Page` | Completed | Added Directory domain identity and AD health status summary with visible Domain Logon Health, GPO Health, and GPResult actions. |
-| `TASK-0060-UI-Counter-Audit` | Archived | Superseded before execution when the audit threshold changed from 10 changes to 25 changes. |
-| `TASK-0061-Directory-Page-Layout-Polish` | Completed | Compacted the Directory page status area into a shorter single-row summary and removed the Directory refresh button. |
-| `TASK-0055-Shared-Embedded-Output-Pattern` | Completed | Added shared embedded command-output helpers and converted Quick Target Checks to use them. |
-| `TASK-0056-Triage-Guided-Workflow-Polish` | Completed | Replaced the visible Triage catalog/notes area with a guided collect, review, and submit workflow. |
-| `TASK-0057-WiFi-And-Windows-Status-Polish` | Completed | Polished Windows Update repair status and Wi-Fi LED/network status presentation. |
-| `TASK-0058-Settings-And-Control-Polish` | Completed | Compacted Settings controls, tab strip, header logo, shared buttons, and removed registered-command startup noise. |
-| `TASK-0062-Computer-Data-Push-Pull` | Completed | Added Push/Pull direction selection to the technician-safe client/computer data transfer workflow. |
-| `TASK-0063-Add-Ons-Concept` | Completed | Added a testable Add-Ons popup for installable/extract-needed programs while preserving Software workflows. |
-| `TASK-0064-Product-Naming-Options` | Completed | Recorded five candidate product names with rationales and no app rename. |
-| `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` | Completed | Expanded deterministic local analysis rules for network, updates, security, services, and domain-health evidence. |
-| `TASK-0065-UI-Regression-Polish` | Completed | Cleaned up visible UI regressions from punch-list items 36 through 46. |
-| `TASK-0066-RapidAssist-Naming-Selection` | Completed | Recorded RapidAssist as the preferred product naming direction with no app rename. |
-| `TASK-0067-UI-Feedback-Corrections` | Completed | Corrected status-bar activity, Windows Update status/health, Settings size refresh, and Triage instruction weighting. |
-| `TASK-0068-Triage-Instructions-And-WU-LED` | Completed | Refined Triage instruction formatting and made Windows Update health use a separate visible LED. |
-| `TASK-0069-Triage-Text-Driven-Workflow` | Completed | Moved Triage page actions into instructional links and removed the old top action row. |
-| `TASK-0070-Local-GitHub-Reconciliation` | Completed | Audited local `master` against `origin/master`, recorded `0 behind / 28 ahead` after reconciliation, closed Wi-Fi hardware verification, and performed no push. |
-| `TASK-0071-Finish-Line-Project-Plan` | Completed | Created the finish-line plan and queued TASK-0072 through TASK-0080 for ARGUS, reporting, UI integration, performance, EDR-safe tooling, packaging, and release validation. |
-| `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Completed | Defined ARGUS product behavior, evidence domains, citation/confidence rules, output contract, and next implementation scope. |
-| `TASK-0081-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached `25 / 25`, reset only the Task System counter, and documented unreconciled ADR-0003 file-access drift. |
-| `TASK-0082-ChatGPT-Governance-Handoff-Review` | Completed | Approved TASK-0073 activation after governance and ARGUS architecture review found no blocking issues. |
-| `TASK-0083-Codex-CLI-Resume-Work-Protocol` | Completed | Added repository-resident Codex CLI instructions and defined the `Resume Work` shortcut. |
-| TASK-0073-ARGUS-Evidence-Normalization-Implementation | Completed | Implemented ARGUS normalization loaders, produced ARGUS/normalized-analysis.json, and validated existing plus synthetic bundle scenarios. |
-| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative technician recommendations with explicit missing-evidence boundaries. |
-| `TASK-0075-Reporting-Finish-Pass` | Completed | Added standalone technician and escalation reports with confidence, citations, limitations, and structured artifact references. |
-| `TASK-0076-Analyze-Workflow-UI-Integration` | Completed | Added a guided Analyze workflow with embedded complete analysis, report access, bundle access, and explicit missing/limited status. |
+| `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Completed | Implemented ARGUS normalization loaders and `ARGUS/normalized-analysis.json`. |
+| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative recommendations. |
+| `TASK-0075-Reporting-Finish-Pass` | Completed | Added technician and escalation reports with confidence, citations, limitations, and artifact references. |
+| `TASK-0076-Analyze-Workflow-UI-Integration` | Completed | Added the guided Analyze workflow and validated parser, smoke, and button-smoke behavior. |
+| `TASK-0085-Documentation-Counter-Audit` | Completed | Audited documentation consistency at `25 / 25`, reset only Documentation, and cleared the gate for TASK-0084. |
 
-## Reconciliation Decision
+## Historical Task Records
+Historical completed and archived task details remain in the individual task files and repository history. The queue’s operational purpose is to identify the single Active task and the ordered remaining work; it is not the canonical substitute for historical task documents.
 
-`TASK-0010-Foundation-Audit` must not remain active because `TASK-0010` is already occupied by `TASK-0010-Classify-Drift-And-Status-Report`, and the repository contains `TASK-0011-Foundation-Audit` as the completed Foundation Audit task. The current reconciliation does not delete or rename historical task files. The clean source of truth is:
-
-- Historical TASK-0010 remains completed as drift classification/status reporting.
-- The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
-- Foundation Audit remains completed as TASK-0011.
-- Current active task is `TASK-0085-Documentation-Counter-Audit`.
-
+## Current Decision
+- TASK-0085 is complete.
+- Documentation was audited and resets to `0 / 25`.
+- The user explicitly selected the already planned TASK-0084 audit at this task boundary.
+- TASK-0084 is the only Active task.
+- TASK-0077 and all implementation work remain queued during the development freeze.
