@@ -24,10 +24,33 @@ Read the project source-of-truth files first. Check punch_list.txt for new addit
 When the user prompts exactly or substantially with `Resume Work`, Codex CLI must treat it as this reusable instruction:
 
 ```text
-Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, verify no 25/25 audit gate blocks implementation, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. Do not push unless explicitly requested.
+Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. A 25/25 audit threshold blocks the next implementation task but does not interrupt an Active task already underway. Do not push unless explicitly requested.
 ```
 
 `Resume Work` is not permission to choose unrelated work, bypass audit gates, clean unrelated drift, or expand task scope.
+
+## Active Task Non-Interruption Rule
+Read `docs/GOVERNANCE/NON-INTERRUPTION-GUARDRAIL.md`.
+
+Once Codex begins an Active task, the task remains locked until its normal completion or blocker boundary.
+
+While Codex is executing that task, ChatGPT may record new user requests for future work, but must not:
+- Replace or deactivate the current Active task.
+- Change its owner or rewrite its scope.
+- Insert a design review, audit, or other gate into the middle of the task.
+- Require Codex to abandon, restart, or restructure work solely because a new request was submitted through ChatGPT.
+
+New requests are reconciled at the next task boundary.
+
+If a subsystem reaches `25 / 25` while an Active task is underway, the current task may finish, validate, and commit. The required audit becomes the next Active task before another implementation task begins.
+
+Immediate interruption is permitted only when:
+- The user explicitly cancels or pauses the task.
+- Continuing creates a material data-loss, credential, destructive-operation, or security risk.
+- Repository corruption or an irreconcilable source-of-truth conflict prevents safe continuation.
+- The Active task encounters a genuine blocker outside its authorized correction scope.
+
+A new ChatGPT request is not by itself an immediate-stop condition.
 
 ## Required Startup Sequence
 1. Read `AGENTS.md` when operating through Codex CLI.
@@ -85,6 +108,8 @@ Each subsystem has its own audit change counter in `docs/HANDOFF.md`.
 A subsystem change is an accepted engineering change that materially affects that subsystem's behavior, structure, responsibility, interface, documentation, or validation model.
 
 When any subsystem counter reaches `25 / 25`, no new implementation work may begin until a new audit task is completed.
+
+The threshold applies at a task boundary. It does not interrupt an Active task already underway. The current task may finish, validate, and commit; the audit must become the next Active task before another implementation task starts.
 
 After the audit is completed:
 1. The audited subsystem counter resets to `0 / 25`.
