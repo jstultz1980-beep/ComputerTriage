@@ -96,12 +96,12 @@ Completion basis:
 - Existing HEPHAESTUS output paths remain compatible with ARGUS.
 
 ## Phase 07 - ARGUS Evidence Normalization
-Status: Active
+Status: Completed
 
 Make ARGUS a trustworthy product layer rather than only a foundation command.
 
 Current active task:
-- `TASK-0075-Reporting-Finish-Pass`
+- None.
 
 Completed work:
 - `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
@@ -114,23 +114,23 @@ Completion target:
 - ARGUS has a defined evidence map, confidence/citation rules, normalized intermediate model, grouped diagnostic themes, and technician recommendations.
 
 ## Phase 08 - Reporting
-Status: Queued
+Status: Completed
 
 Improve technician, escalation, and release-facing reports after deterministic findings and ARGUS outputs are useful.
 
-Planned task:
+Completed task:
 - `TASK-0075-Reporting-Finish-Pass`
 
 Completion target:
 - Reports are readable outside the GUI, cite evidence limitations, and support technician handoff or escalation review.
 
 ## Phase 09 - UI Integration
-Status: Queued
+Status: Active
 
 Connect Collect, Analyze, ARGUS, and Reports into a normal technician workflow, then address remaining performance friction.
 
 Current active task:
-- None.
+- `TASK-0076-Analyze-Workflow-UI-Integration`
 
 Recently completed UI work:
 - `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.

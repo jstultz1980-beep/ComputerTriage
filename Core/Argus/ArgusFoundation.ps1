@@ -480,6 +480,12 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     }
     . $recommendationsModule
 
+    $reportingModule = Join-Path $PSScriptRoot "ArgusReporting.ps1"
+    if(!(Test-Path $reportingModule)){
+        throw "ARGUS reporting module not found: $reportingModule"
+    }
+    . $reportingModule
+
     $validation = New-ARGUSInputValidation -BundleRoot $BundleRoot -Artifacts $artifacts -NormalizedArtifacts $normalizedArtifacts
     $summary = New-ARGUSAnalysisSummary -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
     $normalizedAnalysis = New-ARGUSNormalizedAnalysis -BundleRoot $BundleRoot -Validation $validation -Artifacts $artifacts
@@ -497,6 +503,7 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-ARGUSJsonFile -Path $diagnosticGroupsPath -InputObject $grouping.DiagnosticGroups
     Write-ARGUSJsonFile -Path $recommendationsPath -InputObject $grouping.Recommendations
     Write-ARGUSMarkdownReport -Path $reportPath -Validation $validation -Summary $summary
+    $finalReports = Write-ARGUSFinalReports -ArgusRoot $argusRoot -Validation $validation -Summary $summary -NormalizedAnalysis $normalizedAnalysis -DiagnosticGroups $grouping.DiagnosticGroups -Recommendations $grouping.Recommendations
 
     Write-Host "ARGUS Foundation completed." -ForegroundColor Green
     Write-Host "Bundle root: $BundleRoot"
@@ -505,6 +512,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-Host "Normalized analysis: $normalizedPath"
     Write-Host "Diagnostic groups: $diagnosticGroupsPath"
     Write-Host "Recommendations: $recommendationsPath"
+    Write-Host "Technician report: $($finalReports.TechnicianReport)"
+    Write-Host "Escalation report: $($finalReports.EscalationReport)"
 
     return [pscustomobject]@{
         Status = "Completed"
@@ -516,6 +525,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         NormalizedAnalysis = $normalizedPath
         DiagnosticGroups = $diagnosticGroupsPath
         Recommendations = $recommendationsPath
+        TechnicianReport = $finalReports.TechnicianReport
+        EscalationReport = $finalReports.EscalationReport
         Report = $reportPath
     }
 }

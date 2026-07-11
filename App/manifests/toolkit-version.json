@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260710214943,
-    "SourceUpdatedAt":  "2026-07-10T21:49:43.6854970-05:00",
-    "ReleaseNotes":  "Added ARGUS diagnostic grouping and cited technician recommendations with explicit missing-evidence boundaries."
+    "Build":  20260710220044,
+    "SourceUpdatedAt":  "2026-07-10T22:00:44.4414329-05:00",
+    "ReleaseNotes":  "Added standalone ARGUS technician and escalation reports with confidence, citations, and evidence limitations."
 }

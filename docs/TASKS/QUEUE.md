@@ -9,14 +9,13 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0075-Reporting-Finish-Pass` | Codex | Active | Make technician and escalation reports useful outside the GUI. |
+| `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Active | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
 
 ## Queued
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
 
-| `TASK-0076-Analyze-Workflow-UI-Integration` | Codex | Queued | Connect collection, local analysis, ARGUS, and report review into normal GUI workflow. |
 | `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag. |
 | `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
 | `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | ChatGPT | Queued | Freeze development at the scheduled boundary and perform a very verbose start-to-finish audit before packaging. |
@@ -112,6 +111,7 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 | `TASK-0083-Codex-CLI-Resume-Work-Protocol` | Completed | Added repository-resident Codex CLI instructions and defined the `Resume Work` shortcut. |
 | TASK-0073-ARGUS-Evidence-Normalization-Implementation | Completed | Implemented ARGUS normalization loaders, produced ARGUS/normalized-analysis.json, and validated existing plus synthetic bundle scenarios. |
 | `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative technician recommendations with explicit missing-evidence boundaries. |
+| `TASK-0075-Reporting-Finish-Pass` | Completed | Added standalone technician and escalation reports with confidence, citations, limitations, and structured artifact references. |
 
 ## Reconciliation Decision
 
@@ -120,5 +120,5 @@ The full-codebase audit is intentionally queued after TASK-0078 and before TASK-
 - Historical TASK-0010 remains completed as drift classification/status reporting.
 - The invalid duplicate TASK-0010 Foundation Audit prep task is archived.
 - Foundation Audit remains completed as TASK-0011.
-- Current active task is `TASK-0075-Reporting-Finish-Pass`.
+- Current active task is `TASK-0076-Analyze-Workflow-UI-Integration`.
 

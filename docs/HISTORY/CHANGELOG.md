@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-07-10
+- Completed TASK-0075 Reporting Finish Pass.
+- Added standalone `ARGUS/technician-report.md` and `ARGUS/escalation-report.md` outputs with confidence, citations, limitations, diagnostic themes, and structured artifact references.
+- Validated both reports from the current AI bundle and activated TASK-0076 Analyze Workflow UI Integration.
 - Completed TASK-0074 ARGUS Event Grouping And Recommendations.
 - Added `ARGUS/diagnostic-groups.json` and `ARGUS/recommendations.json` with confidence, citations, root-cause candidates, missing-evidence boundaries, and conservative technician actions.
 - Validated the existing bundle plus synthetic normal, limited/gap-only, and problem-heavy scenarios, then activated TASK-0075 Reporting Finish Pass.

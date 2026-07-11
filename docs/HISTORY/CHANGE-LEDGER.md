@@ -290,3 +290,9 @@ After an audit is completed, the audited subsystem counter resets to `0 / 25` an
 | CHG-0280 | 2026-07-10 | TASK-0074 | Documentation | +1 | Recorded TASK-0074 completion, output contracts, validation evidence, and the next handoff. |
 | CHG-0281 | 2026-07-10 | TASK-0074 / TASK-0075 | Task System | +1 | Completed TASK-0074 and activated TASK-0075 as the single active task. |
 | CHG-0282 | 2026-07-10 | TASK-0074 | Roadmap/Backlog | +1 | Advanced Phase 07 from ARGUS grouping to the reporting finish pass. |
+| CHG-0283 | 2026-07-10 | TASK-0075 | Reporting | +1 | Added standalone ARGUS technician and escalation reports with confidence, citations, limitations, and structured artifact references. |
+| CHG-0284 | 2026-07-10 | TASK-0075 | Build System | +1 | Updated toolkit build metadata for the reporting finish pass. |
+| CHG-0285 | 2026-07-10 | TASK-0075 | Validation/Test Framework | +1 | Validated parser checks, current-bundle report generation, report structure, citations, limitations, and artifact references. |
+| CHG-0286 | 2026-07-10 | TASK-0075 | Documentation | +1 | Recorded reporting completion, output placement, validation evidence, and the next handoff. |
+| CHG-0287 | 2026-07-10 | TASK-0075 / TASK-0076 | Task System | +1 | Completed TASK-0075 and activated TASK-0076 as the single active task. |
+| CHG-0288 | 2026-07-10 | TASK-0075 | Roadmap/Backlog | +1 | Completed the reporting phase and advanced the finish-line sequence to Analyze workflow UI integration. |
