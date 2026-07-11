@@ -106,6 +106,7 @@ The remaining work is now a finish-line sequence rather than a punch-list cleanu
 | `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` | Completed | Defined ARGUS product behavior, evidence domains, citation/confidence rules, output contract, and next implementation scope. |
 | `TASK-0081-Task-System-Counter-Audit` | Completed | Audited task-state consistency after Task System reached `25 / 25`, reset only the Task System counter, and documented unreconciled ADR-0003 file-access drift. |
 | `TASK-0082-ChatGPT-Governance-Handoff-Review` | Completed | Approved TASK-0073 activation after governance and ARGUS architecture review found no blocking issues. |
+| `TASK-0083-Codex-CLI-Resume-Work-Protocol` | Completed | Added repository-resident Codex CLI instructions and defined the `Resume Work` shortcut while preserving TASK-0073 as active. |
 
 ## Reconciliation Decision
 
