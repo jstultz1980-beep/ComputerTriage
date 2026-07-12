@@ -11397,20 +11397,9 @@ function Update-GUIWindowsUpdateHealthIndicator {
 }
 
 function Get-GUIAnalyzeBundleRoot {
-    if(!$NTKPaths -or !$NTKPaths.Exports -or !(Test-Path -LiteralPath $NTKPaths.Exports)){
-        return $null
-    }
-
-    $candidates = @()
-    if((Test-Path (Join-Path $NTKPaths.Exports "Analysis")) -or (Test-Path (Join-Path $NTKPaths.Exports "Metadata"))){
-        $candidates += Get-Item -LiteralPath $NTKPaths.Exports
-    }
-    $candidates += Get-ChildItem -LiteralPath $NTKPaths.Exports -Directory -Recurse -ErrorAction SilentlyContinue |
-        Where-Object { (Test-Path (Join-Path $_.FullName "Analysis")) -or (Test-Path (Join-Path $_.FullName "Metadata")) }
-
-    $latest = @($candidates | Sort-Object LastWriteTime -Descending | Select-Object -First 1)
-    if($latest.Count -eq 0){ return $null }
-    return $latest[0].FullName
+    if(!(Get-Command Get-HEPDefaultBundleRoot -ErrorAction SilentlyContinue)){ return $null }
+    try { return Get-HEPDefaultBundleRoot }
+    catch { return $null }
 }
 
 function Get-GUIAnalyzeArtifactPath {

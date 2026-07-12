@@ -1,7 +1,7 @@
 # TASK-0087 - Parser-Backed Evidence Quality and Timeline Semantics
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

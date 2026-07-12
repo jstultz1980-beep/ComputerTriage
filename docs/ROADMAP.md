@@ -17,7 +17,7 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`
+- `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline`
 
 Required sequence:
 1. TASK-0086 Offline Evidence Isolation and Bundle Identity.

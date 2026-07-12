@@ -2,6 +2,11 @@
 # ArgusFoundation.ps1
 # ARGUS Foundation - Minimal Contract Validation and Summary Slice
 # =====================================================================
+
+$diagnosticIdentityModule = Join-Path (Split-Path -Parent $PSScriptRoot) "Analysis\DiagnosticBundleIdentity.ps1"
+if(!(Test-Path -LiteralPath $diagnosticIdentityModule)){ throw "Diagnostic bundle identity module not found: $diagnosticIdentityModule" }
+. $diagnosticIdentityModule
+$script:ARGUSRepositoryRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 # PowerShell : 5.1+
 # Purpose    : Consume HEPHAESTUS Local Analysis Engine artifacts, validate
 #              the ARGUS input contract, and produce clearly labeled ARGUS
@@ -13,17 +18,22 @@ function Global:New-ARGUSTimestamp {
 }
 
 function Global:Get-ARGUSDefaultBundleRoot {
-    if($Global:NTKPaths -and $Global:NTKPaths.Exports -and (Test-Path $Global:NTKPaths.Exports)){
-        $latest = Get-ChildItem -Path $Global:NTKPaths.Exports -Directory -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-
-        if($latest){
-            return $latest.FullName
+    $searchRoots = @()
+    if($Global:NTKPaths -and $Global:NTKPaths.Exports){ $searchRoots += $Global:NTKPaths.Exports }
+    $searchRoots += Join-Path $script:ARGUSRepositoryRoot "App\Triage\Runs"
+    $candidates = @()
+    foreach($root in @($searchRoots | Select-Object -Unique)){
+        if(!(Test-Path -LiteralPath $root)){ continue }
+        try {
+            $bundle = Get-NTKDefaultDiagnosticBundleRoot -SearchRoot $root
+            $validated = Resolve-NTKDiagnosticBundle -BundleRoot $bundle
+            $candidates += [pscustomobject]@{Root=$bundle;Started=[datetime]::Parse($validated.Identity.collectionStartedUtc);RunId=$validated.Identity.runId}
         }
+        catch {}
     }
-
-    throw "No HEPHAESTUS bundle root was supplied and no export folder was available."
+    $selected = $candidates | Sort-Object Started,RunId -Descending | Select-Object -First 1
+    if(!$selected){ throw "No valid diagnostic bundle is available for ARGUS analysis." }
+    return $selected.Root
 }
 
 function Global:Get-ARGUSRelativePath {
@@ -128,14 +138,20 @@ function Global:New-ARGUSBaseArtifact {
         [string]$ArtifactType = "argus-artifact"
     )
 
+    $validated = if($script:ARGUSBundleValidation -and $script:ARGUSBundleValidation.BundleRoot -eq $BundleRoot){$script:ARGUSBundleValidation}else{Resolve-NTKDiagnosticBundle -BundleRoot $BundleRoot}
     return [ordered]@{
         schemaVersion = "1.0"
         generatedAtUtc = New-ARGUSTimestamp
         generator = "ARGUS Foundation"
         artifactType = $ArtifactType
         sourceBundle = [ordered]@{
-            bundleRoot = $BundleRoot
-            computerName = $env:COMPUTERNAME
+            runId = $validated.Identity.runId
+            bundleId = $validated.Identity.bundleId
+            bundleRoot = $validated.Identity.bundleRoot
+            computerName = $validated.Identity.computerName
+            collectionStartedUtc = $validated.Identity.collectionStartedUtc
+            collectionCompletedUtc = $validated.Identity.collectionCompletedUtc
+            sourceManifest = $validated.Identity.sourceManifest
         }
     }
 }
@@ -427,9 +443,9 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         $BundleRoot = Get-ARGUSDefaultBundleRoot
     }
 
-    if(!(Test-Path $BundleRoot)){
-        throw "Bundle root not found: $BundleRoot"
-    }
+    $script:ARGUSBundleValidation = Resolve-NTKDiagnosticBundle -BundleRoot $BundleRoot
+    $BundleRoot = $script:ARGUSBundleValidation.BundleRoot
+    [void](Write-NTKDiagnosticRunIdentity -BundleValidation $script:ARGUSBundleValidation)
 
     $argusRoot = Join-Path $BundleRoot "ARGUS"
     if(!(Test-Path $argusRoot)){
@@ -453,6 +469,12 @@ function Global:Invoke-ARGUSFoundationAnalysis {
             -Role $spec.Role `
             -TrustRank $spec.TrustRank `
             -Required:([bool]$spec.Required)
+        if($artifacts[$spec.Key].Data -and $artifacts[$spec.Key].Data.sourceBundle){
+            $source = $artifacts[$spec.Key].Data.sourceBundle
+            if($source.runId -ne $script:ARGUSBundleValidation.Identity.runId -or $source.bundleId -ne $script:ARGUSBundleValidation.Identity.bundleId){
+                throw "ARGUS input identity mismatch in $($spec.RelativePath)."
+            }
+        }
     }
 
     $normalizedArtifacts = @()
@@ -527,6 +549,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         Recommendations = $recommendationsPath
         TechnicianReport = $finalReports.TechnicianReport
         EscalationReport = $finalReports.EscalationReport
+        RunId = $script:ARGUSBundleValidation.Identity.runId
+        BundleId = $script:ARGUSBundleValidation.Identity.bundleId
         Report = $reportPath
     }
 }

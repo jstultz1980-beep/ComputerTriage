@@ -1,4 +1,9 @@
 # =====================================================================
+
+$diagnosticIdentityModule = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "Core\Analysis\DiagnosticBundleIdentity.ps1"
+if(!(Test-Path -LiteralPath $diagnosticIdentityModule)){ throw "Diagnostic bundle identity module not found: $diagnosticIdentityModule" }
+. $diagnosticIdentityModule
+$script:HEPAppRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 # LocalAnalysisEngine.ps1
 # HEPHAESTUS Local Analysis Engine v1 - Minimal Vertical Slice
 # =====================================================================
@@ -13,12 +18,15 @@ function Global:New-HEPAnalysisTimestamp {
 
 function Global:New-HEPSourceBundleInfo {
     param([Parameter(Mandatory=$true)][string]$BundleRoot)
-
+    $validated = if($script:HEPBundleValidation -and $script:HEPBundleValidation.BundleRoot -eq $BundleRoot){$script:HEPBundleValidation}else{Resolve-NTKDiagnosticBundle -BundleRoot $BundleRoot}
     return [ordered]@{
-        computerName = $env:COMPUTERNAME
-        collectionStartedUtc = $null
-        collectionCompletedUtc = $null
-        bundleRoot = $BundleRoot
+        runId = $validated.Identity.runId
+        bundleId = $validated.Identity.bundleId
+        computerName = $validated.Identity.computerName
+        collectionStartedUtc = $validated.Identity.collectionStartedUtc
+        collectionCompletedUtc = $validated.Identity.collectionCompletedUtc
+        bundleRoot = $validated.Identity.bundleRoot
+        sourceManifest = $validated.Identity.sourceManifest
     }
 }
 
@@ -49,27 +57,23 @@ function Global:Write-HEPJsonFile {
 }
 
 function Global:Get-HEPDefaultBundleRoot {
-    if($Global:NTKPaths -and $Global:NTKPaths.Exports){
-        if(!(Test-Path $Global:NTKPaths.Exports)){
-            New-Item -ItemType Directory -Path $Global:NTKPaths.Exports -Force | Out-Null
+    $searchRoots = @()
+    if($Global:NTKPaths -and $Global:NTKPaths.Exports){ $searchRoots += $Global:NTKPaths.Exports }
+    $searchRoots += Join-Path $script:HEPAppRoot "Triage\Runs"
+    $candidates = @()
+    foreach($root in @($searchRoots | Select-Object -Unique)){
+        if(!(Test-Path -LiteralPath $root)){ continue }
+        try {
+            $bundle = Get-NTKDefaultDiagnosticBundleRoot -SearchRoot $root
+            $validated = Resolve-NTKDiagnosticBundle -BundleRoot $bundle
+            $started = [datetime]::Parse($validated.Identity.collectionStartedUtc)
+            $candidates += [pscustomobject]@{Root=$bundle;Started=$started;RunId=$validated.Identity.runId}
         }
-
-        $latest = Get-ChildItem -Path $Global:NTKPaths.Exports -Directory -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-
-        if($latest){
-            return $latest.FullName
-        }
-
-        $created = Join-Path $Global:NTKPaths.Exports ("HEPHAESTUS-Analysis-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-        New-Item -ItemType Directory -Path $created -Force | Out-Null
-        return $created
+        catch {}
     }
-
-    $fallback = Join-Path $env:TEMP ("HEPHAESTUS-Analysis-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-    New-Item -ItemType Directory -Path $fallback -Force | Out-Null
-    return $fallback
+    $selected = $candidates | Sort-Object Started,RunId -Descending | Select-Object -First 1
+    if(!$selected){ throw "No valid diagnostic bundle is available for deterministic analysis." }
+    return $selected.Root
 }
 
 function Global:Get-HEPEvidenceInventory {
@@ -79,7 +83,7 @@ function Global:Get-HEPEvidenceInventory {
         return @()
     }
 
-    return @(Get-ChildItem -Path $BundleRoot -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+    return @(Get-NTKDiagnosticSourceFiles -BundleRoot $BundleRoot | ForEach-Object {
         [pscustomobject]@{
             Name = $_.Name
             FullName = $_.FullName
@@ -143,29 +147,34 @@ function Global:New-HEPMachineProfile {
     )
 
     $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
-    $systemEvidence = Test-HEPEvidenceMatch -Inventory $Inventory -Patterns @("systeminfo", "computer.?info", "machine.?profile", "os.?info")
+    $validated = if($script:HEPBundleValidation){$script:HEPBundleValidation}else{Resolve-NTKDiagnosticBundle -BundleRoot $BundleRoot}
+    $systemEvidence = Test-HEPEvidenceMatch -Inventory $Inventory -Patterns @("Get-ComputerInfo\.json$", "computer.?info.*\.json$", "machine.?profile.*\.json$")
 
     $machine = [ordered]@{
-        computerName = $env:COMPUTERNAME
-        userName = $env:USERNAME
-        domain = $env:USERDOMAIN
+        computerName = $validated.Identity.computerName
+        userName = $null
+        domain = $null
         osCaption = $null
         osVersion = $null
         manufacturer = $null
         model = $null
-        source = if($systemEvidence){$systemEvidence.RelativePath}else{"runtime-environment"}
+        source = if($systemEvidence){$systemEvidence.RelativePath}else{$validated.Identity.sourceManifest}
     }
 
-    try {
-        $os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
-        $cs = Get-CimInstance -ClassName Win32_ComputerSystem -ErrorAction Stop
-        $machine.osCaption = $os.Caption
-        $machine.osVersion = $os.Version
-        $machine.manufacturer = $cs.Manufacturer
-        $machine.model = $cs.Model
+    if($systemEvidence){
+        try {
+            $data = Get-Content -LiteralPath $systemEvidence.FullName -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+            if($data.CsName){ $machine.computerName = [string]$data.CsName }
+            $machine.domain = [string]$data.CsDomain
+            $machine.osCaption = [string]$data.WindowsProductName
+            $machine.osVersion = [string]$data.OsBuildNumber
+            $machine.manufacturer = [string]$data.CsManufacturer
+            $machine.model = [string]$data.CsModel
+        }
+        catch { $machine.warning = "Bundle machine profile could not be parsed: $($_.Exception.Message)" }
     }
-    catch {
-        $machine.warning = "Runtime CIM machine profile collection failed: $($_.Exception.Message)"
+    if($machine.computerName -ne $validated.Identity.computerName){
+        throw "Bundle computer identity mismatch between collection manifest and machine evidence."
     }
 
     $artifact["machine"] = $machine
@@ -273,41 +282,6 @@ function Global:New-HEPFindings {
         }
     }
 
-    try {
-        $systemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
-        if($systemDrive -and $systemDrive.Size -gt 0){
-            $freePercent = [Math]::Round(($systemDrive.FreeSpace / [double]$systemDrive.Size) * 100, 2)
-            if($freePercent -lt 10){
-                $id = "HEP-FINDING-{0:0000}" -f $counter
-                $findings += New-HEPFinding `
-                    -Id $id `
-                    -RuleId "HEP-RULE-STORAGE-001" `
-                    -Title "System drive free space is low" `
-                    -Summary "Drive C: has $freePercent percent free space available." `
-                    -Severity "high" `
-                    -Confidence "confirmed" `
-                    -Category "storage" `
-                    -Evidence @([ordered]@{ artifact = "runtime-cim"; field = "C.FreePercent"; value = $freePercent }) `
-                    -Recommendations @("Free disk space or expand the system volume before continuing other remediation.") `
-                    -Tags @("storage", "low-free-space")
-                $counter++
-            }
-        }
-    }
-    catch {
-        $id = "HEP-FINDING-{0:0000}" -f $counter
-        $findings += New-HEPFinding `
-            -Id $id `
-            -RuleId "HEP-RULE-PARSER-001" `
-            -Title "Storage runtime check could not run" `
-            -Summary $_.Exception.Message `
-            -Severity "informational" `
-            -Confidence "confirmed" `
-            -Category "evidence" `
-            -Recommendations @("Review storage evidence manually if storage symptoms are present.") `
-            -Tags @("parser-warning", "storage")
-    }
-
     $artifact["findings"] = @($findings)
     return $artifact
 }
@@ -404,6 +378,7 @@ th { background: #f2f2f2; }
 <body>
 <h1>HEPHAESTUS Local Analysis Report</h1>
 <p class="small">Generated $($Findings.generatedAtUtc)</p>
+<p class="small">Run ID: $(ConvertTo-HEPHtmlText $Findings.sourceBundle.runId)<br>Bundle ID: $(ConvertTo-HEPHtmlText $Findings.sourceBundle.bundleId)</p>
 <h2>Machine Profile</h2>
 <p><strong>Computer:</strong> $computerName</p>
 <p><strong>OS:</strong> $osCaption $osVersion</p>
@@ -438,9 +413,9 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
         $BundleRoot = Get-HEPDefaultBundleRoot
     }
 
-    if(!(Test-Path $BundleRoot)){
-        New-Item -ItemType Directory -Path $BundleRoot -Force | Out-Null
-    }
+    $script:HEPBundleValidation = Resolve-NTKDiagnosticBundle -BundleRoot $BundleRoot
+    $BundleRoot = $script:HEPBundleValidation.BundleRoot
+    [void](Write-NTKDiagnosticRunIdentity -BundleValidation $script:HEPBundleValidation)
 
     $analysisRoot = Join-Path $BundleRoot "Analysis"
     $normalizedRoot = Join-Path $analysisRoot "normalized"
@@ -480,6 +455,8 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
             AnalysisRoot = $analysisRoot
             Findings = @($findings.findings).Count
             EvidenceScore = $evidenceScore.overallScore
+            RunId = $script:HEPBundleValidation.Identity.runId
+            BundleId = $script:HEPBundleValidation.Identity.bundleId
         }
     }
     catch {

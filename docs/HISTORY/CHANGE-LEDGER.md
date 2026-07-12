@@ -31,6 +31,16 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 | CHG-0084-03 | 2026-07-12 | TASK-0084 | Documentation | +1 | Completed the Findings Register, Technical Debt Register, Repository Health Assessment, Executive Engineering Report, and Release Readiness Assessment. |
 | CHG-0084-04 | 2026-07-12 | TASK-0084 | Task System | +1 | Created focused TASK-0086 through TASK-0100 records, removed superseded queue entries, and left exactly one Active task. |
 | CHG-0084-05 | 2026-07-12 | TASK-0084 | Roadmap/Backlog | +1 | Reordered all remaining work into the accepted dependency-based remediation and release sequence. |
+| CHG-0086-01 | 2026-07-12 | TASK-0086 | Architecture | +1 | Added the shared validated diagnostic bundle identity and offline source-evidence boundary. |
+| CHG-0086-02 | 2026-07-12 | TASK-0086 | Evidence Collection and Deterministic Analysis | +1 | Removed live-host contamination, rejected invalid roots, excluded generated outputs, and propagated immutable run identity. |
+| CHG-0086-03 | 2026-07-12 | TASK-0086 | ARGUS | +1 | Required ARGUS inputs and outputs to match the validated run and bundle identity. |
+| CHG-0086-04 | 2026-07-12 | TASK-0086 | Reporting | +1 | Added run and bundle identity to deterministic and ARGUS reports. |
+| CHG-0086-05 | 2026-07-12 | TASK-0086 | UI | +1 | Aligned Analyze workflow bundle selection with the validated default resolver. |
+| CHG-0086-06 | 2026-07-12 | TASK-0086 | Build System | +1 | Updated build metadata for evidence isolation and bundle identity remediation. |
+| CHG-0086-07 | 2026-07-12 | TASK-0086 | Validation/Test Framework | +1 | Added cross-machine, invalid-root, mixed-export, idempotence, ARGUS, and transfer identity fixtures. |
+| CHG-0086-08 | 2026-07-12 | TASK-0086 | Documentation | +1 | Recorded TASK-0086 implementation and validation evidence. |
+| CHG-0086-09 | 2026-07-12 | TASK-0086 / TASK-0087 | Task System | +1 | Completed TASK-0086 and activated TASK-0087 in remediation order. |
+| CHG-0086-10 | 2026-07-12 | TASK-0086 | Roadmap/Backlog | +1 | Advanced release-blocking remediation to parser-backed evidence quality and timeline semantics. |
 
 ## Audit Closeout
 

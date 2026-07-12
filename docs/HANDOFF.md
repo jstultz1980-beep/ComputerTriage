@@ -4,7 +4,7 @@
 HANDOFF-0092
 
 ## Current Task
-TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity
+TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline
 
 ## Current Owner
 Codex
@@ -13,57 +13,53 @@ Codex
 ChatGPT at the next architecture, governance, audit, blocker, or acceptance boundary.
 
 ## Objective
-Eliminate cross-machine evidence contamination and bind deterministic analysis, ARGUS, reports, and transfer behavior to one validated immutable diagnostic run identity.
+TASK-0086 is complete. Make evidence quality reflect real parser and semantic outcomes and ensure timeline artifacts contain source event time rather than file-copy time.
 
 ## Source Of Truth
-The repository is authoritative. Exactly one task may be Active, and `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and the Active task file must agree.
+The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0084 Full Codebase Architecture and Quality Audit is complete.
-- Repository health score is `52 / 100`.
-- Release readiness is `Not Ready for Release Candidate`.
-- Every Critical and High finding has a remediation task or documented disposition.
-- TASK-0086 is the single Active implementation task.
-- TASK-0077, TASK-0078, and TASK-0079 are superseded by focused audit-remediation tasks.
-- TASK-0080 remains the final release-candidate validation and documentation gate.
-- `Resume Work` now requires a mandatory fetch, upstream comparison, and verified local/remote synchronization before task execution.
+- TASK-0084 audit is complete; repository health remains `52 / 100` pending remediation.
+- TASK-0086 completed offline evidence isolation and immutable bundle identity.
+- TASK-0087 is the single Active implementation task.
+- Remaining remediation tasks stay queued in dependency order.
+- Release candidate remains blocked pending Critical/High remediation.
+
+## TASK-0086 Validation Result
+- All changed PowerShell files passed parser validation.
+- Computer-A fixture analyzed on the current host contained only Computer-A identity.
+- Empty, invalid, partial, unrelated, conflicting-identity, and mixed-export cases were rejected or excluded.
+- Default selection chose the newest valid collected run, not the newest arbitrary folder.
+- Repeated analysis preserved source inventory count and immutable identity.
+- ARGUS artifacts and both reports preserved run/bundle identity.
+- Client-data transfer verified and recorded copied run identities.
+- GUI smoke and button-smoke passed.
 
 ## Active Task Scope
-`TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`
+`TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline`
 
-Codex must:
-- Add immutable run/bundle identity.
-- Validate explicit and default bundle roots.
-- Separate offline bundle analysis from live-host observation.
-- Prevent current-host data from contaminating offline analysis.
-- Exclude generated analysis/report artifacts from source evidence.
-- Preserve run identity through deterministic analysis, ARGUS, reporting, and transfer paths.
-- Validate cross-machine and repeated-run behavior.
+Codex must separate discovery, parsing, semantic validation, and coverage; reject invalid structured artifacts; record parser outcomes; replace file-copy chronology with real event semantics; and update downstream ARGUS confidence handling.
 
-Codex must not:
-- Expand the rule catalog.
-- Redesign the GUI.
-- Merge unrelated audit remediations into TASK-0086.
-- Clean unrelated working-tree drift.
+Codex must not expand unrelated rules, redesign the GUI, or merge later remediation tasks.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 10 / 25 | No |
-| Architecture | 4 / 25 | No |
-| Documentation | 1 / 25 | No |
-| Task System | 7 / 25 | No |
-| Evidence Collection and Deterministic Analysis | 4 / 25 | No |
-| ARGUS | 6 / 25 | No |
-| Reporting | 2 / 25 | No |
-| UI | 22 / 25 | No |
+| Repository Governance | 9 / 25 | No |
+| Architecture | 5 / 25 | No |
+| Documentation | 2 / 25 | No |
+| Task System | 8 / 25 | No |
+| Evidence Collection and Deterministic Analysis | 5 / 25 | No |
+| ARGUS | 7 / 25 | No |
+| Reporting | 3 / 25 | No |
+| UI | 23 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 17 / 25 | No |
-| Validation/Test Framework | 23 / 25 | No |
-| Roadmap/Backlog | 14 / 25 | No |
+| Build System | 18 / 25 | No |
+| Validation/Test Framework | 24 / 25 | No |
+| Roadmap/Backlog | 15 / 25 | No |
 
-TASK-0084 was a broad planned audit and did not reset subsystem counters. Closeout governance records incremented only the materially changed governance/task/roadmap/documentation categories shown above.
+No counter gate blocks the already Active TASK-0087. If Validation/Test Framework reaches 25/25 during TASK-0087, finish TASK-0087 and activate its required audit before TASK-0088.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -71,27 +67,19 @@ Do not stage or clean unless a focused task explicitly owns it:
 - Modified locally: `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`
 - Untracked: `App/NetworkToolkit/LatencyMon/`
 - Untracked: `App/NetworkToolkit/Logs/`
+- Untracked: `Custodian-Audit-20260711-000156.md`
+- Untracked: `Project-Custodian-Bridge.ps1`
 - Untracked: `Set-CodexPermissions.ps1`
 
 ## Blockers
-None recorded in the cloud repository.
-
-## Audit Closeout References
-- `docs/REVIEWS/TASK-0084/FINDINGS-REGISTER.md`
-- `docs/REVIEWS/TASK-0084/TECHNICAL-DEBT-REGISTER.md`
-- `docs/REVIEWS/TASK-0084/REPOSITORY-HEALTH-ASSESSMENT.md`
-- `docs/REVIEWS/TASK-0084/EXECUTIVE-ENGINEERING-REPORT.md`
-- `docs/REVIEWS/TASK-0084/RELEASE-READINESS-ASSESSMENT.md`
-- `docs/REVIEWS/TASK-0084/REMEDIATION-BACKLOG.md`
+None.
 
 ## Recommended Commit Message
-
 ```text
 TASK-0086: Isolate offline evidence and bind immutable run identity
 ```
 
 ## Next Bot Prompt
-
 ```text
-Run the mandatory Resume Work synchronization procedure first: read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, run `git fetch --prune origin`, verify the intended branch and upstream, compare local HEAD with the upstream branch, safely fast-forward when behind, and confirm the local and remote commit hashes match before trusting local governance or task files. If the branch is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite preserved work, stop before implementation and use the Error Handoff Procedure. After synchronization, follow the complete repository startup sequence. Verify TASK-0086 is the only Active task. Preserve all documented unrelated drift. Execute only TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity. Validate cross-machine evidence isolation, explicit/default bundle validation, generated-output exclusion, immutable run identity propagation, repeated-run idempotence, parser behavior, smoke tests, and button-smoke tests. Update the task, handoff, queue, changelog, change ledger, and build metadata as required. Commit locally. Do not push unless explicitly requested, except under the Error Handoff Rule.
+Resume Work. Execute only TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline. Preserve documented drift. Validate valid, empty, malformed, truncated, plain-error, and known event/copy timestamp fixtures; run ARGUS confidence regression, parser, smoke, and button-smoke checks; update records and build metadata; commit locally; do not push unless explicitly requested except under the Error Handoff Rule.
 ```

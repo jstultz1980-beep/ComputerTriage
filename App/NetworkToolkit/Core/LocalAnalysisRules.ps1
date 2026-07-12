@@ -71,42 +71,6 @@ function Global:New-HEPFindings {
         }
     }
 
-    try {
-        $systemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
-        if($systemDrive -and $systemDrive.Size -gt 0){
-            $freePercent = [Math]::Round(($systemDrive.FreeSpace / [double]$systemDrive.Size) * 100, 2)
-            if($freePercent -lt 10){
-                $id = "HEP-FINDING-{0:0000}" -f $counter
-                $findings += New-HEPFinding `
-                    -Id $id `
-                    -RuleId "HEP-RULE-STORAGE-001" `
-                    -Title "System drive free space is low" `
-                    -Summary "Drive C: has $freePercent percent free space available." `
-                    -Severity "high" `
-                    -Confidence "confirmed" `
-                    -Category "storage" `
-                    -Evidence @([ordered]@{ artifact = "runtime-cim"; field = "C.FreePercent"; value = $freePercent }) `
-                    -Recommendations @("Free disk space or expand the system volume before continuing other remediation.") `
-                    -Tags @("storage", "low-free-space")
-                $counter++
-            }
-        }
-    }
-    catch {
-        $id = "HEP-FINDING-{0:0000}" -f $counter
-        $findings += New-HEPFinding `
-            -Id $id `
-            -RuleId "HEP-RULE-PARSER-001" `
-            -Title "Storage runtime check could not run" `
-            -Summary $_.Exception.Message `
-            -Severity "informational" `
-            -Confidence "confirmed" `
-            -Category "evidence" `
-            -Recommendations @("Review storage evidence manually if storage symptoms are present.") `
-            -Tags @("parser-warning", "storage")
-        $counter++
-    }
-
     $networkEvidence = Get-HEPEvidenceText -Inventory $Inventory -Patterns @("ipconfig", "network", "adapter")
     if($networkEvidence -and $networkEvidence.Text -match '\b169\.254\.\d{1,3}\.\d{1,3}\b'){
         $id = "HEP-FINDING-{0:0000}" -f $counter

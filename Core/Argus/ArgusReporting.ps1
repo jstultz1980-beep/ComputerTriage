@@ -29,6 +29,8 @@ function Global:Add-ARGUSReportHeader {
     [void]$Lines.Add("")
     [void]$Lines.Add("Generated: $(ConvertTo-ARGUSReportText $Summary.generatedAtUtc)")
     [void]$Lines.Add("Bundle: $(ConvertTo-ARGUSReportText $Summary.sourceBundle.bundleRoot)")
+    [void]$Lines.Add("Run ID: $(ConvertTo-ARGUSReportText $Summary.sourceBundle.runId)")
+    [void]$Lines.Add("Bundle ID: $(ConvertTo-ARGUSReportText $Summary.sourceBundle.bundleId)")
     [void]$Lines.Add("")
     [void]$Lines.Add("- Input status: $(ConvertTo-ARGUSReportText $Validation.status)")
     [void]$Lines.Add("- Analysis mode: $(ConvertTo-ARGUSReportText $Validation.mode)")

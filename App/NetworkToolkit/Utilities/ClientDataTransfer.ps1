@@ -137,6 +137,24 @@ function Copy-NTKClientData {
         }
     }
 
+    $transferredRunIdentities = New-Object System.Collections.Generic.List[object]
+    if(Get-Command Resolve-NTKDiagnosticBundle -ErrorAction SilentlyContinue){
+        $runRoots = @($sourceFiles | Where-Object { $_.RootRelativePath -eq "Triage\Runs" -and $_.RelativeFilePath -match '^[^\\]+\\Metadata\\collection_manifest\.json$' } | ForEach-Object { ($_.RelativeFilePath -split '\\')[0] } | Select-Object -Unique)
+        foreach($runName in $runRoots){
+            try {
+                $sourceRun = Join-Path (Join-Path $sourceDeployment "App\Triage\Runs") $runName
+                $destinationRun = Join-Path (Join-Path $destinationDeployment "App\Triage\Runs") $runName
+                $sourceIdentity = (Resolve-NTKDiagnosticBundle -BundleRoot $sourceRun).Identity
+                $destinationIdentity = (Resolve-NTKDiagnosticBundle -BundleRoot $destinationRun).Identity
+                if($sourceIdentity.runId -ne $destinationIdentity.runId -or $sourceIdentity.bundleId -ne $destinationIdentity.bundleId){ throw "Transferred run identity mismatch." }
+                [void]$transferredRunIdentities.Add([pscustomobject]@{RunId=$sourceIdentity.runId;BundleId=$sourceIdentity.bundleId;ComputerName=$sourceIdentity.computerName;Verified=$true})
+            }
+            catch {
+                [void]$failures.Add([pscustomobject]@{Source=$runName;Destination=$runName;Error="Run identity verification failed: $($_.Exception.Message)"})
+            }
+        }
+    }
+
     $manifestRoot = Join-Path $destinationAppRoot "NetworkToolkit\Data\ClientDataTransfers"
     if(!(Test-Path -LiteralPath $manifestRoot)){
         New-Item -ItemType Directory -Path $manifestRoot -Force | Out-Null
@@ -162,6 +180,7 @@ function Copy-NTKClientData {
             "Build and release folders"
         )
         Failures = @($failures.ToArray())
+        TransferredRunIdentities = @($transferredRunIdentities.ToArray())
     }
 
     $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
@@ -170,3 +189,5 @@ function Copy-NTKClientData {
     $manifest | Add-Member -MemberType NoteProperty -Name Status -Value $(if($failures.Count -gt 0){"CompletedWithWarnings"}else{"Completed"}) -Force
     return $manifest
 }
+$diagnosticIdentityModule = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "Core\Analysis\DiagnosticBundleIdentity.ps1"
+if(Test-Path -LiteralPath $diagnosticIdentityModule){ . $diagnosticIdentityModule }
