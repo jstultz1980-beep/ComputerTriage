@@ -1,215 +1,76 @@
-﻿# Roadmap
+# Roadmap
 
-## Phase 00 - Foundation Zero
-Status: Completed
+## Product Direction
+Build a portable Windows toolkit that collects, analyzes, explains, and reports the health of one computer at a time. Deterministic evidence processing comes first; ARGUS provides cited explanation and technician guidance.
 
-Goal: establish repository source-of-truth documents, handoff protocol, task tracking, decision tracking, and audit counter controls.
+## Completed Foundation
 
-Foundation Audit status:
-- Completed as `TASK-0011-Foundation-Audit`.
-- Reconciled by `REVIEW-0001-Foundation-Audit` on 2026-07-01.
-- `TASK-0010-Foundation-Audit` is not valid active tracked state because TASK-0010 is already used by the completed drift/status task.
+- Repository governance and source-of-truth controls.
+- Collection baseline and manual-run validation.
+- Deterministic local analysis vertical slice and rule expansion.
+- ARGUS input contract, normalization, event grouping, recommendations, and reporting.
+- Guided Analyze workflow integration.
+- TASK-0084 full-codebase architecture and quality audit.
 
-## Phase 01 - HEPHAESTUS Collection Baseline
-Status: Completed
+## Current Phase - Release-Blocking Remediation
 
-Goal: ensure the collection workflow is stable, portable, predictable, and validation-ready before local analysis work begins.
-
-Completion basis:
-- `TASK-0017-Triage-Manual-Run-Validation` passed smoke and button-smoke validation.
-- Runtime drift was documented and excluded from commits.
-
-## Phase 02 - HEPHAESTUS Local Analysis Engine v1
-Status: Completed
-
-Goal: add deterministic local analysis after collection baseline validation.
-
-Completion basis:
-- `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design` completed design and ADR work.
-- `TASK-0019-HEPHAESTUS-Local-Analysis-Engine-v1-Implementation` implemented the minimal vertical slice.
-- Local validation confirmed required `Analysis` and `Metadata` artifacts exist and JSON parses successfully.
-- Smoke and button-smoke tests passed after implementation.
-
-Delivered capabilities:
-- Safe CLI command path: `Run Local Analysis`.
-- Analysis output folders.
-- Schema and bundle capability metadata.
-- Findings, timeline, evidence score, and machine-profile JSON outputs.
-- Starter deterministic rule runner.
-- Evidence-quality handling for missing or failed evidence.
-- Local HTML report generated from structured outputs.
-
-## Phase 03 - ARGUS Input Contract
-Status: Completed
-
-Goal: finalize the contract ARGUS will use to consume HEPHAESTUS deterministic outputs before ARGUS implementation begins.
-
-Completion basis:
-- `TASK-0020-ARGUS-Input-Contract-ADR` completed.
-- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` is accepted.
-- `TASK-0023-ARGUS-Foundation-Implementation` exists as a focused implementation task.
-
-## Phase 04 - Documentation and Task System Audit Gate
-Status: Completed
-
-Goal: complete the required audit because Documentation reached `10 / 10` during TASK-0020.
-
-Completion basis:
-- `TASK-0035-Documentation-Task-System-Audit` completed.
-- Documentation and Task System counters were audited and reset.
-- Implementation gate is cleared.
-
-## Phase 05 - ARGUS Foundation
-Status: Completed
-
-Goal: implement the minimal ARGUS foundation slice using accepted ADR-0003.
-
-Current active task:
-- None.
-
-TASK-0023 must:
-- Load and validate required HEPHAESTUS contract artifacts.
-- Produce ARGUS input validation output.
-- Produce a small analysis summary that prioritizes deterministic HEPHAESTUS findings.
-- Clearly label deterministic evidence, normalized evidence, raw evidence, ARGUS inference, and unsupported conclusions.
-- Produce a basic ARGUS report artifact.
-
-Completion basis:
-- `TASK-0023-ARGUS-Foundation-Implementation` completed.
-- ARGUS Foundation validates required HEPHAESTUS contract artifacts.
-- ARGUS Foundation writes `ARGUS/input-validation.json`, `ARGUS/analysis-summary.json`, and `ARGUS/report.md`.
-- Validation confirmed JSON outputs parse and deterministic findings are labeled separately from ARGUS inference.
-
-## Phase 06 - HEPHAESTUS Rule Catalog Expansion
-Status: Completed
-
-Expand deterministic rule coverage after the v1 vertical slice exists and validates.
-
-Planned future capabilities:
-- Broader service, process, driver, storage, Windows Update, network, security-product, domain-health, DFSR, SYSVOL, and GPO interpretation.
-- Additional normalized JSON outputs.
-- More robust timeline correlation.
-
-Completion basis:
-- `TASK-0021-HEPHAESTUS-Rule-Catalog-Expansion` completed the next deterministic rule expansion.
-- Added explainable rules for APIPA network evidence, Windows Update service repair signals, endpoint protection disabled signals, stopped automatic services, and domain secure-channel/logon failures.
-- Existing HEPHAESTUS output paths remain compatible with ARGUS.
-
-## Phase 07 - ARGUS Evidence Normalization
-Status: Completed
-
-Make ARGUS a trustworthy product layer rather than only a foundation command.
-
-Current active task:
-- None.
-
-Completed work:
-- `TASK-0073-ARGUS-Evidence-Normalization-Implementation`
-- `TASK-0074-ARGUS-Event-Grouping-And-Recommendations`
-
-Completed planning:
-- `TASK-0072-ARGUS-Product-Definition-And-Evidence-Map` created `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md`.
-
-Completion target:
-- ARGUS has a defined evidence map, confidence/citation rules, normalized intermediate model, grouped diagnostic themes, and technician recommendations.
-
-## Phase 08 - Reporting
-Status: Completed
-
-Improve technician, escalation, and release-facing reports after deterministic findings and ARGUS outputs are useful.
-
-Completed task:
-- `TASK-0075-Reporting-Finish-Pass`
-
-Completion target:
-- Reports are readable outside the GUI, cite evidence limitations, and support technician handoff or escalation review.
-
-## Phase 09 - UI Integration
 Status: Active
 
-Connect Collect, Analyze, ARGUS, and Reports into a normal technician workflow, then address remaining performance friction.
+Current Active task:
+- `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`
 
-Current active task:
-- `TASK-0085-Documentation-Counter-Audit`
+Required sequence:
+1. TASK-0086 Offline Evidence Isolation and Bundle Identity.
+2. TASK-0087 Parser-Backed Evidence Quality and Timeline Semantics.
+3. TASK-0088 Canonical Operation Result and Failure Propagation.
+4. TASK-0089 Diagnostic Bundle Integrity and Collection Contract.
+5. TASK-0090 ARGUS Contract, Citation, and Priority Correctness.
+6. TASK-0091 Print and Remote Change Transaction Safety.
+7. TASK-0092 Transactional Package, Deploy, and Update Integrity.
+8. TASK-0093 External Tool Provenance and Lifecycle Policy.
+9. TASK-0094 Sensitive Artifact Handling and Runtime State Safety.
 
-Implementation status:
-- TASK-0076 completed the guided Analyze workflow.
-- UI implementation is paused at the task boundary until the Documentation `25 / 25` audit completes.
+Exit target:
+- No unresolved Critical findings.
+- Every High finding resolved or explicitly accepted in writing.
+- Evidence, result, collection, ARGUS, destructive-operation, deployment, tool-trust, and sensitive-data contracts are validated.
 
-Recently completed UI work:
-- `TASK-0028-Quick-Dx-Compact-Run-Panel` removed the visible Quick Dx internet target chain and compacted the run panel while preserving the internal fallback target order.
-- `TASK-0029-Choco-Page-Layout-Refinement` compacted the Chocolatey status strip and restored readable status action buttons.
+## Architecture Stabilization
 
-Implementation pause:
-- TASK-0041 completed the required UI counter audit after TASK-0029. UI implementation may continue under active focused tasks.
-
-Current UI work:
-- TASK-0037 completed Activity page network visibility, compact process list, and compact controls.
-- TASK-0030 completed Print tab data-path cleanup.
-- TASK-0031 completed Triage page simplification.
-- TASK-0042 completed the required documentation audit gate after the Documentation counter reached 10/10.
-- TASK-0032 completed Computer tab summary redesign.
-- TASK-0048 completed the required Task System audit gate after the Task System counter reached 10/10.
-- TASK-0038 completed modern control styling for Settings/Help header controls and the crown/elevation icon.
-- TASK-0045 completed Print page polish.
-- TASK-0049 completed the required UI audit gate after the UI counter reached 10/10.
-- TASK-0046 completed Triage page catalog and bundle cleanup.
-- TASK-0050 completed the required Roadmap/Backlog audit after outstanding tasks were consolidated.
-- TASK-0052 completed the required Documentation audit after TASK-0046/build metadata updates reached 10/10.
-- TASK-0047 completed status-bar Wi-Fi signal, Wi-Fi page signal, Windows Update service health, clarified busy chrome, and preserved bottom-left version/build placement.
-- TASK-0044 completed GUI startup/tab performance hardening and slow-tab diagnostics.
-- TASK-0053 completed the required Task System counter audit and reset only the audited counter.
-- TASK-0043 completed technician-safe client diagnostic data transfer between toolkit copies.
-- TASK-0051 completed development-only deployment/update exclusions.
-- TASK-0040 completed Software tab launchable/installable placement and portable-tool classification.
-- TASK-0033 completed tab-by-tab direction and embedded-tool planning.
-- TASK-0059 completed the required Documentation and Build System counter audit after TASK-0033.
-- TASK-0054 completed Directory domain identity and AD health status.
-- The audit threshold was raised from 10 changes to 25 changes, so TASK-0060 was archived before execution.
-- TASK-0061 completed Directory page layout polish from the punch list.
-- TASK-0055 completed the shared embedded output pattern and converted Quick Target Checks to use it.
-- TASK-0056 completed Triage guided workflow polish.
-- TASK-0057 completed Wi-Fi and Windows status polish.
-- TASK-0058 completed Settings and control polish.
-- TASK-0062 completed computer data push/pull.
-- TASK-0063 completed Add-Ons concept testing.
-- TASK-0064 completed product naming options.
-- TASK-0021 completed HEPHAESTUS rule catalog expansion.
-- TASK-0065 completed UI regression polish from the latest punch-list additions.
-- TASK-0066 completed RapidAssist naming selection.
-- TASK-0067 completed UI feedback corrections from user verification.
-- TASK-0068 completed Triage instruction and Windows Update LED refinement.
-- TASK-0069 completed Triage text-driven workflow refinement.
-- Wi-Fi status-bar behavior has been verified on hardware with Wi-Fi.
-
-Planned tasks:
-- `TASK-0076-Analyze-Workflow-UI-Integration`
-- `TASK-0077-First-Render-Tab-Performance-Hardening`
-
-## Phase 10 - Release Hardening
 Status: Queued
 
-Validation, packaging, documentation, embedded-tool trust handling, and release preparation.
+1. TASK-0095 Canonical Analysis and Tool Metadata Architecture.
+2. TASK-0096 GUI Background Operation Controller Extraction.
+3. TASK-0097 Architecture, Terminology, and Governance Consolidation.
+4. TASK-0098 Shared Reporting and Run Index Contracts.
 
-Planned tasks:
-- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution`
-- `TASK-0079-Release-Packaging-And-Update-Hardening`
+## Validation and Performance Gates
+
+Status: Queued
+
+1. TASK-0099 Repository-Wide Validation Foundation.
+2. TASK-0100 Performance Instrumentation and Run-Scoped Observation Cache.
+
+TASK-0099 may begin incrementally after the contracts it validates are stable enough to avoid encoding known-bad behavior.
+
+## Release Candidate
+
+Status: Blocked pending remediation
+
+Final task:
 - `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
-Completion target:
-- First release candidate has validated workflows, documented known limitations, package/update confidence, and a defensible antivirus/EDR posture based on provenance and allowlisting rather than evasion.
+Release-candidate entry criteria:
+- Release-blocking remediation complete.
+- Repository-wide validation gates pass.
+- Package/update rollback and external-tool provenance are validated.
+- Performance budgets are measured and accepted.
+- Known limitations and operational guidance are documented.
 
-## Finish-Line Plan
+## Superseded Planning
 
-The active finish-line plan is `docs/PROJECT-FINISH-PLAN.md`.
+- TASK-0077 is superseded by TASK-0096 and TASK-0100.
+- TASK-0078 is superseded by TASK-0093.
+- TASK-0079 is superseded by TASK-0092.
 
-Near-release priority:
-1. Complete TASK-0082 ChatGPT governance and ARGUS design review.
-2. Implement ARGUS normalization.
-3. Add event grouping and recommendations.
-4. Finish report output.
-5. Integrate Analyze workflow into the GUI.
-6. Measure and reduce first-render tab lag.
-7. Document embedded-tool trust and EDR-safe distribution.
-8. Harden packaging/update behavior.
-9. Run release-candidate validation and documentation.
+Historical chronology remains in individual task records, `docs/HISTORY/CHANGELOG.md`, and `docs/HISTORY/CHANGE-LEDGER.md`.
