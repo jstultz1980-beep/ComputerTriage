@@ -9,45 +9,44 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | ChatGPT | Active | Freeze implementation and perform the complete read-only architecture, code-quality, security, performance, validation, deployment, and governance audit. |
+| `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` | Codex | Active | Eliminate cross-machine evidence contamination, validate bundle selection, exclude generated outputs, and propagate immutable run identity. |
 
-## Queued
+## Ordered Queue
 
-| Task | Owner | Status | Purpose |
-|---|---|---|---|
-| `TASK-0077-First-Render-Tab-Performance-Hardening` | Codex | Queued | Measure and reduce remaining first-render tab switching lag after audit remediation priorities are resolved. |
-| `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` | Codex | Queued | Reduce antivirus/EDR friction through provenance, allowlisting guidance, and safe packaging choices. |
-| `TASK-0079-Release-Packaging-And-Update-Hardening` | Codex | Queued | Validate portable release, deployment, update, client-data preservation, and release artifact layout. |
-| `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Run final release-candidate validation and produce release-ready docs. |
+| Order | Task | Owner | Status | Purpose |
+|---:|---|---|---|---|
+| 1 | `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline-Semantics` | Codex | Queued | Require parser-backed evidence quality and correct event-time semantics. |
+| 2 | `TASK-0088-Canonical-Operation-Result-And-Failure-Propagation` | Codex | Queued | Establish one result envelope and eliminate false success. |
+| 3 | `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Codex | Queued | Make bundle identity, integrity, completeness, and collector outcomes trustworthy. |
+| 4 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Queued | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
+| 5 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
+| 6 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Codex | Queued | Make package, deployment, and update operations complete and rollback-capable. |
+| 7 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, and EDR policy for external tools. |
+| 8 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
+| 9 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate duplicate analysis, tool metadata, manifest, and status sources of truth. |
+| 10 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
+| 11 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
+| 12 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
+| 13 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
+| 14 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, and lifecycle performance costs. |
+| 15 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
 
-## Consolidated Plan
+## Superseded Tasks
 
-The current development freeze sequence is:
-
-1. Complete TASK-0084 full-codebase architecture and quality audit.
-2. Create and execute focused remediation tasks for accepted Critical and High findings.
-3. Reassess the placement and scope of TASK-0077 and TASK-0078 against audit findings.
-4. Harden release packaging/update behavior under TASK-0079.
-5. Run release-candidate validation and documentation under TASK-0080.
-
-No implementation task may become Active while TASK-0084 is underway unless the Project Custodian explicitly creates a narrowly scoped audit-support task required to obtain evidence. Audit-support work must not repair application code.
+- `TASK-0077-First-Render-Tab-Performance-Hardening` is superseded by TASK-0096 and TASK-0100.
+- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` is superseded by TASK-0093.
+- `TASK-0079-Release-Packaging-And-Update-Hardening` is superseded by TASK-0092.
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
-| `TASK-0073-ARGUS-Evidence-Normalization-Implementation` | Completed | Implemented ARGUS normalization loaders and `ARGUS/normalized-analysis.json`. |
-| `TASK-0074-ARGUS-Event-Grouping-And-Recommendations` | Completed | Added cited diagnostic groups, root-cause candidates, and conservative recommendations. |
-| `TASK-0075-Reporting-Finish-Pass` | Completed | Added technician and escalation reports with confidence, citations, limitations, and artifact references. |
-| `TASK-0076-Analyze-Workflow-UI-Integration` | Completed | Added the guided Analyze workflow and validated parser, smoke, and button-smoke behavior. |
-| `TASK-0085-Documentation-Counter-Audit` | Completed | Audited documentation consistency at `25 / 25`, reset only Documentation, and cleared the gate for TASK-0084. |
-
-## Historical Task Records
-Historical completed and archived task details remain in the individual task files and repository history. The queue’s operational purpose is to identify the single Active task and the ordered remaining work; it is not the canonical substitute for historical task documents.
+| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | Complete | Completed the full engineering audit, findings and debt registers, repository health and executive reports, release-readiness assessment, and dependency-ordered remediation sequence. |
+| `TASK-0085-Documentation-Counter-Audit` | Complete | Audited Documentation at `25 / 25` and reset only Documentation. |
 
 ## Current Decision
-- TASK-0085 is complete.
-- Documentation was audited and resets to `0 / 25`.
-- The user explicitly selected the already planned TASK-0084 audit at this task boundary.
-- TASK-0084 is the only Active task.
-- TASK-0077 and all implementation work remain queued during the development freeze.
+
+- TASK-0084 is closed.
+- TASK-0086 is the only Active task.
+- Critical and High findings are mapped to remediation tasks or documented disposition.
+- Net-new feature work remains deferred until the release-blocking remediation sequence is complete.
