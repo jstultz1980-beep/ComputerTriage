@@ -1,60 +1,58 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0090
+HANDOFF-0091
 
 ## Current Task
-TASK-0084-Full-Codebase-Architecture-And-Quality-Audit
+TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity
 
 ## Current Owner
-ChatGPT
+Codex
 
 ## Next Owner
-Codex after audit remediation tasks are created and activated
+ChatGPT at the next architecture, governance, audit, blocker, or acceptance boundary.
 
 ## Objective
-Perform the complete read-only codebase architecture and quality audit under a development freeze. Record evidence-backed findings, create focused remediation tasks, and do not change application code during the initial audit.
+Eliminate cross-machine evidence contamination and bind deterministic analysis, ARGUS, reports, and transfer behavior to one validated immutable diagnostic run identity.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and the Active task file must agree.
 
 ## Current Project State
-- TASK-0073 completed ARGUS evidence normalization.
-- TASK-0074 completed event grouping and technician recommendations.
-- TASK-0075 completed technician and escalation reporting.
-- TASK-0076 completed the guided Analyze GUI workflow.
-- TASK-0085 completed the mandatory Documentation `25 / 25` audit and reset only Documentation.
-- TASK-0084 is now the single Active task.
-- Implementation is frozen while TASK-0084 is Active.
-- TASK-0077, TASK-0078, TASK-0079, and TASK-0080 remain queued pending audit findings and remediation sequencing.
+- TASK-0084 Full Codebase Architecture and Quality Audit is complete.
+- Repository health score is `52 / 100`.
+- Release readiness is `Not Ready for Release Candidate`.
+- Every Critical and High finding has a remediation task or documented disposition.
+- TASK-0086 is the single Active implementation task.
+- TASK-0077, TASK-0078, and TASK-0079 are superseded by focused audit-remediation tasks.
+- TASK-0080 remains the final release-candidate validation and documentation gate.
 
 ## Active Task Scope
-`TASK-0084-Full-Codebase-Architecture-And-Quality-Audit`
+`TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`
 
-ChatGPT must:
-- Inventory the operational repository.
-- Trace startup, execution, analysis, reporting, deployment/update, and shutdown flows.
-- Identify redundancy, dead code, hidden failures, false-success conditions, unsafe assumptions, architecture drift, security issues, performance risks, testing gaps, deployment drift, and documentation inconsistencies.
-- Produce severity-ranked findings with evidence.
-- Create focused remediation tasks rather than fixing code during the initial audit.
+Codex must:
+- Add immutable run/bundle identity.
+- Validate explicit and default bundle roots.
+- Separate offline bundle analysis from live-host observation.
+- Prevent current-host data from contaminating offline analysis.
+- Exclude generated analysis/report artifacts from source evidence.
+- Preserve run identity through deterministic analysis, ARGUS, reporting, and transfer paths.
+- Validate cross-machine and repeated-run behavior.
 
-ChatGPT must not:
-- Modify application code.
-- Refactor or clean code during the initial audit.
-- Add product features.
+Codex must not:
+- Expand the rule catalog.
+- Redesign the GUI.
+- Merge unrelated audit remediations into TASK-0086.
 - Clean unrelated working-tree drift.
-- Activate Codex implementation before the audit records the remediation sequence.
-
-Codex is in Engineering Support mode and should not implement changes unless a focused audit-support or remediation task is explicitly activated.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 8 / 25 | No |
-| Architecture | 3 / 25 | No |
-| Documentation | 0 / 25 | No - reset by TASK-0085 |
-| Task System | 6 / 25 | No |
+| Repository Governance | 9 / 25 | No |
+| Architecture | 4 / 25 | No |
+| Documentation | 1 / 25 | No |
+| Task System | 7 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 4 / 25 | No |
 | ARGUS | 6 / 25 | No |
 | Reporting | 2 / 25 | No |
@@ -62,9 +60,9 @@ Codex is in Engineering Support mode and should not implement changes unless a f
 | Plugin Framework | 1 / 25 | No |
 | Build System | 17 / 25 | No |
 | Validation/Test Framework | 23 / 25 | No |
-| Roadmap/Backlog | 13 / 25 | No |
+| Roadmap/Backlog | 14 / 25 | No |
 
-No counter gate blocks TASK-0084. TASK-0084 is a broader planned engineering audit rather than a single-counter reset.
+TASK-0084 was a broad planned audit and did not reset subsystem counters. Closeout governance records incremented only the materially changed governance/task/roadmap/documentation categories shown above.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -74,39 +72,25 @@ Do not stage or clean unless a focused task explicitly owns it:
 - Untracked: `App/NetworkToolkit/Logs/`
 - Untracked: `Set-CodexPermissions.ps1`
 
-The reconciliation safety branch remains available. The committed ADR-0003 is accepted; local drift is unrelated to the audit’s tracked baseline.
-
-## Audit Progress
-- TASK-0085 documentation consistency gate completed.
-- TASK-0084 activated.
-- Development freeze established.
-- Phase 1 governance and architecture-document review started.
-- Initial audit deliverables are being written under `docs/REVIEWS/TASK-0084/`.
-
-## Initial Observations To Investigate
-These are not yet final findings:
-- The project charter still names HEPHAESTUS even though the user decided to remove non-ARGUS codenames.
-- The architecture document is too shallow to describe the implemented collection, deterministic analysis, ARGUS, reporting, deployment, and update boundaries.
-- The roadmap contains stale planning language and historical detail that obscures current phase state.
-- The queue previously carried an excessive historical table, creating duplication with individual task files and history.
-
 ## Blockers
-None.
+None recorded in the cloud repository.
+
+## Audit Closeout References
+- `docs/REVIEWS/TASK-0084/FINDINGS-REGISTER.md`
+- `docs/REVIEWS/TASK-0084/TECHNICAL-DEBT-REGISTER.md`
+- `docs/REVIEWS/TASK-0084/REPOSITORY-HEALTH-ASSESSMENT.md`
+- `docs/REVIEWS/TASK-0084/EXECUTIVE-ENGINEERING-REPORT.md`
+- `docs/REVIEWS/TASK-0084/RELEASE-READINESS-ASSESSMENT.md`
+- `docs/REVIEWS/TASK-0084/REMEDIATION-BACKLOG.md`
 
 ## Recommended Commit Message
+
 ```text
-TASK-0084: Begin full codebase architecture and quality audit
+TASK-0086: Isolate offline evidence and bind immutable run identity
 ```
 
 ## Next Bot Prompt
-For ChatGPT:
 
 ```text
-Continue TASK-0084. Read the live GitHub repository as the source of truth. Continue the read-only audit, update the tracked audit deliverables, do not modify application code, and create focused remediation tasks only after findings are evidence-backed.
-```
-
-For Codex during the freeze:
-
-```text
-Development Freeze. TASK-0084 is Active and owned by ChatGPT. Preserve current drift, perform no implementation, and remain in Engineering Support mode until a focused remediation task is activated.
+Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the complete repository startup sequence. Verify TASK-0086 is the only Active task. Preserve all documented unrelated drift. Execute only TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity. Validate cross-machine evidence isolation, explicit/default bundle validation, generated-output exclusion, immutable run identity propagation, repeated-run idempotence, parser behavior, smoke tests, and button-smoke tests. Update the task, handoff, queue, changelog, change ledger, and build metadata as required. Commit locally. Do not push unless explicitly requested, except under the Error Handoff Rule.
 ```
