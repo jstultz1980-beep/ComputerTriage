@@ -4,6 +4,8 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Strengthened the Codex `Resume Work` protocol to require `git fetch --prune origin`, explicit local/upstream divergence checks, safe fast-forward synchronization, and confirmation that the local checkout matches the authoritative remote branch before Active-task execution.
+- Required Codex to stop and use the Error Handoff Procedure when fetch fails, no upstream exists, branches diverge, local commits are ahead unexpectedly, or synchronization would overwrite preserved work.
 - Completed `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit`.
 - Completed the Findings Register, Technical Debt Register, Repository Health Assessment, Executive Engineering Report, and Release Readiness Assessment.
 - Assigned repository health score `52 / 100` and release decision `Not Ready for Release Candidate`.
