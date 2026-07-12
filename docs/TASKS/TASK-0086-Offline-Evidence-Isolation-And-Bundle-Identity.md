@@ -1,13 +1,13 @@
 # TASK-0086 - Offline Evidence Isolation and Bundle Identity
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
 
 ## Depends On
-TASK-0084 audit completion.
+TASK-0084 audit completion. Dependency satisfied on 2026-07-12.
 
 ## Objective
 Ensure deterministic and ARGUS analysis operate on the intended immutable diagnostic run and never silently mix the analysis host’s live data into an offline bundle.
