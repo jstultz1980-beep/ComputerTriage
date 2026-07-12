@@ -4,7 +4,7 @@
 2. ~~The "Find Servers" Button on the printing page has the top and bottom of the text cut off~~
 3. ~~Computer Tab: Make the info section larger and add any additional info you think may need to be there. Make the Profile table only have about 3 visible lines.~~
 4. ~~Activity Tab needs to render quicker and smoother.~~
-5. ~~The Setttings and Hlep button look pretty ghetto.~~
+5. ~~The "Setttings and Hlep" button look pretty ghetto.~~
 6. Triage tab
 6a. ~~Move the quick and full triage buttons oput of a box. Just make them across the top of the tab. Remove the status block. That is info that should be in the STATUS bar.~~
 6b. ~~Remove sysinternals from the tool cataloge list.~~
@@ -63,3 +63,5 @@
 57. ~~Triage page Quick Triage and Full Triage should be text action items in Step 1 instead of top buttons.~~
 58. ~~Triage page Cancel Run should be inside Step 1 and invisible unless a run is active.~~
 59. ~~Triage page Review actions should be links with explanations instead of buttons.~~
+60. Review the bundled Sysinternals tools and remove tools whose diagnostic value does not justify package size, maintenance burden, licensing/provenance work, or EDR friction. Reconcile under TASK-0093 rather than creating a duplicate task.
+61. Verify the toolkit remains modular enough to support adding and removing plugins without editing core GUI/orchestration code. Define and validate the plugin contract, discovery, registration, lifecycle, isolation, compatibility, and failure behavior under TASK-0095 or a focused successor task if TASK-0095 cannot fully own the scope.
