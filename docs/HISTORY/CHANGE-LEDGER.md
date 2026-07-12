@@ -8,7 +8,7 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 9 / 25 | TASK-0084 closeout and custodian handoff reconciliation. |
+| Repository Governance | 10 / 25 | Mandatory remote synchronization verification added to `Resume Work`. |
 | Architecture | 4 / 25 | TASK-0084 architecture and quality audit closeout. |
 | Documentation | 1 / 25 | TASK-0084 final audit reports after TASK-0085 reset. |
 | Task System | 7 / 25 | TASK-0084 remediation task creation and queue reordering. |
@@ -25,6 +25,7 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-GOV-0091 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Required `Resume Work` to fetch the authoritative remote, compare local/upstream divergence, safely synchronize before reading Active-task state, and stop through Error Handoff when synchronization is unsafe or impossible. |
 | CHG-0084-01 | 2026-07-12 | TASK-0084 | Repository Governance | +1 | Closed the full codebase audit, confirmed GitHub source-of-truth and admin write access, and transferred ownership to the first remediation task. |
 | CHG-0084-02 | 2026-07-12 | TASK-0084 | Architecture | +1 | Completed architecture compliance assessment and established the dependency-ordered remediation architecture. |
 | CHG-0084-03 | 2026-07-12 | TASK-0084 | Documentation | +1 | Completed the Findings Register, Technical Debt Register, Repository Health Assessment, Executive Engineering Report, and Release Readiness Assessment. |
