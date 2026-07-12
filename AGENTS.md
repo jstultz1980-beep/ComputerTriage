@@ -10,19 +10,24 @@ The repository is the single source of truth. Chat history is not authoritative 
 When the user enters `Resume Work`, do all of the following without asking for a separate task prompt:
 
 1. Read `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` in full.
-2. Follow the required startup sequence in `PROJECT.md`.
-3. Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one Active task.
-4. Read the Active task and every design/ADR/file it references.
-5. Check audit counters. A counter at `25 / 25` blocks the next implementation task, but does not interrupt an Active task already underway.
-6. Preserve all documented unrelated working-tree drift.
-7. Execute the Active task autonomously within its approved scope.
-8. Validate the work using the task’s required validation plus applicable parser, smoke, button-smoke, fixture, and artifact checks.
-9. Correct in-scope defects found during implementation or validation without asking for separate permission.
-10. Update the task, queue, handoff, ledger, changelog, roadmap/backlog, punch list, and build metadata where required.
-11. Commit locally. Push only when the user explicitly requests a push or repository rules require it.
-12. Report the commit hash, files changed, validation, current Active task, current owner, next owner, and any blockers.
+2. Verify the local checkout is on the intended branch and has a valid `origin` remote.
+3. Run `git fetch --prune origin` before trusting any local governance or task state.
+4. Compare local `HEAD`, the upstream tracking branch, and `origin/<branch>` using `git status --short --branch`, `git rev-parse HEAD`, `git rev-parse @{u}`, and `git rev-list --left-right --count HEAD...@{u}`.
+5. If local is behind and the update is a safe fast-forward, synchronize without overwriting documented drift. If local is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite work, stop before implementation and use the Error Handoff Procedure.
+6. Re-run the comparison and confirm the local checkout matches the authoritative remote branch before reading the Active task. Record the synchronized commit hash in the work log or completion report.
+7. Follow the required startup sequence in `PROJECT.md` using the synchronized checkout.
+8. Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one Active task.
+9. Read the Active task and every design/ADR/file it references.
+10. Check audit counters. A counter at `25 / 25` blocks the next implementation task, but does not interrupt an Active task already underway.
+11. Preserve all documented unrelated working-tree drift.
+12. Execute the Active task autonomously within its approved scope.
+13. Validate the work using the task’s required validation plus applicable parser, smoke, button-smoke, fixture, and artifact checks.
+14. Correct in-scope defects found during implementation or validation without asking for separate permission.
+15. Update the task, queue, handoff, ledger, changelog, roadmap/backlog, punch list, and build metadata where required.
+16. Commit locally. Push only when the user explicitly requests a push or repository rules require it.
+17. Report the synchronized starting commit, resulting commit hash, files changed, validation, current Active task, current owner, next owner, and any blockers.
 
-Do not reinterpret `Resume Work` as permission to choose unrelated work, clean drift, bypass an audit gate, or expand scope.
+Do not reinterpret `Resume Work` as permission to choose unrelated work, clean drift, bypass an audit gate, expand scope, or implement from a stale checkout.
 
 ## Autonomous Execution Rule
 
