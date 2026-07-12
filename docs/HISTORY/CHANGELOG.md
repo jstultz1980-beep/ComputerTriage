@@ -1,102 +1,33 @@
 # Changelog
 
+Detailed historical implementation chronology remains preserved in Git history and individual task records. This file records current milestone-level changes.
+
+## 2026-07-12
+
+- Completed `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit`.
+- Completed the Findings Register, Technical Debt Register, Repository Health Assessment, Executive Engineering Report, and Release Readiness Assessment.
+- Assigned repository health score `52 / 100` and release decision `Not Ready for Release Candidate`.
+- Verified every Critical and High finding has a focused remediation task or documented disposition.
+- Created the complete remediation task set through TASK-0100.
+- Superseded TASK-0077 with TASK-0096/TASK-0100, TASK-0078 with TASK-0093, and TASK-0079 with TASK-0092.
+- Retained TASK-0080 as the final release-candidate validation and documentation gate.
+- Reordered the queue into a dependency-based remediation sequence.
+- Closed TASK-0084 and activated `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` as the only Active task.
+- Updated handoff, queue, roadmap, task records, history, and audit counters.
+- No application code was changed during the audit.
+
 ## 2026-07-10
-- Completed TASK-0076 Analyze Workflow UI Integration.
-- Added a guided Analyze page with embedded complete analysis, latest local/technician/escalation report access, bundle access, and explicit missing or limited evidence status.
-- Parser, GUI smoke, and extended button-smoke validation passed; activated TASK-0085 because Documentation reached `25 / 25`.
-- Completed TASK-0075 Reporting Finish Pass.
-- Added standalone `ARGUS/technician-report.md` and `ARGUS/escalation-report.md` outputs with confidence, citations, limitations, diagnostic themes, and structured artifact references.
-- Validated both reports from the current AI bundle and activated TASK-0076 Analyze Workflow UI Integration.
-- Completed TASK-0074 ARGUS Event Grouping And Recommendations.
-- Added `ARGUS/diagnostic-groups.json` and `ARGUS/recommendations.json` with confidence, citations, root-cause candidates, missing-evidence boundaries, and conservative technician actions.
-- Validated the existing bundle plus synthetic normal, limited/gap-only, and problem-heavy scenarios, then activated TASK-0075 Reporting Finish Pass.
-- Completed TASK-0083 Codex CLI Resume Work Protocol.
-- Added root `AGENTS.md` and `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` so Codex can resume from tracked repository state.
-- Completed TASK-0073 ARGUS Evidence Normalization Implementation.
-- Added structured ARGUS domain, fact, gap, and citation records in `ARGUS/normalized-analysis.json` while preserving deterministic evidence boundaries.
-- Validated PowerShell parsing and the existing AI bundle, then activated TASK-0074 Event Grouping And Recommendations.
-- Completed TASK-0082 ChatGPT Governance Handoff Review.
-- Reviewed the Codex-only work stretch, governance state, finish-line plan, ARGUS product definition, and TASK-0073/TASK-0074 scopes.
-- Confirmed no blocking architecture findings.
-- Confirmed HEPHAESTUS owns collection and deterministic local analysis while ARGUS owns cited explanation, normalization, grouping, and technician guidance.
-- Confirmed the TASK-0072 evidence trust order, citation model, confidence language, and unsupported-inference rules are sufficient for first-release implementation.
-- Confirmed ADR-0003 remains accepted and does not require replacement before TASK-0073.
-- Activated TASK-0073 ARGUS Evidence Normalization Implementation for Codex.
-- Preserved known unstaged/runtime drift outside TASK-0073 scope.
-- Created and activated TASK-0082 ChatGPT Governance Handoff Review as the single active task.
-- Reconciled the Codex-only work stretch for ChatGPT, including current task state, audit counters, known drift, completed tasks since TASK-0020, and the exact Next Bot Prompt.
-- Updated the roadmap to pause Phase 07 until ChatGPT reviews the ARGUS product/evidence map and approves TASK-0073 activation.
-- Completed TASK-0081 Task System Counter Audit.
-- Verified handoff/queue consistency, completed TASK-0072 state, and queued TASK-0073 through TASK-0080 order.
-- Reset only the Task System counter from `25 / 25` to `0 / 25`.
-- Attempted to reconcile stale local ADR-0003 drift, but Windows denied file replacement/writes; the drift remains unstaged and documented for follow-up.
-- Completed TASK-0072 ARGUS Product Definition And Evidence Map.
-- Added `docs/DESIGN/ARGUS-PRODUCT-DEFINITION-AND-EVIDENCE-MAP.md` with ARGUS evidence domains, trust order, output contract, citation model, confidence language, unsupported-inference rules, and implementation plans for TASK-0073/TASK-0074.
-- Updated TASK-0073 and TASK-0074 scopes to consume the TASK-0072 design.
-- Activated TASK-0081 Task System Counter Audit because Task System reached `25 / 25`.
-- Completed TASK-0071 Finish Line Project Plan.
-- Added `docs/PROJECT-FINISH-PLAN.md` to define the remaining release path.
-- Queued TASK-0072 through TASK-0080 for ARGUS product definition, ARGUS normalization, event grouping/recommendations, reporting, Analyze UI integration, first-render tab performance, embedded-tool trust/EDR-safe distribution, release packaging/update hardening, and release-candidate validation.
-- Updated roadmap, backlog, queue, handoff, and audit counters.
-- Recorded that the user explicitly requested repo sync after TASK-0070 and local/GitHub matched at `e882044`.
-- Completed TASK-0070 Local GitHub Reconciliation.
-- Fetched `origin` and confirmed local `master` was `0 behind / 27 ahead` before the reconciliation commit and `0 behind / 28 ahead` after it.
-- Added `docs/REVIEWS/LOCAL-GITHUB-RECONCILIATION-20260710.md` with the local-ahead commit list, committed-file delta, known working-tree drift, and sync recommendation.
-- Marked the Wi-Fi hardware verification punch-list item complete based on user confirmation and reconciled the roadmap note.
-- No push was performed.
 
-## 2026-07-09
-- Completed TASK-0069 Triage Text Driven Workflow.
-- Removed the old Triage top action buttons/progress field, made Quick/Full Triage link actions in Step 1, moved Cancel Run into Step 1, and changed Review actions to explanatory links.
-- Updated toolkit build metadata for TASK-0069.
-- Completed TASK-0068 Triage Instructions And WU LED.
-- Added a separate Windows Update Service Health LED and converted Triage collect/submit instructions to compact rich-text quick-reference entries.
-- Updated toolkit build metadata for TASK-0068.
-- Completed TASK-0067 UI Feedback Corrections.
-- Replaced the blank status-bar progress box with fixed-width `Working` and spinner labels, restored the Windows Update status row, made Windows Update Service Health show explicit state text, changed Settings toolkit-size refresh to an inline icon, and split Triage instruction heading/body weights.
-- Updated toolkit build metadata for TASK-0067.
-- Completed TASK-0066 RapidAssist Naming Selection.
-- Recorded RapidAssist as the preferred product naming direction without renaming application files, manifests, windows, package metadata, or branding assets.
-- Completed TASK-0065 UI Regression Polish and activated TASK-0066 RapidAssist Naming Selection.
-- Polished the busy progress indicator, Windows Update service-health/status layout, Directory Domain and Policy actions, Wi-Fi page/status icons, Settings refresh/size controls, Software/Add-Ons placement, and Triage instruction emphasis.
-- Updated toolkit build metadata for TASK-0065.
-- Completed TASK-0021 HEPHAESTUS Rule Catalog Expansion.
-- Added deterministic local-analysis rules for APIPA network evidence, Windows Update service repair signals, disabled endpoint protection, stopped automatic services, and domain trust/logon failures.
-- Validated the local analysis engine against the existing AI-Bundles folder and synthetic evidence covering all new rule IDs.
-- Updated toolkit build metadata for TASK-0021.
-- Completed TASK-0064 Product Naming Options and activated TASK-0021 HEPHAESTUS Rule Catalog Expansion.
-- Added `docs/DESIGN/PRODUCT-NAMING-OPTIONS.md` with five candidate names and rationales.
-- No application files, manifests, windows, package metadata, or branding assets were renamed.
-- Completed TASK-0063 Add Ons Concept and activated TASK-0064 Product Naming Options.
-- Added a Software-page Add-Ons popup for installable/extract-needed programs while preserving existing Software sections.
-- Shared safe software resource links between Software and the Add-Ons concept popup.
-- Updated toolkit build metadata for TASK-0063.
-- Completed TASK-0062 Computer Data Push Pull and activated TASK-0063 Add Ons Concept.
-- Reworked Transfer Client Data into a Push/Pull computer-data dialog while preserving the existing diagnostic-data allow-list and manifest output.
-- Validated fake push and pull transfers, parser checks, GUI smoke, and button-smoke.
-- Updated toolkit build metadata for TASK-0062.
-- Completed TASK-0058 Settings And Control Polish and activated TASK-0062 Computer Data Push Pull.
-- Compacted shared button styling, shortened the static tab strip to two rows, and enlarged the header logo.
-- Replaced Settings `Refresh Size` with a circular-arrow icon button and removed registered-command startup log noise.
-- Updated toolkit build metadata for TASK-0058.
-- Completed TASK-0057 Wi-Fi And Windows Status Polish and activated TASK-0058 Settings And Control Polish.
-- Made Windows Update health surface `Repair recommended` when required services are missing, disabled, or in an unexpected state.
-- Replaced Wi-Fi status text with a colored LED-style indicator and added bottom Wi-Fi network details to the Wi-Fi page.
-- Removed redundant Wi-Fi page labels and updated toolkit build metadata for TASK-0057.
-- Completed TASK-0056 Triage Guided Workflow Polish and activated TASK-0057 Wi-Fi And Windows Status Polish.
-- Replaced the visible Triage catalog/Technician Notes area with guided Collect, Review, and Submit workflow sections.
-- Preserved top-row Quick Triage, Full Triage, Cancel Run, status/progress, Latest Run, Bundle Folder, and Validate Setup access.
-- Updated toolkit build metadata for TASK-0056.
-- Completed TASK-0055 Shared Embedded Output Pattern and activated TASK-0056 Triage Guided Workflow Polish.
-- Added reusable embedded command-output helpers and converted Quick Target Checks to use them.
-- Updated toolkit build metadata for TASK-0055.
-- Completed TASK-0061 Directory Page Layout Polish and activated TASK-0055 Shared Embedded Output Pattern.
-- Compacted the Directory page status area, removed the Directory refresh button, and preserved domain/policy actions and tools.
-- Added queued tasks for computer data push/pull, Add-Ons concept testing, and product naming options from new punch-list entries.
-- Updated toolkit build metadata for TASK-0061.
-- Added the `Next 25` prompt shortcut rule for punch-list reconciliation, task reordering, implementation through the next 25-change audit gate, deferred user testing, local commits, and no push unless explicitly requested.
-- Corrected forward-looking audit reset wording to `0 / 25`.
+- Completed TASK-0073 ARGUS evidence normalization.
+- Completed TASK-0074 event grouping and technician recommendations.
+- Completed TASK-0075 technician and escalation reporting.
+- Completed TASK-0076 guided Analyze workflow integration.
+- Completed TASK-0085 Documentation counter audit and reset Documentation to `0 / 25`.
+- Activated TASK-0084 full-codebase architecture and quality audit.
 
-## 2026-07-05
-- Raised the audit gate threshold from 10 changes to 25 changes and cleared the UI audit gate that had been triggered at 10/10.
-- Added TASK-0061 Directory Page Layout Polish for new Directory punch-list feedback and moved it ahead of shared embedded-output work.
+## Earlier History
+
+Earlier detailed changes remain in:
+- Individual files under `docs/TASKS/`.
+- `docs/HISTORY/CHANGE-LEDGER.md`.
+- Immutable Git commit history.
