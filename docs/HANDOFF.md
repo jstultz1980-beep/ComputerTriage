@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0091
+HANDOFF-0092
 
 ## Current Task
 TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity
@@ -26,6 +26,7 @@ The repository is authoritative. Exactly one task may be Active, and `docs/HANDO
 - TASK-0086 is the single Active implementation task.
 - TASK-0077, TASK-0078, and TASK-0079 are superseded by focused audit-remediation tasks.
 - TASK-0080 remains the final release-candidate validation and documentation gate.
+- `Resume Work` now requires a mandatory fetch, upstream comparison, and verified local/remote synchronization before task execution.
 
 ## Active Task Scope
 `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`
@@ -49,7 +50,7 @@ Codex must not:
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 9 / 25 | No |
+| Repository Governance | 10 / 25 | No |
 | Architecture | 4 / 25 | No |
 | Documentation | 1 / 25 | No |
 | Task System | 7 / 25 | No |
@@ -92,5 +93,5 @@ TASK-0086: Isolate offline evidence and bind immutable run identity
 ## Next Bot Prompt
 
 ```text
-Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the complete repository startup sequence. Verify TASK-0086 is the only Active task. Preserve all documented unrelated drift. Execute only TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity. Validate cross-machine evidence isolation, explicit/default bundle validation, generated-output exclusion, immutable run identity propagation, repeated-run idempotence, parser behavior, smoke tests, and button-smoke tests. Update the task, handoff, queue, changelog, change ledger, and build metadata as required. Commit locally. Do not push unless explicitly requested, except under the Error Handoff Rule.
+Run the mandatory Resume Work synchronization procedure first: read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, run `git fetch --prune origin`, verify the intended branch and upstream, compare local HEAD with the upstream branch, safely fast-forward when behind, and confirm the local and remote commit hashes match before trusting local governance or task files. If the branch is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite preserved work, stop before implementation and use the Error Handoff Procedure. After synchronization, follow the complete repository startup sequence. Verify TASK-0086 is the only Active task. Preserve all documented unrelated drift. Execute only TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity. Validate cross-machine evidence isolation, explicit/default bundle validation, generated-output exclusion, immutable run identity propagation, repeated-run idempotence, parser behavior, smoke tests, and button-smoke tests. Update the task, handoff, queue, changelog, change ledger, and build metadata as required. Commit locally. Do not push unless explicitly requested, except under the Error Handoff Rule.
 ```
