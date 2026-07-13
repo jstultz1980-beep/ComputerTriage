@@ -17,14 +17,16 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
 | UI | 0 / 25 | TASK-0103 Engineering Audit accepted and reset only UI. |
 | Plugin Framework | 4 / 25 | TASK-0093 provenance-gated external-tool launch behavior. |
-| Build System | 25 / 25 | TASK-0093 reviewed Sysinternals package inclusion policy. |
+| Build System | 0 / 25 | TASK-0105 Engineering Audit accepted and reset only Build System. |
 | Validation/Test Framework | 6 / 25 | TASK-0093 provenance and lifecycle negative-path fixtures. |
-| Roadmap/Backlog | 23 / 25 | Remediation paused for Build System Engineering Audit. |
+| Roadmap/Backlog | 23 / 25 | TASK-0094 activated after Build System audit acceptance. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0105-01 | 2026-07-13 | TASK-0105 | Build System | Reset to 0 | Accepted the TASK-0104 Build System audit package, retained TASK-0100 as performance remediation owner, and reset only Build System. |
+| CHG-0105-02 | 2026-07-13 | TASK-0105 / TASK-0094 | Task System | 0 | Closed the Project Custodian audit boundary and activated TASK-0094 without incrementing the counter for routine audit bookkeeping. |
 | CHG-0093-01 | 2026-07-12 | TASK-0093 | Architecture | +1 | Added the external-tool provenance, integrity, lifecycle, licensing, privilege, and EDR trust contract. |
 | CHG-0093-02 | 2026-07-12 | TASK-0093 | Plugin Framework | +1 | Blocked external-tool resolution and launch unless tracked trust checks pass. |
 | CHG-0093-03 | 2026-07-12 | TASK-0093 | Build System | +1 | Enforced the reviewed Sysinternals production package allowlist, reaching 25 / 25. |
@@ -60,4 +62,4 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 ## Audit Closeout
 
-TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. Future threshold audits follow the autonomous two-stage cycle.
+TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. Future threshold audits follow the autonomous two-stage cycle.
