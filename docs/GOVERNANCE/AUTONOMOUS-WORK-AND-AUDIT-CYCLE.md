@@ -57,6 +57,7 @@ At audit completion Codex must:
 3. Update handoff and queue.
 4. Commit and push the audit package and minimum governance transition to the cloud repository.
 5. Report that Project Custodian review is required.
+6. End the report with the exact final line `Tell Debbie to continue`.
 
 ## Engineering Audit — Project Custodian
 
@@ -96,3 +97,21 @@ Codex must also stop for:
 - handoff/queue conflict that cannot be safely reconciled from tracked evidence.
 
 These use `docs/ERROR-HANDOFF.md` and the existing `Address Errors` workflow.
+
+## Mandatory Closing Instruction
+
+Every Codex stop-boundary summary must end with exactly one final operator instruction and no text after it.
+
+For every non-blocked stop boundary, including successful cycle completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, use exactly:
+
+```text
+Tell Debbie to continue
+```
+
+For a genuine blocker recorded and pushed through `docs/ERROR-HANDOFF.md`, use exactly:
+
+```text
+Tell Debbie to address errors
+```
+
+Neither instruction may be paraphrased.
