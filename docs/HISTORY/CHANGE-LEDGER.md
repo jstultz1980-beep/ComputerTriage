@@ -11,7 +11,7 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 16 / 25 | TASK-0097 intended-state runtime boundaries, contracts, flow, and failure behavior. |
 | Documentation | 18 / 25 | TASK-0108 Task System audit evidence package. |
-| Task System | 25 / 25 | TASK-0097 completion and TASK-0108 Audit Preparation activation. |
+| Task System | 0 / 25 | TASK-0109 Engineering Audit accepted and reset only Task System. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
@@ -25,6 +25,8 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0109-01 | 2026-07-13 | TASK-0109 | Task System | Reset to 0 | Accepted the TASK-0108 Task System audit package, recorded all debt dispositions, and reset only Task System. |
+| CHG-0109-02 | 2026-07-13 | TASK-0109 / TASK-0110 | Task System | 0 | Closed the Project Custodian audit boundary and activated focused consistency cleanup without incrementing the freshly reset counter. |
 | CHG-0108-01 | 2026-07-13 | TASK-0108 | Documentation | +1 | Recorded deterministic Task System threshold evidence, validation, debt candidates, and recommended dispositions. |
 | CHG-0108-02 | 2026-07-13 | TASK-0108 / TASK-0109 | Task System | 0 | Completed Audit Preparation and activated Project Custodian review without resetting or incrementing the gated counter. |
 | CHG-0097-06 | 2026-07-13 | TASK-0097 | Repository Governance | +1 | Replaced duplicated entry-point procedures with authoritative workflow and audit references while retaining mandatory controls. |
@@ -100,4 +102,4 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 ## Audit Closeout
 
-TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. TASK-0107 reset Roadmap/Backlog only. Future threshold audits follow the autonomous two-stage cycle.
+TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. TASK-0107 reset Roadmap/Backlog only. TASK-0109 reset Task System only. Future threshold audits follow the autonomous two-stage cycle.
