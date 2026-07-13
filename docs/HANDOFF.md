@@ -1,42 +1,38 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0112
+HANDOFF-0113
 
 ## Current Task
-TASK-0109-Project-Custodian-Task-System-Engineering-Audit
+TASK-0110-Task-System-Consistency-Cleanup
 
 ## Current Owner
-ChatGPT (Project Custodian)
+Codex
 
 ## Next Owner
-Codex after the Project Custodian accepts or corrects the evidence, resets only Task System, and activates exactly one dependency-ready task.
+Codex may activate TASK-0098 after TASK-0110 completes and all required consistency and governance simulations pass. ChatGPT becomes next owner only at a Project Custodian, audit, blocker, or user-only boundary.
 
 ## Objective
-Review the TASK-0108 Task System evidence, decide recorded debt dispositions, reset only the audited counter if accepted, and activate the next task.
+Resolve accepted Task System identity, status, Error Handoff, and punch-list consistency debt without changing application behavior or expanding governance.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0096 completed the shared GUI background operation controller and migrated Analyze and Triage.
-- TASK-0097 Project Custodian architecture, terminology, roadmap, queue, and governance decisions are complete.
-- TASK-0097 focused reconciliation and all required governance simulations passed.
-- The authoritative decision is `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`.
-- `docs/ARCHITECTURE.md` now defines the concise intended-state runtime boundaries, contracts, flow, and failure behavior.
-- `docs/ROADMAP.md` is forward-looking; historical chronology remains in task and history records.
-- ARGUS remains the sole approved analysis/explanation product name.
-- Task System reached `25 / 25` and triggered mandatory TASK-0108 Audit Preparation before implementation could resume.
-- TASK-0108 completed the evidence package and transferred the audit to TASK-0109.
-- Task System remains `25 / 25`; Codex did not reset it.
-- Six Task System debt candidates require Project Custodian disposition.
-- The remaining sequence is TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- TASK-0097 architecture, terminology, roadmap, queue, and governance consolidation is complete.
+- TASK-0108 completed Task System Audit Preparation.
+- TASK-0109 accepted the evidence package and reset only Task System from `25 / 25` to `0 / 25`.
+- The authoritative audit decision is `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`.
+- TASK-0110 is the sole Active Codex task.
+- TASK-0110 must resolve the duplicate TASK-0010 alias, stale superseded task statuses, terminal status vocabulary, stale Error Handoff text, and punch-list item 61 disposition.
+- TASK-0098 remains next after TASK-0110.
+- Remaining order: TASK-0110, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0109-Project-Custodian-Task-System-Engineering-Audit`
+`TASK-0110-Task-System-Consistency-Cleanup`
 
-The Project Custodian must review `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`, decide the recorded debt dispositions, reset only Task System if accepted, and activate exactly one dependency-ready successor. Codex must not implement while TASK-0109 is Active.
+Codex must perform only the focused repository consistency cleanup defined by TASK-0110. No application code, architecture expansion, governance expansion, feature work, helper framework, native replacement, or unrelated drift cleanup is authorized.
 
 ## Audit Counters
 
@@ -45,7 +41,7 @@ The Project Custodian must review `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREP
 | Repository Governance | 15 / 25 | No |
 | Architecture | 16 / 25 | No |
 | Documentation | 18 / 25 | No |
-| Task System | 25 / 25 | Yes |
+| Task System | 0 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 4 / 25 | No |
@@ -73,12 +69,11 @@ None.
 
 ## Decision Reference
 - `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`
+- `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`
 - `docs/TASKS/TASK-0109-Project-Custodian-Task-System-Engineering-Audit.md`
-- `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`
-- `docs/ARCHITECTURE.md`
-- `docs/ROADMAP.md`
+- `docs/TASKS/TASK-0110-Task-System-Consistency-Cleanup.md`
 
 ## Next Bot Prompt
 ```text
-Continue
+Resume Work
 ```
