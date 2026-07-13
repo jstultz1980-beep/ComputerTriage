@@ -39,6 +39,24 @@ try {
         throw "Triage command runner did not capture stdout."
     }
 
+    $nonzero = Invoke-NTKTriageCommand -Name 'nonzero_fixture' -FilePath 'cmd.exe' -Arguments '/c exit 7' -OutputPath (Join-Path $testFolder 'nonzero.txt') -TimeoutSeconds 15
+    if($nonzero.succeeded -or $nonzero.exitCode -ne 7){ throw 'Nonzero command outcome was not persisted accurately.' }
+    $missing = Invoke-NTKTriageCommand -Name 'missing_fixture' -FilePath (Join-Path $testFolder 'missing.exe') -Arguments '' -OutputPath (Join-Path $testFolder 'missing.txt') -TimeoutSeconds 15
+    if($missing.succeeded -or $missing.exitCode -ne -999){ throw 'Missing executable outcome was not persisted accurately.' }
+    $collector = Export-NTKTriagePowerShellObject -Name 'failed_collector_fixture' -ScriptBlock { throw 'collector fixture' } -TxtPath (Join-Path $testFolder 'collector.txt') -JsonPath (Join-Path $testFolder 'collector.json')
+    if($collector.succeeded -or $collector.error -notmatch 'collector fixture'){ throw 'Failed PowerShell collector outcome was not preserved.' }
+
+    $bundleRoot = Join-Path $testFolder 'bundle-source'
+    New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
+    'fixture' | Set-Content (Join-Path $bundleRoot 'artifact.txt')
+    $bundle = Join-Path $testFolder 'fixture.zip'
+    Compress-Archive -LiteralPath (Join-Path $bundleRoot 'artifact.txt') -DestinationPath $bundle
+    $hash = (Get-FileHash $bundle -Algorithm SHA256).Hash
+    [ordered]@{algorithm='SHA256';bundleFileName='fixture.zip';sha256=$hash} | ConvertTo-Json | Set-Content ($bundle + '.sha256.json')
+    if(!(Test-NTKDiagnosticBundleIntegrity -BundlePath $bundle).passed){ throw 'Final bundle hash did not validate.' }
+    [IO.File]::AppendAllText($bundle,'tamper')
+    if((Test-NTKDiagnosticBundleIntegrity -BundlePath $bundle).passed){ throw 'Tampered bundle was accepted.' }
+
     $validation = Test-NTKTriageSetup
     if(!$validation.passed){
         $failed = @($validation.checks | Where-Object { !$_.passed } | ForEach-Object { $_.name }) -join ", "
@@ -49,4 +67,4 @@ finally {
     Remove-Item -LiteralPath $testFolder -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "Triage service smoke test passed."
+Write-Host "Triage service integrity and failure fixtures passed."

@@ -1,7 +1,7 @@
 # TASK-0090 - ARGUS Contract, Citation, and Priority Correctness
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

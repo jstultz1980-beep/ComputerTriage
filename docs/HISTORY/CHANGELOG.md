@@ -4,6 +4,10 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Completed TASK-0089 diagnostic bundle integrity and collection contract.
+- Added final sidecar SHA-256 verification, tamper detection, complete collector outcomes, capability completeness, and inner-operation section status propagation.
+- Activated TASK-0090 ARGUS contract, citation, and priority correctness.
+
 - Completed TASK-0088 canonical operation results and failure propagation.
 - Added deterministic terminal states/exit codes, required/optional startup handling, partial triage and plugin summaries, failed-contract ARGUS suppression, and GUI result-state display.
 - Added negative-path operation-result and CLI/ARGUS fixtures; full existing regression suite passed.

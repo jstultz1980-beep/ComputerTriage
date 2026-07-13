@@ -9,17 +9,17 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 11 / 25 | Autonomous Resume Work and two-stage audit cycle. |
-| Architecture | 7 / 25 | TASK-0088 canonical operation-result contract. |
-| Documentation | 6 / 25 | TASK-0088 implementation and validation evidence. |
-| Task System | 12 / 25 | TASK-0088 completion and TASK-0089 activation. |
-| Evidence Collection and Deterministic Analysis | 7 / 25 | TASK-0088 result propagation through triage and deterministic analysis. |
+| Architecture | 8 / 25 | TASK-0089 diagnostic bundle integrity contract. |
+| Documentation | 7 / 25 | TASK-0089 implementation and validation evidence. |
+| Task System | 13 / 25 | TASK-0089 completion and TASK-0090 activation. |
+| Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
 | ARGUS | 9 / 25 | TASK-0088 failed-contract result and recommendation suppression. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
 | UI | 24 / 25 | TASK-0088 GUI result-state and exit display. |
 | Plugin Framework | 2 / 25 | TASK-0088 per-step plugin outcome summary. |
-| Build System | 20 / 25 | TASK-0088 build metadata. |
-| Validation/Test Framework | 1 / 25 | TASK-0088 terminal-state and negative-path fixtures. |
-| Roadmap/Backlog | 18 / 25 | Remediation advanced to TASK-0089. |
+| Build System | 21 / 25 | TASK-0089 build metadata. |
+| Validation/Test Framework | 2 / 25 | TASK-0089 integrity, tamper, and collector-failure fixtures. |
+| Roadmap/Backlog | 19 / 25 | Remediation advanced to TASK-0090. |
 
 ## Current Ledger Entries
 
@@ -66,6 +66,13 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | CHG-0088-08 | 2026-07-12 | TASK-0088 | Documentation | +1 | Recorded implementation and validation evidence. |
 | CHG-0088-09 | 2026-07-12 | TASK-0088 / TASK-0089 | Task System | +1 | Completed TASK-0088 and activated TASK-0089. |
 | CHG-0088-10 | 2026-07-12 | TASK-0088 / TASK-0089 | Roadmap/Backlog | +1 | Advanced dependency-ordered remediation to bundle integrity. |
+| CHG-0089-01 | 2026-07-12 | TASK-0089 | Architecture | +1 | Defined final sidecar bundle integrity and collection outcome contracts. |
+| CHG-0089-02 | 2026-07-12 | TASK-0089 | Evidence Collection and Deterministic Analysis | +1 | Added final hash verification, tamper detection, and complete collector/capability outcomes. |
+| CHG-0089-03 | 2026-07-12 | TASK-0089 | Validation/Test Framework | +1 | Added integrity, tamper, nonzero, missing-executable, and failed-collector fixtures. |
+| CHG-0089-04 | 2026-07-12 | TASK-0089 | Build System | +1 | Updated accepted implementation build metadata. |
+| CHG-0089-05 | 2026-07-12 | TASK-0089 | Documentation | +1 | Recorded implementation and validation evidence. |
+| CHG-0089-06 | 2026-07-12 | TASK-0089 / TASK-0090 | Task System | +1 | Completed TASK-0089 and activated TASK-0090. |
+| CHG-0089-07 | 2026-07-12 | TASK-0089 / TASK-0090 | Roadmap/Backlog | +1 | Advanced remediation to ARGUS correctness. |
 
 ## Audit Closeout
 

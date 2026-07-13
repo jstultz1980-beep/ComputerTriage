@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0096
+HANDOFF-0097
 
 ## Current Task
-TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract
+TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness
 
 ## Current Owner
 Codex
@@ -13,7 +13,7 @@ Codex
 ChatGPT at the next Project Custodian Engineering Audit, architecture/governance boundary, blocker, acceptance boundary, or user-only decision.
 
 ## Objective
-Continue dependency-ordered remediation with TASK-0089 under the autonomous `Resume Work` cycle.
+Continue dependency-ordered remediation with TASK-0090 under the autonomous `Resume Work` cycle.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -24,7 +24,8 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0087 completed parser-backed evidence quality and source-event-time timeline semantics.
 - TASK-0101 completed the Validation/Test Framework threshold audit and reset it to `0 / 25`.
 - TASK-0088 completed canonical operation results and failure propagation.
-- TASK-0089 is the single Active implementation task.
+- TASK-0089 completed diagnostic bundle integrity and collection outcomes.
+- TASK-0090 is the single Active implementation task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
 - `Resume Work` now authorizes continuous Codex execution through dependency-ready Codex tasks.
@@ -39,11 +40,11 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`
 
 ## Active Task Scope
-`TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract`
+`TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness`
 
-Codex must make bundle identity, integrity, completeness, and collection outcomes trustworthy within TASK-0089 scope.
+Codex must make ARGUS contract, citation, confidence, classification, and priority behavior correct within TASK-0090 scope.
 
-Codex must read TASK-0089 and its references before implementation and must not merge later ARGUS, transaction, package, or GUI-controller remediations into TASK-0089.
+Codex must read TASK-0090 and its references before implementation and must not merge later transaction, package, or GUI-controller remediations into TASK-0090.
 
 After TASK-0089 completes, Codex must re-read the queue and counters. If no gate or stop condition exists, it must activate the next dependency-ready Codex-owned task and continue without another prompt.
 
@@ -52,19 +53,19 @@ After TASK-0089 completes, Codex must re-read the queue and counters. If no gate
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
 | Repository Governance | 11 / 25 | No |
-| Architecture | 7 / 25 | No |
-| Documentation | 6 / 25 | No |
-| Task System | 12 / 25 | No |
-| Evidence Collection and Deterministic Analysis | 7 / 25 | No |
+| Architecture | 8 / 25 | No |
+| Documentation | 7 / 25 | No |
+| Task System | 13 / 25 | No |
+| Evidence Collection and Deterministic Analysis | 8 / 25 | No |
 | ARGUS | 9 / 25 | No |
 | Reporting | 3 / 25 | No |
 | UI | 24 / 25 | No |
 | Plugin Framework | 2 / 25 | No |
-| Build System | 20 / 25 | No |
-| Validation/Test Framework | 1 / 25 | No |
-| Roadmap/Backlog | 18 / 25 | No |
+| Build System | 21 / 25 | No |
+| Validation/Test Framework | 2 / 25 | No |
+| Roadmap/Backlog | 19 / 25 | No |
 
-No counter currently blocks TASK-0089. UI is at `24 / 25`; any material UI change in TASK-0089 would trigger Audit Preparation at its boundary.
+No counter currently blocks TASK-0090. UI remains at `24 / 25`.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -81,10 +82,10 @@ None.
 
 ## Recommended Commit Message
 ```text
-TASK-0089: Enforce diagnostic bundle integrity and collection contract
+TASK-0090: Correct ARGUS contract citations and priority
 ```
 
 ## Next Bot Prompt
 ```text
-Resume Work. First perform the mandatory repository synchronization procedure and confirm local HEAD matches the authoritative upstream without overwriting preserved drift. Then read PROJECT.md, AGENTS.md, docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md, the handoff, queue, error handoff, TASK-0089, and all referenced files. Execute TASK-0089 within scope, validate bundle integrity, completeness, partial collection, parser/smoke/button-smoke behavior, update all required records and build metadata, and commit locally. After completion, continue through the autonomous cycle until a gate or stop boundary.
+Resume Work. First perform mandatory repository synchronization and preserve documented drift. Then read the required governance files, handoff, queue, error handoff, TASK-0090, and all references. Execute TASK-0090 within scope, validate failed contracts, citations, classification, confidence, priority, parser, smoke, and button-smoke behavior, update required records/build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary.
 ```

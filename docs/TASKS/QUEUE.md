@@ -12,14 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Codex | Active | Make bundle identity, integrity, completeness, and collector outcomes trustworthy. |
+| `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Active | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 1 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Queued | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
-| 2 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
+| 1 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
 | 3 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Codex | Queued | Make package, deployment, and update operations complete and rollback-capable. |
 | 4 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, EDR policy, and tool-retention review. |
 | 5 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
@@ -41,6 +40,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Complete | Added final sidecar hash verification, tamper detection, complete collector outcomes, and capability/status integrity. |
 | `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation` | Complete | Added canonical results, deterministic exits, startup failure classification, partial propagation, ARGUS suppression, and GUI/plugin outcome handling. |
 | `TASK-0101-Validation-Test-Framework-Counter-Audit` | Complete | Audited executable validation and reset only Validation/Test Framework. |
 | `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Complete | Added parser-backed evidence quality and source-event-time semantics. |
@@ -50,7 +50,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0088 is complete and TASK-0089 is the only Active task.
+- TASK-0088 and TASK-0089 are complete; TASK-0090 is the only Active task.
 - Codex is authorized to continue through ordered dependency-ready Codex tasks under one `Resume Work` cycle.
 - Audit Preparation occurs automatically at `25 / 25`.
 - Project Custodian review follows each Audit Preparation package.

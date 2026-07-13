@@ -8,6 +8,10 @@ $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScript
 
 function Assert-True { param([bool]$Condition,[string]$Message) if(!$Condition){ throw $Message } }
 
+$sectionStatus = New-Object System.Collections.ArrayList
+Invoke-NTKCollectorSection -Status $sectionStatus -Name 'inner-failure-fixture' -Script { $false }
+Assert-True ($sectionStatus[0].State -eq 'Failed') 'Collector section reported Completed after an inner writer failure.'
+
 $root = Join-Path $env:TEMP ("TASK-0087-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path (Join-Path $root "Metadata") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $root "CommandOutput") -Force | Out-Null
