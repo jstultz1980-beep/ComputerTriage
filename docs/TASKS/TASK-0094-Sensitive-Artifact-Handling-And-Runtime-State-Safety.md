@@ -1,7 +1,7 @@
 # TASK-0094 - Sensitive Artifact Handling and Runtime State Safety
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
