@@ -4,6 +4,8 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Added the lightweight `Governance Refresh` command so Codex can safely pause, fetch, reload only governance/workflow files, apply changes immediately, and resume the same Active task without a full restart.
+- Added `docs/GOVERNANCE/GOVERNANCE-REFRESH.md` and registered the command in PROJECT.md, AGENTS.md, and Codex operating instructions.
 - Resolved `ERR-GIT-DIVERGENCE-20260712-001` by merging PR #1 from the preserved Codex safety branch without force-push or history rewriting.
 - Reconciled TASK-0088 through TASK-0090 implementation onto authoritative `master` while retaining newer governance and operator-closing instructions.
 - Completed TASK-0088 canonical operation results and failure propagation.
