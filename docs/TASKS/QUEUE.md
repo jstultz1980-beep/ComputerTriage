@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT (Project Custodian) | Active | Decide intended-state architecture, terminology, roadmap, queue, and governance normalization before any focused Codex support. |
+| `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | Codex (focused support) | Active | Apply the recorded Project Custodian architecture/terminology decision, reconcile references, and run governance simulations. |
 
 ## Ordered Queue
 
@@ -20,14 +20,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 |---:|---|---|---|---|
 | 6 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
 | 7 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
-| 8 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, and lifecycle performance costs. |
+| 8 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs. |
 | 9 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
-
-## Superseded Tasks
-
-- TASK-0077 is superseded by TASK-0096 and TASK-0100.
-- TASK-0078 is superseded by TASK-0093.
-- TASK-0079 is superseded by TASK-0092.
 
 ## Recently Completed
 
@@ -35,21 +29,14 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 |---|---|---|
 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Complete | Added a shared background lifecycle controller and migrated Analyze and Triage with leak and terminal-state validation. |
 | `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit` | Complete | Accepted the roadmap audit, confirmed remaining sequence, clarified TASK-0097 ownership, reset only Roadmap/Backlog, and activated TASK-0096. |
-| `TASK-0106-Roadmap-Backlog-Audit-Preparation` | Complete | Prepared deterministic Roadmap/Backlog threshold evidence without resetting the counter. |
 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Complete | Reconciled analysis roles, tool descriptors, plugin contracts, manifest roles, and operation states. |
 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Complete | Added masked/audited sensitive actions, explicit retention, selective verified encrypted transfer, atomic state, and Runtime/default separation. |
 | `TASK-0105-Project-Custodian-Build-System-Engineering-Audit` | Complete | Accepted the Build System audit, retained TASK-0100 for performance remediation, reset only Build System, and activated TASK-0094. |
-| `TASK-0104-Build-System-Audit-Preparation` | Complete | Prepared deterministic Build System threshold evidence without resetting the counter. |
-| `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Complete | Enforced tracked trust, lifecycle, licensing, EULA, EDR, and package-retention policy. |
-| `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Complete | Added managed manifests, staged verification, identity checks, atomic swaps, and rollback. |
-| `TASK-0103-Project-Custodian-UI-Engineering-Audit` | Complete | Accepted the UI audit package, retained TASK-0096/TASK-0099 remediation ownership, and reset only UI. |
 
 ## Current Decision
 
-- TASK-0107 is complete and the Roadmap/Backlog evidence is accepted.
-- Only Roadmap/Backlog was reset from `25 / 25` to `0 / 25`.
-- TASK-0096 is complete with Analyze and Triage using the shared background lifecycle controller.
-- The remaining order is TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
-- TASK-0097 is the only Active task and is a Project Custodian decision boundary; Codex support is limited to authorized implementation-reference updates.
-- Codex implementation is not authorized until the Project Custodian records the TASK-0097 decision or activates a focused support task.
-- Net-new feature work remains deferred until release-blocking remediation is complete.
+- The TASK-0097 Project Custodian decision is recorded in `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`.
+- The intended-state architecture and forward-looking roadmap are established.
+- Codex is authorized only for focused terminology/reference reconciliation and governance simulation under TASK-0097.
+- The remaining order is TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- Net-new feature work remains deferred until release-blocking stabilization, validation, and performance work is complete.
