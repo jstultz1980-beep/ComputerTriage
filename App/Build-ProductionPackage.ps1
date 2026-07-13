@@ -70,6 +70,19 @@ if($LASTEXITCODE -gt 7){
     throw "Robocopy failed with exit code $LASTEXITCODE."
 }
 
+# Ship only the reviewed Sysinternals subset. The source suite remains untouched;
+# pruning occurs solely inside the newly staged production image.
+$provenancePath = Join-Path $packageAppRoot 'manifests\external-tool-provenance.json'
+$packagedSysinternals = Join-Path $packageAppRoot 'NetworkToolkit\ExternalTools\Sysinternals'
+if((Test-Path -LiteralPath $provenancePath) -and (Test-Path -LiteralPath $packagedSysinternals)){
+    $provenancePolicy = (Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json).policy
+    $sysinternalsAllowList = @($provenancePolicy.sysinternalsPackageAllowList)
+    if($sysinternalsAllowList.Count -eq 0){ throw 'Sysinternals package allowlist is missing.' }
+    Get-ChildItem -LiteralPath $packagedSysinternals -File -Force |
+        Where-Object { $_.Name -notin $sysinternalsAllowList } |
+        Remove-Item -Force
+}
+
 Copy-Item -LiteralPath (Join-Path $launcherRoot "NetworkToolkit.vbs") -Destination (Join-Path $packageRoot "NetworkToolkit.vbs") -Force
 
 # Recreate clean runtime folders expected by the toolkit; no client records are copied.

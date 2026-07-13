@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712212326,
-    "SourceUpdatedAt":  "2026-07-12T21:23:26.9311673-05:00",
-    "ReleaseNotes":  "Added transactional print and remote-management changes with pre-state capture, verification, spooler recovery, partial-change detection, cancellation, and rollback."
+    "Build":  20260712214017,
+    "SourceUpdatedAt":  "2026-07-12T21:40:17.6618752-05:00",
+    "ReleaseNotes":  "TASK-0093 external tool provenance, lifecycle enforcement, and package retention policy."
 }

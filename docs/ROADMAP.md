@@ -17,9 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy`
+- `TASK-0105-Project-Custodian-Build-System-Engineering-Audit`
 
-TASK-0103 completed the UI audit and reset UI. TASK-0092 is complete; remediation is active on TASK-0093.
+TASK-0093 completed external-tool trust and retention policy. Build System reached `25 / 25`; TASK-0104 prepared evidence and TASK-0105 is the active Project Custodian audit.
 
 TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
 
@@ -31,8 +31,9 @@ Required sequence:
 5. TASK-0090 ARGUS Contract, Citation, and Priority Correctness. Complete.
 6. TASK-0091 Print and Remote Change Transaction Safety. Complete.
 7. TASK-0092 Transactional Package, Deploy, and Update Integrity. Complete.
-8. TASK-0093 External Tool Provenance and Lifecycle Policy.
-9. TASK-0094 Sensitive Artifact Handling and Runtime State Safety.
+8. TASK-0093 External Tool Provenance and Lifecycle Policy. Complete.
+9. TASK-0104 / TASK-0105 Build System Audit Preparation and Project Custodian Engineering Audit. Active audit boundary.
+10. TASK-0094 Sensitive Artifact Handling and Runtime State Safety.
 
 Exit target:
 - No unresolved Critical findings.

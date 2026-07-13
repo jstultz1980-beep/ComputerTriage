@@ -9,22 +9,29 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 11 / 25 | TASK-0092 staged-image and deployment transaction contract. |
-| Documentation | 12 / 25 | TASK-0092 implementation and validation evidence. |
-| Task System | 17 / 25 | TASK-0092 completion and TASK-0093 activation. |
+| Architecture | 12 / 25 | TASK-0093 external-tool trust and lifecycle contract. |
+| Documentation | 13 / 25 | TASK-0093 policy and Build audit evidence. |
+| Task System | 19 / 25 | TASK-0093 closeout, TASK-0104 preparation, and TASK-0105 activation. |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
 | UI | 0 / 25 | TASK-0103 Engineering Audit accepted and reset only UI. |
-| Plugin Framework | 3 / 25 | TASK-0091 print and remote transaction behavior. |
-| Build System | 24 / 25 | TASK-0092 managed-image and transactional deploy/update integrity. |
-| Validation/Test Framework | 5 / 25 | TASK-0092 payload, interruption, identity, swap, and rollback fixtures. |
-| Roadmap/Backlog | 22 / 25 | Remediation advanced to TASK-0093. |
+| Plugin Framework | 4 / 25 | TASK-0093 provenance-gated external-tool launch behavior. |
+| Build System | 25 / 25 | TASK-0093 reviewed Sysinternals package inclusion policy. |
+| Validation/Test Framework | 6 / 25 | TASK-0093 provenance and lifecycle negative-path fixtures. |
+| Roadmap/Backlog | 23 / 25 | Remediation paused for Build System Engineering Audit. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0093-01 | 2026-07-12 | TASK-0093 | Architecture | +1 | Added the external-tool provenance, integrity, lifecycle, licensing, privilege, and EDR trust contract. |
+| CHG-0093-02 | 2026-07-12 | TASK-0093 | Plugin Framework | +1 | Blocked external-tool resolution and launch unless tracked trust checks pass. |
+| CHG-0093-03 | 2026-07-12 | TASK-0093 | Build System | +1 | Enforced the reviewed Sysinternals production package allowlist, reaching 25 / 25. |
+| CHG-0093-04 | 2026-07-12 | TASK-0093 | Validation/Test Framework | +1 | Added hash, signature, missing, expired, local classification, and EULA fixtures. |
+| CHG-0093-05 | 2026-07-12 | TASK-0093 / TASK-0104 / TASK-0105 | Task System | +2 | Completed remediation, prepared the Build audit, and activated Project Custodian review. |
+| CHG-0093-06 | 2026-07-12 | TASK-0093 / TASK-0104 | Documentation | +1 | Recorded provenance, retention, validation, and Build audit evidence. |
+| CHG-0093-07 | 2026-07-12 | TASK-0104 / TASK-0105 | Roadmap/Backlog | +1 | Inserted the required Build System audit before TASK-0094. |
 | CHG-0103-01 | 2026-07-12 | TASK-0103 | UI | Reset to 0 | Accepted the TASK-0102 UI audit package, retained TASK-0096 and TASK-0099 as remediation owners, and reset only UI. |
 | CHG-0103-02 | 2026-07-12 | TASK-0103 / TASK-0092 | Task System | 0 | Closed the Project Custodian audit boundary and activated TASK-0092 without incrementing the counter for routine audit bookkeeping. |
 | CHG-GOV-0094 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Added the lightweight `Governance Refresh` command so Codex can safely reload current governance during an Active task and resume without a full restart. |

@@ -4,6 +4,8 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Completed TASK-0093 external-tool provenance, lifecycle, EULA, privilege, EDR, and production-retention enforcement.
+- Completed TASK-0104 Build System Audit Preparation and activated TASK-0105 Project Custodian Build System Engineering Audit.
 - Completed TASK-0092 transactional package, deployment, and update integrity; activated TASK-0093.
 - Added managed-file manifests, staging verification, destination identity, atomic swaps, interruption recovery, and rollback fixtures.
 

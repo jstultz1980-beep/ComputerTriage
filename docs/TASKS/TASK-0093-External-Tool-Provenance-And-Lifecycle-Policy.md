@@ -1,7 +1,7 @@
 # TASK-0093 - External Tool Provenance and Lifecycle Policy
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -24,3 +24,9 @@ PLG-007 through PLG-010; SEC-002, SEC-004, SEC-008, SEC-009; DEP-012.
 
 ## Validation
 Hash mismatch, signature failure, missing tool, expired tool, local-tool classification, and EULA fixtures.
+
+## Result
+- Added a tracked 38-tool provenance manifest covering SHA-256, source, publisher, license, signature, lifecycle, update cadence, privilege, EULA, EDR, and package-inclusion policy.
+- Resolution and launch now block missing, untracked, deprecated, expired, hash-mismatched, signature-invalid, and unenforced-EULA tools.
+- Production staging retains only the reviewed Sysinternals diagnostic subset and never alters the source suite.
+- Parser, provenance negative-path fixtures, toolkit smoke, JSON parsing, and whitespace validation passed.

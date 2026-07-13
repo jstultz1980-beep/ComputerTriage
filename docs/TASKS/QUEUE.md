@@ -12,13 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Active | Enforce provenance, integrity, licensing, privilege, EDR policy, and tool-retention review. |
+| `TASK-0105-Project-Custodian-Build-System-Engineering-Audit` | ChatGPT (Project Custodian) | Active | Review TASK-0104 evidence and decide Build System counter reset and remediation disposition. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 2 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
+| 2 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults after audit acceptance. |
 | 3 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate analysis/tool metadata sources and verify plugin modularity. |
 | 4 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
 | 5 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
@@ -37,6 +37,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0104-Build-System-Audit-Preparation` | Complete | Prepared deterministic Build System threshold evidence without resetting the counter. |
+| `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Complete | Enforced tracked trust, lifecycle, licensing, EULA, EDR, and package-retention policy. |
 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Complete | Added managed manifests, staged verification, identity checks, atomic swaps, and rollback. |
 | `TASK-0103-Project-Custodian-UI-Engineering-Audit` | Complete | Accepted the UI audit package, retained TASK-0096/TASK-0099 remediation ownership, and reset only UI. |
 | `TASK-0102-UI-Audit-Preparation` | Complete | Prepared UI threshold evidence without resetting the counter. |
@@ -47,10 +49,10 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0103 is complete.
-- UI reset from `25 / 25` to `0 / 25`.
-- TASK-0092 is complete and TASK-0093 is the only Active task.
+- TASK-0093 and TASK-0104 are complete.
+- Build System reached `25 / 25` and remains gated pending Project Custodian review.
+- TASK-0105 is the only Active task.
 - TASK-0096 retains UI lifecycle/controller remediation.
 - TASK-0099 retains behavioral and negative-path UI validation remediation.
-- Codex is authorized to continue through ordered dependency-ready Codex tasks under one `Resume Work` cycle.
+- Codex implementation is paused at the Project Custodian boundary.
 - Net-new feature work remains deferred until release-blocking remediation is complete.

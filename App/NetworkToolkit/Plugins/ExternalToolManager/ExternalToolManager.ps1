@@ -8,6 +8,106 @@ function Global:Get-NTKExternalToolRoot {
 
 }
 
+function Global:Get-NTKExternalToolProvenanceManifestPath {
+
+    if($script:NTKExternalToolProvenanceManifestPath){
+        return $script:NTKExternalToolProvenanceManifestPath
+    }
+
+    if($NTKPaths -and $NTKPaths.Root){
+        return (Join-Path (Split-Path -Parent $NTKPaths.Root) "manifests\external-tool-provenance.json")
+    }
+
+    return $null
+
+}
+
+function Global:Get-NTKExternalToolProvenanceManifest {
+
+    $path = Get-NTKExternalToolProvenanceManifestPath
+    if(!$path -or !(Test-Path -LiteralPath $path -PathType Leaf)){
+        return $null
+    }
+
+    try {
+        return (Get-Content -LiteralPath $path -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop)
+    }
+    catch {
+        return $null
+    }
+
+}
+
+function Global:Test-NTKExternalToolTrust {
+
+param(
+    [Parameter(Mandatory=$true)][string]$ToolId,
+    [string]$Path,
+    [datetime]$NowUtc = [datetime]::UtcNow,
+    [bool]$EulaEnforced = $true
+)
+
+    $manifest = Get-NTKExternalToolProvenanceManifest
+    $record = if($manifest){ @($manifest.tools | Where-Object { $_.id -eq $ToolId }) | Select-Object -First 1 } else { $null }
+    $result = [ordered]@{
+        ToolId = $ToolId; Trusted = $false; Status = "local-untrusted"; Reason = "No tracked provenance record."
+        Lifecycle = "unclassified"; Source = "local"; Publisher = "unknown"; License = "unknown"
+        Version = "unknown"; RequiresEula = $false; EulaEnforced = $EulaEnforced
+        EDRGuidance = if($manifest){ [string]$manifest.policy.edrGuidance } else { "Do not run unclassified tools." }
+    }
+
+    if(!$record){ return [pscustomobject]$result }
+
+    $result.Lifecycle = [string]$record.lifecycle
+    $result.Source = [string]$record.source
+    $result.Publisher = [string]$record.publisher
+    $result.License = [string]$record.license
+    $result.RequiresEula = [bool]$record.eulaRequired
+
+    if(!$Path -or !(Test-Path -LiteralPath $Path -PathType Leaf)){
+        $result.Status = "missing"; $result.Reason = "Tracked executable is missing."
+        return [pscustomobject]$result
+    }
+
+    try { $result.Version = [string](Get-Item -LiteralPath $Path -ErrorAction Stop).VersionInfo.FileVersion } catch {}
+
+    if($record.lifecycle -in @("missing","deprecated")){
+        $result.Status = [string]$record.lifecycle; $result.Reason = "Lifecycle policy blocks this tool."
+        return [pscustomobject]$result
+    }
+    if($record.expiresUtc -and $NowUtc -gt ([datetime]::Parse([string]$record.expiresUtc).ToUniversalTime())){
+        $result.Status = "expired"; $result.Reason = "Provenance approval has expired."
+        return [pscustomobject]$result
+    }
+    if($record.eulaRequired -and !$EulaEnforced){
+        $result.Status = "eula-required"; $result.Reason = "Required EULA acceptance is not enforced."
+        return [pscustomobject]$result
+    }
+    if(!$record.sha256){
+        $result.Status = "hash-missing"; $result.Reason = "No approved SHA-256 is recorded."
+        return [pscustomobject]$result
+    }
+
+    $actualHash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+    if($actualHash -ne [string]$record.sha256){
+        $result.Status = "hash-mismatch"; $result.Reason = "Executable SHA-256 does not match provenance."
+        return [pscustomobject]$result
+    }
+
+    if($record.signatureRequired){
+        $signature = Get-AuthenticodeSignature -LiteralPath $Path
+        $subject = if($signature.SignerCertificate){ [string]$signature.SignerCertificate.Subject } else { "" }
+        if($signature.Status -ne "Valid" -or !$subject -or $subject -notlike ("*" + [string]$record.publisher + "*")){
+            $result.Status = "signature-invalid"; $result.Reason = "Authenticode signature or publisher does not match provenance."
+            return [pscustomobject]$result
+        }
+    }
+
+    $result.Trusted = $true; $result.Status = "trusted"; $result.Reason = "Hash, lifecycle, license, and required signature checks passed."
+    return [pscustomobject]$result
+
+}
+
 function Global:Test-NTKSysinternalsPath {
 
 param([string]$Path)
@@ -570,16 +670,22 @@ param([string]$Id)
 
             $arguments = @($tool.Arguments | Where-Object {$null -ne $_ -and $_ -ne ""})
 
+            $resolvedPath = (Resolve-Path $path).Path
+            $trust = Test-NTKExternalToolTrust -ToolId $tool.Id -Path $resolvedPath
             return [pscustomobject]@{
                 Id = $tool.Id
                 Name = $tool.Name
                 Group = $tool.Group
-                Path = (Resolve-Path $path).Path
+                Path = $resolvedPath
                 Arguments = $arguments
                 RequiresAdmin = [bool]$tool.RequiresAdmin
                 Console = [bool]$tool.Console
                 Notes = $tool.Notes
-                Found = $true
+                Found = [bool]$trust.Trusted
+                Present = $true
+                Trusted = [bool]$trust.Trusted
+                TrustStatus = $trust.Status
+                Provenance = $trust
             }
 
         }
@@ -598,6 +704,10 @@ param([string]$Id)
         Console = [bool]$tool.Console
         Notes = $tool.Notes
         Found = $false
+        Present = $false
+        Trusted = $false
+        TrustStatus = "missing"
+        Provenance = (Test-NTKExternalToolTrust -ToolId $tool.Id -Path "")
     }
 
 }
@@ -673,6 +783,10 @@ param(
     [string[]]$Arguments = @()
 )
 
+    if($Tool.PSObject.Properties.Name -contains "Trusted" -and !$Tool.Trusted){
+        throw "External tool launch blocked: $($Tool.TrustStatus)."
+    }
+
     $workingDirectory = Split-Path -Parent $Tool.Path
 
     if(!$workingDirectory){
@@ -702,7 +816,8 @@ param(
     $tool = Resolve-NTKExternalTool -Id $Id
 
     if(!$tool -or !$tool.Found){
-        Write-Host "External tool not found:" $Id -ForegroundColor Yellow
+        Write-Host "External tool unavailable or untrusted:" $Id -ForegroundColor Yellow
+        if($tool -and $tool.TrustStatus){ Write-Host "Trust status:" $tool.TrustStatus -ForegroundColor Yellow }
         Write-Host "Expected under:" (Get-NTKExternalToolRoot)
         return
     }
