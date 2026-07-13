@@ -1,7 +1,7 @@
 # TASK-0096 - GUI Background Operation Controller Extraction
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
