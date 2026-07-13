@@ -1,7 +1,7 @@
 # TASK-0095 - Canonical Analysis and Tool Metadata Architecture
 
 ## Status
-Queued
+Complete
 
 ## Owner
 Codex
@@ -23,3 +23,10 @@ RED-001, RED-002, RED-006, RED-008, RED-012, and PLG-016.
 
 ## Validation
 Duplicate-symbol checks, analysis comparison fixtures, and tool-catalog consistency tests.
+
+## Result
+- Removed filename-order HEPHAESTUS function overrides and documented distinct Quick Diagnosis, HEPHAESTUS, ARGUS, and Reporting responsibilities.
+- Added normalized canonical tool descriptors consumed by GUI tabs, search, and launch behavior, with external provenance validation.
+- Added required plugin discovery, compatibility, enablement, lifecycle, and failure-isolation contracts.
+- Defined distinct manifest responsibilities and canonical operation states.
+- Parser, canonical architecture fixtures, plugin fixtures, toolkit smoke, GUI smoke, button smoke, diagnostic analysis regression, and whitespace checks passed.

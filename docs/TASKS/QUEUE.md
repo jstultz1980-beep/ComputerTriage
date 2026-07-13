@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Active | Consolidate analysis/tool metadata sources and verify plugin modularity. |
+| `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit` | ChatGPT (Project Custodian) | Active | Review roadmap/backlog evidence, sequence, ownership boundaries, and counter reset. |
 
 ## Ordered Queue
 
@@ -35,6 +35,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0106-Roadmap-Backlog-Audit-Preparation` | Complete | Prepared deterministic Roadmap/Backlog threshold evidence without resetting the counter. |
+| `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Complete | Reconciled analysis roles, tool descriptors, plugin contracts, manifest roles, and operation states. |
 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Complete | Added masked/audited sensitive actions, explicit retention, selective verified encrypted transfer, atomic state, and Runtime/default separation. |
 | `TASK-0105-Project-Custodian-Build-System-Engineering-Audit` | Complete | Accepted the Build System audit, retained TASK-0100 for performance remediation, reset only Build System, and activated TASK-0094. |
 | `TASK-0104-Build-System-Audit-Preparation` | Complete | Prepared deterministic Build System threshold evidence without resetting the counter. |
@@ -49,8 +51,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0094 is complete and TASK-0095 is the only Active task.
-- No subsystem is gated.
+- TASK-0094 and TASK-0095 are complete.
+- Roadmap/Backlog reached `25 / 25` and remains gated pending Project Custodian review.
+- TASK-0107 is the only Active task; Codex implementation is paused.
 
 - TASK-0105 is complete and the Build System audit evidence is accepted.
 - Only Build System was reset from `25 / 25` to `0 / 25`.

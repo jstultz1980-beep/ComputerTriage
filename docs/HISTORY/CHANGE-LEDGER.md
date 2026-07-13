@@ -9,22 +9,31 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 13 / 25 | TASK-0094 artifact ownership, transfer, and runtime-state contracts. |
-| Documentation | 14 / 25 | TASK-0094 sensitive artifact and runtime-state policy. |
-| Task System | 20 / 25 | TASK-0094 completion and TASK-0095 activation. |
-| Evidence Collection and Deterministic Analysis | 9 / 25 | TASK-0094 classified selective evidence transfer. |
+| Architecture | 14 / 25 | TASK-0095 canonical analysis, tool metadata, plugin, and manifest contracts. |
+| Documentation | 15 / 25 | TASK-0095 contracts and Roadmap/Backlog audit evidence. |
+| Task System | 22 / 25 | TASK-0095 closeout, TASK-0106 preparation, and TASK-0107 activation. |
+| Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
-| UI | 1 / 25 | TASK-0094 explicit software-key reveal/copy/export actions. |
-| Plugin Framework | 5 / 25 | TASK-0094 artifact policy integration. |
-| Build System | 1 / 25 | TASK-0094 explicit portable mutable-path policy and Runtime layout. |
-| Validation/Test Framework | 7 / 25 | TASK-0094 sensitive artifact and concurrency fixtures. |
-| Roadmap/Backlog | 24 / 25 | Architecture stabilization advanced to TASK-0095. |
+| UI | 2 / 25 | TASK-0095 canonical descriptor-backed tabs, search, and launch registry. |
+| Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
+| Build System | 2 / 25 | TASK-0095 canonical package/trust descriptor validation and build metadata. |
+| Validation/Test Framework | 8 / 25 | TASK-0095 duplicate, descriptor, plugin, state, GUI, and analysis fixtures. |
+| Roadmap/Backlog | 25 / 25 | TASK-0095 completion triggered TASK-0106/TASK-0107 audit boundary. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0095-01 | 2026-07-13 | TASK-0095 | Architecture | +1 | Established canonical analysis roles, normalized tool descriptors, plugin contracts, manifest roles, and operation states. |
+| CHG-0095-02 | 2026-07-13 | TASK-0095 | Evidence Collection and Deterministic Analysis | +1 | Removed duplicate HEPHAESTUS symbols and assigned authoritative deterministic analysis ownership. |
+| CHG-0095-03 | 2026-07-13 | TASK-0095 | UI | +1 | Drove GUI tabs, search, and launch registry from canonical tool descriptors. |
+| CHG-0095-04 | 2026-07-13 | TASK-0095 | Plugin Framework | +1 | Enforced discovery, compatibility, enablement, lifecycle, and failure isolation. |
+| CHG-0095-05 | 2026-07-13 | TASK-0095 | Build System | +1 | Validated package/trust metadata through normalized external descriptors and updated build metadata. |
+| CHG-0095-06 | 2026-07-13 | TASK-0095 | Validation/Test Framework | +1 | Added duplicate-symbol, descriptor, plugin, operation-state, analysis-role, GUI, and regression checks. |
+| CHG-0095-07 | 2026-07-13 | TASK-0095 / TASK-0106 | Documentation | +1 | Documented canonical contracts and Roadmap/Backlog audit evidence. |
+| CHG-0095-08 | 2026-07-13 | TASK-0095 / TASK-0106 / TASK-0107 | Task System | +2 | Completed architecture work, prepared the roadmap audit, and activated Project Custodian review. |
+| CHG-0095-09 | 2026-07-13 | TASK-0106 / TASK-0107 | Roadmap/Backlog | +1 | Reconciled remaining task order and reached the 25 / 25 audit boundary. |
 | CHG-0094-01 | 2026-07-13 | TASK-0094 | Architecture | +1 | Defined artifact ownership, retention, transfer, immutable program, and writable Runtime contracts. |
 | CHG-0094-02 | 2026-07-13 | TASK-0094 | Evidence Collection and Deterministic Analysis | +1 | Added classified selective evidence transfer with verification and encryption. |
 | CHG-0094-03 | 2026-07-13 | TASK-0094 | Reporting | +1 | Masked licensing reports by default and classified unmasked exports Sensitive. |

@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260713090711,
-    "SourceUpdatedAt":  "2026-07-13T09:07:11.4780816-05:00",
-    "ReleaseNotes":  "TASK-0094 sensitive artifact handling, selective verified transfer, atomic runtime state, and immutable default separation."
+    "Build":  20260713091500,
+    "SourceUpdatedAt":  "2026-07-13T09:15:00.7402453-05:00",
+    "ReleaseNotes":  "TASK-0095 canonical analysis responsibilities, normalized tool descriptors, plugin contract, manifest roles, and operation states."
 }

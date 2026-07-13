@@ -17,9 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture`
+- `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit`
 
-TASK-0105 accepted the Build System audit and reset only Build System. TASK-0094 completed sensitive artifact and runtime-state remediation; architecture stabilization is active on TASK-0095.
+TASK-0094 and TASK-0095 are complete. Roadmap/Backlog reached `25 / 25`; TASK-0106 prepared evidence and TASK-0107 is the active Project Custodian audit.
 
 TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
 
@@ -42,9 +42,9 @@ Exit target:
 
 ## Architecture Stabilization
 
-Status: Active
+Status: Paused for Roadmap/Backlog audit
 
-1. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Active.
+1. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Complete.
 2. TASK-0096 GUI Background Operation Controller Extraction.
 3. TASK-0097 Architecture, Terminology, and Governance Consolidation.
 4. TASK-0098 Shared Reporting and Run Index Contracts.

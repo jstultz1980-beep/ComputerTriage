@@ -167,38 +167,9 @@ $plugins = Get-ChildItem -Path $NTKPaths.Plugins -Directory -ErrorAction Silentl
            Sort-Object Name
 
 foreach($plugin in $plugins){
-
-    $manifestFile = Join-Path $plugin.FullName "PluginManifest.psd1"
-    $pluginName = $plugin.Name
-    $enabled = $true
-    $scriptName = $plugin.Name + ".ps1"
-
-    if(Test-Path $manifestFile){
-
-        try{
-
-            $manifest = Import-PowerShellDataFile $manifestFile
-
-            if($manifest.Name){
-                $pluginName = $manifest.Name
-            }
-
-            if($manifest.ContainsKey("Enabled")){
-                $enabled = [bool]$manifest.Enabled
-            }
-
-            if($manifest.Script){
-                $scriptName = $manifest.Script
-            }
-
-        }
-        catch{
-            Add-NTKImportFailure -Stage 'Plugin manifest' -Name $plugin.Name -Path $manifestFile -Exception $_.Exception -Required $false
-            continue
-
-        }
-
-    }
+    try{$descriptor=Get-NTKPluginDescriptor -PluginPath $plugin.FullName}
+    catch{Add-NTKImportFailure -Stage 'Plugin manifest' -Name $plugin.Name -Path (Join-Path $plugin.FullName 'PluginManifest.psd1') -Exception $_.Exception -Required $false;continue}
+    $pluginName=$descriptor.Name;$enabled=$descriptor.Enabled
 
     if(!$enabled){
 
@@ -207,7 +178,8 @@ foreach($plugin in $plugins){
 
     }
 
-    $script = Join-Path $plugin.FullName $scriptName
+    if(!$descriptor.Compatible){Add-NTKImportFailure -Stage 'Plugin compatibility' -Name $pluginName -Path $descriptor.ManifestPath -Exception ([InvalidOperationException]::new($descriptor.CompatibilityReason)) -Required $false;continue}
+    $script = $descriptor.ScriptPath
 
     if(Test-Path $script){
 

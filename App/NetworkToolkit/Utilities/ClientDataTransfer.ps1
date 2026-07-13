@@ -214,6 +214,10 @@ function Copy-NTKClientData {
 
     $manifest | Add-Member -MemberType NoteProperty -Name ManifestPath -Value $manifestPath -Force
     $manifest | Add-Member -MemberType NoteProperty -Name Status -Value $(if($failures.Count -gt 0){"CompletedWithWarnings"}else{"Completed"}) -Force
+    $canonicalState=if($failures.Count -gt 0){'SucceededWithWarnings'}else{'Succeeded'}
+    $manifest | Add-Member -MemberType NoteProperty -Name state -Value $canonicalState -Force
+    $canonicalExitCode=if(Get-Command Get-NTKOperationExitCode -ErrorAction SilentlyContinue){Get-NTKOperationExitCode -State $canonicalState}else{if($failures.Count -gt 0){2}else{0}}
+    $manifest | Add-Member -MemberType NoteProperty -Name exitCode -Value $canonicalExitCode -Force
     return $manifest
 }
 $diagnosticIdentityModule = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "Core\Analysis\DiagnosticBundleIdentity.ps1"

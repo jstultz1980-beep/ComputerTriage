@@ -344,64 +344,6 @@ function Global:New-HEPTimeline {
     return $artifact
 }
 
-function Global:New-HEPFindings {
-    param(
-        [Parameter(Mandatory=$true)][string]$BundleRoot,
-        [object[]]$Inventory,
-        [object]$EvidenceScore
-    )
-
-    $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
-    $findings = @()
-    $counter = 1
-
-    foreach($category in @($EvidenceScore.categories)){
-        if($category.status -eq "missing"){
-            $id = "HEP-FINDING-{0:0000}" -f $counter
-            $findings += New-HEPFinding `
-                -Id $id `
-                -RuleId "HEP-RULE-EVIDENCE-001" `
-                -Title "Expected evidence category missing: $($category.category)" `
-                -Summary "The local analysis engine did not find evidence for $($category.category). Findings that depend on this category may be incomplete." `
-                -Severity "informational" `
-                -Confidence "confirmed" `
-                -Category "evidence" `
-                -Evidence @([ordered]@{ artifact = $BundleRoot; field = "category"; value = $category.category }) `
-                -Recommendations @("Confirm whether the collector is expected to gather $($category.category) evidence on this computer.") `
-                -Tags @("missing-evidence", $category.category)
-            $counter++
-        }
-    }
-
-    $artifact["findings"] = @($findings)
-    return $artifact
-}
-
-function Global:New-HEPBundleCapabilities {
-    param([Parameter(Mandatory=$true)][string]$BundleRoot)
-
-    return [ordered]@{
-        schemaVersion = "1.0"
-        generatedAtUtc = New-HEPAnalysisTimestamp
-        analysisEngineVersion = "1.0.0"
-        generator = "HEPHAESTUS Local Analysis Engine"
-        sourceBundle = New-HEPSourceBundleInfo -BundleRoot $BundleRoot
-        capabilities = [ordered]@{
-            machineProfile = "supported"
-            services = "partial"
-            processes = "planned"
-            drivers = "planned"
-            network = "partial"
-            storage = "partial"
-            updates = "partial"
-            domainHealth = "planned"
-            gpo = "planned"
-            localHtmlReport = "supported"
-        }
-        tools = @()
-    }
-}
-
 function Global:New-HEPSchemaVersionArtifact {
     param([Parameter(Mandatory=$true)][string]$BundleRoot)
 

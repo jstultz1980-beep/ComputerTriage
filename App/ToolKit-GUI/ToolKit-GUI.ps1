@@ -9114,24 +9114,16 @@ function Add-GUIToolRegistryMetadata {
 
 function Get-GUIToolRegistry {
     $items = New-Object System.Collections.ArrayList
-
-    foreach($tab in @(Get-GUIHeaderToolSearchTabs)){
-        $catalogTools = @(Get-GUICatalogTools -Tab $tab)
-        foreach($tool in $catalogTools){
-            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Tool Catalog"))
+    $resolver={param($tool) Get-GUICustomToolPlacement -Tool $tool}
+    foreach($descriptor in @(Get-NTKCanonicalToolDescriptors -CustomPlacementResolver $resolver)){
+        $tool=if($descriptor.Kind -eq 'Custom'){
+            $launchPath=$descriptor.LaunchPath.Replace("'","''")
+            New-GUIToolItem -Text $descriptor.Name -Description $descriptor.Description -Section $descriptor.Section -Action ([scriptblock]::Create("Start-GUICustomToolByLaunchPath -LaunchPath '$launchPath'"))
+        }else{
+            New-GUIToolItem -Text $descriptor.Name -Description $descriptor.Description -Section $descriptor.Section -FunctionName $(if($descriptor.Kind -eq 'Command'){$descriptor.EntryPoint}else{''}) -External $(if($descriptor.Kind -eq 'External'){$descriptor.ExternalId}else{''}) -ActionName $(if($descriptor.Kind -eq 'GuiAction'){$descriptor.EntryPoint}else{''}) -RequiresAdmin ([bool]$descriptor.RequiresAdmin)
         }
-
-        $sysinternalsTools = @(Get-GUIMappedSysinternalsItems -Tab $tab)
-        foreach($tool in $sysinternalsTools){
-            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Sysinternals"))
-        }
-
-        $existingTools = @($catalogTools + $sysinternalsTools)
-        foreach($tool in @(Get-GUICustomTabItems -Tab $tab -ExistingTools $existingTools)){
-            [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $tab -Source "Toolkit App"))
-        }
+        [void]$items.Add((Add-GUIToolRegistryMetadata -Tool $tool -Tab $descriptor.Tab -Source $descriptor.Source))
     }
-
     return @($items)
 }
 

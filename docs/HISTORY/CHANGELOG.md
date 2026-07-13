@@ -6,6 +6,8 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 - Completed TASK-0094 sensitive artifact handling and runtime-state safety; activated TASK-0095.
 - Added masked and audited sensitive-value actions, explicit artifact retention/pinning, selective verified encrypted transfer, locked atomic state, a dedicated Runtime tree, and immutable shipped defaults.
+- Completed TASK-0095 canonical analysis/tool metadata architecture and TASK-0106 Roadmap/Backlog Audit Preparation; activated TASK-0107 Project Custodian audit.
+- Removed duplicate analysis symbols, normalized tool descriptors, enforced plugin contracts, and documented distinct manifest/operation responsibilities.
 
 - Completed TASK-0105 Project Custodian Build System Engineering Audit.
 - Accepted the TASK-0104 evidence package and reset only Build System from `25 / 25` to `0 / 25`.

@@ -2359,6 +2359,10 @@ param(
 
     if($report){
 
+        $report | Add-Member -MemberType NoteProperty -Name AnalysisRole -Value 'InteractiveSnapshot' -Force
+        $report | Add-Member -MemberType NoteProperty -Name AuthoritativeDeterministicAnalysis -Value $false -Force
+        $report | Add-Member -MemberType NoteProperty -Name CanonicalAnalysisCommand -Value 'Invoke-HEPHAESTUSLocalAnalysis' -Force
+
         try {
             if($report.Fingerprint -and (Get-Command Save-NTKComputerFingerprint -ErrorAction SilentlyContinue)){
                 $fingerprintData = Save-NTKComputerFingerprint -Fingerprint $report.Fingerprint
