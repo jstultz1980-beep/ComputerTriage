@@ -9,24 +9,24 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 12 / 25 | Mandatory Codex operator closing instruction. |
-| Architecture | 6 / 25 | TASK-0087 parser-backed evidence and event-time contracts. |
-| Documentation | 6 / 25 | Completion-prompt governance documented across authoritative workflow files. |
-| Task System | 11 / 25 | Codex continuous queue progression and automatic audit-task transition. |
-| Evidence Collection and Deterministic Analysis | 6 / 25 | TASK-0087 parser-backed quality and structured error artifacts. |
-| ARGUS | 8 / 25 | TASK-0087 parser-failure and timestamp confidence handling. |
+| Architecture | 9 / 25 | TASK-0090 ARGUS citation and confidence contract. |
+| Documentation | 9 / 25 | TASK-0090 evidence plus completion-prompt governance. |
+| Task System | 14 / 25 | TASK-0090 completion and TASK-0091 activation. |
+| Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
+| ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
-| UI | 23 / 25 | TASK-0086 Analyze workflow bundle selection. |
-| Plugin Framework | 1 / 25 | No recent material change. |
-| Build System | 19 / 25 | TASK-0087 build metadata. |
-| Validation/Test Framework | 0 / 25 | TASK-0101 threshold audit completed. |
-| Roadmap/Backlog | 17 / 25 | Release-blocking remediation resumed with TASK-0088. |
+| UI | 24 / 25 | TASK-0088 GUI result-state and exit display. |
+| Plugin Framework | 2 / 25 | TASK-0088 per-step plugin outcome summary. |
+| Build System | 22 / 25 | TASK-0090 build metadata. |
+| Validation/Test Framework | 3 / 25 | TASK-0090 domain, priority, citation, and mixed-gap fixtures. |
+| Roadmap/Backlog | 20 / 25 | Remediation advanced to TASK-0091. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
 | CHG-GOV-0093 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Required every Codex stop-boundary summary to end with the exact operator instruction `Tell Debbie to continue`, or `Tell Debbie to address errors` for a genuine blocker, with no trailing text. |
-| CHG-DOC-0093 | 2026-07-12 | Governance maintenance | Documentation | +1 | Updated PROJECT.md, AGENTS.md, Codex operating instructions, autonomous-cycle policy, handoff, and changelog with the mandatory closing instruction. |
+| CHG-DOC-0093 | 2026-07-12 | Governance maintenance | Documentation | +1 | Updated authoritative workflow files with the mandatory closing instruction. |
 | CHG-GOV-0092 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Authorized one `Resume Work` instruction to continue through dependency-ready Codex tasks until an audit, Project Custodian, blocker, or user-only boundary. |
 | CHG-DOC-0092 | 2026-07-12 | Governance maintenance | Documentation | +1 | Added the autonomous work/audit policy and reusable Audit Preparation template. |
 | CHG-TASK-0092 | 2026-07-12 | Governance maintenance | Task System | +1 | Authorized Codex to activate the next ordered Codex task and automatically create/complete Audit Preparation before transferring to Project Custodian Engineering Audit. |
@@ -58,6 +58,30 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | CHG-0101-02 | 2026-07-12 | TASK-0101 | Documentation | +1 | Added audit evidence report. |
 | CHG-0101-03 | 2026-07-12 | TASK-0101 / TASK-0088 | Task System | +1 | Completed audit and activated TASK-0088. |
 | CHG-0101-04 | 2026-07-12 | TASK-0101 / TASK-0088 | Roadmap/Backlog | +1 | Cleared validation gate and resumed remediation. |
+| CHG-0088-01 | 2026-07-12 | TASK-0088 | Architecture | +1 | Added the canonical operation-result schema, terminal states, and exit-code mapping. |
+| CHG-0088-02 | 2026-07-12 | TASK-0088 | Evidence Collection and Deterministic Analysis | +1 | Propagated canonical states through triage and deterministic analysis. |
+| CHG-0088-03 | 2026-07-12 | TASK-0088 | ARGUS | +1 | Failed closed and suppressed recommendations after contract failure. |
+| CHG-0088-04 | 2026-07-12 | TASK-0088 | UI | +1 | Made safe-runner completion text depend on canonical exit state. |
+| CHG-0088-05 | 2026-07-12 | TASK-0088 | Plugin Framework | +1 | Added per-step repair outcome propagation. |
+| CHG-0088-06 | 2026-07-12 | TASK-0088 | Validation/Test Framework | +1 | Added terminal-state, CLI failure, and ARGUS suppression fixtures. |
+| CHG-0088-07 | 2026-07-12 | TASK-0088 | Build System | +1 | Updated accepted implementation build metadata. |
+| CHG-0088-08 | 2026-07-12 | TASK-0088 | Documentation | +1 | Recorded implementation and validation evidence. |
+| CHG-0088-09 | 2026-07-12 | TASK-0088 / TASK-0089 | Task System | +1 | Completed TASK-0088 and activated TASK-0089. |
+| CHG-0088-10 | 2026-07-12 | TASK-0088 / TASK-0089 | Roadmap/Backlog | +1 | Advanced dependency-ordered remediation to bundle integrity. |
+| CHG-0089-01 | 2026-07-12 | TASK-0089 | Architecture | +1 | Defined final sidecar bundle integrity and collection outcome contracts. |
+| CHG-0089-02 | 2026-07-12 | TASK-0089 | Evidence Collection and Deterministic Analysis | +1 | Added final hash verification, tamper detection, and complete collector/capability outcomes. |
+| CHG-0089-03 | 2026-07-12 | TASK-0089 | Validation/Test Framework | +1 | Added integrity, tamper, nonzero, missing-executable, and failed-collector fixtures. |
+| CHG-0089-04 | 2026-07-12 | TASK-0089 | Build System | +1 | Updated accepted implementation build metadata. |
+| CHG-0089-05 | 2026-07-12 | TASK-0089 | Documentation | +1 | Recorded implementation and validation evidence. |
+| CHG-0089-06 | 2026-07-12 | TASK-0089 / TASK-0090 | Task System | +1 | Completed TASK-0089 and activated TASK-0090. |
+| CHG-0089-07 | 2026-07-12 | TASK-0089 / TASK-0090 | Roadmap/Backlog | +1 | Advanced remediation to ARGUS correctness. |
+| CHG-0090-01 | 2026-07-12 | TASK-0090 | Architecture | +1 | Tightened immutable citation and confidence-bound contracts. |
+| CHG-0090-02 | 2026-07-12 | TASK-0090 | ARGUS | +1 | Corrected domain matching, priority ordering, citation identity, gap isolation, and confidence bounds. |
+| CHG-0090-03 | 2026-07-12 | TASK-0090 | Validation/Test Framework | +1 | Added exact-domain, all-priority, citation, and mixed-gap fixtures. |
+| CHG-0090-04 | 2026-07-12 | TASK-0090 | Build System | +1 | Updated build metadata. |
+| CHG-0090-05 | 2026-07-12 | TASK-0090 | Documentation | +1 | Recorded implementation evidence. |
+| CHG-0090-06 | 2026-07-12 | TASK-0090 / TASK-0091 | Task System | +1 | Completed TASK-0090 and activated TASK-0091. |
+| CHG-0090-07 | 2026-07-12 | TASK-0090 / TASK-0091 | Roadmap/Backlog | +1 | Advanced remediation to transaction safety. |
 
 ## Audit Closeout
 
