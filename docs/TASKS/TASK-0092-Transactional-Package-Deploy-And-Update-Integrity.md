@@ -1,7 +1,7 @@
 # TASK-0092 - Transactional Package, Deploy, and Update Integrity
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex
