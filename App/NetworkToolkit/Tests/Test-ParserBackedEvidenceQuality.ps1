@@ -13,6 +13,7 @@ Invoke-NTKCollectorSection -Status $sectionStatus -Name 'inner-failure-fixture' 
 Assert-True ($sectionStatus[0].State -eq 'Failed') 'Collector section reported Completed after an inner writer failure.'
 
 $root = Join-Path $env:TEMP ("TASK-0087-" + [guid]::NewGuid().ToString("N"))
+$Global:NTKPaths = [pscustomobject]@{ Data = (Join-Path $root 'Runtime\Data') }
 New-Item -ItemType Directory -Path (Join-Path $root "Metadata") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $root "CommandOutput") -Force | Out-Null
 try {

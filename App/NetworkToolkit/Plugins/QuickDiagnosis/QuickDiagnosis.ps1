@@ -2,7 +2,7 @@ function Global:Convert-NTKHtml {
 
 param([object]$Value)
 
-    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+    return ConvertTo-NTKReportHtml -Value $Value
 
 }
 
@@ -317,6 +317,10 @@ $remediationChecklist
 "@
 
     $html | Set-Content -Path $htmlPath -Encoding UTF8
+    $runIdentity = Resolve-NTKReportRunIdentity -InputObject $Report
+    if($Report.Fingerprint){ try { $Report.Fingerprint | Add-Member -NotePropertyName RunIdentity -NotePropertyValue $runIdentity -Force } catch {} }
+    $metadata = New-NTKReportMetadata -ReportType 'quick-diagnosis' -Title 'Network Toolkit Quick Diagnosis' -Format html -RunIdentity $runIdentity -Limitations @('Point-in-time diagnostic summary; confirm findings before remediation.')
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $htmlPath -ArtifactType 'quick-diagnosis-report' -ReportMetadata $metadata)
     return $htmlPath
 
 }

@@ -1,6 +1,7 @@
 $ErrorActionPreference='Stop'
 $repoRoot=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 . (Join-Path $repoRoot 'App\NetworkToolkit\Utilities\AtomicState.ps1')
+. (Join-Path $repoRoot 'App\NetworkToolkit\Utilities\ReportingContract.ps1')
 . (Join-Path $repoRoot 'App\NetworkToolkit\Utilities\ArtifactPolicy.ps1')
 . (Join-Path $repoRoot 'App\NetworkToolkit\Utilities\ReportingRetention.ps1')
 . (Join-Path $repoRoot 'App\NetworkToolkit\Utilities\ComputerState.ps1')

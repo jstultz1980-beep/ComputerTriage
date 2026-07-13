@@ -12,13 +12,12 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Active | Create shared reporting metadata, escaping helpers, and immutable run indexing. |
+| `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Active | Add repository-wide parser, load, negative-path, package, and regression gates. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 7 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
 | 8 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs. |
 | 9 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
 
@@ -26,6 +25,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Complete | Added canonical report metadata and escaping plus immutable run/artifact indexing with explicit stale and missing state. |
 | `TASK-0110-Task-System-Consistency-Cleanup` | Complete | Resolved accepted identity, status, Error Handoff, supersession, and punch-list consistency debt. |
 | `TASK-0109-Project-Custodian-Task-System-Engineering-Audit` | Complete | Accepted the Task System audit, reset only Task System, recorded six debt dispositions, and activated TASK-0110. |
 | `TASK-0108-Task-System-Audit-Preparation` | Complete | Prepared Task System threshold evidence, preserved the `25 / 25` counter, and transferred review to TASK-0109. |
@@ -34,9 +34,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0110 is complete and all required consistency and workflow simulations passed.
-- TASK-0098 is the sole Active task.
-- The remaining order is TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- TASK-0098 is complete and all reporting/run-index fixtures and regressions passed.
+- TASK-0099 is the sole Active task.
+- The remaining order is TASK-0099, TASK-0100, TASK-0080.
 - TASK-0109 accepted the TASK-0108 evidence package.
 - Only Task System was reset from `25 / 25` to `0 / 25`.
 - Net-new feature work remains deferred.

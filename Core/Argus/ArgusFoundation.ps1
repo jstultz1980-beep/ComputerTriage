@@ -541,6 +541,8 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-ARGUSJsonFile -Path $recommendationsPath -InputObject $grouping.Recommendations
     Write-ARGUSMarkdownReport -Path $reportPath -Validation $validation -Summary $summary
     $finalReports = Write-ARGUSFinalReports -ArgusRoot $argusRoot -Validation $validation -Summary $summary -NormalizedAnalysis $normalizedAnalysis -DiagnosticGroups $grouping.DiagnosticGroups -Recommendations $grouping.Recommendations
+    $foundationMetadata = New-NTKReportMetadata -ReportType 'argus-foundation' -Title 'ARGUS Foundation Report' -Format markdown -RunIdentity $script:ARGUSBundleValidation.Identity -SourceArtifacts @('ARGUS/input-validation.json','ARGUS/analysis-summary.json') -Limitations @('Foundation summary; review cited structured artifacts before drawing conclusions.')
+    [void](Register-NTKRunArtifact -RunIdentity $script:ARGUSBundleValidation.Identity -Path $reportPath -ArtifactType 'argus-foundation-report' -ReportMetadata $foundationMetadata)
 
     Write-Host "ARGUS Foundation completed." -ForegroundColor Green
     Write-Host "Bundle root: $BundleRoot"

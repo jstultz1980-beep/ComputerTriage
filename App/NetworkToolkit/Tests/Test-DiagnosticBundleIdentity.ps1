@@ -21,6 +21,7 @@ function New-TestBundle {
 
 $testRoot = Join-Path $env:TEMP ("TASK-0086-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $testRoot | Out-Null
+$Global:NTKPaths = [pscustomobject]@{ Data = (Join-Path $testRoot 'Runtime\Data') }
 try {
     $bundleA = Join-Path $testRoot "Computer-A"
     New-TestBundle -Root $bundleA -RunId "RUN-COMPUTER-A-001" -ComputerName "COMPUTER-A-FIXTURE" -StartedUtc "2026-07-10T10:00:00Z"

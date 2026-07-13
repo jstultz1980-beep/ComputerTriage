@@ -3,10 +3,15 @@
 # ARGUS first-release technician and escalation reports
 # =====================================================================
 
+$reportingContractModule = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'App\NetworkToolkit\Utilities\ReportingContract.ps1'
+if(!(Get-Command New-NTKReportMetadata -ErrorAction SilentlyContinue)){
+    if(!(Test-Path -LiteralPath $reportingContractModule)){ throw "Reporting contract module not found: $reportingContractModule" }
+    . $reportingContractModule
+}
+
 function Global:ConvertTo-ARGUSReportText {
     param([object]$Value)
-    if($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)){ return "Not available" }
-    return ((([string]$Value) -replace "`r?`n", " ") -replace "\|", "\|").Trim()
+    return ConvertTo-NTKReportMarkdown -Value $Value
 }
 
 function Global:Format-ARGUSReportCitation {
@@ -135,5 +140,12 @@ function Global:Write-ARGUSFinalReports {
     $escalationPath = Join-Path $ArgusRoot "escalation-report.md"
     Write-ARGUSTechnicianReport -Path $technicianPath -Validation $Validation -Summary $Summary -NormalizedAnalysis $NormalizedAnalysis -DiagnosticGroups $DiagnosticGroups -Recommendations $Recommendations
     Write-ARGUSEscalationReport -Path $escalationPath -Validation $Validation -Summary $Summary -NormalizedAnalysis $NormalizedAnalysis -DiagnosticGroups $DiagnosticGroups -Recommendations $Recommendations
+    $identity = $Summary.sourceBundle
+    $sourceArtifacts = @('ARGUS/input-validation.json','ARGUS/analysis-summary.json','ARGUS/normalized-analysis.json','ARGUS/diagnostic-groups.json','ARGUS/recommendations.json')
+    $limitations = @('Technician guidance only; no remediation is performed.','Missing evidence limits supported conclusions.')
+    $technicianMetadata = New-NTKReportMetadata -ReportType 'argus-technician' -Title 'ARGUS Technician Report' -Format markdown -RunIdentity $identity -SourceArtifacts $sourceArtifacts -Limitations $limitations
+    $escalationMetadata = New-NTKReportMetadata -ReportType 'argus-escalation' -Title 'ARGUS Escalation Handoff' -Format markdown -RunIdentity $identity -SourceArtifacts $sourceArtifacts -Limitations $limitations
+    [void](Register-NTKRunArtifact -RunIdentity $identity -Path $technicianPath -ArtifactType 'argus-technician-report' -ReportMetadata $technicianMetadata)
+    [void](Register-NTKRunArtifact -RunIdentity $identity -Path $escalationPath -ArtifactType 'argus-escalation-report' -ReportMetadata $escalationMetadata)
     return [pscustomobject]@{ TechnicianReport = $technicianPath; EscalationReport = $escalationPath }
 }

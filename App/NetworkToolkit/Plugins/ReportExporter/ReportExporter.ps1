@@ -4,9 +4,13 @@ function Global:Get-NTKReportFiles {
         return @()
     }
 
-    return Get-ChildItem -Path $NTKPaths.Exports -File -ErrorAction SilentlyContinue |
-           Where-Object {$_.Extension -in ".html",".htm",".json",".csv",".txt",".log",".xml"} |
-           Sort-Object LastWriteTime -Descending
+    $indexed = @(Get-NTKIndexedRunArtifacts | Where-Object { $_.State -eq 'Available' -and $_.Artifact.path -like "$($NTKPaths.Exports)*" })
+    $indexedFiles = @($indexed | ForEach-Object { Get-Item -LiteralPath $_.Artifact.path } | Group-Object FullName | ForEach-Object { $_.Group | Select-Object -First 1 })
+    $indexedPaths = @($indexedFiles | ForEach-Object FullName)
+    $legacyFiles = @(Get-ChildItem -Path $NTKPaths.Exports -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -in ".html",".htm",".json",".csv",".txt",".log",".xml" -and $_.FullName -notin $indexedPaths } |
+        Sort-Object Name -Descending)
+    return @($indexedFiles) + @($legacyFiles)
 
 }
 

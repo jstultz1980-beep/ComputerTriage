@@ -86,7 +86,7 @@ param([object]$Value)
         return ""
     }
 
-    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+    return ConvertTo-NTKReportHtml -Value $Value
 
 }
 
@@ -570,6 +570,10 @@ param(
     ConvertTo-NTKComputerFingerprintHtml -Fingerprint $Fingerprint |
         Set-Content -Path $htmlPath -Encoding UTF8
 
+    $runIdentity = Resolve-NTKReportRunIdentity -InputObject $Fingerprint
+    $metadata = New-NTKReportMetadata -ReportType 'computer-fingerprint' -Title 'Computer Profile' -Format html -RunIdentity $runIdentity -Limitations @('Point-in-time local inventory; values may change after collection.')
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $htmlPath -ArtifactType 'computer-fingerprint-html' -ReportMetadata $metadata)
+
     return $htmlPath
 
 }
@@ -615,6 +619,7 @@ param(
     }
 
     $jsonPath = Join-Path $root "$fileBase.json"
+    $runIdentity = Resolve-NTKReportRunIdentity -InputObject $Fingerprint
 
     $Fingerprint |
         ConvertTo-Json -Depth 8 |
@@ -632,6 +637,8 @@ param(
     }
 
     $htmlPath = Export-NTKComputerFingerprintHtml -Fingerprint $Fingerprint -JsonPath $jsonPath
+    $jsonMetadata = New-NTKReportMetadata -ReportType 'computer-fingerprint-data' -Title 'Computer Profile Data' -Format json -RunIdentity $runIdentity -Limitations @('Point-in-time local inventory; values may change after collection.')
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $jsonPath -ArtifactType 'computer-fingerprint-json' -ReportMetadata $jsonMetadata)
 
     return [pscustomobject]@{
         Json = $jsonPath

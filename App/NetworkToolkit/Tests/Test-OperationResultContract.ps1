@@ -20,6 +20,7 @@ $process = Start-Process powershell.exe -ArgumentList @('-NoProfile','-Execution
 Assert-True ($process.ExitCode -eq 1) "Thrown/missing CLI command returned exit code $($process.ExitCode), expected 1."
 
 $root = Join-Path $env:TEMP ('TASK-0088-' + [guid]::NewGuid().ToString('N'))
+$Global:NTKPaths = [pscustomobject]@{ Data = (Join-Path $root 'Runtime\Data') }
 New-Item -ItemType Directory -Path (Join-Path $root 'Metadata') -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $root 'CommandOutput') -Force | Out-Null
 try {

@@ -1567,6 +1567,8 @@ param(
     $jsonPath = "$basePath.json"
     $textPath = "$basePath.txt"
 
+    $runIdentity = Resolve-NTKReportRunIdentity -InputObject $Report
+
     $Report | ConvertTo-Json -Depth 8 | Set-Content -Path $jsonPath -Encoding UTF8
 
     $lines = @()
@@ -1618,6 +1620,12 @@ param(
     }
 
     $lines | Set-Content -Path $textPath -Encoding UTF8
+
+    $limitations = @('Point-in-time triage report; validate findings before remediation.')
+    $jsonMetadata = New-NTKReportMetadata -ReportType 'full-triage-data' -Title 'NTK Full Computer Triage Data' -Format json -RunIdentity $runIdentity -Limitations $limitations
+    $textMetadata = New-NTKReportMetadata -ReportType 'full-triage-summary' -Title 'NTK Full Computer Triage' -Format text -RunIdentity $runIdentity -Limitations $limitations
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $jsonPath -ArtifactType 'full-triage-json' -ReportMetadata $jsonMetadata)
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $textPath -ArtifactType 'full-triage-text' -ReportMetadata $textMetadata)
 
     return [pscustomobject]@{
         Json = $jsonPath

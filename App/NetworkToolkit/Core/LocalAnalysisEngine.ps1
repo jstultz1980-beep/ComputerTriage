@@ -3,6 +3,9 @@
 $diagnosticIdentityModule = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "Core\Analysis\DiagnosticBundleIdentity.ps1"
 if(!(Test-Path -LiteralPath $diagnosticIdentityModule)){ throw "Diagnostic bundle identity module not found: $diagnosticIdentityModule" }
 . $diagnosticIdentityModule
+$reportingContractModule = Join-Path (Split-Path -Parent $PSScriptRoot) "Utilities\ReportingContract.ps1"
+if(!(Test-Path -LiteralPath $reportingContractModule)){ throw "Reporting contract module not found: $reportingContractModule" }
+. $reportingContractModule
 $script:HEPAppRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 # LocalAnalysisEngine.ps1
 # HEPHAESTUS Local Analysis Engine v1 - Minimal Vertical Slice
@@ -367,9 +370,7 @@ function Global:New-HEPSchemaVersionArtifact {
 
 function Global:ConvertTo-HEPHtmlText {
     param([object]$Value)
-
-    if($null -eq $Value){ return "" }
-    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+    return ConvertTo-NTKReportHtml -Value $Value
 }
 
 function Global:Write-HEPHtmlReport {
@@ -480,7 +481,10 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
         Write-HEPJsonFile -Path (Join-Path $analysisRoot "findings.json") -InputObject $findings
         Write-HEPJsonFile -Path (Join-Path $metadataRoot "bundle-capabilities.json") -InputObject $capabilities
         Write-HEPJsonFile -Path (Join-Path $metadataRoot "schema-version.json") -InputObject $schemaVersion
-        Write-HEPHtmlReport -Path (Join-Path $analysisRoot "report.html") -Findings $findings -EvidenceScore $evidenceScore -MachineProfile $machineProfile
+        $reportPath = Join-Path $analysisRoot "report.html"
+        Write-HEPHtmlReport -Path $reportPath -Findings $findings -EvidenceScore $evidenceScore -MachineProfile $machineProfile
+        $reportMetadata = New-NTKReportMetadata -ReportType 'hephaestus-local-analysis' -Title 'HEPHAESTUS Local Analysis Report' -Format html -RunIdentity $script:HEPBundleValidation.Identity -SourceArtifacts @('Analysis/findings.json','Analysis/evidence-score.json','Analysis/normalized/machine-profile.json') -Limitations @('Deterministic local analysis; review evidence completeness before drawing conclusions.')
+        [void](Register-NTKRunArtifact -RunIdentity $script:HEPBundleValidation.Identity -Path $reportPath -ArtifactType 'hephaestus-report' -ReportMetadata $reportMetadata)
 
         Write-Host "HEPHAESTUS Local Analysis completed." -ForegroundColor Green
         Write-Host "Bundle root: $BundleRoot"

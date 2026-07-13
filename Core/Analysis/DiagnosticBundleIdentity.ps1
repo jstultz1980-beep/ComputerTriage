@@ -120,10 +120,17 @@ function Global:Get-NTKDefaultDiagnosticBundleRoot {
     foreach($root in $roots){
         $candidate = Test-NTKDiagnosticBundle -BundleRoot $root -PassThru
         if($candidate.Valid){
+            if(Get-Command Register-NTKRunIdentity -ErrorAction SilentlyContinue){ [void](Register-NTKRunIdentity -RunIdentity $candidate.Identity) }
             $started = [datetime]::MinValue
             [void][datetime]::TryParse($candidate.Identity.collectionStartedUtc,[ref]$started)
             $valid += [pscustomobject]@{ Root=$candidate.BundleRoot; Started=$started; RunId=$candidate.Identity.runId }
         }
+    }
+    if(Get-Command Get-NTKRunIndex -ErrorAction SilentlyContinue){
+        $resolvedSearchRoot = (Resolve-Path -LiteralPath $SearchRoot).Path.TrimEnd('\','/')
+        $indexed = @(Get-NTKRunIndex | Where-Object { $_.bundleRoot -and ([IO.Path]::GetFullPath([string]$_.bundleRoot).TrimEnd('\','/')).StartsWith($resolvedSearchRoot,[StringComparison]::OrdinalIgnoreCase) } |
+            Sort-Object @{Expression={[datetimeoffset]$_.collectionStartedUtc};Descending=$true},@{Expression={$_.runId};Descending=$true}) | Select-Object -First 1
+        if($indexed -and (Test-Path -LiteralPath $indexed.bundleRoot -PathType Container)){ return [string]$indexed.bundleRoot }
     }
     $selected = $valid | Sort-Object Started,RunId -Descending | Select-Object -First 1
     if(!$selected){ throw "No valid diagnostic bundles were found under: $SearchRoot" }

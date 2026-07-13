@@ -1334,7 +1334,7 @@ param([object[]]$Events = @())
 
     $safeComputer = if($env:COMPUTERNAME){($env:COMPUTERNAME -replace '[^A-Za-z0-9._-]+','_')}else{"Computer"}
     $reportPath = Join-Path $outputRoot ("crash-event-summary-{0}-{1}.html" -f $safeComputer,(Get-Date -Format "yyyyMMdd-HHmmss"))
-    $encode = { param($Value) [System.Net.WebUtility]::HtmlEncode([string]$Value) }
+    $encode = { param($Value) ConvertTo-NTKReportHtml -Value $Value }
 
     $rows = if(@($Events).Count -gt 0){
         (@($Events | Select-Object -First 40 | ForEach-Object {
@@ -1357,6 +1357,9 @@ body{margin:0;background:#eef2f6;color:#1f2933;font-family:"Segoe UI",Arial,sans
 "@
 
     $html | Set-Content -Path $reportPath -Encoding UTF8
+    $runIdentity = Resolve-NTKReportRunIdentity -InputObject $null -ComputerName $env:COMPUTERNAME
+    $metadata = New-NTKReportMetadata -ReportType 'crash-event-summary' -Title 'Network Toolkit Crash Event Summary' -Format html -RunIdentity $runIdentity -Limitations @('Event evidence does not prove a blue screen or retained dump file.')
+    [void](Register-NTKRunArtifact -RunIdentity $runIdentity -Path $reportPath -ArtifactType 'crash-event-summary-report' -ReportMetadata $metadata)
     return $reportPath
 
 }

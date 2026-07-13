@@ -9,22 +9,29 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
-| Architecture | 16 / 25 | TASK-0097 intended-state runtime boundaries, contracts, flow, and failure behavior. |
-| Documentation | 19 / 25 | TASK-0110 Task System consistency reconciliation and validation record. |
-| Task System | 1 / 25 | TASK-0110 completion and TASK-0098 activation. |
+| Architecture | 17 / 25 | TASK-0098 shared report metadata and immutable run-index contract. |
+| Documentation | 20 / 25 | TASK-0098 reporting/run-index contract and validation record. |
+| Task System | 2 / 25 | TASK-0098 completion and TASK-0099 activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
-| Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
+| Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
 | UI | 3 / 25 | TASK-0096 Analyze and Triage lifecycle migration. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 3 / 25 | TASK-0096 build metadata. |
-| Validation/Test Framework | 9 / 25 | TASK-0096 background lifecycle and leak fixtures. |
-| Roadmap/Backlog | 4 / 25 | Advanced architecture stabilization to TASK-0098. |
+| Build System | 4 / 25 | TASK-0098 build metadata. |
+| Validation/Test Framework | 10 / 25 | TASK-0098 report snapshot, ordering, immutability, stale, and missing fixtures. |
+| Roadmap/Backlog | 5 / 25 | Advanced architecture stabilization to TASK-0099. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0098-01 | 2026-07-13 | TASK-0098 | Architecture | +1 | Defined shared report metadata, escaping, immutable run identity, artifact record, ordering, and state contracts. |
+| CHG-0098-02 | 2026-07-13 | TASK-0098 | Reporting | +1 | Integrated canonical metadata and escaping across identified report families with explicit available, stale, and missing resolution. |
+| CHG-0098-03 | 2026-07-13 | TASK-0098 | Validation/Test Framework | +1 | Added snapshot, escaping, multiple-run, immutable-conflict, stale, and deleted artifact fixtures. |
+| CHG-0098-04 | 2026-07-13 | TASK-0098 | Documentation | +1 | Documented the reporting and run-index contract plus complete validation evidence. |
+| CHG-0098-05 | 2026-07-13 | TASK-0098 | Build System | +1 | Updated toolkit build metadata for the reporting/run-index implementation. |
+| CHG-0098-06 | 2026-07-13 | TASK-0098 / TASK-0099 | Task System | +1 | Completed TASK-0098 and activated repository-wide validation work. |
+| CHG-0098-07 | 2026-07-13 | TASK-0098 / TASK-0099 | Roadmap/Backlog | +1 | Advanced architecture stabilization to the repository-wide validation foundation. |
 | CHG-0110-01 | 2026-07-13 | TASK-0110 | Documentation | +1 | Reconciled task aliases, terminal vocabulary, supersession, resolved Error Handoff history, and punch-list evidence. |
 | CHG-0110-02 | 2026-07-13 | TASK-0110 / TASK-0098 | Task System | +1 | Completed consistency cleanup and activated TASK-0098. |
 | CHG-0110-03 | 2026-07-13 | TASK-0110 / TASK-0098 | Roadmap/Backlog | +1 | Advanced the approved sequence to shared reporting and run-index contracts. |

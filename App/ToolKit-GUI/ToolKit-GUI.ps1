@@ -12454,7 +12454,7 @@ function Import-GUIAIAnalysis {
         foreach($property in @('computerName','riskLevel','executiveSummary','findings','rootCauseCandidates','missingEvidence','technicianChecklist')){
             if(!$analysis.PSObject.Properties[$property]){ throw "The imported JSON is missing required field: $property" }
         }
-        $encode = { param($value) [System.Net.WebUtility]::HtmlEncode([string]$value) }
+        $encode = { param($value) ConvertTo-NTKReportHtml -Value $value }
         $findings = @($analysis.findings | ForEach-Object {
             $evidence = @($_.evidence) -join '<br>'
             "<tr><td>$( & $encode $_.severity )</td><td>$( & $encode $_.title )</td><td>$( & $encode $evidence )</td><td>$( & $encode $_.impact )</td><td>$( & $encode $_.confidence )</td><td>$( & $encode $_.nextAction )</td></tr>"
@@ -12485,7 +12485,7 @@ function Export-GUIFinalComputerReport {
     if(!$sections -or !$sections.AIAnalysis -or !$sections.AIAnalysis.Data){ throw "Import an AI analysis JSON for $ComputerName first." }
     $ai = $sections.AIAnalysis.Data
     $quick = if($sections.QuickDiagnosis){$sections.QuickDiagnosis.Data}else{$null}
-    $enc = { param($v) [System.Net.WebUtility]::HtmlEncode([string]$v) }
+    $enc = { param($v) ConvertTo-NTKReportHtml -Value $v }
     $findings = @($ai.findings | ForEach-Object { "<tr><td>$( & $enc $_.severity )</td><td>$( & $enc $_.title )</td><td>$( & $enc (@($_.evidence) -join '<br>') )</td><td>$( & $enc $_.nextAction )</td></tr>" }) -join "`n"
     $checklist = @($ai.technicianChecklist | ForEach-Object { "<li>$( & $enc $_ )</li>" }) -join "`n"
     $problems = if($quick -and $quick.Problems){@($quick.Problems | ForEach-Object { "<li><strong>$( & $enc ("$($_.Area) - $($_.Check)") )</strong>: $( & $enc $_.Detail )</li>" }) -join "`n"}else{'<li>No saved Quick Diagnosis findings were available.</li>'}

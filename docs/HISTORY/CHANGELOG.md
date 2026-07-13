@@ -4,6 +4,10 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Completed TASK-0098 shared reporting and run-index contracts and activated TASK-0099.
+- Centralized report escaping and metadata, indexed report artifacts by immutable run identity, replaced ambiguous latest ordering, and made stale/deleted artifact state explicit.
+- Passed all repository fixture suites plus parser, toolkit smoke, GUI smoke, and button-smoke validation.
+
 - Completed TASK-0110 Task System consistency cleanup and activated TASK-0098.
 - Standardized current task terminal status, recorded superseded replacements, compacted the Clear Error Handoff, preserved resolved incident history, and closed plugin-modularity punch item 61.
 
