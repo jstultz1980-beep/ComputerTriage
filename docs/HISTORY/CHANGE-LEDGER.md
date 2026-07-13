@@ -9,17 +9,17 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 10 / 25 | Mandatory remote synchronization verification added to `Resume Work`. |
-| Architecture | 4 / 25 | TASK-0084 architecture and quality audit closeout. |
-| Documentation | 1 / 25 | TASK-0084 final audit reports after TASK-0085 reset. |
-| Task System | 7 / 25 | TASK-0084 remediation task creation and queue reordering. |
-| Evidence Collection and Deterministic Analysis | 4 / 25 | No audit-closeout implementation change. |
-| ARGUS | 6 / 25 | No audit-closeout implementation change. |
-| Reporting | 2 / 25 | No audit-closeout implementation change. |
-| UI | 22 / 25 | No audit-closeout implementation change. |
+| Architecture | 6 / 25 | TASK-0087 parser-backed evidence and event-time contracts. |
+| Documentation | 3 / 25 | TASK-0087 implementation and validation evidence. |
+| Task System | 9 / 25 | TASK-0087 completion and TASK-0101 activation. |
+| Evidence Collection and Deterministic Analysis | 6 / 25 | TASK-0087 parser-backed quality and structured error artifacts. |
+| ARGUS | 8 / 25 | TASK-0087 parser-failure and timestamp confidence handling. |
+| Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
+| UI | 23 / 25 | TASK-0086 Analyze workflow bundle selection. |
 | Plugin Framework | 1 / 25 | No audit-closeout implementation change. |
-| Build System | 17 / 25 | No audit-closeout implementation change. |
-| Validation/Test Framework | 23 / 25 | No audit-closeout implementation change. |
-| Roadmap/Backlog | 14 / 25 | TASK-0084 dependency-based remediation roadmap. |
+| Build System | 19 / 25 | TASK-0087 build metadata. |
+| Validation/Test Framework | 25 / 25 | TASK-0087 fixtures; TASK-0101 audit required. |
+| Roadmap/Backlog | 16 / 25 | TASK-0101 audit inserted before TASK-0088. |
 
 ## Current Ledger Entries
 
@@ -41,6 +41,14 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 | CHG-0086-08 | 2026-07-12 | TASK-0086 | Documentation | +1 | Recorded TASK-0086 implementation and validation evidence. |
 | CHG-0086-09 | 2026-07-12 | TASK-0086 / TASK-0087 | Task System | +1 | Completed TASK-0086 and activated TASK-0087 in remediation order. |
 | CHG-0086-10 | 2026-07-12 | TASK-0086 | Roadmap/Backlog | +1 | Advanced release-blocking remediation to parser-backed evidence quality and timeline semantics. |
+| CHG-0087-01 | 2026-07-12 | TASK-0087 | Architecture | +1 | Defined parser-backed evidence-quality and source-event-time timeline contracts. |
+| CHG-0087-02 | 2026-07-12 | TASK-0087 | Evidence Collection and Deterministic Analysis | +1 | Separated discovery, parsing, semantics, and coverage and emitted structured export-error envelopes. |
+| CHG-0087-03 | 2026-07-12 | TASK-0087 | ARGUS | +1 | Downgraded evidence quality for parser failures and tied timeline confidence to source-event-time semantics. |
+| CHG-0087-04 | 2026-07-12 | TASK-0087 | Validation/Test Framework | +1 | Added parser-quality, safe-export, event/copy timestamp, and ARGUS confidence regression fixtures, reaching 25 / 25. |
+| CHG-0087-05 | 2026-07-12 | TASK-0087 | Documentation | +1 | Recorded TASK-0087 implementation and validation evidence. |
+| CHG-0087-06 | 2026-07-12 | TASK-0087 / TASK-0101 | Task System | +1 | Completed TASK-0087 and activated the required Validation/Test Framework threshold audit. |
+| CHG-0087-07 | 2026-07-12 | TASK-0087 | Build System | +1 | Updated build metadata for parser-backed evidence quality and event-time semantics. |
+| CHG-0087-08 | 2026-07-12 | TASK-0087 / TASK-0101 | Roadmap/Backlog | +1 | Inserted the required threshold audit before TASK-0088. |
 
 ## Audit Closeout
 

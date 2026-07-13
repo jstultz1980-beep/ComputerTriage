@@ -126,9 +126,11 @@ function Global:Get-ARGUSEvidenceQualityBand {
     $overall = [int]($EvidenceScore.overallScore)
     $completeness = [int]($EvidenceScore.completenessScore)
     $quality = [int]($EvidenceScore.qualityScore)
+    $failedParsers = [int]($EvidenceScore.failedParserCount)
+    $warningCount = @($EvidenceScore.warnings).Count
 
-    if($quality -lt 50 -or $overall -lt 40){ return "low" }
-    if($completeness -lt 70 -or $overall -lt 70){ return "partial" }
+    if($failedParsers -gt 0 -or $quality -lt 50 -or $overall -lt 40){ return "low" }
+    if($warningCount -gt 0 -or $completeness -lt 70 -or $overall -lt 70){ return "partial" }
     return "high"
 }
 
@@ -291,6 +293,7 @@ function Global:New-ARGUSAnalysisSummary {
             [ordered]@{
                 label = "normalizedEvidence"
                 timestampUtc = $_.timestampUtc
+                timestampType = $_.timestampType
                 source = $_.source
                 category = $_.category
                 title = $_.title

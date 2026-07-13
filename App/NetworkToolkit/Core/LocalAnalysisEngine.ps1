@@ -109,6 +109,51 @@ function Global:Test-HEPEvidenceMatch {
     return $null
 }
 
+function Global:Test-HEPArtifactContent {
+    param([Parameter(Mandatory=$true)][object]$Item)
+
+    $result = [ordered]@{
+        artifact = $Item.RelativePath
+        format = $Item.Extension.TrimStart('.').ToLowerInvariant()
+        discoveryStatus = "present"
+        parserStatus = "not_applicable"
+        semanticStatus = "unknown"
+        recordCount = 0
+        error = $null
+    }
+    if($Item.Length -le 0){ $result.parserStatus="failed"; $result.semanticStatus="invalid"; $result.error="Artifact is empty."; return [pscustomobject]$result }
+
+    try {
+        $raw = Get-Content -LiteralPath $Item.FullName -Raw -ErrorAction Stop
+        if($raw -match '^\s*ERROR\s*:'){ throw "Artifact contains collector error text." }
+        switch($result.format){
+            "json" {
+                $data = $raw | ConvertFrom-Json -ErrorAction Stop
+                if($null -eq $data){ throw "JSON contains no value." }
+                $result.parserStatus = "parsed"
+                $result.recordCount = @($data).Count
+                $result.semanticStatus = if($result.recordCount -gt 0){"valid"}else{"empty"}
+            }
+            "csv" {
+                $data = @(Import-Csv -LiteralPath $Item.FullName -ErrorAction Stop)
+                if($data.Count -eq 0){ throw "CSV contains no data records." }
+                $result.parserStatus = "parsed"; $result.recordCount = $data.Count; $result.semanticStatus = "valid"
+            }
+            "xml" {
+                [xml]$data = $raw
+                if(!$data.DocumentElement){ throw "XML contains no document element." }
+                $result.parserStatus = "parsed"; $result.recordCount = 1; $result.semanticStatus = "valid"
+            }
+            default {
+                if([string]::IsNullOrWhiteSpace($raw)){ throw "Artifact contains no meaningful text." }
+                $result.parserStatus = "parsed"; $result.recordCount = @($raw -split "`r?`n" | Where-Object { $_.Trim() }).Count; $result.semanticStatus = "valid"
+            }
+        }
+    }
+    catch { $result.parserStatus="failed"; $result.semanticStatus="invalid"; $result.error=$_.Exception.Message }
+    return [pscustomobject]$result
+}
+
 function Global:New-HEPFinding {
     param(
         [Parameter(Mandatory=$true)][string]$Id,
@@ -198,26 +243,43 @@ function Global:New-HEPEvidenceScore {
     )
 
     $categoryResults = @()
+    $warningsOut = New-Object System.Collections.Generic.List[object]
+    foreach($warning in @($Warnings)){ [void]$warningsOut.Add($warning) }
     $present = 0
+    $parsed = 0
+    $failed = 0
 
     foreach($category in $categories){
-        $match = Test-HEPEvidenceMatch -Inventory $Inventory -Patterns $category.Patterns
-        $isPresent = [bool]$match
-        if($isPresent){ $present++ }
+        $matches = @($Inventory | Where-Object {
+            $item = $_
+            @($category.Patterns | Where-Object { $item.RelativePath -match $_ -or $item.Name -match $_ }).Count -gt 0
+        })
+        $outcomes = @($matches | ForEach-Object { Test-HEPArtifactContent -Item $_ })
+        $parsedOutcomes = @($outcomes | Where-Object { $_.parserStatus -eq "parsed" -and $_.semanticStatus -eq "valid" })
+        $failedOutcomes = @($outcomes | Where-Object { $_.parserStatus -eq "failed" -or $_.semanticStatus -eq "invalid" })
+        if($matches.Count -gt 0){ $present++ }
+        if($parsedOutcomes.Count -gt 0){ $parsed++ }
+        $failed += $failedOutcomes.Count
+        foreach($failure in $failedOutcomes){
+            [void]$warningsOut.Add([ordered]@{artifact=$failure.artifact;parser=$failure.format;status="failed";message=$failure.error;category=$category.Name})
+        }
+        $score = if($matches.Count -eq 0){0}elseif($parsedOutcomes.Count -eq 0){0}else{[int][Math]::Round(($parsedOutcomes.Count / [double]$matches.Count) * 100)}
         $categoryResults += [ordered]@{
             category = $category.Name
             expectedArtifacts = 1
-            presentArtifacts = if($isPresent){1}else{0}
-            parsedArtifacts = if($isPresent){1}else{0}
-            failedParsers = 0
-            score = if($isPresent){100}else{0}
-            status = if($isPresent){"present"}else{"missing"}
+            discoveredArtifacts = $matches.Count
+            presentArtifacts = $matches.Count
+            parsedArtifacts = $parsedOutcomes.Count
+            failedParsers = $failedOutcomes.Count
+            score = $score
+            status = if($matches.Count -eq 0){"missing"}elseif($parsedOutcomes.Count -eq 0){"invalid"}elseif($failedOutcomes.Count -gt 0){"partial"}else{"parsed"}
+            artifacts = @($outcomes)
         }
     }
 
-    $completeness = [int][Math]::Round(($present / [double]$categories.Count) * 100)
-    $qualityPenalty = @($Warnings).Count * 5
-    $quality = [Math]::Max(0, 100 - $qualityPenalty)
+    $completeness = [int][Math]::Round(($parsed / [double]$categories.Count) * 100)
+    $qualityPenalty = $warningsOut.Count * 5
+    $quality = [Math]::Max(0, 100 - $qualityPenalty - ($failed * 10))
     $overall = [int][Math]::Round(($completeness + $quality) / 2)
 
     $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
@@ -225,7 +287,10 @@ function Global:New-HEPEvidenceScore {
     $artifact["completenessScore"] = $completeness
     $artifact["qualityScore"] = $quality
     $artifact["categories"] = @($categoryResults)
-    $artifact["warnings"] = @($Warnings)
+    $artifact["discoveredCategoryCount"] = $present
+    $artifact["parsedCategoryCount"] = $parsed
+    $artifact["failedParserCount"] = $failed
+    $artifact["warnings"] = @($warningsOut.ToArray())
     return $artifact
 }
 
@@ -237,19 +302,45 @@ function Global:New-HEPTimeline {
 
     $artifact = New-HEPBaseArtifact -BundleRoot $BundleRoot
     $events = @()
-
-    foreach($item in @($Inventory | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 25)){
-        $events += [ordered]@{
-            timestampUtc = $item.LastWriteTimeUtc
-            source = $item.RelativePath
-            category = "evidence"
-            title = "Evidence artifact present"
-            details = "Artifact $($item.RelativePath) was present in the analyzed bundle."
-            relatedFindingIds = @()
+    $warnings = @()
+    $eventArtifacts = @($Inventory | Where-Object { $_.Extension -eq ".json" -and $_.RelativePath -match '(?i)(event|timeline)' })
+    foreach($item in $eventArtifacts){
+        $outcome = Test-HEPArtifactContent -Item $item
+        if($outcome.parserStatus -ne "parsed"){ $warnings += [ordered]@{artifact=$item.RelativePath;message=$outcome.error}; continue }
+        try {
+            $records = @(Get-Content -LiteralPath $item.FullName -Raw | ConvertFrom-Json)
+            if($records.Count -eq 1 -and $records[0] -is [System.Array]){
+                $records = @($records[0] | ForEach-Object { $_ })
+            }
+            $recordIndex = 0
+            foreach($record in $records){
+                $rawTimestamp = @($record.timestampUtc,$record.TimeCreated,$record.timeCreated,$record.EventTimeUtc,$record.eventTimeUtc) | Where-Object { $_ } | Select-Object -First 1
+                $eventTime = [datetime]::MinValue
+                if(!$rawTimestamp -or ![datetime]::TryParse([string]$rawTimestamp,[ref]$eventTime)){
+                    $warnings += [ordered]@{artifact=$item.RelativePath;record=$recordIndex;message="Record has no parseable source event timestamp."}
+                    $recordIndex++; continue
+                }
+                $title = @($record.title,$record.ProviderName,$record.Source,$record.Id) | Where-Object { $_ } | Select-Object -First 1
+                $details = @($record.details,$record.Message,$record.Summary) | Where-Object { $_ } | Select-Object -First 1
+                $events += [ordered]@{
+                    timestampUtc = $eventTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                    timestampType = "sourceEventTime"
+                    source = $item.RelativePath
+                    sourceRecord = $recordIndex
+                    category = "event"
+                    title = if($title){[string]$title}else{"Event record"}
+                    details = if($details){[string]$details}else{"Structured event record from $($item.RelativePath)."}
+                    relatedFindingIds = @()
+                }
+                $recordIndex++
+            }
         }
+        catch { $warnings += [ordered]@{artifact=$item.RelativePath;message=$_.Exception.Message} }
     }
 
-    $artifact["events"] = @($events)
+    $artifact["timelineSemantics"] = "sourceEventTimeOnly"
+    $artifact["events"] = @($events | Sort-Object timestampUtc -Descending)
+    $artifact["warnings"] = @($warnings)
     return $artifact
 }
 

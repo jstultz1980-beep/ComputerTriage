@@ -459,8 +459,9 @@ function Global:New-ARGUSNormalizedAnalysis {
         $events = @($timelineData.events)
         for($i = 0; $i -lt [Math]::Min($events.Count, 10); $i++){
             $event = $events[$i]
+            $timelineConfidence = if($event.timestampType -eq "sourceEventTime"){"medium"}else{"unsupported"}
             $citation = Add-NormalizedCitation (New-ARGUSCitationRecord -SourceType "timelineEvent" -Artifact "Analysis/timeline.json" -JsonPointer ("/events/{0}" -f $i) -Field "event" -ObservedValue $event.title -TrustRank 5)
-            [void]$facts.Add((New-ARGUSFactRecord -Id (Get-ARGUSNextFactId -Counter ([ref]$factCounter)) -Domain "timeline" -Label ("event-{0}" -f ($i + 1)) -Statement ("Timeline event {0} from {1} records {2}." -f ($i + 1),$event.source,$event.title) -Severity "informational" -Confidence "medium" -SourceKind "timelineEvent" -Citations @($citation) -Limitations @("Temporal context only; no causality without supporting findings.")))
+            [void]$facts.Add((New-ARGUSFactRecord -Id (Get-ARGUSNextFactId -Counter ([ref]$factCounter)) -Domain "timeline" -Label ("event-{0}" -f ($i + 1)) -Statement ("Timeline event {0} from {1} records {2}." -f ($i + 1),$event.source,$event.title) -Severity "informational" -Confidence $timelineConfidence -SourceKind "timelineEvent" -Citations @($citation) -Limitations @("Timestamp semantics: $($event.timestampType). Temporal context only; no causality without supporting findings.")))
         }
     }
 

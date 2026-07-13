@@ -22,7 +22,9 @@ param($InputObject,[string]$Path)
         return $true
     }
     catch {
-        "ERROR: $($_.Exception.Message)" | Set-Content -LiteralPath $Path -Encoding UTF8
+        if(Test-Path -LiteralPath $Path){ Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue }
+        [ordered]@{schemaVersion="1.0";artifactType="collector-export-error";intendedPath=$Path;intendedFormat="json";status="failed";message=$_.Exception.Message;recordedAtUtc=(Get-Date).ToUniversalTime().ToString("o")} |
+            ConvertTo-Json -Depth 5 | Set-Content -LiteralPath ($Path + ".error.json") -Encoding UTF8
         return $false
     }
 }
@@ -36,7 +38,9 @@ param($InputObject,[string]$Path)
         return $true
     }
     catch {
-        "ERROR: $($_.Exception.Message)" | Set-Content -LiteralPath $Path -Encoding UTF8
+        if(Test-Path -LiteralPath $Path){ Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue }
+        [ordered]@{schemaVersion="1.0";artifactType="collector-export-error";intendedPath=$Path;intendedFormat="csv";status="failed";message=$_.Exception.Message;recordedAtUtc=(Get-Date).ToUniversalTime().ToString("o")} |
+            ConvertTo-Json -Depth 5 | Set-Content -LiteralPath ($Path + ".error.json") -Encoding UTF8
         return $false
     }
 }

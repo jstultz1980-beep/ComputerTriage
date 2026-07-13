@@ -17,7 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline`
+- `TASK-0101-Validation-Test-Framework-Counter-Audit`
+
+TASK-0087 is complete. TASK-0101 is the required threshold audit before remediation resumes with TASK-0088.
 
 Required sequence:
 1. TASK-0086 Offline Evidence Isolation and Bundle Identity.

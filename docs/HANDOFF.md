@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0092
+HANDOFF-0093
 
 ## Current Task
-TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline
+TASK-0101-Validation-Test-Framework-Counter-Audit
 
 ## Current Owner
 Codex
@@ -13,7 +13,7 @@ Codex
 ChatGPT at the next architecture, governance, audit, blocker, or acceptance boundary.
 
 ## Objective
-TASK-0086 is complete. Make evidence quality reflect real parser and semantic outcomes and ensure timeline artifacts contain source event time rather than file-copy time.
+TASK-0087 is complete. Audit the Validation/Test Framework at its required `25 / 25` threshold before TASK-0088 begins.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -21,45 +21,45 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 ## Current Project State
 - TASK-0084 audit is complete; repository health remains `52 / 100` pending remediation.
 - TASK-0086 completed offline evidence isolation and immutable bundle identity.
-- TASK-0087 is the single Active implementation task.
+- TASK-0087 completed parser-backed evidence quality and source-event-time timeline semantics.
+- TASK-0101 is the single Active threshold-audit task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
+- `Resume Work` requires a mandatory fetch, upstream comparison, and verified local/remote synchronization before task execution.
 
-## TASK-0086 Validation Result
+## TASK-0087 Validation Result
 - All changed PowerShell files passed parser validation.
-- Computer-A fixture analyzed on the current host contained only Computer-A identity.
-- Empty, invalid, partial, unrelated, conflicting-identity, and mixed-export cases were rejected or excluded.
-- Default selection chose the newest valid collected run, not the newest arbitrary folder.
-- Repeated analysis preserved source inventory count and immutable identity.
-- ARGUS artifacts and both reports preserved run/bundle identity.
-- Client-data transfer verified and recorded copied run identities.
-- GUI smoke and button-smoke passed.
+- Valid, empty, malformed, truncated, plain-error, and CSV fixtures produced separate parser and semantic outcomes.
+- Failed JSON/CSV writes produced parseable adjacent `.error.json` envelopes and no false structured artifacts.
+- Timeline fixtures retained only source event time, excluded timestamp-free records, and never used file-copy time.
+- ARGUS downgraded evidence quality for parser failures and retained medium confidence only for source-event-time facts.
+- Diagnostic identity, triage, toolkit, GUI smoke, and button-smoke regressions passed.
 
 ## Active Task Scope
-`TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline`
+`TASK-0101-Validation-Test-Framework-Counter-Audit`
 
-Codex must separate discovery, parsing, semantic validation, and coverage; reject invalid structured artifacts; record parser outcomes; replace file-copy chronology with real event semantics; and update downstream ARGUS confidence handling.
+Codex must audit current validation entry points, executable evidence, gaps, brittleness, and side effects, then record focused remediation and reset only Validation/Test Framework if the audit is accepted.
 
-Codex must not expand unrelated rules, redesign the GUI, or merge later remediation tasks.
+Codex must not begin TASK-0088 or unrelated implementation during this audit.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 9 / 25 | No |
-| Architecture | 5 / 25 | No |
-| Documentation | 2 / 25 | No |
-| Task System | 8 / 25 | No |
-| Evidence Collection and Deterministic Analysis | 5 / 25 | No |
-| ARGUS | 7 / 25 | No |
+| Repository Governance | 10 / 25 | No |
+| Architecture | 6 / 25 | No |
+| Documentation | 3 / 25 | No |
+| Task System | 9 / 25 | No |
+| Evidence Collection and Deterministic Analysis | 6 / 25 | No |
+| ARGUS | 8 / 25 | No |
 | Reporting | 3 / 25 | No |
 | UI | 23 / 25 | No |
 | Plugin Framework | 1 / 25 | No |
-| Build System | 18 / 25 | No |
-| Validation/Test Framework | 24 / 25 | No |
-| Roadmap/Backlog | 15 / 25 | No |
+| Build System | 19 / 25 | No |
+| Validation/Test Framework | 25 / 25 | Yes - TASK-0101 Active |
+| Roadmap/Backlog | 16 / 25 | No |
 
-No counter gate blocks the already Active TASK-0087. If Validation/Test Framework reaches 25/25 during TASK-0087, finish TASK-0087 and activate its required audit before TASK-0088.
+Validation/Test Framework reached `25 / 25`. TASK-0101 is the required audit; no implementation task may begin until it completes.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -76,10 +76,10 @@ None.
 
 ## Recommended Commit Message
 ```text
-TASK-0086: Isolate offline evidence and bind immutable run identity
+TASK-0087: Add parser-backed evidence quality and event timeline semantics
 ```
 
 ## Next Bot Prompt
 ```text
-Resume Work. Execute only TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline. Preserve documented drift. Validate valid, empty, malformed, truncated, plain-error, and known event/copy timestamp fixtures; run ARGUS confidence regression, parser, smoke, and button-smoke checks; update records and build metadata; commit locally; do not push unless explicitly requested except under the Error Handoff Rule.
+Run the mandatory Resume Work synchronization procedure first: read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, run `git fetch --prune origin`, verify the intended branch and upstream, compare local HEAD with the upstream branch, safely fast-forward when behind, and confirm the local and remote commit hashes match before trusting local governance or task files. If the branch is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite preserved work, stop before implementation and use the Error Handoff Procedure. Then execute only TASK-0101-Validation-Test-Framework-Counter-Audit. Preserve documented drift. Audit current validation entry points, recorded evidence, coverage gaps, brittle fixtures, and test side effects; create focused follow-up tasks as required; reset only Validation/Test Framework after the audit is complete; commit locally; do not push unless explicitly requested except under the Error Handoff Rule.
 ```

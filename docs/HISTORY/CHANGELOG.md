@@ -6,6 +6,11 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 - Strengthened the Codex `Resume Work` protocol to require `git fetch --prune origin`, explicit local/upstream divergence checks, safe fast-forward synchronization, and confirmation that the local checkout matches the authoritative remote branch before Active-task execution.
 - Required Codex to stop and use the Error Handoff Procedure when fetch fails, no upstream exists, branches diverge, local commits are ahead unexpectedly, or synchronization would overwrite preserved work.
+- Completed `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline`.
+- Added parser-backed evidence and semantic quality outcomes, structured collector error envelopes, source-event-time-only timelines, and downstream ARGUS confidence handling.
+- Added malformed, empty, truncated, plain-error, event/copy-time, export-failure, and ARGUS regression fixtures; parser, identity, triage, toolkit, GUI, and button-smoke checks passed.
+- Activated `TASK-0101-Validation-Test-Framework-Counter-Audit` because Validation/Test Framework reached `25 / 25`.
+
 - Completed `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity`.
 - Added validated immutable run/bundle identity, rejected invalid/default roots, removed live-host contamination, excluded generated outputs, and propagated identity through deterministic analysis, ARGUS, reports, GUI selection, and client-data transfer.
 - Added cross-machine, mixed-export, invalid-root, repeated-run, ARGUS, and transfer fixtures; parser, smoke, and button-smoke validation passed.

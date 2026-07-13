@@ -9,13 +9,13 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Codex | Active | Require parser-backed evidence quality and correct event-time semantics. |
+| `TASK-0101-Validation-Test-Framework-Counter-Audit` | Codex | Active | Audit the validation/test framework at its required 25-change threshold. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 1 | `TASK-0088-Canonical-Operation-Result-And-Failure-Propagation` | Codex | Queued | Establish one result envelope and eliminate false success. |
+| 1 | `TASK-0088-Canonical-Operation-Result-And-Failure-Propagation` | Codex | Queued | Establish one result envelope and eliminate false success after the required TASK-0101 audit. |
 | 2 | `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Codex | Queued | Make bundle identity, integrity, completeness, and collector outcomes trustworthy. |
 | 3 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Queued | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
 | 4 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
@@ -40,6 +40,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Complete | Added parser-backed evidence quality, structured export errors, source-event-time timeline semantics, and ARGUS confidence handling. |
 | `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | Complete | Completed the full engineering audit, findings and debt registers, repository health and executive reports, release-readiness assessment, and dependency-ordered remediation sequence. |
 | `TASK-0085-Documentation-Counter-Audit` | Complete | Audited Documentation at `25 / 25` and reset only Documentation. |
 | `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` | Completed | Added validated immutable run identity, offline evidence isolation, generated-output exclusion, and identity propagation through ARGUS/reports/transfers. |
@@ -48,6 +49,7 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 - TASK-0084 is closed.
 - TASK-0086 is complete.
-- TASK-0087 is the only Active task.
+- TASK-0087 is complete and TASK-0101 is the only Active task.
+- TASK-0101 is the required Validation/Test Framework threshold audit before TASK-0088.
 - Critical and High findings are mapped to remediation tasks or documented disposition.
 - Net-new feature work remains deferred until the release-blocking remediation sequence is complete.

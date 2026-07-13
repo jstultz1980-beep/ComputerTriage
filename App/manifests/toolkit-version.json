@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712185011,
-    "SourceUpdatedAt":  "2026-07-12T18:50:11.2175475-05:00",
-    "ReleaseNotes":  "Isolated offline evidence and propagated validated immutable diagnostic run identity through analysis, ARGUS, reports, GUI selection, and transfer."
+    "Build":  20260712190500,
+    "SourceUpdatedAt":  "2026-07-12T19:05:00-05:00",
+    "ReleaseNotes":  "Added parser-backed evidence quality, structured export errors, source-event-time timeline semantics, and downstream ARGUS confidence handling."
 }
