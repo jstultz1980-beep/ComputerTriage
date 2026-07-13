@@ -1,44 +1,41 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0107
+HANDOFF-0108
 
 ## Current Task
-TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit
+TASK-0096-GUI-Background-Operation-Controller-Extraction
 
 ## Current Owner
-ChatGPT (Project Custodian)
+Codex
 
 ## Next Owner
-Codex after the Project Custodian accepts the audit and activates a Codex-owned task.
+ChatGPT (Project Custodian) when TASK-0097 becomes active or an audit/blocker boundary is reached.
 
 ## Objective
-Review Roadmap/Backlog threshold evidence, confirm remaining sequencing and ownership boundaries, and decide the counter reset.
+Create one reusable controller for GUI background processes, jobs, timers, cancellation, timeout, completion, and cleanup; migrate Analyze and Triage first.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0105 completed the Build System Engineering Audit.
-- The TASK-0104 evidence package was accepted.
-- BUILD-AUD-01 remains owned by TASK-0100 for package/build performance instrumentation and observation caching.
-- BUILD-AUD-02 remains low-priority future tool-lifecycle work; no duplicate task was created.
-- Only Build System was reset from `25 / 25` to `0 / 25`.
-- TASK-0094 completed sensitive artifact and runtime-state safety remediation.
-- TASK-0095 completed canonical analysis/tool metadata architecture.
-- TASK-0106 completed Roadmap/Backlog Audit Preparation without resetting the counter.
-- TASK-0107 is the single Active Project Custodian task.
-- Release candidate remains blocked pending Critical/High remediation.
-- `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks.
+- TASK-0107 completed the Roadmap/Backlog Engineering Audit.
+- The TASK-0106 evidence package was accepted.
+- Only Roadmap/Backlog was reset from `25 / 25` to `0 / 25`.
+- Remaining sequence confirmed: TASK-0096, TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- TASK-0097 begins with a Project Custodian architecture/governance decision; Codex support is limited to focused implementation-reference updates authorized by that decision.
+- TASK-0096 is the single Active Codex task.
+- Release candidate remains blocked pending stabilization, validation, and performance gates.
+- `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks, but Codex must stop when TASK-0097 becomes active because it is a Project Custodian boundary.
 - `Governance Refresh` performs a lightweight safe-point governance reload and resumes the same Active task.
 - At `25 / 25`, Codex automatically completes Audit Preparation, pushes the evidence package, and activates a Project Custodian Engineering Audit task.
 - Every non-blocked Codex stop-boundary summary must end exactly with `Tell Debbie to continue`.
 - Every genuine blocker summary must end exactly with `Tell Debbie to address errors`.
 
 ## Active Task Scope
-`TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit`
+`TASK-0096-GUI-Background-Operation-Controller-Extraction`
 
-The Project Custodian must review `docs/REVIEWS/TASK-0106/ROADMAP-BACKLOG-AUDIT-PREPARATION.md`, confirm sequencing and TASK-0097 ownership boundaries, and reset only Roadmap/Backlog if accepted. Codex must not implement another task while this audit is Active.
+Codex must implement only the shared GUI background operation lifecycle controller and migrate Analyze and Triage within the task acceptance criteria. No unrelated architecture, governance, helper framework, native replacement, or feature expansion is authorized.
 
 ## Audit Counters
 
@@ -55,9 +52,7 @@ The Project Custodian must review `docs/REVIEWS/TASK-0106/ROADMAP-BACKLOG-AUDIT-
 | Plugin Framework | 6 / 25 | No |
 | Build System | 2 / 25 | No |
 | Validation/Test Framework | 8 / 25 | No |
-| Roadmap/Backlog | 25 / 25 | Yes |
-
-Roadmap/Backlog is gated at `25 / 25`. TASK-0106 is complete, and TASK-0107 requires Project Custodian review before implementation may resume.
+| Roadmap/Backlog | 0 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -73,15 +68,10 @@ Do not stage or clean unless a focused task explicitly owns it:
 None.
 
 ## Audit Decision Reference
-- `docs/REVIEWS/TASK-0104/BUILD-SYSTEM-AUDIT-PREPARATION.md`
-- `docs/TASKS/TASK-0105-Project-Custodian-Build-System-Engineering-Audit.md`
-
-## Recommended Project Custodian Action
-```text
-Review TASK-0106 Roadmap/Backlog evidence; if accepted, reset only Roadmap/Backlog, clarify TASK-0097 ownership sequencing, and activate TASK-0096.
-```
+- `docs/REVIEWS/TASK-0106/ROADMAP-BACKLOG-AUDIT-PREPARATION.md`
+- `docs/TASKS/TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit.md`
 
 ## Next Bot Prompt
 ```text
-Continue. Review TASK-0107 and the TASK-0106 Roadmap/Backlog evidence package, decide sequencing and counter reset, and activate exactly one dependency-ready task.
+Resume Work
 ```
