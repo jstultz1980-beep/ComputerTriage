@@ -32,6 +32,14 @@ The instruction authorizes one continuous execution cycle:
 
 `Resume Work` does not authorize unrelated work, architecture invention, dependency bypass, destructive cleanup, stale-checkout implementation, or activation of ChatGPT-owned work.
 
+## Governance Refresh Rule
+
+When the user prompts `Governance Refresh`, Codex must follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`.
+
+This command is a lightweight in-task rules reload. Codex pauses at the next safe point, preserves current work and documented drift, fetches and safely synchronizes with the authoritative remote, rereads only the defined governance set, applies changed workflow rules immediately, and resumes the same Active task.
+
+`Governance Refresh` must not restart the task, perform a full project startup, reload architecture/roadmap/ADRs unless required by refreshed governance, clean drift, discard changes, or activate another task. Unsafe synchronization or irreconcilable governance conflict uses the Error Handoff Procedure.
+
 ## Project Custodian Continue Rule
 
 When the user tells ChatGPT `Continue`, the Project Custodian must read the current cloud handoff, queue, error handoff, active task, and any audit package.
