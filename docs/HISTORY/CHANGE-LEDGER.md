@@ -8,10 +8,10 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 14 / 25 | TASK-0097 authoritative governance-document boundaries. |
+| Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 16 / 25 | TASK-0097 intended-state runtime boundaries, contracts, flow, and failure behavior. |
-| Documentation | 16 / 25 | TASK-0097 architecture decision and forward-looking roadmap. |
-| Task System | 24 / 25 | TASK-0097 focused Codex support handoff. |
+| Documentation | 17 / 25 | TASK-0097 current-reference and superseded-plan reconciliation. |
+| Task System | 25 / 25 | TASK-0097 completion and TASK-0108 Audit Preparation activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
@@ -19,12 +19,16 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
 | Build System | 3 / 25 | TASK-0096 build metadata. |
 | Validation/Test Framework | 9 / 25 | TASK-0096 background lifecycle and leak fixtures. |
-| Roadmap/Backlog | 2 / 25 | TASK-0097 forward-looking roadmap and approved remaining sequence. |
+| Roadmap/Backlog | 3 / 25 | Inserted the required Task System audit before TASK-0098. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0097-06 | 2026-07-13 | TASK-0097 | Repository Governance | +1 | Replaced duplicated entry-point procedures with authoritative workflow and audit references while retaining mandatory controls. |
+| CHG-0097-07 | 2026-07-13 | TASK-0097 | Documentation | +1 | Reconciled current terminology references and removed the stale finish-plan queue as a competing sequence authority. |
+| CHG-0097-08 | 2026-07-13 | TASK-0097 / TASK-0108 | Task System | +1 | Completed TASK-0097 and activated mandatory Task System Audit Preparation at `25 / 25`. |
+| CHG-0097-09 | 2026-07-13 | TASK-0097 / TASK-0108 | Roadmap/Backlog | +1 | Inserted the Task System audit boundary before TASK-0098. |
 | CHG-0097-01 | 2026-07-13 | TASK-0097 | Architecture | +1 | Defined intended-state runtime boundaries, canonical components, contracts, flow, and failure behavior. |
 | CHG-0097-02 | 2026-07-13 | TASK-0097 | Repository Governance | +1 | Assigned one authoritative document to each governance responsibility and prohibited duplicated procedure text. |
 | CHG-0097-03 | 2026-07-13 | TASK-0097 | Documentation | +1 | Recorded the Project Custodian decision, expanded the architecture authority, and made the roadmap forward-looking. |

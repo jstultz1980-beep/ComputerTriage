@@ -4,9 +4,13 @@ Date: 2026-07-01
 Status: Accepted
 Task: `TASK-0018-HEPHAESTUS-Local-Analysis-Engine-v1-Design`
 
+## Current-State Reconciliation
+
+This ADR preserves the context and decision recorded on 2026-07-01. The current intended-state authority is `docs/ARCHITECTURE.md`, as approved by `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`. HEPHAESTUS now owns collection, evidence normalization, integrity validation, deterministic analysis, and machine-readable outputs. ARGUS is implemented as the cited explanation, prioritization, and technician-guidance layer over validated evidence and deterministic findings.
+
 ## Context
 
-The toolkit mission is rapid single-computer diagnosis. HEPHAESTUS currently owns evidence collection, while ARGUS is planned as the analysis and explanation engine. The project direction now requires deterministic local analysis before AI-assisted interpretation.
+At the time of this decision, HEPHAESTUS owned evidence collection while ARGUS was planned as the analysis and explanation engine. The project direction required deterministic local analysis before AI-assisted interpretation.
 
 ## Decision
 
@@ -32,7 +36,7 @@ ARGUS responsibilities remain later-stage interpretation:
 ## Consequences
 
 - HEPHAESTUS can provide useful diagnosis without ARGUS.
-- ARGUS implementation remains blocked until HEPHAESTUS output contracts are stable.
+- At the time of this decision, ARGUS implementation remained blocked until HEPHAESTUS output contracts were stable.
 - HEPHAESTUS collectors should not be modified by the design task.
 - Implementation should begin with a small vertical slice rather than a full rule catalog.
 

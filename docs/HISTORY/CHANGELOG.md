@@ -4,6 +4,9 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Completed TASK-0097 terminology/reference reconciliation and governance simulations; Task System reached `25 / 25` and TASK-0108 Audit Preparation became active before TASK-0098.
+- Reconciled the charter and current ADR references, retired the stale finish-plan queue as an authority, and reduced duplicated Codex entry-point procedure text.
+
 - Recorded the TASK-0097 Project Custodian intended-state architecture, canonical terminology, governance authority boundaries, and approved remaining sequence.
 - Expanded `docs/ARCHITECTURE.md` into the concise runtime authority and converted `docs/ROADMAP.md` to forward-looking work only.
 - Authorized Codex for focused terminology/reference reconciliation and governance simulations without application or feature changes.

@@ -9,17 +9,16 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 Status: Active
 
 Current Active task:
-- `TASK-0097-Architecture-Terminology-And-Governance-Consolidation`
+- `TASK-0108-Task-System-Audit-Preparation`
 
 Current objective:
-- Apply the approved intended-state architecture and canonical terminology to repository references.
-- Keep governance controls intact while removing stale or duplicated wording.
-- Validate Resume Work, Address Errors, audit-gate, and handoff workflows.
+- Prepare the mandatory Task System threshold evidence after TASK-0097 completion.
+- Keep TASK-0098 queued until Project Custodian audit acceptance.
 
 ## Remaining Sequence
 
-1. **TASK-0097 - Architecture, Terminology, and Governance Consolidation**
-   - Complete focused documentation/reference consolidation and governance simulations.
+1. **TASK-0108 / TASK-0109 - Task System Audit Preparation and Engineering Audit**
+   - Audit the `25 / 25` Task System threshold before more implementation.
 2. **TASK-0098 - Shared Reporting and Run Index Contracts**
    - Establish canonical report metadata, escaping, and immutable run identity resolution.
 3. **TASK-0099 - Repository-Wide Validation Foundation**

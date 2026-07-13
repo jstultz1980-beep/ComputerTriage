@@ -1,19 +1,19 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0110
+HANDOFF-0111
 
 ## Current Task
-TASK-0097-Architecture-Terminology-And-Governance-Consolidation
+TASK-0108-Task-System-Audit-Preparation
 
 ## Current Owner
-Codex (focused implementation-reference support only)
+Codex
 
 ## Next Owner
-Codex may activate TASK-0098 after TASK-0097 acceptance criteria and governance simulations pass, unless an audit, blocker, or Project Custodian boundary intervenes.
+ChatGPT (Project Custodian) when TASK-0109 becomes active after the Task System audit evidence package is complete.
 
 ## Objective
-Apply the recorded intended-state architecture and canonical terminology, reconcile focused documentation references, and validate governance workflows without changing product behavior or scope.
+Prepare deterministic Task System threshold evidence without resetting the counter or beginning TASK-0098.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -21,27 +21,28 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 ## Current Project State
 - TASK-0096 completed the shared GUI background operation controller and migrated Analyze and Triage.
 - TASK-0097 Project Custodian architecture, terminology, roadmap, queue, and governance decisions are complete.
+- TASK-0097 focused reconciliation and all required governance simulations passed.
 - The authoritative decision is `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`.
 - `docs/ARCHITECTURE.md` now defines the concise intended-state runtime boundaries, contracts, flow, and failure behavior.
 - `docs/ROADMAP.md` is forward-looking; historical chronology remains in task and history records.
 - ARGUS remains the sole approved analysis/explanation product name.
-- Codex support is limited to terminology/reference reconciliation and governance simulations defined by the Active task.
+- Task System reached `25 / 25`; TASK-0108 Audit Preparation is mandatory before implementation resumes.
 - The remaining sequence is TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0097-Architecture-Terminology-And-Governance-Consolidation`
+`TASK-0108-Task-System-Audit-Preparation`
 
-Codex must inventory current repository terminology, correct only conflicts with the approved decision, reduce duplicated governance references without weakening controls, run the required governance simulations, and complete TASK-0097. No application behavior, architecture, task order, or feature scope changes are authorized.
+Codex must gather and validate Task System evidence using the audit template, keep the counter at `25 / 25`, keep TASK-0098 queued, and transfer to a Project Custodian Engineering Audit. No implementation or counter reset is authorized.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 14 / 25 | No |
+| Repository Governance | 15 / 25 | No |
 | Architecture | 16 / 25 | No |
-| Documentation | 16 / 25 | No |
-| Task System | 24 / 25 | No |
+| Documentation | 17 / 25 | No |
+| Task System | 25 / 25 | Yes |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 4 / 25 | No |
@@ -49,7 +50,7 @@ Codex must inventory current repository terminology, correct only conflicts with
 | Plugin Framework | 6 / 25 | No |
 | Build System | 3 / 25 | No |
 | Validation/Test Framework | 9 / 25 | No |
-| Roadmap/Backlog | 2 / 25 | No |
+| Roadmap/Backlog | 3 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:

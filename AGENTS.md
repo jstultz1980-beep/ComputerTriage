@@ -4,23 +4,9 @@ ChatGPT is the Project Custodian. Codex is the implementation and audit-preparat
 
 ## Resume Work
 
-When the user enters `Resume Work`, Codex must:
+When the user enters `Resume Work`, follow the complete executable startup and implementation procedure in `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` and the continuation/audit rules in `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`.
 
-1. Read `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` and `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`.
-2. Verify the intended branch and `origin` remote.
-3. Run `git fetch --prune origin` before trusting local governance or task state.
-4. Compare local `HEAD` with the upstream branch.
-5. Safely fast-forward when behind without overwriting preserved drift.
-6. Stop and use the Error Handoff Procedure if local is ahead, diverged, lacks an upstream, fetch fails, or safe synchronization is impossible.
-7. Confirm local and remote commit hashes match and record the synchronized starting commit.
-8. Follow the startup sequence in `PROJECT.md`.
-9. Verify exactly one Active task and no unresolved blocker.
-10. Execute the Active Codex-owned task autonomously.
-11. Validate and correct in-scope defects.
-12. Update required task, queue, handoff, history, counter, punch-list, and build records.
-13. Commit the task locally.
-14. If no gate or stop condition exists, activate the next dependency-ready Codex-owned queued task and continue without another prompt.
-15. Repeat until an audit gate, Project Custodian boundary, genuine blocker, or user-only decision is reached.
+The non-negotiable entry conditions are: synchronize before trusting governance, preserve documented drift, verify exactly one Active task, execute only authorized Codex-owned scope, and stop at a Project Custodian, audit, blocker, or user-only boundary.
 
 ## Governance Refresh
 
@@ -32,18 +18,7 @@ Do not restart the task, perform a full project startup, change task ownership, 
 
 ## Audit Gate Behavior
 
-When any subsystem reaches `25 / 25` at a task boundary:
-
-1. Finish and validate the current Active task.
-2. Automatically create and activate an Audit Preparation task.
-3. Complete the audit evidence package using `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`.
-4. Do not reset counters or resume implementation.
-5. Mark Audit Preparation complete.
-6. Activate a Project Custodian Engineering Audit task as the only Active task.
-7. Commit and push the audit package and minimum transition records.
-8. Tell the user that Project Custodian review is ready.
-
-No separate user instruction is required to perform Audit Preparation.
+At `25 / 25`, follow the Audit Preparation procedure in `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md` and its evidence template at `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`. Codex completes and pushes the evidence transition without resetting counters or beginning more implementation; Project Custodian review is then mandatory.
 
 ## Autonomous Authority
 

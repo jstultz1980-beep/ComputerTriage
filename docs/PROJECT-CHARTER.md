@@ -14,8 +14,8 @@ Every feature must reduce the time, effort, or uncertainty required to diagnose 
 The toolkit is focused on one computer at a time.
 
 ## Primary Components
-- HEPHAESTUS: evidence collection engine
-- ARGUS: analysis and explanation engine
+- HEPHAESTUS: evidence collection, normalization, integrity validation, and deterministic local analysis pipeline
+- ARGUS: cited explanation, prioritization, and technician-guidance layer over validated HEPHAESTUS outputs
 - Reporting: technician-focused outputs
 
 ## Non-Goals
