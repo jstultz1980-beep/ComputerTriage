@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0095
+HANDOFF-0096
 
 ## Current Task
 TASK-0088-Canonical-Operation-Results-And-Failure-Propagation
@@ -26,9 +26,10 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0088 is the single Active implementation task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
-- `Resume Work` now authorizes continuous Codex execution through dependency-ready Codex tasks.
+- `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks.
 - At `25 / 25`, Codex automatically completes Audit Preparation, pushes the evidence package, and activates a Project Custodian Engineering Audit task.
-- The user tells ChatGPT `Continue` at the Project Custodian boundary; after the decision is pushed, the user tells Codex `Resume Work` and the cycle repeats.
+- Every non-blocked Codex stop-boundary summary must end exactly with `Tell Debbie to continue`.
+- Every genuine blocker summary must end exactly with `Tell Debbie to address errors`.
 
 ## Autonomous Cycle References
 - `PROJECT.md`
@@ -50,9 +51,9 @@ After TASK-0088 completes, Codex must re-read the queue and counters. If no gate
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 11 / 25 | No |
+| Repository Governance | 12 / 25 | No |
 | Architecture | 6 / 25 | No |
-| Documentation | 5 / 25 | No |
+| Documentation | 6 / 25 | No |
 | Task System | 11 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 6 / 25 | No |
 | ARGUS | 8 / 25 | No |
@@ -85,5 +86,5 @@ TASK-0088: Establish canonical operation results and failure propagation
 
 ## Next Bot Prompt
 ```text
-Resume Work. First perform the mandatory repository synchronization procedure and confirm local HEAD matches the authoritative upstream without overwriting preserved drift. Then read PROJECT.md, AGENTS.md, docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md, the handoff, queue, error handoff, TASK-0088, and all referenced files. Execute TASK-0088 within scope, validate negative paths plus parser/smoke/button-smoke behavior, update all required records and build metadata, and commit locally. After completion, re-read the queue, counters, punch list, and blockers. If no stop condition exists, activate the next dependency-ready Codex-owned task and continue automatically. Repeat until a counter reaches 25 / 25, a Project Custodian-owned task becomes Active, a genuine blocker occurs, or a user-only decision is unavoidable. At a 25 / 25 gate, automatically create and complete Audit Preparation using the tracked template, push the audit package and transition records, activate a Project Custodian Engineering Audit task, and stop. Do not push normal implementation commits unless explicitly authorized; audit packages and blocker handoffs must be pushed as required.
+Resume Work. First perform the mandatory repository synchronization procedure and confirm local HEAD matches the authoritative upstream without overwriting preserved drift. Then read PROJECT.md, AGENTS.md, docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md, the handoff, queue, error handoff, TASK-0088, and all referenced files. Execute TASK-0088 within scope, validate negative paths plus parser/smoke/button-smoke behavior, update all required records and build metadata, and commit locally. After completion, re-read the queue, counters, punch list, and blockers. If no stop condition exists, activate the next dependency-ready Codex-owned task and continue automatically. Repeat until a counter reaches 25 / 25, a Project Custodian-owned task becomes Active, a genuine blocker occurs, or a user-only decision is unavoidable. At a 25 / 25 gate, automatically create and complete Audit Preparation using the tracked template, push the audit package and transition records, activate a Project Custodian Engineering Audit task, and stop. Do not push normal implementation commits unless explicitly authorized; audit packages and blocker handoffs must be pushed as required. Every non-blocked stop-boundary summary must end with the exact final line `Tell Debbie to continue`. Every genuine blocker summary must end with the exact final line `Tell Debbie to address errors`. Do not add text after the final operator instruction.
 ```
