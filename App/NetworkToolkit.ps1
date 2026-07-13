@@ -12,6 +12,7 @@ param(
     [string]$RunCommand,
     [switch]$SmokeTest,
     [switch]$ButtonSmokeTest,
+    [string]$PerformanceResultPath,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$RemainingArgs
 )
@@ -74,6 +75,7 @@ try {
     $guiArgs = @{}
     if($SmokeTest){ $guiArgs.SmokeTest = $true }
     if($ButtonSmokeTest){ $guiArgs.ButtonSmokeTest = $true }
+    if($PerformanceResultPath){ $guiArgs.PerformanceResultPath = $PerformanceResultPath }
 
     & $guiLauncher @guiArgs
     exit $LASTEXITCODE

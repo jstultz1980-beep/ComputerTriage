@@ -4,23 +4,21 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Architecture Stabilization
+## Current Phase - Release-Candidate Validation
 
 Status: Active
 
 Current Active task:
-- `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache`
+- `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
 Current objective:
-- Measure startup, first-render, repeated-query, lifecycle, and package hashing costs.
-- Add run-scoped observation caching where evidence freshness remains explicit.
-- Define and validate cold/warm performance budgets without weakening correctness contracts.
+- Execute the canonical repository and production-package gates.
+- Reconcile operational, troubleshooting, limitation, and release-readiness documentation.
+- Produce the final Project Custodian release decision evidence package.
 
 ## Remaining Sequence
 
-1. **TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache**
-   - Measure and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs.
-2. **TASK-0080 - Release-Candidate Validation and Documentation**
+1. **TASK-0080 - Release-Candidate Validation and Documentation**
    - Execute final validation, operational documentation, and release-readiness review.
 
 ## Release-Candidate Entry Criteria

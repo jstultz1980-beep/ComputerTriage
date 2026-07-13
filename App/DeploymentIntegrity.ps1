@@ -1,25 +1,42 @@
 #Requires -Version 5.1
 
+$performanceModule = Join-Path $PSScriptRoot 'NetworkToolkit\Utilities\Performance.ps1'
+if(!(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath $performanceModule)){ . $performanceModule }
+
 function New-NTKManagedFileManifest {
     param([Parameter(Mandatory=$true)][string]$Root,[string[]]$ExcludeRelativePaths=@())
-    $resolved=(Resolve-Path -LiteralPath $Root).Path.TrimEnd('\')
-    @((Get-ChildItem -LiteralPath $resolved -Recurse -File -Force -ErrorAction SilentlyContinue | ForEach-Object {
-        $relative=$_.FullName.Substring($resolved.Length).TrimStart('\')
-        if($ExcludeRelativePaths -contains $relative){return}
-        if(!(Test-Path -LiteralPath $_.FullName -PathType Leaf)){return}
-        [pscustomobject]@{Path=$relative;Length=$_.Length;SHA256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
-    }) | Sort-Object Path)
+    $performanceHandle=Start-NTKPerformanceRun -Name 'package-manifest-hash';$timer=[Diagnostics.Stopwatch]::StartNew();$fileCount=0
+    try {
+        $resolved=(Resolve-Path -LiteralPath $Root).Path.TrimEnd('\')
+        $manifest=@((Get-ChildItem -LiteralPath $resolved -Recurse -File -Force -ErrorAction SilentlyContinue | ForEach-Object {
+            $relative=$_.FullName.Substring($resolved.Length).TrimStart('\')
+            if($ExcludeRelativePaths -contains $relative){return}
+            if(!(Test-Path -LiteralPath $_.FullName -PathType Leaf)){return}
+            [pscustomobject]@{Path=$relative;Length=$_.Length;SHA256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
+        }) | Sort-Object Path)
+        $fileCount=$manifest.Count
+        return $manifest
+    }
+    finally {
+        $timer.Stop();[void](Add-NTKPerformanceTiming -Name 'package.manifest-hash' -DurationMs $timer.ElapsedMilliseconds -Tags @{Files=$fileCount;Operation='Create'});[void](Complete-NTKPerformanceRun -Handle $performanceHandle)
+    }
 }
 
 function Test-NTKManagedFileManifest {
     param([Parameter(Mandatory=$true)][string]$Root,[Parameter(Mandatory=$true)][object[]]$Manifest)
-    $failures=New-Object System.Collections.Generic.List[string]
-    foreach($entry in @($Manifest)){
-        $path=Join-Path $Root $entry.Path
-        if(!(Test-Path -LiteralPath $path -PathType Leaf)){[void]$failures.Add("Missing: $($entry.Path)");continue}
-        if((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $entry.SHA256){[void]$failures.Add("Hash mismatch: $($entry.Path)")}
+    $performanceHandle=Start-NTKPerformanceRun -Name 'package-manifest-verify';$timer=[Diagnostics.Stopwatch]::StartNew()
+    try {
+        $failures=New-Object System.Collections.Generic.List[string]
+        foreach($entry in @($Manifest)){
+            $path=Join-Path $Root $entry.Path
+            if(!(Test-Path -LiteralPath $path -PathType Leaf)){[void]$failures.Add("Missing: $($entry.Path)");continue}
+            if((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $entry.SHA256){[void]$failures.Add("Hash mismatch: $($entry.Path)")}
+        }
+        return [pscustomobject]@{passed=($failures.Count -eq 0);failures=$failures.ToArray();verified=@($Manifest).Count}
     }
-    [pscustomobject]@{passed=($failures.Count -eq 0);failures=$failures.ToArray();verified=@($Manifest).Count}
+    finally {
+        $timer.Stop();[void](Add-NTKPerformanceTiming -Name 'package.manifest-hash' -DurationMs $timer.ElapsedMilliseconds -Tags @{Files=@($Manifest).Count;Operation='Verify'});[void](Complete-NTKPerformanceRun -Handle $performanceHandle)
+    }
 }
 
 function Test-NTKDeploymentIdentity {

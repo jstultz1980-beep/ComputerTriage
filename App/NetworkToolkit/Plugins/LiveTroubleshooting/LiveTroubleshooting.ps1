@@ -1640,8 +1640,13 @@ param(
     [string]$Target = "www.microsoft.com",
     [switch]$SkipRepair,
     [switch]$NoExport,
-    [switch]$PassThru
+    [switch]$PassThru,
+    [switch]$ReusePerformanceRun
 )
+
+    $performanceHandle = Start-NTKPerformanceRun -Name 'full-triage' -ReuseActive:$ReusePerformanceRun
+    $triageTimer = [Diagnostics.Stopwatch]::StartNew()
+    try {
 
     Clear-Host
 
@@ -1882,6 +1887,13 @@ param(
 
         return $report
 
+    }
+
+    }
+    finally {
+        $triageTimer.Stop()
+        [void](Add-NTKPerformanceTiming -Name 'workflow.full-triage' -DurationMs $triageTimer.ElapsedMilliseconds -Tags @{Target=$Target;Exported=[bool]$exported})
+        [void](Complete-NTKPerformanceRun -Handle $performanceHandle)
     }
 
 }

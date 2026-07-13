@@ -17,7 +17,8 @@
     "external-tool-provenance",
     "sensitive-state",
     "gui",
-    "lifecycle"
+    "lifecycle",
+    "performance"
   ],
   "requiredNegativePathCoverage": [
     "cli-exit",
@@ -30,7 +31,8 @@
     "managed-manifest",
     "external-tool-provenance",
     "sensitive-state",
-    "lifecycle"
+    "lifecycle",
+    "performance"
   ],
   "stages": [
     { "id": "argus-correctness", "path": "App/NetworkToolkit/Tests/Test-ArgusCorrectness.ps1", "coverage": ["argus"], "negativePath": true },
@@ -42,6 +44,7 @@
     { "id": "external-tool-provenance", "path": "App/NetworkToolkit/Tests/Test-ExternalToolProvenance.ps1", "coverage": ["external-tool-provenance"], "negativePath": true },
     { "id": "operation-result", "path": "App/NetworkToolkit/Tests/Test-OperationResultContract.ps1", "coverage": ["cli-exit", "analysis", "argus"], "negativePath": true },
     { "id": "parser-backed-evidence", "path": "App/NetworkToolkit/Tests/Test-ParserBackedEvidenceQuality.ps1", "coverage": ["collection", "analysis", "argus"], "negativePath": true },
+    { "id": "performance-observation-cache", "path": "App/NetworkToolkit/Tests/Test-PerformanceAndObservationCache.ps1", "coverage": ["performance", "lifecycle", "gui"], "negativePath": true },
     { "id": "reporting-run-index", "path": "App/NetworkToolkit/Tests/Test-ReportingAndRunIndex.ps1", "coverage": ["reporting", "artifact"], "negativePath": true },
     { "id": "sensitive-artifact-safety", "path": "App/NetworkToolkit/Tests/Test-SensitiveArtifactSafety.ps1", "coverage": ["sensitive-state", "artifact"], "negativePath": true },
     { "id": "toolkit-load-smoke", "path": "App/NetworkToolkit/Tests/Test-ToolkitSmoke.ps1", "coverage": ["module-plugin-load"], "negativePath": false },

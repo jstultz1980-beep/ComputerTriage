@@ -9,22 +9,29 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
-| Architecture | 18 / 25 | TASK-0099 manifest-driven repository validation foundation. |
-| Documentation | 21 / 25 | TASK-0099 validation contract and evidence record. |
-| Task System | 3 / 25 | TASK-0099 completion and TASK-0100 activation. |
+| Architecture | 19 / 25 | TASK-0100 structured timing and run-scoped observation/provider contract. |
+| Documentation | 22 / 25 | TASK-0100 performance contract, budgets, and baselines. |
+| Task System | 4 / 25 | TASK-0100 completion and TASK-0080 activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
-| UI | 3 / 25 | TASK-0096 Analyze and Triage lifecycle migration. |
+| UI | 4 / 25 | TASK-0100 GUI shell, first-render, and tab-switch timing. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 5 / 25 | TASK-0099 build metadata and production-package contract gate. |
-| Validation/Test Framework | 11 / 25 | TASK-0099 tracked parser, load, negative-path, package, and regression gate. |
-| Roadmap/Backlog | 6 / 25 | Advanced architecture stabilization to TASK-0100. |
+| Build System | 6 / 25 | TASK-0100 package manifest hashing telemetry and build metadata. |
+| Validation/Test Framework | 12 / 25 | TASK-0100 cache, provider, budget, cold/warm, and invalidation fixtures. |
+| Roadmap/Backlog | 7 / 25 | Advanced to final release-candidate validation. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0100-01 | 2026-07-13 | TASK-0100 | Architecture | +1 | Added nested performance-run, budget, observation freshness, provider-health, invalidation, and telemetry contracts. |
+| CHG-0100-02 | 2026-07-13 | TASK-0100 | UI | +1 | Emitted structured GUI shell, first-render, and every-tab-switch timing. |
+| CHG-0100-03 | 2026-07-13 | TASK-0100 | Build System | +1 | Instrumented managed-file hashing and updated build metadata. |
+| CHG-0100-04 | 2026-07-13 | TASK-0100 | Validation/Test Framework | +1 | Added cold/warm, cache reuse, provider failure, cross-run retry, invalidation, and budget fixtures. |
+| CHG-0100-05 | 2026-07-13 | TASK-0100 | Documentation | +1 | Documented performance budgets, cache safety, telemetry, and workstation baselines. |
+| CHG-0100-06 | 2026-07-13 | TASK-0100 / TASK-0080 | Task System | +1 | Completed performance remediation and activated the final release-candidate gate. |
+| CHG-0100-07 | 2026-07-13 | TASK-0100 / TASK-0080 | Roadmap/Backlog | +1 | Advanced from architecture stabilization to release-candidate validation. |
 | CHG-0099-01 | 2026-07-13 | TASK-0099 | Architecture | +1 | Established one manifest-driven repository validation entry point with coverage and fixture-completeness enforcement. |
 | CHG-0099-02 | 2026-07-13 | TASK-0099 | Validation/Test Framework | +1 | Added all-tracked-file 5.1 parsing, isolated stages, timeouts, negative-path coverage, load completeness, and JSON results. |
 | CHG-0099-03 | 2026-07-13 | TASK-0099 | Build System | +1 | Added valid/tampered production-package verification and updated toolkit build metadata. |

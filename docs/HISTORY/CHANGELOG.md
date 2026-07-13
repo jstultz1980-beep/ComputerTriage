@@ -4,6 +4,10 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Completed TASK-0100 performance instrumentation and run-scoped observation caching; activated TASK-0080.
+- Added structured workflow/render timing, explicit budgets, nested cache/provider-health scope, CIM/driver observation reuse, bounded optional registry crawling, and cold/warm baselines.
+- Canonical repository validation now passes 18 gates with zero failures.
+
 - Completed TASK-0099 repository-wide validation foundation and activated TASK-0100.
 - Added a manifest-driven Windows PowerShell 5.1 parser/load/negative-path/package/regression runner; all 17 gates pass and all 82 tracked PowerShell files parse with zero exclusions.
 - Added production-package positive/tamper fixtures and made toolkit smoke reject any import failure or degraded load.

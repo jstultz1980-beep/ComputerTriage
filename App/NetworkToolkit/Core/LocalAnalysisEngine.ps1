@@ -3,6 +3,11 @@
 $diagnosticIdentityModule = Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))) "Core\Analysis\DiagnosticBundleIdentity.ps1"
 if(!(Test-Path -LiteralPath $diagnosticIdentityModule)){ throw "Diagnostic bundle identity module not found: $diagnosticIdentityModule" }
 . $diagnosticIdentityModule
+$performanceModule = Join-Path (Split-Path -Parent $PSScriptRoot) "Utilities\Performance.ps1"
+if(!(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue)){
+    if(!(Test-Path -LiteralPath $performanceModule)){ throw "Performance module not found: $performanceModule" }
+    . $performanceModule
+}
 $reportingContractModule = Join-Path (Split-Path -Parent $PSScriptRoot) "Utilities\ReportingContract.ps1"
 if(!(Test-Path -LiteralPath $reportingContractModule)){ throw "Reporting contract module not found: $reportingContractModule" }
 . $reportingContractModule
@@ -443,6 +448,10 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
     [CmdletBinding()]
     param([string]$BundleRoot)
 
+    $performanceHandle = Start-NTKPerformanceRun -Name 'hephaestus'
+    $analysisTimer = [Diagnostics.Stopwatch]::StartNew()
+    try {
+
     if(!(Get-Command New-NTKOperationResult -ErrorAction SilentlyContinue)){
         . (Join-Path (Split-Path -Parent $PSScriptRoot) 'Utilities\OperationResult.ps1')
     }
@@ -515,6 +524,12 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
         return New-NTKOperationResult -Operation 'HEPHAESTUS Local Analysis' -State Partial -Message 'Local analysis failed; collection may continue.' -Errors @($_.Exception.Message) -Data @{
             Status='FailedNonFatal'; BundleRoot=$BundleRoot; AnalysisRoot=$analysisRoot; Error=$_.Exception.Message
         }
+    }
+    }
+    finally {
+        $analysisTimer.Stop()
+        [void](Add-NTKPerformanceTiming -Name 'workflow.hephaestus' -DurationMs $analysisTimer.ElapsedMilliseconds -Tags @{BundleRoot=[string]$BundleRoot})
+        [void](Complete-NTKPerformanceRun -Handle $performanceHandle)
     }
 }
 

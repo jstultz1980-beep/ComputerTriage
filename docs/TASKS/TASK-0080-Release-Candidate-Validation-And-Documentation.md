@@ -1,7 +1,7 @@
 # TASK-0080 - Release Candidate Validation And Documentation
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

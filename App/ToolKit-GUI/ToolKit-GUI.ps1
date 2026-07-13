@@ -8,7 +8,8 @@
 [CmdletBinding()]
 param(
     [switch]$SmokeTest,
-    [switch]$ButtonSmokeTest
+    [switch]$ButtonSmokeTest,
+    [string]$PerformanceResultPath
 )
 
 $ErrorActionPreference = "Stop"
@@ -80,6 +81,7 @@ catch {
     exit 1
 }
 
+$script:GUIPerformanceHandle = if(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue){ Start-NTKPerformanceRun -Name 'gui' }else{$null}
 $script:Commands = @(Get-NTKCommands | Where-Object {$_.Name -notin @("File Utilities","Software Utilities")})
 $script:ToolkitLoadFailures = if(Get-Command Get-NTKImportFailures -ErrorAction SilentlyContinue){ @(Get-NTKImportFailures) }else{ @() }
 $script:Fingerprints = @()
@@ -3211,6 +3213,7 @@ finally {
         Write-Host "Could not save tool output to computer state: `$(`$_.Exception.Message)" -ForegroundColor Yellow
     }
 }
+
 exit ([int]`$metadata.ExitCode)
 "@
 
@@ -9355,6 +9358,7 @@ function Build-GUITabIfNeeded {
 
     $entry = $script:TabBuilders[$Page.Text]
     $buildTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    $buildSucceeded = $false
     $Page.SuspendLayout()
 
     try {
@@ -9364,6 +9368,7 @@ function Build-GUITabIfNeeded {
         & $entry.Builder $Page
         Apply-GUIThemeToControl -Control $Page
         $script:BuiltTabs[$Page.Text] = $true
+        $buildSucceeded = $true
         Set-GUIFallbackButtonToolTips
         $buildTimer.Stop()
         Write-GUIDiagnosticLog -Event 'TabBuilt' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count)
@@ -9388,6 +9393,9 @@ function Build-GUITabIfNeeded {
     }
     finally {
         if($buildTimer.IsRunning){ $buildTimer.Stop() }
+        if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceTiming -Name 'gui.tab.first-render' -DurationMs $buildTimer.ElapsedMilliseconds -Tags @{Tab=$Page.Text;Success=$buildSucceeded;Controls=$Page.Controls.Count})
+        }
         $Page.ResumeLayout()
     }
 }
@@ -9405,6 +9413,10 @@ function Complete-GUITabSwitchTiming {
 
     if($Timer.IsRunning){
         $Timer.Stop()
+    }
+
+    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+        [void](Add-NTKPerformanceTiming -Name 'gui.tab.switch' -DurationMs $Timer.ElapsedMilliseconds -Tags @{Tab=$(if($Page){$Page.Text}else{'Unknown'});Source=$Source})
     }
 
     if(!$Page -or $Timer.ElapsedMilliseconds -lt $script:SlowTabSwitchThresholdMs){
@@ -16751,6 +16763,9 @@ if($script:GUIStartupStopwatch){
     $script:GUIStartupStopwatch.Stop()
     Add-GUILog ("GUI shell initialized in {0} ms" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
     Write-GUIDiagnosticLog -Event 'GUIStartupShellReady' -Tool 'GUI' -Detail ("ElapsedMs={0}; DeferredStartupTab=True" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
+    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+        [void](Add-NTKPerformanceTiming -Name 'gui.startup.shell' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{SmokeTest=[bool]$SmokeTest;ButtonSmokeTest=[bool]$ButtonSmokeTest})
+    }
 }
 if($script:ToolkitLoadFailures.Count -gt 0){
     foreach($failure in $script:ToolkitLoadFailures){
@@ -16773,6 +16788,7 @@ if($SmokeTest){
     Write-Host "Commands:" $script:Commands.Count
     Stop-GUIAsyncWorkers
     if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
+    if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
     return
 }
 
@@ -16898,6 +16914,7 @@ if($ButtonSmokeTest){
     Write-Host "Quick tab: OK"
     Stop-GUIAsyncWorkers
     if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
+    if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
     return
 }
 
@@ -16905,6 +16922,7 @@ try {
     [void]$Form.ShowDialog()
 }
 finally {
+    if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
     if($script:OwnsGuiInstanceMutex -and $global:NetworkToolkitInstanceMutex){
         try { $global:NetworkToolkitInstanceMutex.ReleaseMutex() } catch {}
         $global:NetworkToolkitInstanceMutex.Dispose()

@@ -671,14 +671,16 @@ param([string]$Path)
 
 function Global:Get-NTKComputerFingerprint {
 
-    $os = Get-CimInstance Win32_OperatingSystem
-    $system = Get-CimInstance Win32_ComputerSystem
-    $bios = Get-CimInstance Win32_BIOS
-    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
-    $disks = Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" |
-             Select-Object DeviceID,VolumeName,
-                           @{Name="SizeGB";Expression={[math]::Round($_.Size / 1GB,2)}},
-                           @{Name="FreeGB";Expression={[math]::Round($_.FreeSpace / 1GB,2)}}
+    $os = Get-NTKRunObservationValue -Key 'cim.operating-system' -Provider 'cim' -Required -Collector { Get-CimInstance Win32_OperatingSystem -ErrorAction Stop }
+    $system = Get-NTKRunObservationValue -Key 'cim.computer-system' -Provider 'cim' -Required -Collector { Get-CimInstance Win32_ComputerSystem -ErrorAction Stop }
+    $bios = Get-NTKRunObservationValue -Key 'cim.bios' -Provider 'cim' -Required -Collector { Get-CimInstance Win32_BIOS -ErrorAction Stop }
+    $cpu = Get-NTKRunObservationValue -Key 'cim.processor' -Provider 'cim' -Required -Collector { Get-CimInstance Win32_Processor -ErrorAction Stop | Select-Object -First 1 }
+    $disks = @(Get-NTKRunObservationValue -Key 'cim.logical-disks' -Provider 'cim' -Required -Collector {
+        @(Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" -ErrorAction Stop |
+            Select-Object DeviceID,VolumeName,
+                @{Name="SizeGB";Expression={[math]::Round($_.Size / 1GB,2)}},
+                @{Name="FreeGB";Expression={[math]::Round($_.FreeSpace / 1GB,2)}})
+    })
 
     $adapters = @()
 

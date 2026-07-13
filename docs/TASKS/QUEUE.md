@@ -12,18 +12,19 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Active | Instrument and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs. |
+| `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Active | Execute the final release-candidate validation and documentation gate. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 9 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
+| - | None | - | No task remains queued behind the Active release-candidate gate. |
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Complete | Added structured timings, explicit budgets, run-scoped observations/provider health, and cold/warm baselines. |
 | `TASK-0099-Repository-Wide-Validation-Foundation` | Complete | Added the canonical 5.1 parser, load, negative-path, package, artifact, and regression gate; 17 stages pass. |
 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Complete | Added canonical report metadata and escaping plus immutable run/artifact indexing with explicit stale and missing state. |
 | `TASK-0110-Task-System-Consistency-Cleanup` | Complete | Resolved accepted identity, status, Error Handoff, supersession, and punch-list consistency debt. |
@@ -34,9 +35,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0099 is complete and the canonical repository validation gate passes 17 stages with zero failures.
-- TASK-0100 is the sole Active task.
-- The remaining order is TASK-0100, TASK-0080.
+- TASK-0100 is complete and the canonical repository validation gate passes 18 stages with zero failures.
+- TASK-0080 is the sole Active task and final queued release-candidate gate.
+- No implementation task remains queued behind TASK-0080.
 - TASK-0109 accepted the TASK-0108 evidence package.
 - Only Task System was reset from `25 / 25` to `0 / 25`.
 - Net-new feature work remains deferred.

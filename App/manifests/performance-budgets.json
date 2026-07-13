@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "budgetsMs": {
+    "gui.process.cold": 15000,
+    "gui.process.warm": 10000,
+    "gui.startup.shell": 10000,
+    "gui.tab.first-render": 3000,
+    "gui.tab.switch": 1000,
+    "workflow.quick-diagnosis": 120000,
+    "workflow.full-triage": 90000,
+    "workflow.hephaestus": 30000,
+    "workflow.argus": 30000,
+    "provider.cim": 15000,
+    "provider.event-log": 10000,
+    "provider.windows-update-driver": 20000,
+    "package.manifest-hash": 120000
+  }
+}

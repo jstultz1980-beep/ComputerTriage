@@ -1190,7 +1190,7 @@ param([object]$Driver)
 
 }
 
-function Global:Get-NTKQuickDriverInventory {
+function Global:Invoke-NTKQuickDriverInventoryQuery {
 
     $importantClasses = @("Display","Net","SNTKAdapter","HDC","System","MEDIA","Bluetooth","USB","Printer")
     $drivers = @()
@@ -1216,10 +1216,15 @@ function Global:Get-NTKQuickDriverInventory {
                 }
         )
     }
-    catch {}
+    catch { throw }
 
     return @($drivers | Sort-Object DeviceClass,DeviceName)
 
+}
+
+function Global:Get-NTKQuickDriverInventory {
+    $value = Get-NTKRunObservationValue -Key 'cim.pnp-signed-drivers' -Provider 'cim' -Collector { @(Invoke-NTKQuickDriverInventoryQuery) }
+    return @($value)
 }
 
 function Global:Get-NTKQuickDriverForDevice {
@@ -1817,7 +1822,7 @@ param(
 
 }
 
-function Global:Get-NTKQuickWindowsUpdateDriverCandidates {
+function Global:Invoke-NTKQuickWindowsUpdateDriverCandidateQuery {
 
 param([int]$TimeoutSeconds = 18)
 
@@ -1910,6 +1915,12 @@ param([int]$TimeoutSeconds = 18)
         }
     }
 
+}
+
+function Global:Get-NTKQuickWindowsUpdateDriverCandidates {
+    param([int]$TimeoutSeconds = 18)
+    $value = Get-NTKRunObservationValue -Key 'windows-update.driver-candidates' -Provider 'windows-update-driver' -Collector { @(Invoke-NTKQuickWindowsUpdateDriverCandidateQuery -TimeoutSeconds $TimeoutSeconds) }
+    return @($value)
 }
 
 function Global:Find-NTKQuickDriverCandidate {
@@ -2344,6 +2355,10 @@ param(
     [string]$Target = "www.microsoft.com"
 )
 
+    $performanceHandle = Start-NTKPerformanceRun -Name 'quick-diagnosis'
+    $quickTimer = [Diagnostics.Stopwatch]::StartNew()
+    try {
+
     Clear-Host
 
     Write-Host ""
@@ -2359,7 +2374,8 @@ param(
     $report = Invoke-FullComputerTriage `
         -Target $Target `
         -SkipRepair `
-        -PassThru
+        -PassThru `
+        -ReusePerformanceRun
 
     if($report){
 
@@ -2381,7 +2397,14 @@ param(
                 Write-Host "Computer profile saved for selector:" $fingerprintData.Json -ForegroundColor Green
             }
 
-            $report = Add-NTKQuickStatusChecksToReport -Report $report
+            $quickBudgetMs = Get-NTKPerformanceBudgetMs -Name 'workflow.quick-diagnosis'
+            if(Test-NTKPerformanceBudgetExpired -Name 'workflow.quick-diagnosis' -ElapsedMs $quickTimer.ElapsedMilliseconds){
+                $report | Add-Member -MemberType NoteProperty -Name PerformanceBudgetExceeded -Value $true -Force
+                $report | Add-Member -MemberType NoteProperty -Name PerformanceLimitation -Value "Optional Quick Diagnosis enrichment was skipped after the $quickBudgetMs ms workflow budget was exhausted." -Force
+            }
+            else {
+                $report = Add-NTKQuickStatusChecksToReport -Report $report
+            }
             $issueEvidencePath = Export-NTKQuickIssueEvidence -Report $report
 
             if($report.Fingerprint -and $report.FingerprintExports){
@@ -2446,6 +2469,13 @@ param(
             Write-Host $_.Exception.Message
         }
 
+    }
+
+    }
+    finally {
+        $quickTimer.Stop()
+        [void](Add-NTKPerformanceTiming -Name 'workflow.quick-diagnosis' -DurationMs $quickTimer.ElapsedMilliseconds -Tags @{Target=$Target;Result=$(if($report){'Completed'}else{'NoResult'})})
+        [void](Complete-NTKPerformanceRun -Handle $performanceHandle)
     }
 
 }

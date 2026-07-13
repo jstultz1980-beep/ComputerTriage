@@ -7,6 +7,11 @@ $diagnosticIdentityModule = Join-Path (Split-Path -Parent $PSScriptRoot) "Analys
 if(!(Test-Path -LiteralPath $diagnosticIdentityModule)){ throw "Diagnostic bundle identity module not found: $diagnosticIdentityModule" }
 . $diagnosticIdentityModule
 $script:ARGUSRepositoryRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$performanceModule = Join-Path $script:ARGUSRepositoryRoot 'App\NetworkToolkit\Utilities\Performance.ps1'
+if(!(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue)){
+    if(!(Test-Path -LiteralPath $performanceModule)){ throw "Performance module not found: $performanceModule" }
+    . $performanceModule
+}
 # PowerShell : 5.1+
 # Purpose    : Consume HEPHAESTUS Local Analysis Engine artifacts, validate
 #              the ARGUS input contract, and produce clearly labeled ARGUS
@@ -442,6 +447,10 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     [CmdletBinding()]
     param([string]$BundleRoot)
 
+    $performanceHandle = Start-NTKPerformanceRun -Name 'argus'
+    $argusTimer = [Diagnostics.Stopwatch]::StartNew()
+    try {
+
     if(!(Get-Command New-NTKOperationResult -ErrorAction SilentlyContinue)){
         . (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'App\NetworkToolkit\Utilities\OperationResult.ps1')
     }
@@ -562,6 +571,12 @@ function Global:Invoke-ARGUSFoundationAnalysis {
         TechnicianReport=$finalReports.TechnicianReport; EscalationReport=$finalReports.EscalationReport; RunId=$script:ARGUSBundleValidation.Identity.runId
         BundleId = $script:ARGUSBundleValidation.Identity.bundleId
         Report = $reportPath
+    }
+    }
+    finally {
+        $argusTimer.Stop()
+        [void](Add-NTKPerformanceTiming -Name 'workflow.argus' -DurationMs $argusTimer.ElapsedMilliseconds -Tags @{BundleRoot=[string]$BundleRoot})
+        [void](Complete-NTKPerformanceRun -Handle $performanceHandle)
     }
 }
 
