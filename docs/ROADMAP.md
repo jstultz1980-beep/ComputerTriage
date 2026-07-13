@@ -17,9 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0105-Project-Custodian-Build-System-Engineering-Audit`
+- `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture`
 
-TASK-0093 completed external-tool trust and retention policy. Build System reached `25 / 25`; TASK-0104 prepared evidence and TASK-0105 is the active Project Custodian audit.
+TASK-0105 accepted the Build System audit and reset only Build System. TASK-0094 completed sensitive artifact and runtime-state remediation; architecture stabilization is active on TASK-0095.
 
 TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
 
@@ -32,8 +32,8 @@ Required sequence:
 6. TASK-0091 Print and Remote Change Transaction Safety. Complete.
 7. TASK-0092 Transactional Package, Deploy, and Update Integrity. Complete.
 8. TASK-0093 External Tool Provenance and Lifecycle Policy. Complete.
-9. TASK-0104 / TASK-0105 Build System Audit Preparation and Project Custodian Engineering Audit. Active audit boundary.
-10. TASK-0094 Sensitive Artifact Handling and Runtime State Safety.
+9. TASK-0104 / TASK-0105 Build System Audit Preparation and Project Custodian Engineering Audit. Complete.
+10. TASK-0094 Sensitive Artifact Handling and Runtime State Safety. Complete.
 
 Exit target:
 - No unresolved Critical findings.
@@ -42,9 +42,9 @@ Exit target:
 
 ## Architecture Stabilization
 
-Status: Queued
+Status: Active
 
-1. TASK-0095 Canonical Analysis and Tool Metadata Architecture.
+1. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Active.
 2. TASK-0096 GUI Background Operation Controller Extraction.
 3. TASK-0097 Architecture, Terminology, and Governance Consolidation.
 4. TASK-0098 Shared Reporting and Run Index Contracts.

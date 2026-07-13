@@ -27,20 +27,22 @@ function Get-NTKClientDataTransferRoots {
         [Parameter(Mandatory=$true)][string]$DeploymentRoot
     )
 
-    $appRoot = Join-Path $DeploymentRoot "App"
     $relativeRoots = @(
-        "NetworkToolkit\Data",
-        "NetworkToolkit\Exports",
-        "NetworkToolkit\Logs",
-        "Triage\Runs",
-        "Triage\Profiles",
-        "logs"
+        "Runtime\Data",
+        "Runtime\Exports",
+        "Runtime\Logs",
+        "App\Triage\Runs",
+        "App\Triage\Profiles",
+        "App\logs",
+        "App\NetworkToolkit\Data",
+        "App\NetworkToolkit\Exports",
+        "App\NetworkToolkit\Logs"
     )
 
     foreach($relative in $relativeRoots){
         [pscustomobject]@{
             RelativePath = $relative
-            SourcePath = Join-Path $appRoot $relative
+            SourcePath = Join-Path $DeploymentRoot $relative
             DestinationPath = $null
         }
     }
@@ -66,11 +68,13 @@ function Get-NTKClientDataFileList {
             }
 
             $relativeFile = $file.FullName.Substring($rootFull.Length).TrimStart('\')
+            $artifactMetadata = if(Get-Command Get-NTKArtifactMetadata -ErrorAction SilentlyContinue){Get-NTKArtifactMetadata -Path $file.FullName}else{[pscustomobject]@{Classification='ClientEvidence'}}
             $files.Add([pscustomobject]@{
                 RootRelativePath = $root.RelativePath
                 RelativeFilePath = $relativeFile
                 FullName = $file.FullName
                 Length = [int64]$file.Length
+                Sensitivity = $artifactMetadata.Classification
             }) | Out-Null
         }
     }
@@ -91,7 +95,10 @@ function Copy-NTKClientData {
     param(
         [Parameter(Mandatory=$true)][string]$SourceRoot,
         [Parameter(Mandatory=$true)][string]$DestinationRoot,
-        [switch]$Force
+        [switch]$Force,
+        [ValidateSet('Operational','ClientEvidence','Sensitive')][string[]]$IncludeSensitivity=@('Operational','ClientEvidence'),
+        [switch]$EncryptSensitive,
+        [string]$EncryptionPassword=''
     )
 
     $sourceDeployment = Resolve-NTKDeploymentRoot -Path $SourceRoot
@@ -105,23 +112,39 @@ function Copy-NTKClientData {
         throw "Destination already contains client data. Re-run with -Force only after technician confirmation."
     }
 
-    $sourceFiles = @(Get-NTKClientDataFileList -DeploymentRoot $sourceDeployment)
-    $destinationAppRoot = Join-Path $destinationDeployment "App"
+    if($IncludeSensitivity -contains 'Sensitive' -and !$EncryptSensitive){ throw 'Sensitive transfers require -EncryptSensitive and a password.' }
+    if($EncryptSensitive -and [string]::IsNullOrWhiteSpace($EncryptionPassword)){ throw 'EncryptionPassword is required for sensitive transfer.' }
+    $allSourceFiles = @(Get-NTKClientDataFileList -DeploymentRoot $sourceDeployment)
+    $sourceFiles = @($allSourceFiles | Where-Object { $IncludeSensitivity -contains $_.Sensitivity })
+    [int64]$requiredBytes=($sourceFiles|Measure-Object Length -Sum).Sum
+    $driveName=[IO.Path]::GetPathRoot($destinationDeployment).TrimEnd('\').TrimEnd(':')
+    $drive=Get-PSDrive -Name $driveName -ErrorAction SilentlyContinue
+    if($drive -and $drive.Free -lt ($requiredBytes + 10MB)){throw 'Destination does not have enough free space for the selected transfer.'}
     $copiedFiles = 0
     [int64]$copiedBytes = 0
     $includedRoots = New-Object System.Collections.Generic.List[string]
     $failures = New-Object System.Collections.Generic.List[object]
+    $verifiedFiles = New-Object System.Collections.Generic.List[object]
 
     foreach($file in $sourceFiles){
-        $destinationRoot = Join-Path $destinationAppRoot $file.RootRelativePath
+        $destinationRoot = Join-Path $destinationDeployment $file.RootRelativePath
         $destinationPath = Join-Path $destinationRoot $file.RelativeFilePath
+        if($file.Sensitivity -eq 'Sensitive'){ $destinationPath += '.ntkenc' }
         $destinationParent = Split-Path -Parent $destinationPath
         if(!(Test-Path -LiteralPath $destinationParent)){
             New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
         }
 
         try {
-            Copy-Item -LiteralPath $file.FullName -Destination $destinationPath -Force -ErrorAction Stop
+            if($file.Sensitivity -eq 'Sensitive'){
+                Protect-NTKTransferFile -Source $file.FullName -Destination $destinationPath -Password $EncryptionPassword | Out-Null
+            } else {
+                Copy-Item -LiteralPath $file.FullName -Destination $destinationPath -Force -ErrorAction Stop
+            }
+            $sourceHash=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+            $destinationHash=(Get-FileHash -LiteralPath $destinationPath -Algorithm SHA256).Hash
+            if($file.Sensitivity -ne 'Sensitive' -and $sourceHash -ne $destinationHash){throw 'Destination hash verification failed.'}
+            [void]$verifiedFiles.Add([pscustomobject]@{RelativePath=(Join-Path $file.RootRelativePath $file.RelativeFilePath);Sensitivity=$file.Sensitivity;Encrypted=($file.Sensitivity -eq 'Sensitive');SourceSHA256=$sourceHash;DestinationSHA256=$destinationHash;Verified=$true})
             $copiedFiles++
             $copiedBytes += [int64]$file.Length
             if(!$includedRoots.Contains($file.RootRelativePath)){
@@ -139,7 +162,7 @@ function Copy-NTKClientData {
 
     $transferredRunIdentities = New-Object System.Collections.Generic.List[object]
     if(Get-Command Resolve-NTKDiagnosticBundle -ErrorAction SilentlyContinue){
-        $runRoots = @($sourceFiles | Where-Object { $_.RootRelativePath -eq "Triage\Runs" -and $_.RelativeFilePath -match '^[^\\]+\\Metadata\\collection_manifest\.json$' } | ForEach-Object { ($_.RelativeFilePath -split '\\')[0] } | Select-Object -Unique)
+        $runRoots = @($sourceFiles | Where-Object { $_.RootRelativePath -eq "App\Triage\Runs" -and $_.RelativeFilePath -match '^[^\\]+\\Metadata\\collection_manifest\.json$' } | ForEach-Object { ($_.RelativeFilePath -split '\\')[0] } | Select-Object -Unique)
         foreach($runName in $runRoots){
             try {
                 $sourceRun = Join-Path (Join-Path $sourceDeployment "App\Triage\Runs") $runName
@@ -155,7 +178,7 @@ function Copy-NTKClientData {
         }
     }
 
-    $manifestRoot = Join-Path $destinationAppRoot "NetworkToolkit\Data\ClientDataTransfers"
+    $manifestRoot = Join-Path $destinationDeployment "Runtime\Data\ClientDataTransfers"
     if(!(Test-Path -LiteralPath $manifestRoot)){
         New-Item -ItemType Directory -Path $manifestRoot -Force | Out-Null
     }
@@ -168,7 +191,10 @@ function Copy-NTKClientData {
         SourceRoot = $sourceDeployment
         DestinationRoot = $destinationDeployment
         IncludedFolders = @($includedRoots.ToArray())
-        SourceFileCount = $sourceFiles.Count
+        SourceFileCount = $allSourceFiles.Count
+        SelectedFileCount = $sourceFiles.Count
+        IncludedSensitivity = @($IncludeSensitivity)
+        SensitiveFilesEncrypted = [bool]$EncryptSensitive
         CopiedFileCount = $copiedFiles
         CopiedByteCount = $copiedBytes
         CopiedSizeMB = [math]::Round(($copiedBytes / 1MB),2)
@@ -180,10 +206,11 @@ function Copy-NTKClientData {
             "Build and release folders"
         )
         Failures = @($failures.ToArray())
+        VerifiedFiles = @($verifiedFiles.ToArray())
         TransferredRunIdentities = @($transferredRunIdentities.ToArray())
     }
 
-    $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    if(Get-Command Write-NTKAtomicJson -ErrorAction SilentlyContinue){Write-NTKAtomicJson -Path $manifestPath -Value $manifest -Depth 8|Out-Null}else{$manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $manifestPath -Encoding UTF8}
 
     $manifest | Add-Member -MemberType NoteProperty -Name ManifestPath -Value $manifestPath -Force
     $manifest | Add-Member -MemberType NoteProperty -Name Status -Value $(if($failures.Count -gt 0){"CompletedWithWarnings"}else{"Completed"}) -Force

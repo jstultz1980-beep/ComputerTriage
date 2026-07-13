@@ -63,12 +63,19 @@ param(
     $remove += @($items | Where-Object { $_.LastWriteTime -lt $cutoff })
 
     foreach($item in @($remove | Sort-Object FullName -Unique)){
-        if(Test-NTKOutputHasSevereEvidence -Path $item.FullName){
+        $metadata = if(Get-Command Get-NTKArtifactMetadata -ErrorAction SilentlyContinue){ Get-NTKArtifactMetadata -Path $item.FullName }else{$null}
+        if($metadata -and [bool]$metadata.Pinned){
             continue
+        }
+
+        if($metadata -and $metadata.RetentionDays){
+            $createdAt=try{[datetime]$metadata.CreatedAt}catch{$item.CreationTime}
+            if($createdAt.AddDays([int]$metadata.RetentionDays) -gt (Get-Date)){continue}
         }
 
         try {
             Remove-Item -LiteralPath $item.FullName -Recurse:$Directory -Force -ErrorAction Stop
+            Remove-Item -LiteralPath (Get-NTKArtifactMetadataPath $item.FullName) -Force -ErrorAction SilentlyContinue
         }
         catch {
             if(Get-Command Write-NTKWarning -ErrorAction SilentlyContinue){
@@ -97,6 +104,7 @@ param(
             "robocopy*.log",
             "dism*.log",
             "sfc*.log"
+            "software-key-report*.html"
         )){
             Clear-NTKOutputQuota -Path $NTKPaths.Exports -Pattern $pattern -KeepCount $ReportKeepCount -MaxAgeDays $MaxAgeDays
         }
@@ -109,7 +117,8 @@ param(
             foreach($toolFolder in @(Get-ChildItem -LiteralPath $usage -File -Filter "*.log" -ErrorAction SilentlyContinue | Group-Object BaseName)){
                 $files = @($toolFolder.Group | Sort-Object LastWriteTime -Descending)
                 foreach($file in @($files | Select-Object -Skip $LogKeepCount)){
-                    if(!(Test-NTKOutputHasSevereEvidence -Path $file.FullName)){
+                    $metadata=if(Get-Command Get-NTKArtifactMetadata -ErrorAction SilentlyContinue){Get-NTKArtifactMetadata -Path $file.FullName}else{$null}
+                    if(!$metadata -or ![bool]$metadata.Pinned){
                         try {
                             Remove-Item -LiteralPath $file.FullName -Force -ErrorAction Stop
                         }

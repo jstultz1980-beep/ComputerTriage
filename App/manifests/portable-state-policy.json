@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "runtimeRoot": "..\\Runtime",
+  "mutablePaths": [
+    "Custom\\ccleaner.portable\\Data",
+    "Custom\\FirefoxPortable\\Data",
+    "Custom\\HijackThisPortable\\Data",
+    "Custom\\HWMonitorPortable\\Data",
+    "Custom\\LibreOfficePortable\\Data",
+    "Custom\\PWGenPortable\\Data",
+    "Custom\\QuickMemoryTestOKPortable\\Data",
+    "Custom\\RevoUninstallerPortable\\Data",
+    "Custom\\SSD-ZPortable\\Data",
+    "Custom\\WiseRegistryCleanerPortable\\Data",
+    "Custom\\xpyPortable\\Data"
+  ],
+  "immutableDefaults": [
+    "manifests\\custom-tools.json",
+    "manifests\\gui-settings.json"
+  ],
+  "runtimeState": [
+    "Runtime\\State\\custom-tools.json",
+    "Runtime\\State\\gui-settings.json"
+  ]
+}

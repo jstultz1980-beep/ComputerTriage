@@ -4,10 +4,14 @@
 # =====================================================================
 
 $Script:ToolkitRoot = Split-Path -Parent $PSScriptRoot
+$Script:DeploymentRoot = Split-Path -Parent (Split-Path -Parent $ToolkitRoot)
+$Script:RuntimeRoot = Join-Path $DeploymentRoot "Runtime"
 
 $Script:Paths = [pscustomobject]@{
 
     Root        = $ToolkitRoot
+    DeploymentRoot = $DeploymentRoot
+    Runtime     = $RuntimeRoot
 
     Config      = Join-Path $ToolkitRoot "Config"
     Core        = Join-Path $ToolkitRoot "Core"
@@ -19,10 +23,10 @@ $Script:Paths = [pscustomobject]@{
     Custom      = Join-Path (Split-Path -Parent $ToolkitRoot) "Custom"
     Manifests   = Join-Path (Split-Path -Parent $ToolkitRoot) "manifests"
 
-    Logs        = Join-Path $ToolkitRoot "Logs"
-    Exports     = Join-Path $ToolkitRoot "Exports"
-    Data        = Join-Path $ToolkitRoot "Data"
-    TempOutputs = Join-Path $ToolkitRoot "Data\TempToolOutputs"
+    Logs        = Join-Path $RuntimeRoot "Logs"
+    Exports     = Join-Path $RuntimeRoot "Exports"
+    Data        = Join-Path $RuntimeRoot "Data"
+    TempOutputs = Join-Path $RuntimeRoot "Data\TempToolOutputs"
 }
 
 $Script:Files = [pscustomobject]@{
@@ -32,8 +36,14 @@ $Script:Files = [pscustomobject]@{
     ToolCatalog = Join-Path $Paths.Config "ToolCatalog.ps1"
     LogFile     = Join-Path $Paths.Logs "Toolkit.log"
     HelpFile    = Join-Path $Paths.Docs "NetworkToolkitHelp.html"
-    CustomTools = Join-Path $Paths.Manifests "custom-tools.json"
-    GuiSettings = Join-Path $Paths.Manifests "gui-settings.json"
+    CustomToolsDefaults = Join-Path $Paths.Manifests "custom-tools.json"
+    CustomTools = Join-Path $RuntimeRoot "State\custom-tools.json"
+    GuiSettings = Join-Path $RuntimeRoot "State\gui-settings.json"
+}
+
+if(!(Test-Path -LiteralPath (Split-Path -Parent $Files.CustomTools))){ New-Item -ItemType Directory -Path (Split-Path -Parent $Files.CustomTools) -Force | Out-Null }
+if(!(Test-Path -LiteralPath $Files.CustomTools) -and (Test-Path -LiteralPath $Files.CustomToolsDefaults)){
+    Copy-Item -LiteralPath $Files.CustomToolsDefaults -Destination $Files.CustomTools -Force
 }
 
 $Global:NTKPaths = $Paths

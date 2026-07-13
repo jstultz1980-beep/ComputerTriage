@@ -57,17 +57,15 @@ try {
     $result.ExitCode = $LASTEXITCODE
     if($result.ExitCode -gt 7){ throw "Robocopy failed with exit code $($result.ExitCode). Review $($result.LogPath)." }
 
-    # A fresh deployment includes the portable applications but none of their
-    # prior user profiles, browser data, caches, or app-specific settings.
-    $customRoot = Join-Path $appDestination 'Custom'
-    if(Test-Path -LiteralPath $customRoot){
-        Get-ChildItem -LiteralPath $customRoot -Directory -Recurse -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -ceq 'Data' } |
-            ForEach-Object {
-                Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue |
-                    Remove-Item -Recurse -Force -ErrorAction Stop
-            }
+    # A fresh deployment clears only explicitly declared portable state paths.
+    $statePolicyPath=Join-Path $appDestination 'manifests\portable-state-policy.json'
+    if(!(Test-Path -LiteralPath $statePolicyPath)){throw 'Portable state policy is missing.'}
+    $statePolicy=Get-Content -LiteralPath $statePolicyPath -Raw|ConvertFrom-Json
+    foreach($relativeMutablePath in @($statePolicy.mutablePaths)){
+        $mutablePath=Join-Path $appDestination $relativeMutablePath
+        if(Test-Path -LiteralPath $mutablePath){Get-ChildItem -LiteralPath $mutablePath -Force -ErrorAction SilentlyContinue|Remove-Item -Recurse -Force -ErrorAction Stop}
     }
+    foreach($relativeRuntimePath in @('Data','Exports','Logs','State')){New-Item -ItemType Directory -Path (Join-Path $staging ("Runtime\"+$relativeRuntimePath)) -Force|Out-Null}
 
     $launcher = Join-Path $source 'NetworkToolkit.vbs'
     if(!(Test-Path -LiteralPath $launcher)){ throw "Launcher not found: $launcher" }

@@ -20,7 +20,8 @@ These files and folders are required in a deployed toolkit:
 - `App/Triage/Templates/`, `App/Triage/Tools/`, and `App/Triage/README.md`: triage runtime templates and approved triage tools.
 - `App/Custom/`: portable toolbox apps on fresh deployment.
 - `App/manifests/toolkit-version.json`: source-of-truth toolkit version and build metadata.
-- `App/manifests/custom-tools.json`: toolbox app registry on fresh deployment.
+- `App/manifests/custom-tools.json`: immutable toolbox defaults on fresh deployment.
+- `App/manifests/portable-state-policy.json`: explicit mutable/immutable path ownership.
 - `App/Update-NetworkToolkit.ps1`: field update engine.
 - `App/Deploy-NetworkToolkit.ps1`: fresh deployment engine.
 - `App/DeploymentExclusions.ps1`: shared deployment/update exclusion policy.
@@ -29,9 +30,10 @@ These files and folders are required in a deployed toolkit:
 
 Client data is intentionally excluded from fresh deployment and deployed toolkit updates unless the dedicated client-data transfer workflow is used:
 
-- `App/NetworkToolkit/Data/`
-- `App/NetworkToolkit/Exports/`
-- `App/NetworkToolkit/Logs/`
+- `Runtime/Data/`
+- `Runtime/Exports/`
+- `Runtime/Logs/`
+- `Runtime/State/`
 - `App/Triage/Runs/`
 - `App/Triage/Profiles/`
 - `App/logs/`
@@ -40,9 +42,9 @@ Client data is intentionally excluded from fresh deployment and deployed toolkit
 
 The updater preserves these destination files because they are technician/runtime state for that copy:
 
-- `App/manifests/gui-settings.json`
-- `App/manifests/custom-tools.json`
-- `App/manifests/custom-tools.json.bak`
+- `Runtime/State/gui-settings.json`
+- `Runtime/State/custom-tools.json`
+- `Runtime/State/custom-tools.json.bak`
 - `App/Custom/`
 - `App/NetworkToolkit/ExternalTools/`
 

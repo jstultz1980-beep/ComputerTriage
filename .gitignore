@@ -2,3 +2,4 @@ App/cache/
 App/logs/
 App/Triage/Runs/
 App/Triage/Tools/**/*.cfg
+Runtime/

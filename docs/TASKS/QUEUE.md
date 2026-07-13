@@ -12,13 +12,12 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Active | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
+| `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Active | Consolidate analysis/tool metadata sources and verify plugin modularity. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 3 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate analysis/tool metadata sources and verify plugin modularity. |
 | 4 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
 | 5 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
 | 6 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
@@ -36,6 +35,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Complete | Added masked/audited sensitive actions, explicit retention, selective verified encrypted transfer, atomic state, and Runtime/default separation. |
 | `TASK-0105-Project-Custodian-Build-System-Engineering-Audit` | Complete | Accepted the Build System audit, retained TASK-0100 for performance remediation, reset only Build System, and activated TASK-0094. |
 | `TASK-0104-Build-System-Audit-Preparation` | Complete | Prepared deterministic Build System threshold evidence without resetting the counter. |
 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Complete | Enforced tracked trust, lifecycle, licensing, EULA, EDR, and package-retention policy. |
@@ -48,6 +48,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 | `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation` | Complete | Added canonical operation results, deterministic exits, startup classification, partial propagation, and failed-contract handling. |
 
 ## Current Decision
+
+- TASK-0094 is complete and TASK-0095 is the only Active task.
+- No subsystem is gated.
 
 - TASK-0105 is complete and the Build System audit evidence is accepted.
 - Only Build System was reset from `25 / 25` to `0 / 25`.

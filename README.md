@@ -101,20 +101,21 @@ NetworkToolkit\
 | `NetworkToolkit.vbs` | Root launcher used by technicians. |
 | `App\NetworkToolkit.ps1` | Shared launcher for GUI and CLI. |
 | `App\ToolKit-GUI` | Windows Forms GUI code, icon, and logo assets. |
-| `App\NetworkToolkit` | Shared toolkit backend, plugins, docs, reports, logs, data, and utilities. |
+| `App\NetworkToolkit` | Immutable toolkit backend, plugins, docs, and utilities. |
 | `App\NetworkToolkit\Config` | Toolkit path/configuration and GUI tool catalog. |
 | `App\NetworkToolkit\Core` | Core network scan/ping/port scan functions. |
 | `App\NetworkToolkit\Discovery` | Network topology and neighbor discovery functions. |
 | `App\NetworkToolkit\Plugins` | Console and GUI-backed feature modules. |
 | `App\NetworkToolkit\Utilities` | Shared helpers for logging, retention, launch, state, reporting, and AI bundles. |
 | `App\NetworkToolkit\Docs` | Help, readiness notes, and placement matrix. |
-| `App\NetworkToolkit\Exports` | Technician-facing reports. Runtime/client data. |
-| `App\NetworkToolkit\Logs` | Toolkit and tool usage logs. Runtime/client data. |
-| `App\NetworkToolkit\Data` | Computer profiles, computer state, minidumps, and temp output sessions. Runtime/client data. |
+| `Runtime\Exports` | Technician-facing reports and artifact metadata. Runtime/client data. |
+| `Runtime\Logs` | Toolkit, tool usage, and sensitive-action audit logs. Runtime/client data. |
+| `Runtime\Data` | Computer profiles, atomic computer state, minidumps, and temp output sessions. Runtime/client data. |
+| `Runtime\State` | Writable settings and runtime tool registry separated from shipped defaults. |
 | `App\Custom` | Toolkit-installed portable apps and migrated standalone tools. |
 | `App\ExternalTools` | Bundled third-party tools managed outside the custom manifest. |
 | `App\manifests\toolkit-version.json` | Source version/build metadata used by the updater. |
-| `App\manifests\custom-tools.json` | Runtime/toolbox app registry. Usually not committed as source. |
+| `App\manifests\custom-tools.json` | Immutable shipped toolbox defaults. Runtime changes use `Runtime\State\custom-tools.json`. |
 
 ## Main Technician Workflow
 
@@ -510,12 +511,12 @@ Runtime output is useful during troubleshooting but must be treated as client da
 
 | Location | Contains |
 | --- | --- |
-| `App\NetworkToolkit\Exports` | HTML/TXT/CSV reports intended for technicians. |
-| `App\NetworkToolkit\Data\ComputerProfiles` | Saved computer profile JSON/HTML. |
-| `App\NetworkToolkit\Data\ComputerState` | Latest known state per computer. |
-| `App\NetworkToolkit\Data\MiniDumps` | Collected crash dump files. |
-| `App\NetworkToolkit\Data\TempToolOutputs` | Per-tool output sessions. |
-| `App\NetworkToolkit\Logs` | Toolkit logs and tool usage logs. |
+| `Runtime\Exports` | HTML/TXT/CSV reports intended for technicians. |
+| `Runtime\Data\ComputerProfiles` | Saved computer profile JSON/HTML. |
+| `Runtime\Data\ComputerState` | Latest known atomic state per computer. |
+| `Runtime\Data\MiniDumps` | Collected crash dump files. |
+| `Runtime\Data\TempToolOutputs` | Per-tool output sessions. |
+| `Runtime\Logs` | Toolkit logs, tool usage logs, and sensitive-action audit. |
 
 Use **Settings > Remove Client Data** after an engagement or when preparing a clean field copy. This cleanup is intentionally double-confirmed because it removes reports, profiles, logs, temp output sessions, minidumps, and computer state.
 

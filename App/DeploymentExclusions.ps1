@@ -16,6 +16,7 @@ function Get-NetworkToolkitDeploymentExclusions {
         "Triage\Runs",
         "Triage\Profiles",
         "logs"
+        "Runtime"
     )
 
     $relativeFiles = @(

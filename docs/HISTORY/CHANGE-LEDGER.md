@@ -9,22 +9,32 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 12 / 25 | TASK-0093 external-tool trust and lifecycle contract. |
-| Documentation | 13 / 25 | TASK-0093 policy and Build audit evidence. |
-| Task System | 19 / 25 | TASK-0093 closeout, TASK-0104 preparation, and TASK-0105 activation. |
-| Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
+| Architecture | 13 / 25 | TASK-0094 artifact ownership, transfer, and runtime-state contracts. |
+| Documentation | 14 / 25 | TASK-0094 sensitive artifact and runtime-state policy. |
+| Task System | 20 / 25 | TASK-0094 completion and TASK-0095 activation. |
+| Evidence Collection and Deterministic Analysis | 9 / 25 | TASK-0094 classified selective evidence transfer. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
-| Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
-| UI | 0 / 25 | TASK-0103 Engineering Audit accepted and reset only UI. |
-| Plugin Framework | 4 / 25 | TASK-0093 provenance-gated external-tool launch behavior. |
-| Build System | 0 / 25 | TASK-0105 Engineering Audit accepted and reset only Build System. |
-| Validation/Test Framework | 6 / 25 | TASK-0093 provenance and lifecycle negative-path fixtures. |
-| Roadmap/Backlog | 23 / 25 | TASK-0094 activated after Build System audit acceptance. |
+| Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
+| UI | 1 / 25 | TASK-0094 explicit software-key reveal/copy/export actions. |
+| Plugin Framework | 5 / 25 | TASK-0094 artifact policy integration. |
+| Build System | 1 / 25 | TASK-0094 explicit portable mutable-path policy and Runtime layout. |
+| Validation/Test Framework | 7 / 25 | TASK-0094 sensitive artifact and concurrency fixtures. |
+| Roadmap/Backlog | 24 / 25 | Architecture stabilization advanced to TASK-0095. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0094-01 | 2026-07-13 | TASK-0094 | Architecture | +1 | Defined artifact ownership, retention, transfer, immutable program, and writable Runtime contracts. |
+| CHG-0094-02 | 2026-07-13 | TASK-0094 | Evidence Collection and Deterministic Analysis | +1 | Added classified selective evidence transfer with verification and encryption. |
+| CHG-0094-03 | 2026-07-13 | TASK-0094 | Reporting | +1 | Masked licensing reports by default and classified unmasked exports Sensitive. |
+| CHG-0094-04 | 2026-07-13 | TASK-0094 | UI | +1 | Added explicit audited reveal, clipboard, and unmasked export confirmation. |
+| CHG-0094-05 | 2026-07-13 | TASK-0094 | Plugin Framework | +1 | Integrated shared artifact metadata and atomic state utilities. |
+| CHG-0094-06 | 2026-07-13 | TASK-0094 | Build System | +1 | Replaced folder-name cleanup with an explicit mutable-path policy and Runtime layout. |
+| CHG-0094-07 | 2026-07-13 | TASK-0094 | Validation/Test Framework | +1 | Added mask, reveal, retention, transfer, interruption, concurrency, and separation fixtures. |
+| CHG-0094-08 | 2026-07-13 | TASK-0094 | Documentation | +1 | Documented sensitive artifact and runtime-state policy. |
+| CHG-0094-09 | 2026-07-13 | TASK-0094 / TASK-0095 | Task System | +1 | Completed TASK-0094 and activated TASK-0095. |
+| CHG-0094-10 | 2026-07-13 | TASK-0094 / TASK-0095 | Roadmap/Backlog | +1 | Advanced from release-blocking remediation into architecture stabilization. |
 | CHG-0105-01 | 2026-07-13 | TASK-0105 | Build System | Reset to 0 | Accepted the TASK-0104 Build System audit package, retained TASK-0100 as performance remediation owner, and reset only Build System. |
 | CHG-0105-02 | 2026-07-13 | TASK-0105 / TASK-0094 | Task System | 0 | Closed the Project Custodian audit boundary and activated TASK-0094 without incrementing the counter for routine audit bookkeeping. |
 | CHG-0093-01 | 2026-07-12 | TASK-0093 | Architecture | +1 | Added the external-tool provenance, integrity, lifecycle, licensing, privilege, and EDR trust contract. |

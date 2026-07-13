@@ -103,6 +103,10 @@ foreach($relativePath in $runtimeFolders){
     New-Item -ItemType Directory -Path (Join-Path $packageAppRoot $relativePath) -Force | Out-Null
 }
 
+foreach($relativePath in @('Data','Exports','Logs','State')){
+    New-Item -ItemType Directory -Path (Join-Path $packageRoot ("Runtime\" + $relativePath)) -Force | Out-Null
+}
+
 # Portable tool logs may sit inside plugin folders rather than the central Logs folder.
 Get-ChildItem -LiteralPath $packageAppRoot -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue |
     ForEach-Object {
@@ -110,17 +114,16 @@ Get-ChildItem -LiteralPath $packageAppRoot -Directory -Recurse -Filter "Logs" -E
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-# Portable applications keep user profiles, browser history, caches, and
-# application settings under their Data folders. A fresh deployment carries
-# the apps but starts with empty portable profiles.
-$customRoot = Join-Path $packageAppRoot 'Custom'
-if(Test-Path -LiteralPath $customRoot){
-    Get-ChildItem -LiteralPath $customRoot -Directory -Recurse -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -ceq 'Data' } |
-        ForEach-Object {
-            Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue |
-                Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        }
+# Mutable portable-application paths are explicit. Never infer ownership from
+# a folder merely being named Data.
+$statePolicyPath = Join-Path $packageAppRoot 'manifests\portable-state-policy.json'
+if(!(Test-Path -LiteralPath $statePolicyPath)){throw 'Portable state policy is missing.'}
+$statePolicy = Get-Content -LiteralPath $statePolicyPath -Raw | ConvertFrom-Json
+foreach($relativeMutablePath in @($statePolicy.mutablePaths)){
+    $mutablePath = Join-Path $packageAppRoot $relativeMutablePath
+    if(Test-Path -LiteralPath $mutablePath){
+        Get-ChildItem -LiteralPath $mutablePath -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 Remove-Item -LiteralPath (Join-Path $packageAppRoot "manifests\gui-settings.json") -Force -ErrorAction SilentlyContinue

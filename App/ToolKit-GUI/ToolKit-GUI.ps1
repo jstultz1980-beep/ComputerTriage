@@ -5176,7 +5176,7 @@ function Initialize-GUICustomToolProvenance {
             Add-Member -InputObject $manifest -MemberType NoteProperty -Name 'schemaVersion' -Value 3 -Force
             $changed = $true
         }
-        if($changed){ $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $NTKFiles.CustomTools -Encoding UTF8 }
+        if($changed){ Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 7 | Out-Null }
     }
     catch { Add-GUILog "Custom tool provenance migration failed: $($_.Exception.Message)" }
     finally { $script:CustomToolProvenanceInitialized = $true }
@@ -5351,7 +5351,7 @@ function Update-GUICustomToolsManifestEntry {
     }
 
     $manifest = [pscustomobject]@{ tools = @($existing + $entry | Sort-Object name) }
-    $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
+    Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 6 | Out-Null
 }
 
 function Remove-GUICustomToolsManifestEntry {
@@ -5366,7 +5366,7 @@ function Remove-GUICustomToolsManifestEntry {
         $manifest = [pscustomobject]@{
             tools = @($manifest.tools | Where-Object { $_.name -ne $Name } | Sort-Object name)
         }
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
+        Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 6 | Out-Null
     }
     catch {
         Add-GUILog "Could not update custom tools manifest: $($_.Exception.Message)"
@@ -5396,7 +5396,7 @@ function Set-GUICustomToolsManifestTabOverride {
             }
         }
 
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
+        Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 6 | Out-Null
     }
     catch {
         Add-GUILog "Could not update custom tool tab placement: $($_.Exception.Message)"
@@ -5422,7 +5422,7 @@ function Set-GUICustomToolsManifestName {
         }
 
         $manifest = [pscustomobject]@{ tools = @($manifest.tools | Sort-Object name) }
-        $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $NTKFiles.CustomTools -Encoding UTF8
+        Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 6 | Out-Null
     }
     catch {
         Add-GUILog "Could not rename custom tool: $($_.Exception.Message)"
@@ -7586,7 +7586,7 @@ function Set-GUICustomToolUpgradeStatus {
             Add-Member -InputObject $tool -MemberType NoteProperty -Name availableVersion -Value $AvailableVersion -Force
             Add-Member -InputObject $tool -MemberType NoteProperty -Name lastUpdateCheck -Value (Get-Date).ToString('o') -Force
         }
-        $manifest | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $NTKFiles.CustomTools -Encoding UTF8
+        Write-NTKLockedJson -Path $NTKFiles.CustomTools -Value $manifest -Depth 7 | Out-Null
         $script:GuiCustomToolsCache = $null
     }
     catch {
@@ -9767,7 +9767,7 @@ function Save-GUISettings {
         New-Item -ItemType Directory -Path $NTKPaths.Manifests -Force | Out-Null
     }
 
-    $Settings | ConvertTo-Json -Depth 6 | Set-Content -Path $path -Encoding UTF8
+    Write-NTKLockedJson -Path $path -Value $Settings -Depth 6 | Out-Null
     $script:GuiSettings = $Settings
 }
 
@@ -14159,7 +14159,7 @@ function Refresh-GUISoftwareKeyFinderResults {
     if($script:SoftwareKeyGrid){
         $SoftwareKeyGrid.Rows.Clear()
         foreach($key in @($Keys)){
-            $row = $SoftwareKeyGrid.Rows.Add($key.Product,$key.Key,$key.Source,$key.Note)
+            $row = $SoftwareKeyGrid.Rows.Add($key.Product,(ConvertTo-NTKMaskedSensitiveValue $key.Key),$key.Source,$key.Note)
             $SoftwareKeyGrid.Rows[$row].Tag = $key
         }
     }
@@ -14180,6 +14180,8 @@ function Start-GUISoftwareKeyFinderScan {
 
         $keys = @(Get-NTKWindowsLicenseKeys) + @(Get-NTKOfficeLicenseKeys) + @(Get-NTKApplicationLicenseEntries)
         $activation = @(Get-NTKMicrosoftActivationInventory)
+        $script:SoftwareKeyResults = $keys
+        $script:SoftwareActivationResults = $activation
         $script:SoftwareKeyReportPath = Export-NTKSoftwareKeyReport -RecoveredKeys $keys -ActivationInventory $activation
         Refresh-GUISoftwareKeyFinderResults -Keys $keys -Activation $activation
         Add-GUILog "Software Key Finder completed. Confidential report: $script:SoftwareKeyReportPath"
@@ -14203,13 +14205,25 @@ function Copy-GUISelectedSoftwareKey {
         return
     }
 
-    $key = [string]$SoftwareKeyGrid.SelectedRows[0].Cells["Key"].Value
+    $answer=[System.Windows.Forms.MessageBox]::Show("Reveal and copy this sensitive licensing value to the clipboard? This action will be audited.","Software Key Finder",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning)
+    if($answer -ne [System.Windows.Forms.DialogResult]::Yes){return}
+    $record=$SoftwareKeyGrid.SelectedRows[0].Tag
+    $key = [string]$record.Key
     if(!$key){
         return
     }
 
     [System.Windows.Forms.Clipboard]::SetText($key)
+    Write-NTKSensitiveActionAudit -Action 'RevealAndCopySoftwareKey' -ArtifactPath 'WindowsClipboard' -Reason ([string]$record.Product)
     Add-GUILog "Copied a software key to the clipboard."
+}
+
+function Export-GUIUnmaskedSoftwareKeyReport {
+    if(@($script:SoftwareKeyResults).Count -eq 0){[System.Windows.Forms.MessageBox]::Show('Run Scan Computer first.','Software Key Finder')|Out-Null;return}
+    $answer=[System.Windows.Forms.MessageBox]::Show("Export an unmasked sensitive report? It will expire under the three-day sensitive retention policy and the action will be audited.","Software Key Finder",[System.Windows.Forms.MessageBoxButtons]::YesNo,[System.Windows.Forms.MessageBoxIcon]::Warning)
+    if($answer -ne [System.Windows.Forms.DialogResult]::Yes){return}
+    $script:SoftwareKeyReportPath=Export-NTKSoftwareKeyReport -RecoveredKeys $script:SoftwareKeyResults -ActivationInventory $script:SoftwareActivationResults -Reveal -ConfirmSensitiveAction -Reason 'GUI technician confirmation'
+    Open-GUISoftwareKeyReport
 }
 
 function Open-GUISoftwareKeyReport {
@@ -14249,7 +14263,8 @@ function Build-SoftwareKeyFinderPage {
     foreach($button in @(
         (New-GUIButton "Scan Computer" { Start-GUISoftwareKeyFinderScan }),
         (New-GUIButton "Copy Key" { Copy-GUISelectedSoftwareKey }),
-        (New-GUIButton "Key Report" { Open-GUISoftwareKeyReport })
+        (New-GUIButton "Key Report" { Open-GUISoftwareKeyReport }),
+        (New-GUIButton "Export Unmasked" { Export-GUIUnmaskedSoftwareKeyReport })
     )){
         $button.Width = 150
         [void]$toolbar.Controls.Add($button)

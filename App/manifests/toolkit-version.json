@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712214017,
-    "SourceUpdatedAt":  "2026-07-12T21:40:17.6618752-05:00",
-    "ReleaseNotes":  "TASK-0093 external tool provenance, lifecycle enforcement, and package retention policy."
+    "Build":  20260713090711,
+    "SourceUpdatedAt":  "2026-07-13T09:07:11.4780816-05:00",
+    "ReleaseNotes":  "TASK-0094 sensitive artifact handling, selective verified transfer, atomic runtime state, and immutable default separation."
 }

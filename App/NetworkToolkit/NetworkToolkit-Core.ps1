@@ -88,6 +88,7 @@ $requiredDirs = @(
     $NTKPaths.TempOutputs
     $NTKPaths.Custom
     $NTKPaths.Manifests
+    $NTKPaths.Runtime
 )
 
 foreach($dir in $requiredDirs){

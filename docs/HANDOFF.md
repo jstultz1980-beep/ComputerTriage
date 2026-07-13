@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0094
+HANDOFF-0095
 
 ## Current Task
-TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety
+TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture
 
 ## Current Owner
 Codex
@@ -13,7 +13,7 @@ Codex
 Codex may continue to the next dependency-ready Codex-owned task under the autonomous cycle unless a gate or stop condition is reached.
 
 ## Objective
-Classify and protect sensitive artifacts, define retention and transfer policy, and make runtime state writes atomic and separate from immutable defaults.
+Consolidate analysis and tool metadata sources and verify plugin modularity.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -24,7 +24,8 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - BUILD-AUD-01 remains owned by TASK-0100 for package/build performance instrumentation and observation caching.
 - BUILD-AUD-02 remains low-priority future tool-lifecycle work; no duplicate task was created.
 - Only Build System was reset from `25 / 25` to `0 / 25`.
-- TASK-0094 is the single Active Codex task.
+- TASK-0094 completed sensitive artifact and runtime-state safety remediation.
+- TASK-0095 is the single Active Codex task.
 - Release candidate remains blocked pending Critical/High remediation.
 - `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks.
 - `Governance Refresh` performs a lightweight safe-point governance reload and resumes the same Active task.
@@ -33,28 +34,28 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - Every genuine blocker summary must end exactly with `Tell Debbie to address errors`.
 
 ## Active Task Scope
-`TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety`
+`TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture`
 
-Codex must classify and protect sensitive artifacts, define retention and transfer policy, and make runtime state writes atomic and separate from immutable defaults. Scope is limited to the task file and referenced findings. Future helper frameworks, native replacements, or unrelated external-tool expansion are not authorized.
+Codex must consolidate canonical analysis/tool metadata ownership and validate that plugins can be added, removed, disabled, or failed without editing or breaking core orchestration. Scope is limited to TASK-0095 and its referenced findings.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
 | Repository Governance | 13 / 25 | No |
-| Architecture | 12 / 25 | No |
-| Documentation | 13 / 25 | No |
-| Task System | 19 / 25 | No |
-| Evidence Collection and Deterministic Analysis | 8 / 25 | No |
+| Architecture | 13 / 25 | No |
+| Documentation | 14 / 25 | No |
+| Task System | 20 / 25 | No |
+| Evidence Collection and Deterministic Analysis | 9 / 25 | No |
 | ARGUS | 10 / 25 | No |
-| Reporting | 3 / 25 | No |
-| UI | 0 / 25 | No |
-| Plugin Framework | 4 / 25 | No |
-| Build System | 0 / 25 | No |
-| Validation/Test Framework | 6 / 25 | No |
-| Roadmap/Backlog | 23 / 25 | No |
+| Reporting | 4 / 25 | No |
+| UI | 1 / 25 | No |
+| Plugin Framework | 5 / 25 | No |
+| Build System | 1 / 25 | No |
+| Validation/Test Framework | 7 / 25 | No |
+| Roadmap/Backlog | 24 / 25 | No |
 
-Build System audit is closed. No subsystem is currently gated.
+No subsystem is currently gated. Roadmap/Backlog is at `24 / 25`; if TASK-0095 increments it, finish TASK-0095 and perform Audit Preparation before further implementation.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -75,7 +76,7 @@ None.
 
 ## Recommended Codex Action
 ```text
-Execute TASK-0094 within its approved scope, preserve documented drift, validate all acceptance criteria, update required records and build metadata, and continue under the autonomous cycle until a stop boundary is reached.
+Execute TASK-0095 within its approved scope, preserve documented drift, validate all acceptance criteria, update required records and build metadata, and continue under the autonomous cycle until a stop boundary is reached.
 ```
 
 ## Next Bot Prompt

@@ -78,12 +78,13 @@ param([string]$ComputerName = $env:COMPUTERNAME)
 
     if(Test-Path $path){
         try {
-            return (ConvertTo-NTKHashtable (Get-Content -Raw -Path $path | ConvertFrom-Json))
+            return (ConvertTo-NTKHashtable (Read-NTKJsonPreservingCorrupt -Path $path))
         }
         catch {
             if(Get-Command Write-NTKWarning -ErrorAction SilentlyContinue){
-                Write-NTKWarning -Component 'ComputerState' -Message ("Could not read {0}: {1}. A new state document will be used." -f $path,$_.Exception.Message)
+                Write-NTKWarning -Component 'ComputerState' -Message ("Could not read {0}: {1}" -f $path,$_.Exception.Message)
             }
+            throw
         }
     }
 
@@ -113,8 +114,7 @@ param(
     }
 
     $path = Get-NTKComputerStatePath -ComputerName $State["ComputerName"]
-    $State | ConvertTo-Json -Depth 20 | Set-Content -Path $path -Encoding UTF8
-    return $path
+    return (Invoke-NTKFileLock -Path $path -Action { Write-NTKAtomicJson -Path $path -Value $State -Depth 20 })
 
 }
 
@@ -129,6 +129,8 @@ param(
     [string]$Source = ""
 )
 
+    $path = Get-NTKComputerStatePath -ComputerName $ComputerName
+    return (Invoke-NTKFileLock -Path $path -Action {
     $state = ConvertTo-NTKHashtable (Read-NTKComputerState -ComputerName $ComputerName)
 
     if(!$state.Contains("Sections") -or $null -eq $state["Sections"]){
@@ -171,7 +173,9 @@ param(
         $state["LastQuickDiagnosisReportPath"] = $reportPath
     }
 
-    return (Write-NTKComputerState -State $state -ComputerName $ComputerName)
+    $state["UpdatedAt"] = (Get-Date).ToString("s")
+    Write-NTKAtomicJson -Path $path -Value $state -Depth 20
+    })
 
 }
 
@@ -186,6 +190,8 @@ param(
     [string]$ComputerName = $env:COMPUTERNAME
 )
 
+    $path = Get-NTKComputerStatePath -ComputerName $ComputerName
+    return (Invoke-NTKFileLock -Path $path -Action {
     $state = ConvertTo-NTKHashtable (Read-NTKComputerState -ComputerName $ComputerName)
 
     if(!$state.Contains("Sections") -or $null -eq $state["Sections"]){
@@ -241,6 +247,8 @@ param(
         TranscriptPreview = $preview
     }
 
-    return (Write-NTKComputerState -State $state -ComputerName $ComputerName)
+    $state["UpdatedAt"] = (Get-Date).ToString("s")
+    Write-NTKAtomicJson -Path $path -Value $state -Depth 20
+    })
 
 }
