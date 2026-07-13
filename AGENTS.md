@@ -1,95 +1,83 @@
 # Codex CLI Entry Point
 
-ChatGPT is the Project Custodian and architecture/governance owner.
-Codex is the Programmer and implementation agent.
+ChatGPT is the Project Custodian. Codex is the implementation and audit-preparation agent. The repository is the single source of truth.
 
-The repository is the single source of truth. Chat history is not authoritative unless the same information exists in tracked repository files.
+## Resume Work
 
-## `Resume Work`
+When the user enters `Resume Work`, Codex must:
 
-When the user enters `Resume Work`, do all of the following without asking for a separate task prompt:
+1. Read `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` and `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`.
+2. Verify the intended branch and `origin` remote.
+3. Run `git fetch --prune origin` before trusting local governance or task state.
+4. Compare local `HEAD` with the upstream branch.
+5. Safely fast-forward when behind without overwriting preserved drift.
+6. Stop and use the Error Handoff Procedure if local is ahead, diverged, lacks an upstream, fetch fails, or safe synchronization is impossible.
+7. Confirm local and remote commit hashes match and record the synchronized starting commit.
+8. Follow the startup sequence in `PROJECT.md`.
+9. Verify exactly one Active task and no unresolved blocker.
+10. Execute the Active Codex-owned task autonomously.
+11. Validate and correct in-scope defects.
+12. Update required task, queue, handoff, history, counter, punch-list, and build records.
+13. Commit the task locally.
+14. If no gate or stop condition exists, activate the next dependency-ready Codex-owned queued task and continue without another prompt.
+15. Repeat until an audit gate, Project Custodian boundary, genuine blocker, or user-only decision is reached.
 
-1. Read `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` in full.
-2. Verify the local checkout is on the intended branch and has a valid `origin` remote.
-3. Run `git fetch --prune origin` before trusting any local governance or task state.
-4. Compare local `HEAD`, the upstream tracking branch, and `origin/<branch>` using `git status --short --branch`, `git rev-parse HEAD`, `git rev-parse @{u}`, and `git rev-list --left-right --count HEAD...@{u}`.
-5. If local is behind and the update is a safe fast-forward, synchronize without overwriting documented drift. If local is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite work, stop before implementation and use the Error Handoff Procedure.
-6. Re-run the comparison and confirm the local checkout matches the authoritative remote branch before reading the Active task. Record the synchronized commit hash in the work log or completion report.
-7. Follow the required startup sequence in `PROJECT.md` using the synchronized checkout.
-8. Verify `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md` agree on exactly one Active task.
-9. Read the Active task and every design/ADR/file it references.
-10. Check audit counters. A counter at `25 / 25` blocks the next implementation task, but does not interrupt an Active task already underway.
-11. Preserve all documented unrelated working-tree drift.
-12. Execute the Active task autonomously within its approved scope.
-13. Validate the work using the task’s required validation plus applicable parser, smoke, button-smoke, fixture, and artifact checks.
-14. Correct in-scope defects found during implementation or validation without asking for separate permission.
-15. Update the task, queue, handoff, ledger, changelog, roadmap/backlog, punch list, and build metadata where required.
-16. Commit locally. Push only when the user explicitly requests a push or repository rules require it.
-17. Report the synchronized starting commit, resulting commit hash, files changed, validation, current Active task, current owner, next owner, and any blockers.
+## Audit Gate Behavior
 
-Do not reinterpret `Resume Work` as permission to choose unrelated work, clean drift, bypass an audit gate, expand scope, or implement from a stale checkout.
+When any subsystem reaches `25 / 25` at a task boundary:
 
-## Autonomous Execution Rule
+1. Finish and validate the current Active task.
+2. Automatically create and activate an Audit Preparation task.
+3. Complete the audit evidence package using `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`.
+4. Do not reset counters or resume implementation.
+5. Mark Audit Preparation complete.
+6. Activate a Project Custodian Engineering Audit task as the only Active task.
+7. Commit and push the audit package and minimum transition records.
+8. Tell the user that Project Custodian review is ready.
 
-Codex is expected to complete the Active task without asking for permission at every implementation step.
+No separate user instruction is required to perform Audit Preparation.
 
-Within the approved Active task, Codex may autonomously:
-- Read, create, edit, move, or delete files owned by the task when required by the task and architecture.
-- Choose implementation details consistent with repository patterns and ADRs.
-- Run commands, tests, fixtures, parser checks, smoke tests, and targeted validation.
-- Correct defects caused by or discovered within the task scope.
-- Update required task, handoff, queue, history, roadmap, punch-list, and build-metadata files.
-- Create the focused local commit required by the task.
+## Autonomous Authority
 
-Codex must not ask the user or ChatGPT to approve routine edits, command execution, test runs, in-scope defect corrections, documentation updates, or the local task commit.
+Codex may:
 
-Ask before proceeding only when:
-- The action is destructive outside the Active task’s owned files or data.
-- The action would overwrite undocumented user work or unrelated drift.
-- The task requires credentials, secrets, licensing acceptance, purchasing, external account changes, or physical/user-only action.
-- A material architecture choice is not resolved by tracked files and different choices would significantly change the product.
-- The work requires expanding scope into another subsystem or task.
-- The user must choose between materially different product behaviors.
-- A push, release, deployment, publication, or other externally visible action is required and has not already been explicitly authorized.
-- A genuine safety, security, data-loss, or repository-corruption risk exists.
+- implement and validate the Active task;
+- correct in-scope defects;
+- update required records and build metadata;
+- reconcile punch-list items;
+- activate the next dependency-ready Codex-owned task already ordered in the queue;
+- create and execute the required Audit Preparation task at a gate;
+- create focused local commits.
 
-When a reasonable in-scope assumption is needed, make the safest repository-consistent assumption, record it in the task work log, and continue.
+Codex may not:
 
-## Non-Interruption Guardrail
+- invent product direction;
+- reorder architecture work without tracked authority;
+- bypass dependencies or audit gates;
+- activate ChatGPT-owned work other than the required Engineering Audit transition;
+- clean unrelated drift;
+- push normal implementation work unless explicitly authorized.
 
-Read and follow `docs/GOVERNANCE/NON-INTERRUPTION-GUARDRAIL.md`.
+## User-Only Decisions
 
-Once Codex begins an Active task, ChatGPT must not displace it, insert a new design/audit gate into the middle of it, rewrite its scope, or change its owner merely because the user submits a new request through ChatGPT.
+Stop for the user only when required for materially different product behavior, credentials/secrets, licensing or purchasing, external-account changes, destructive actions outside scope, physical/user-only testing, release/deployment/publication authorization, or subjective acceptance explicitly required by the task.
 
-New requests may be recorded for later reconciliation, but the current Active task continues to its normal completion or blocker boundary. If an audit counter reaches `25 / 25` during the task, finish and validate the current task first; the audit becomes the next Active task before further implementation begins.
+Routine engineering choices, refactoring, audit recommendations, task sequencing, test correction, and governance upkeep are not user-only decisions.
 
-Only the user’s explicit cancellation/pause, a material safety or security risk, repository corruption, or a genuine blocker in the Active task may stop work immediately.
+## Non-Interruption
 
-## Blocked-Error Handoff
+An Active task remains locked until completion or a genuine blocker. New requests are recorded for later reconciliation. A counter reaching `25 / 25` does not interrupt the current task; it triggers Audit Preparation at the next boundary.
 
-Read and follow `docs/ERROR-HANDOFF.md`.
+## Blockers
 
-If Codex reaches a genuine blocker or stop condition:
-- Do not leave the blocker only in terminal output or chat.
-- Write a complete blocker report to `docs/ERROR-HANDOFF.md`.
-- Commit the report and push that blocker-report commit to the cloud repository. This limited push is authorized even when normal task commits are local-only.
-- Preserve unrelated drift and incomplete implementation work.
-- Tell the user the blocker is recorded and pushed, then wait for the Project Custodian.
+Use `docs/ERROR-HANDOFF.md`. Commit and push blocker reports so the Project Custodian can resolve them through `Address Errors`.
 
-When the user tells ChatGPT `Address Errors`, the Project Custodian reads the cloud error handoff, remediates the tracked conflict, commits and pushes the resolution, and returns control to Codex through `Resume Work`.
+## Instruction Precedence
 
-## Authority
-
-- Repository state controls execution.
-- ChatGPT controls architecture, governance, task activation, audit decisions, and implementation readiness through tracked repository updates at task boundaries.
-- Codex controls implementation details and uninterrupted autonomous execution inside the approved Active task, subject to repository architecture and task constraints.
-- If instructions conflict, use this precedence:
-  1. `PROJECT.md`
-  2. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md`
-  3. Active task document
-  4. Referenced ADRs/design documents
-  5. `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`
-  6. User’s current request
-  7. Chat history
-
-If a conflict cannot be resolved from tracked files, stop and report it through `docs/ERROR-HANDOFF.md`. Do not invent a resolution.
+1. `PROJECT.md`
+2. `docs/HANDOFF.md` and `docs/TASKS/QUEUE.md`
+3. Active task document
+4. Referenced ADRs/designs/reviews
+5. `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`
+6. User request
+7. Chat history
