@@ -1,9 +1,12 @@
 # Task Queue
 
-This file is the task-state source of truth alongside `docs/HANDOFF.md`.
+This file is the operational task-state source of truth alongside `docs/HANDOFF.md`.
 
 ## Current Rule
-Exactly one task may have `Active` status at a time. No implementation work may begin unless the active task exists under `docs/TASKS` and `docs/HANDOFF.md` names the same task.
+
+Exactly one task may be Active. A Codex `Resume Work` cycle may complete the Active Codex-owned task and activate the next dependency-ready Codex-owned task already ordered below without another user prompt.
+
+When any subsystem reaches `25 / 25`, Codex must automatically create and complete Audit Preparation, then activate a Project Custodian Engineering Audit task before more implementation.
 
 ## Active
 
@@ -19,9 +22,9 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 | 2 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Queued | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
 | 3 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
 | 4 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Codex | Queued | Make package, deployment, and update operations complete and rollback-capable. |
-| 5 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, and EDR policy for external tools. |
+| 5 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, EDR policy, and tool-retention review. |
 | 6 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
-| 7 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate duplicate analysis, tool metadata, manifest, and status sources of truth. |
+| 7 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate analysis/tool metadata sources and verify plugin modularity. |
 | 8 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
 | 9 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
 | 10 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
@@ -31,25 +34,24 @@ Exactly one task may have `Active` status at a time. No implementation work may 
 
 ## Superseded Tasks
 
-- `TASK-0077-First-Render-Tab-Performance-Hardening` is superseded by TASK-0096 and TASK-0100.
-- `TASK-0078-Embedded-Tool-Trust-And-EDR-Safe-Distribution` is superseded by TASK-0093.
-- `TASK-0079-Release-Packaging-And-Update-Hardening` is superseded by TASK-0092.
+- TASK-0077 is superseded by TASK-0096 and TASK-0100.
+- TASK-0078 is superseded by TASK-0093.
+- TASK-0079 is superseded by TASK-0092.
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
-| `TASK-0101-Validation-Test-Framework-Counter-Audit` | Complete | Audited executable validation, reconciled recent claims, mapped remaining gaps to existing tasks, and reset only Validation/Test Framework. |
-| `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Complete | Added parser-backed evidence quality, structured export errors, source-event-time timeline semantics, and ARGUS confidence handling. |
-| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | Complete | Completed the full engineering audit, findings and debt registers, repository health and executive reports, release-readiness assessment, and dependency-ordered remediation sequence. |
-| `TASK-0085-Documentation-Counter-Audit` | Complete | Audited Documentation at `25 / 25` and reset only Documentation. |
-| `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` | Completed | Added validated immutable run identity, offline evidence isolation, generated-output exclusion, and identity propagation through ARGUS/reports/transfers. |
+| `TASK-0101-Validation-Test-Framework-Counter-Audit` | Complete | Audited executable validation and reset only Validation/Test Framework. |
+| `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Complete | Added parser-backed evidence quality and source-event-time semantics. |
+| `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` | Complete | Added immutable run identity and offline evidence isolation. |
+| `TASK-0084-Full-Codebase-Architecture-And-Quality-Audit` | Complete | Completed the full engineering audit and remediation sequence. |
+| `TASK-0085-Documentation-Counter-Audit` | Complete | Audited and reset Documentation. |
 
 ## Current Decision
 
-- TASK-0084 is closed.
-- TASK-0086 is complete.
-- TASK-0101 is complete and TASK-0088 is the only Active task.
-- Validation/Test Framework reset to `0 / 25` after the required audit.
-- Critical and High findings are mapped to remediation tasks or documented disposition.
-- Net-new feature work remains deferred until the release-blocking remediation sequence is complete.
+- TASK-0088 is the only Active task.
+- Codex is authorized to continue through ordered dependency-ready Codex tasks under one `Resume Work` cycle.
+- Audit Preparation occurs automatically at `25 / 25`.
+- Project Custodian review follows each Audit Preparation package.
+- Net-new feature work remains deferred until release-blocking remediation is complete.
