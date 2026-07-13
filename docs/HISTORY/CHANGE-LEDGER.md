@@ -8,10 +8,10 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 15 / 25 | TASK-0096 shared background operation lifecycle controller. |
-| Documentation | 15 / 25 | TASK-0095 contracts and Roadmap/Backlog audit evidence. |
-| Task System | 23 / 25 | TASK-0096 completion and TASK-0097 Project Custodian activation. |
+| Repository Governance | 14 / 25 | TASK-0097 authoritative governance-document boundaries. |
+| Architecture | 16 / 25 | TASK-0097 intended-state runtime boundaries, contracts, flow, and failure behavior. |
+| Documentation | 16 / 25 | TASK-0097 architecture decision and forward-looking roadmap. |
+| Task System | 24 / 25 | TASK-0097 focused Codex support handoff. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
@@ -19,12 +19,17 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
 | Build System | 3 / 25 | TASK-0096 build metadata. |
 | Validation/Test Framework | 9 / 25 | TASK-0096 background lifecycle and leak fixtures. |
-| Roadmap/Backlog | 1 / 25 | Architecture stabilization advanced to TASK-0097. |
+| Roadmap/Backlog | 2 / 25 | TASK-0097 forward-looking roadmap and approved remaining sequence. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0097-01 | 2026-07-13 | TASK-0097 | Architecture | +1 | Defined intended-state runtime boundaries, canonical components, contracts, flow, and failure behavior. |
+| CHG-0097-02 | 2026-07-13 | TASK-0097 | Repository Governance | +1 | Assigned one authoritative document to each governance responsibility and prohibited duplicated procedure text. |
+| CHG-0097-03 | 2026-07-13 | TASK-0097 | Documentation | +1 | Recorded the Project Custodian decision, expanded the architecture authority, and made the roadmap forward-looking. |
+| CHG-0097-04 | 2026-07-13 | TASK-0097 | Task System | +1 | Transferred the Active task to narrowly scoped Codex documentation/reference support. |
+| CHG-0097-05 | 2026-07-13 | TASK-0097 | Roadmap/Backlog | +1 | Confirmed TASK-0097, TASK-0098, TASK-0099, TASK-0100, and TASK-0080 as the remaining sequence. |
 | CHG-0096-01 | 2026-07-13 | TASK-0096 | Architecture | +1 | Centralized process, job, timer, timeout, cancellation, completion, and cleanup ownership. |
 | CHG-0096-02 | 2026-07-13 | TASK-0096 | UI | +1 | Migrated Analyze and Triage to the shared lifecycle controller while preserving GUI behavior. |
 | CHG-0096-03 | 2026-07-13 | TASK-0096 | Validation/Test Framework | +1 | Added repeated replacement, cancel, close, timeout, failure, partial, success, process, job, and timer cleanup fixtures. |
