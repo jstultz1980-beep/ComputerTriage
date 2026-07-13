@@ -9,11 +9,11 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 Status: Active
 
 Current Active task:
-- `TASK-0108-Task-System-Audit-Preparation`
+- `TASK-0109-Project-Custodian-Task-System-Engineering-Audit`
 
 Current objective:
-- Prepare the mandatory Task System threshold evidence after TASK-0097 completion.
-- Keep TASK-0098 queued until Project Custodian audit acceptance.
+- Review the completed Task System threshold evidence and decide recorded debt dispositions.
+- Reset only Task System if accepted and activate one dependency-ready successor.
 
 ## Remaining Sequence
 

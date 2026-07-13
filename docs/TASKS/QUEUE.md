@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0108-Task-System-Audit-Preparation` | Codex | Active | Prepare deterministic Task System threshold evidence without resetting the counter or beginning implementation. |
+| `TASK-0109-Project-Custodian-Task-System-Engineering-Audit` | ChatGPT (Project Custodian) | Active | Review Task System evidence, decide debt dispositions, reset only the audited counter, and activate the next task. |
 
 ## Ordered Queue
 
@@ -27,6 +27,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0108-Task-System-Audit-Preparation` | Complete | Prepared Task System threshold evidence, preserved the `25 / 25` counter, and transferred review to TASK-0109. |
 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | Complete | Reconciled canonical references, removed stale competing sequence text, and passed all required governance simulations. |
 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Complete | Added a shared background lifecycle controller and migrated Analyze and Triage with leak and terminal-state validation. |
 | `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit` | Complete | Accepted the roadmap audit, confirmed remaining sequence, clarified TASK-0097 ownership, reset only Roadmap/Backlog, and activated TASK-0096. |
@@ -36,9 +37,10 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
+- TASK-0108 is complete and TASK-0109 is the sole Active Project Custodian audit.
+- Task System remains `25 / 25`; Codex did not reset it.
+- TASK-0098 remains queued pending audit acceptance and debt disposition.
 - TASK-0097 is complete and all required terminology and governance simulations passed.
-- Task System reached `25 / 25`; TASK-0108 is the sole Active Audit Preparation task.
-- TASK-0098 remains queued until Project Custodian Task System audit acceptance.
 - The TASK-0097 Project Custodian decision is recorded in `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`.
 - The intended-state architecture and forward-looking roadmap are established.
 - Codex is authorized only for focused terminology/reference reconciliation and governance simulation under TASK-0097.

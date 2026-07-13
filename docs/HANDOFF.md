@@ -1,19 +1,19 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0111
+HANDOFF-0112
 
 ## Current Task
-TASK-0108-Task-System-Audit-Preparation
+TASK-0109-Project-Custodian-Task-System-Engineering-Audit
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
-ChatGPT (Project Custodian) when TASK-0109 becomes active after the Task System audit evidence package is complete.
+Codex after the Project Custodian accepts or corrects the evidence, resets only Task System, and activates exactly one dependency-ready task.
 
 ## Objective
-Prepare deterministic Task System threshold evidence without resetting the counter or beginning TASK-0098.
+Review the TASK-0108 Task System evidence, decide recorded debt dispositions, reset only the audited counter if accepted, and activate the next task.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -26,14 +26,17 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - `docs/ARCHITECTURE.md` now defines the concise intended-state runtime boundaries, contracts, flow, and failure behavior.
 - `docs/ROADMAP.md` is forward-looking; historical chronology remains in task and history records.
 - ARGUS remains the sole approved analysis/explanation product name.
-- Task System reached `25 / 25`; TASK-0108 Audit Preparation is mandatory before implementation resumes.
+- Task System reached `25 / 25` and triggered mandatory TASK-0108 Audit Preparation before implementation could resume.
+- TASK-0108 completed the evidence package and transferred the audit to TASK-0109.
+- Task System remains `25 / 25`; Codex did not reset it.
+- Six Task System debt candidates require Project Custodian disposition.
 - The remaining sequence is TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0108-Task-System-Audit-Preparation`
+`TASK-0109-Project-Custodian-Task-System-Engineering-Audit`
 
-Codex must gather and validate Task System evidence using the audit template, keep the counter at `25 / 25`, keep TASK-0098 queued, and transfer to a Project Custodian Engineering Audit. No implementation or counter reset is authorized.
+The Project Custodian must review `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`, decide the recorded debt dispositions, reset only Task System if accepted, and activate exactly one dependency-ready successor. Codex must not implement while TASK-0109 is Active.
 
 ## Audit Counters
 
@@ -41,7 +44,7 @@ Codex must gather and validate Task System evidence using the audit template, ke
 |---|---:|---|
 | Repository Governance | 15 / 25 | No |
 | Architecture | 16 / 25 | No |
-| Documentation | 17 / 25 | No |
+| Documentation | 18 / 25 | No |
 | Task System | 25 / 25 | Yes |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
@@ -60,17 +63,22 @@ Do not stage or clean unless a focused task explicitly owns it:
 - Untracked: `App/NetworkToolkit/Logs/`
 - Untracked: `Custodian-Audit-20260711-000156.md`
 - Untracked: `Project-Custodian-Bridge.ps1`
+- Untracked: `Export-ProjectFactoryGovernancePackage.ps1`
+- Untracked: `Project-Factory-Governance-Handoff.zip`
+- Untracked: `Project-Factory-Lessons-Learned-Handoff.txt`
 - Untracked: `Set-CodexPermissions.ps1`
 
 ## Blockers
 None.
 
 ## Decision Reference
+- `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`
+- `docs/TASKS/TASK-0109-Project-Custodian-Task-System-Engineering-Audit.md`
 - `docs/REVIEWS/TASK-0097/PROJECT-CUSTODIAN-DECISION.md`
 - `docs/ARCHITECTURE.md`
 - `docs/ROADMAP.md`
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```
