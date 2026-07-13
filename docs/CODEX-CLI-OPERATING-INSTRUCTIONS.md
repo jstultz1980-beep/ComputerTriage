@@ -148,7 +148,7 @@ Push is required for:
 
 Use `docs/ERROR-HANDOFF.md` for synchronization failures, irreconcilable governance conflicts, out-of-scope blockers, structural failure, unrelated-work overwrite risk, security/data-loss risk, or validation failure outside authorized correction scope.
 
-Commit and push the blocker report, then tell the user to prompt ChatGPT with `Address Errors`.
+Commit and push the blocker report, then stop at the Project Custodian boundary.
 
 ## Completion Reporting
 
@@ -164,3 +164,19 @@ At a stop boundary report:
 - counters;
 - preserved drift;
 - blocker, audit, or user-only decision requiring the stop.
+
+The summary must then end with exactly one final operator instruction and no text after it.
+
+For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, the exact final line is:
+
+```text
+Tell Debbie to continue
+```
+
+For a genuine blocker recorded and pushed through `docs/ERROR-HANDOFF.md`, the exact final line is:
+
+```text
+Tell Debbie to address errors
+```
+
+Do not paraphrase either final line.
