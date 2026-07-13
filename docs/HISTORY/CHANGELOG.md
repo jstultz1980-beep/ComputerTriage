@@ -2,6 +2,13 @@
 
 Detailed historical implementation chronology remains preserved in Git history and individual task records. This file records current milestone-level changes.
 
+## 2026-07-13
+
+- Completed TASK-0105 Project Custodian Build System Engineering Audit.
+- Accepted the TASK-0104 evidence package and reset only Build System from `25 / 25` to `0 / 25`.
+- Retained TASK-0100 for package/build performance instrumentation and observation caching; created no duplicate remediation task.
+- Activated TASK-0094 Sensitive Artifact Handling and Runtime State Safety for Codex.
+
 ## 2026-07-12
 
 - Completed TASK-0093 external-tool provenance, lifecycle, EULA, privilege, EDR, and production-retention enforcement.
