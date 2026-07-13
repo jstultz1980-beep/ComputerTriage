@@ -8,9 +8,9 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 12 / 25 | Mandatory Codex operator closing instruction. |
+| Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
 | Architecture | 9 / 25 | TASK-0090 ARGUS citation and confidence contract. |
-| Documentation | 9 / 25 | TASK-0090 evidence plus completion-prompt governance. |
+| Documentation | 10 / 25 | Governance Refresh policy and command documentation. |
 | Task System | 14 / 25 | TASK-0090 completion and TASK-0091 activation. |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
@@ -25,6 +25,8 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-GOV-0094 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Added the lightweight `Governance Refresh` command so Codex can safely reload current governance during an Active task and resume without a full restart. |
+| CHG-DOC-0094 | 2026-07-12 | Governance maintenance | Documentation | +1 | Added `docs/GOVERNANCE/GOVERNANCE-REFRESH.md` and registered the command in PROJECT.md, AGENTS.md, and Codex operating instructions. |
 | CHG-GOV-0093 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Required every Codex stop-boundary summary to end with the exact operator instruction `Tell Debbie to continue`, or `Tell Debbie to address errors` for a genuine blocker, with no trailing text. |
 | CHG-DOC-0093 | 2026-07-12 | Governance maintenance | Documentation | +1 | Updated authoritative workflow files with the mandatory closing instruction. |
 | CHG-GOV-0092 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Authorized one `Resume Work` instruction to continue through dependency-ready Codex tasks until an audit, Project Custodian, blocker, or user-only boundary. |
