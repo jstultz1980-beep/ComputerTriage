@@ -12,16 +12,14 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 - Guided Analyze workflow integration.
 - TASK-0084 full-codebase architecture and quality audit.
 
-## Current Phase - Release-Blocking Remediation
+## Current Phase - Architecture Stabilization
 
 Status: Active
 
 Current Active task:
-- `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit`
+- `TASK-0096-GUI-Background-Operation-Controller-Extraction`
 
-TASK-0094 and TASK-0095 are complete. Roadmap/Backlog reached `25 / 25`; TASK-0106 prepared evidence and TASK-0107 is the active Project Custodian audit.
-
-TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
+Release-blocking remediation through TASK-0094 is complete. TASK-0095 established canonical analysis, tool-metadata, plugin, manifest, and operation-state contracts. TASK-0106/TASK-0107 completed the Roadmap/Backlog threshold audit and reset only that subsystem.
 
 Required sequence:
 1. TASK-0086 Offline Evidence Isolation and Bundle Identity. Complete.
@@ -32,41 +30,26 @@ Required sequence:
 6. TASK-0091 Print and Remote Change Transaction Safety. Complete.
 7. TASK-0092 Transactional Package, Deploy, and Update Integrity. Complete.
 8. TASK-0093 External Tool Provenance and Lifecycle Policy. Complete.
-9. TASK-0104 / TASK-0105 Build System Audit Preparation and Project Custodian Engineering Audit. Complete.
+9. TASK-0104 / TASK-0105 Build System Audit Preparation and Engineering Audit. Complete.
 10. TASK-0094 Sensitive Artifact Handling and Runtime State Safety. Complete.
+11. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Complete.
+12. TASK-0106 / TASK-0107 Roadmap/Backlog Audit Preparation and Engineering Audit. Complete.
+13. TASK-0096 GUI Background Operation Controller Extraction. Active.
+14. TASK-0097 Architecture, Terminology, and Governance Consolidation.
+15. TASK-0098 Shared Reporting and Run Index Contracts.
+16. TASK-0099 Repository-Wide Validation Foundation.
+17. TASK-0100 Performance Instrumentation and Run-Scoped Observation Cache.
+18. TASK-0080 Release-Candidate Validation and Documentation.
 
-Exit target:
-- No unresolved Critical findings.
-- Every High finding resolved or explicitly accepted in writing.
-- Evidence, result, collection, ARGUS, destructive-operation, deployment, tool-trust, and sensitive-data contracts are validated.
-
-## Architecture Stabilization
-
-Status: Paused for Roadmap/Backlog audit
-
-1. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Complete.
-2. TASK-0096 GUI Background Operation Controller Extraction.
-3. TASK-0097 Architecture, Terminology, and Governance Consolidation.
-4. TASK-0098 Shared Reporting and Run Index Contracts.
-
-## Validation and Performance Gates
-
-Status: Queued
-
-1. TASK-0099 Repository-Wide Validation Foundation.
-2. TASK-0100 Performance Instrumentation and Run-Scoped Observation Cache.
-
-TASK-0099 may begin incrementally after the contracts it validates are stable enough to avoid encoding known-bad behavior.
+TASK-0097 begins with a Project Custodian architecture/governance decision. Codex support is limited to focused implementation-reference updates explicitly authorized by that decision.
 
 ## Release Candidate
 
-Status: Blocked pending remediation
-
-Final task:
-- `TASK-0080-Release-Candidate-Validation-And-Documentation`
+Status: Blocked pending stabilization and validation
 
 Release-candidate entry criteria:
-- Release-blocking remediation complete.
+- No unresolved Critical findings.
+- Every High finding resolved or explicitly accepted in writing.
 - Repository-wide validation gates pass.
 - Package/update rollback and external-tool provenance are validated.
 - Performance budgets are measured and accepted.
