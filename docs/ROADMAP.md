@@ -9,16 +9,17 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 Status: Active
 
 Current Active task:
-- `TASK-0109-Project-Custodian-Task-System-Engineering-Audit`
+- `TASK-0110-Task-System-Consistency-Cleanup`
 
 Current objective:
-- Review the completed Task System threshold evidence and decide recorded debt dispositions.
-- Reset only Task System if accepted and activate one dependency-ready successor.
+- Resolve accepted Task System identity, status, Error Handoff, and punch-list consistency debt.
+- Preserve approved runtime architecture and governance behavior.
+- Activate TASK-0098 after focused cleanup and simulations pass.
 
 ## Remaining Sequence
 
-1. **TASK-0108 / TASK-0109 - Task System Audit Preparation and Engineering Audit**
-   - Audit the `25 / 25` Task System threshold before more implementation.
+1. **TASK-0110 - Task System Consistency Cleanup**
+   - Resolve accepted Task System audit debt before more implementation.
 2. **TASK-0098 - Shared Reporting and Run Index Contracts**
    - Establish canonical report metadata, escaping, and immutable run identity resolution.
 3. **TASK-0099 - Repository-Wide Validation Foundation**
