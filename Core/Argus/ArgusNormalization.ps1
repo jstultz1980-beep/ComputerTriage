@@ -23,9 +23,9 @@ function Global:Get-ARGUSCapabilityStatus {
 function Global:Get-ARGUSFindingDomain {
     param([object]$Finding)
 
-    $title = [string]$Finding.title
-    $tags = @($Finding.tags)
-    $category = [string]$Finding.category
+    $title = ([string]$Finding.title).Trim().ToLowerInvariant()
+    $tags = @($Finding.tags | ForEach-Object { ([string]$_).Trim().ToLowerInvariant() })
+    $category = ([string]$Finding.category).Trim().ToLowerInvariant()
 
     $domainMap = @(
         @{ Domain = "storage"; Tokens = @("storage") },
@@ -41,12 +41,13 @@ function Global:Get-ARGUSFindingDomain {
 
     foreach($entry in $domainMap){
         foreach($token in $entry.Tokens){
-            if($title -match [regex]::Escape($token) -or $category -match [regex]::Escape($token)){
+            $normalizedToken = $token.ToLowerInvariant()
+            if($title -eq $normalizedToken -or $category -eq $normalizedToken){
                 return $entry.Domain
             }
 
             foreach($tag in $tags){
-                if(([string]$tag) -match [regex]::Escape($token)){
+                if($tag -eq $normalizedToken){
                     return $entry.Domain
                 }
             }
@@ -77,6 +78,8 @@ function Global:New-ARGUSCitationRecord {
         field = $Field
         observedValue = if($null -ne $ObservedValue){ [string]$ObservedValue } else { $null }
         trustRank = $TrustRank
+        runId = if($script:ARGUSBundleValidation){$script:ARGUSBundleValidation.Identity.runId}else{$null}
+        bundleId = if($script:ARGUSBundleValidation){$script:ARGUSBundleValidation.Identity.bundleId}else{$null}
     }
 }
 
@@ -442,7 +445,9 @@ function Global:New-ARGUSNormalizedAnalysis {
             $domain = Get-ARGUSFindingDomain -Finding $finding
             $citation = Add-NormalizedCitation (New-ARGUSCitationRecord -SourceType "deterministicFinding" -Artifact "Analysis/findings.json" -JsonPointer ("/findings/{0}" -f $i) -Field "finding" -ObservedValue $finding.title -TrustRank 4)
             $statement = if($finding.summary){ [string]$finding.summary } else { [string]$finding.title }
-            [void]$facts.Add((New-ARGUSFactRecord -Id (Get-ARGUSNextFactId -Counter ([ref]$factCounter)) -Domain $domain -Label ([string]$finding.id) -Statement $statement -Severity ([string]$finding.severity) -Confidence ([string]$finding.confidence) -SourceKind "deterministicFinding" -Citations @($citation) -Limitations @("Deterministic HEPHAESTUS finding; ARGUS does not override it.")))
+            $upstreamConfidence = ([string]$finding.confidence).ToLowerInvariant()
+            $boundedConfidence = if($qualityBand -eq 'low'){'low'}elseif($qualityBand -eq 'partial' -and $upstreamConfidence -in @('confirmed','high')){'medium'}else{$upstreamConfidence}
+            [void]$facts.Add((New-ARGUSFactRecord -Id (Get-ARGUSNextFactId -Counter ([ref]$factCounter)) -Domain $domain -Label ([string]$finding.id) -Statement $statement -Severity ([string]$finding.severity) -Confidence $boundedConfidence -SourceKind "deterministicFinding" -Citations @($citation) -Limitations @("Deterministic HEPHAESTUS finding; ARGUS confidence is capped by verified evidence quality.")))
 
             $recommended = if($finding.recommendations -and @($finding.recommendations).Count -gt 0){
                 [string](@($finding.recommendations) -join " ")

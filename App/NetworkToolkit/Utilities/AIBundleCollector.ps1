@@ -115,7 +115,10 @@ param(
 )
     try {
         $detail = & $Script
-        Write-NTKCollectorSectionStatus $Status $Name 'Completed' ([string]$detail)
+        $failedInner = ($detail -is [bool] -and !$detail) -or ($detail -and $detail.PSObject.Properties['state'] -and $detail.state -notin @('Succeeded','SucceededWithWarnings'))
+        $sectionState = if($failedInner){'Failed'}elseif($detail -and $detail.PSObject.Properties['state'] -and $detail.state -eq 'SucceededWithWarnings'){'Partial'}else{'Completed'}
+        $sectionDetail = if($detail -and $detail.PSObject.Properties['message']){[string]$detail.message}else{[string]$detail}
+        Write-NTKCollectorSectionStatus $Status $Name $sectionState $sectionDetail
     }
     catch {
         Write-NTKCollectorSectionStatus $Status $Name 'Failed' $_.Exception.Message

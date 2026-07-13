@@ -274,6 +274,19 @@ function Global:Export-NTKTriagePowerShellObject {
     }
 }
 
+function Global:Test-NTKDiagnosticBundleIntegrity {
+    param([Parameter(Mandatory=$true)][string]$BundlePath,[string]$SidecarPath = ($BundlePath + '.sha256.json'))
+    if(!(Test-Path -LiteralPath $BundlePath)){ return [pscustomobject]@{passed=$false;status='missing';message='Bundle is missing.'} }
+    if(!(Test-Path -LiteralPath $SidecarPath)){ return [pscustomobject]@{passed=$false;status='missing_sidecar';message='Bundle hash sidecar is missing.'} }
+    try {
+        $sidecar = Get-Content -LiteralPath $SidecarPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $actual = (Get-FileHash -LiteralPath $BundlePath -Algorithm SHA256).Hash
+        $passed = ($sidecar.algorithm -eq 'SHA256' -and $sidecar.sha256 -eq $actual -and $sidecar.bundleFileName -eq [IO.Path]::GetFileName($BundlePath))
+        [pscustomobject]@{passed=$passed;status=$(if($passed){'verified'}else{'tampered'});expected=$sidecar.sha256;actual=$actual;sidecarPath=$SidecarPath;message=$(if($passed){'Final bundle hash verified.'}else{'Final bundle hash mismatch.'})}
+    }
+    catch { [pscustomobject]@{passed=$false;status='invalid_sidecar';message=$_.Exception.Message;sidecarPath=$SidecarPath} }
+}
+
 function Global:Get-NTKTriageCommandPlan {
     param([string]$Profile)
     $normal = @(
@@ -499,6 +512,7 @@ function Global:Invoke-NTKTriageRun {
     $run = New-NTKTriageRunFolder -Profile $Profile
     $warnings = New-Object System.Collections.Generic.List[object]
     $commandResults = @()
+    $collectorResults = @()
     $toolResults = @()
     $missingTools = @()
     $fileRecords = @()
@@ -527,7 +541,7 @@ function Global:Invoke-NTKTriageRun {
         )
         foreach($collector in $psCollectors){
             $base = ($collector.Name -replace '[^\w.-]','_')
-            [void](Export-NTKTriagePowerShellObject -Name $collector.Name -ScriptBlock $collector.Script -TxtPath (Join-Path $run.Path "CommandOutput\$base.txt") -JsonPath (Join-Path $run.Path "CommandOutput\$base.json") -RunLog $run.RunLog)
+            $collectorResults += Export-NTKTriagePowerShellObject -Name $collector.Name -ScriptBlock $collector.Script -TxtPath (Join-Path $run.Path "CommandOutput\$base.txt") -JsonPath (Join-Path $run.Path "CommandOutput\$base.json") -RunLog $run.RunLog
         }
         $eventResults += Export-NTKTriageEventSummary -LogName "System" -Days 7 -OutputPath (Join-Path $run.Path "EventLogs\System_recent_errors.csv") -RunLog $run.RunLog
         $eventResults += Export-NTKTriageEventSummary -LogName "Application" -Days 7 -OutputPath (Join-Path $run.Path "EventLogs\Application_recent_errors.csv") -RunLog $run.RunLog
@@ -580,12 +594,13 @@ function Global:Invoke-NTKTriageRun {
             }
         }
         $commandResults | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\command_results.json") -Encoding UTF8
+        $collectorResults | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\collector_results.json") -Encoding UTF8
         $findings = Invoke-NTKTriageAnalysis -Run $run -CommandResults $commandResults -EventResults $eventResults -FileRecords $fileRecords -ToolResults $toolResults -MissingTools $missingTools -Warnings $warnings -StartedUtc $started
         $bundleProfile = if($SelectedToolsOnly){"SelectedTools"}else{$Profile}
         $bundleProfile = ([regex]::Replace([string]$bundleProfile,'[^A-Za-z0-9._-]+','-')).Trim('-')
         if([string]::IsNullOrWhiteSpace($bundleProfile)){ $bundleProfile = "Triage" }
         $bundlePath = Join-Path $run.Path ("Bundle\{0}_{1}_DiagnosticBundle.zip" -f $run.RunId,$bundleProfile)
-        $manifest = [pscustomobject]@{runId=$run.RunId;toolkitVersion=(Get-Content -LiteralPath (Join-Path (Get-NTKTriagePaths).Manifests "toolkit-version.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue);computerName=$env:COMPUTERNAME;profile=$Profile;startedUtc=$started;endedUtc=(Get-Date).ToUniversalTime().ToString("o");selectedToolsOnly=[bool]$SelectedToolsOnly;selectedToolIds=@($SelectedToolIds);filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);missingTools=@($missingTools | Select-Object name,id,required,status);warnings=$warnings;bundleFileName=[IO.Path]::GetFileName($bundlePath);bundlePath=$bundlePath;bundleSha256=""}
+        $manifest = [pscustomobject]@{schemaVersion='2.0';producer='Network Toolkit Triage Service';producerVersion='1.0';runId=$run.RunId;toolkitVersion=(Get-Content -LiteralPath (Join-Path (Get-NTKTriagePaths).Manifests "toolkit-version.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue);computerName=$env:COMPUTERNAME;profile=$Profile;startedUtc=$started;endedUtc=(Get-Date).ToUniversalTime().ToString("o");selectedToolsOnly=[bool]$SelectedToolsOnly;selectedToolIds=@($SelectedToolIds);filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);collectorsRun=(Get-NTKTriageCount $collectorResults);toolsRun=(Get-NTKTriageCount $toolResults);collectorOutcomes=@($collectorResults);commandOutcomes=@($commandResults);toolOutcomes=@($toolResults);missingTools=@($missingTools | Select-Object name,id,required,status);warnings=$warnings;capabilities=[ordered]@{commands=$(if(@($commandResults|Where-Object succeeded).Count -eq $commandResults.Count){'complete'}else{'partial'});powershellCollectors=$(if(@($collectorResults|Where-Object succeeded).Count -eq $collectorResults.Count){'complete'}else{'partial'});portableTools=$(if($missingTools.Count -eq 0){'complete'}else{'partial'});bundleIntegrity='sidecar-sha256'};bundleFileName=[IO.Path]::GetFileName($bundlePath);bundlePath=$bundlePath;bundleHashSidecar=([IO.Path]::GetFileName($bundlePath)+'.sha256.json')}
         $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Encoding UTF8
         Copy-Item -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Destination (Join-Path $run.Path "Metadata\collection_manifest.json") -Force
         Write-NTKTriageLog "Creating file inventory." $run.RunLog
@@ -594,20 +609,24 @@ function Global:Invoke-NTKTriageRun {
         Write-NTKTriageLog "Creating bundle: $bundlePath" $run.RunLog
         Compress-Archive -LiteralPath $items -DestinationPath $bundlePath -Force
         $bundleHash = (Get-FileHash -LiteralPath $bundlePath -Algorithm SHA256).Hash
-        $manifest | Add-Member -MemberType NoteProperty -Name bundleSha256 -Value $bundleHash -Force
-        $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Encoding UTF8
-        Copy-Item -LiteralPath (Join-Path $run.Path "Analysis\collection_manifest.json") -Destination (Join-Path $run.Path "Metadata\collection_manifest.json") -Force
-        Compress-Archive -LiteralPath $items -DestinationPath $bundlePath -Force
+        [ordered]@{schemaVersion='1.0';algorithm='SHA256';bundleFileName=[IO.Path]::GetFileName($bundlePath);sha256=$bundleHash;runId=$run.RunId;createdAtUtc=(Get-Date).ToUniversalTime().ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath ($bundlePath + '.sha256.json') -Encoding UTF8
         $post = Test-NTKTriagePostRun -RunPath $run.Path -BundlePath $bundlePath
         $post | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\validation_postrun.json") -Encoding UTF8
-        "Preflight validation: $($preflight.passed)`r`nCollection: PASS`r`nLocal analysis: PASS`r`nBundle creation: PASS`r`nPost-run validation: $($post.passed)" | Set-Content -LiteralPath (Join-Path $run.Path "Reports\validation_summary.txt") -Encoding UTF8
-        $result = [pscustomobject]@{status="Completed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path "Analysis\summary.md");filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);toolsMissing=(Get-NTKTriageCount $missingTools);warnings=(Get-NTKTriageCount $warnings);findings=(Get-NTKTriageCount $findings);postValidationPassed=$post.passed}
+        $failedCommands = @($commandResults + $toolResults | Where-Object { $_.PSObject.Properties['succeeded'] -and !$_.succeeded })
+        $triageState = if(!$preflight.passed -or !$post.passed -or $failedCommands.Count -gt 0){'Partial'}elseif($warnings.Count -gt 0 -or $missingTools.Count -gt 0){'SucceededWithWarnings'}else{'Succeeded'}
+        "Preflight validation: $($preflight.passed)`r`nCollection state: $triageState`r`nFailed commands/tools: $($failedCommands.Count)`r`nBundle creation: $([bool](Test-Path -LiteralPath $bundlePath))`r`nPost-run validation: $($post.passed)" | Set-Content -LiteralPath (Join-Path $run.Path "Reports\validation_summary.txt") -Encoding UTF8
+        $result = New-NTKOperationResult -Operation 'Computer Triage' -State $triageState -Message "Triage completed with state $triageState." -Warnings @($warnings) -Errors @($failedCommands | ForEach-Object { "$( $_.name ): exit $( $_.exitCode )" }) -Stages @(
+            [pscustomobject]@{name='preflight';required=$true;succeeded=[bool]$preflight.passed},
+            [pscustomobject]@{name='collection';required=$true;succeeded=($failedCommands.Count -eq 0)},
+            [pscustomobject]@{name='bundle';required=$true;succeeded=[bool](Test-Path -LiteralPath $bundlePath)},
+            [pscustomobject]@{name='postValidation';required=$true;succeeded=[bool]$post.passed}
+        ) -Data @{status=$(if($triageState -in @('Succeeded','SucceededWithWarnings')){'Completed'}else{'Partial'});runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path 'Analysis\summary.md');filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);toolsMissing=(Get-NTKTriageCount $missingTools);warningCount=(Get-NTKTriageCount $warnings);findings=(Get-NTKTriageCount $findings);postValidationPassed=$post.passed}
     }
     catch {
         Write-NTKTriageLog "Triage failed: $($_.Exception.Message)" $run.RunLog
         Write-NTKTriageLog "Triage failure type: $($_.Exception.GetType().FullName)" $run.RunLog
         Write-NTKTriageLog "Triage failure stack: $($_.ScriptStackTrace)" $run.RunLog
-        $result = [pscustomobject]@{status="Failed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message;errorType=$_.Exception.GetType().FullName;stack=$_.ScriptStackTrace}
+        $result = New-NTKOperationResult -Operation 'Computer Triage' -State Failed -Message 'Triage failed.' -Errors @($_.Exception.Message) -Data @{status='Failed';runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message;errorType=$_.Exception.GetType().FullName;stack=$_.ScriptStackTrace}
     }
     if($ResultPath){ $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ResultPath -Encoding UTF8 }
     return $result
@@ -624,6 +643,8 @@ function Global:Test-NTKTriagePostRun {
     try { Get-Content -LiteralPath (Join-Path $RunPath "Analysis\collection_manifest.json") -Raw | ConvertFrom-Json | Out-Null; & $add "collection_manifest.json parses" $true "" } catch { & $add "collection_manifest.json parses" $false $_.Exception.Message }
     & $add "file_inventory.csv exists" (Test-Path -LiteralPath (Join-Path $RunPath "Metadata\file_inventory.csv")) ""
     & $add "bundle exists" (Test-Path -LiteralPath $BundlePath) $BundlePath
+    $integrity = Test-NTKDiagnosticBundleIntegrity -BundlePath $BundlePath
+    & $add "final bundle SHA256 verifies" $integrity.passed $integrity.message
     try {
         Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction SilentlyContinue
         $zip = [System.IO.Compression.ZipFile]::OpenRead($BundlePath)
@@ -631,6 +652,7 @@ function Global:Test-NTKTriagePostRun {
             $names = @($zip.Entries | ForEach-Object FullName)
             & $add "ZIP includes Analysis summary" (@($names | Where-Object { $_ -match 'Analysis/summary.md|Analysis\\summary.md' }).Count -gt 0) ""
             & $add "ZIP includes file inventory" (@($names | Where-Object { $_ -match 'Metadata/file_inventory.csv|Metadata\\file_inventory.csv' }).Count -gt 0) ""
+            & $add "ZIP includes collector outcomes" (@($names | Where-Object { $_ -match 'Metadata/collector_results.json|Metadata\\collector_results.json' }).Count -gt 0) ""
         } finally { $zip.Dispose() }
     } catch { & $add "ZIP readable" $false $_.Exception.Message }
     & $add "Command output exists" (@(Get-ChildItem -LiteralPath (Join-Path $RunPath "CommandOutput") -File -ErrorAction SilentlyContinue).Count -gt 0) ""
