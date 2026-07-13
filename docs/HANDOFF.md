@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0094
+HANDOFF-0095
 
 ## Current Task
 TASK-0088-Canonical-Operation-Results-And-Failure-Propagation
@@ -10,10 +10,10 @@ TASK-0088-Canonical-Operation-Results-And-Failure-Propagation
 Codex
 
 ## Next Owner
-ChatGPT at the next architecture, governance, audit, blocker, or acceptance boundary.
+ChatGPT at the next Project Custodian Engineering Audit, architecture/governance boundary, blocker, acceptance boundary, or user-only decision.
 
 ## Objective
-TASK-0101 is complete and the validation audit gate is cleared. Establish canonical operation-result and failure-propagation semantics under TASK-0088.
+Continue dependency-ordered remediation beginning with TASK-0088 under the autonomous `Resume Work` cycle.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -22,34 +22,38 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0084 audit is complete; repository health remains `52 / 100` pending remediation.
 - TASK-0086 completed offline evidence isolation and immutable bundle identity.
 - TASK-0087 completed parser-backed evidence quality and source-event-time timeline semantics.
-- TASK-0101 completed the required Validation/Test Framework threshold audit.
+- TASK-0101 completed the Validation/Test Framework threshold audit and reset it to `0 / 25`.
 - TASK-0088 is the single Active implementation task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
-- `Resume Work` requires a mandatory fetch, upstream comparison, and verified local/remote synchronization before task execution.
+- `Resume Work` now authorizes continuous Codex execution through dependency-ready Codex tasks.
+- At `25 / 25`, Codex automatically completes Audit Preparation, pushes the evidence package, and activates a Project Custodian Engineering Audit task.
+- The user tells ChatGPT `Continue` at the Project Custodian boundary; after the decision is pushed, the user tells Codex `Resume Work` and the cycle repeats.
 
-## TASK-0101 Audit Result
-- All 62 tracked PowerShell scripts parsed with zero failures.
-- Identity, parser-quality, triage, toolkit, GUI smoke, and button-smoke checks passed.
-- Recent TASK-0086 and TASK-0087 validation claims remain reproducible.
-- Remaining material gaps map to existing focused tasks; no duplicate task was created.
-- Validation/Test Framework reset from `25 / 25` to `0 / 25`.
+## Autonomous Cycle References
+- `PROJECT.md`
+- `AGENTS.md`
+- `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`
+- `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`
+- `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`
 
 ## Active Task Scope
 `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation`
 
 Codex must establish one canonical operation-result envelope and propagate failure, cancellation, partial completion, warnings, and exit semantics through the task-owned execution paths.
 
-Codex must read TASK-0088 and its references before implementation and must not merge later collection, ARGUS, transaction, package, or GUI-controller remediations into this task.
+Codex must read TASK-0088 and its references before implementation and must not merge later collection, ARGUS, transaction, package, or GUI-controller remediations into TASK-0088.
+
+After TASK-0088 completes, Codex must re-read the queue and counters. If no gate or stop condition exists, it must activate the next dependency-ready Codex-owned task and continue without another prompt.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 10 / 25 | No |
+| Repository Governance | 11 / 25 | No |
 | Architecture | 6 / 25 | No |
-| Documentation | 4 / 25 | No |
-| Task System | 10 / 25 | No |
+| Documentation | 5 / 25 | No |
+| Task System | 11 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 6 / 25 | No |
 | ARGUS | 8 / 25 | No |
 | Reporting | 3 / 25 | No |
@@ -59,7 +63,7 @@ Codex must read TASK-0088 and its references before implementation and must not 
 | Validation/Test Framework | 0 / 25 | No |
 | Roadmap/Backlog | 17 / 25 | No |
 
-TASK-0101 completed the required threshold audit and reset only Validation/Test Framework. No counter currently blocks TASK-0088.
+No counter currently blocks TASK-0088. When any counter reaches `25 / 25` at a task boundary, Codex automatically performs Audit Preparation before further implementation.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -76,10 +80,10 @@ None.
 
 ## Recommended Commit Message
 ```text
-TASK-0101: Audit validation and test framework
+TASK-0088: Establish canonical operation results and failure propagation
 ```
 
 ## Next Bot Prompt
 ```text
-Run the mandatory Resume Work synchronization procedure first: read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, run `git fetch --prune origin`, verify the intended branch and upstream, compare local HEAD with the upstream branch, safely fast-forward when behind, and confirm the local and remote commit hashes match before trusting local governance or task files. If the branch is ahead, diverged, has no upstream, fetch fails, or synchronization would overwrite preserved work, stop before implementation and use the Error Handoff Procedure. Then execute only TASK-0088-Canonical-Operation-Results-And-Failure-Propagation. Preserve documented drift. Read the task and every referenced file, implement canonical operation-result and failure-propagation semantics only within its approved scope, run required negative-path plus parser/smoke/button-smoke validation, update required records and build metadata, commit locally, and do not push unless explicitly requested except under the Error Handoff Rule.
+Resume Work. First perform the mandatory repository synchronization procedure and confirm local HEAD matches the authoritative upstream without overwriting preserved drift. Then read PROJECT.md, AGENTS.md, docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md, the handoff, queue, error handoff, TASK-0088, and all referenced files. Execute TASK-0088 within scope, validate negative paths plus parser/smoke/button-smoke behavior, update all required records and build metadata, and commit locally. After completion, re-read the queue, counters, punch list, and blockers. If no stop condition exists, activate the next dependency-ready Codex-owned task and continue automatically. Repeat until a counter reaches 25 / 25, a Project Custodian-owned task becomes Active, a genuine blocker occurs, or a user-only decision is unavoidable. At a 25 / 25 gate, automatically create and complete Audit Preparation using the tracked template, push the audit package and transition records, activate a Project Custodian Engineering Audit task, and stop. Do not push normal implementation commits unless explicitly authorized; audit packages and blocker handoffs must be pushed as required.
 ```
