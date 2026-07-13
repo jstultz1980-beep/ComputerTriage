@@ -102,6 +102,8 @@ When any subsystem reaches `25 / 25` at a task boundary:
 
 Codex stops when the sole Active task is owned by ChatGPT/Project Custodian. The user then tells ChatGPT `Continue`. After the Project Custodian pushes the decision and activates a Codex task, the user tells Codex `Resume Work`.
 
+Use the timestamped handoff protocol in `PROJECT.md` to determine which idle chat contains the newest handoff. If chat messages conflict with repository task ownership, the repository remains authoritative.
+
 ## User-Only Decisions
 
 Ask the user only for unresolved materially different product behavior, credentials/secrets, purchasing/licensing, external-account changes, destructive action outside scope, physical/user-only access/testing, release/deployment/publication authorization, or explicit subjective acceptance.
@@ -126,18 +128,20 @@ Commit and push the blocker report, then stop at the Project Custodian boundary.
 
 At a stop boundary report synchronized starting commit, tasks completed, resulting commits, files changed, validation, current/next owner, counters, preserved drift, and the reason for stopping.
 
-The summary must end with exactly one final operator instruction and no text after it.
+The summary must end with a current UTC handoff timestamp followed by exactly one final operator instruction, with no text after it.
 
 For a non-blocked stop boundary:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to continue
 ```
 
 For a genuine blocker recorded and pushed through `docs/ERROR-HANDOFF.md`:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either final line.
+Do not paraphrase either final instruction. The operator instruction remains the final line.
