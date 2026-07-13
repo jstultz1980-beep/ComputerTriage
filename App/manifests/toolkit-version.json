@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260713130556,
-    "SourceUpdatedAt":  "2026-07-13T13:05:56.1475727-05:00",
-    "ReleaseNotes":  "TASK-0098 shared report metadata, canonical escaping, and immutable run artifact indexing."
+    "Build":  20260713131634,
+    "SourceUpdatedAt":  "2026-07-13T13:16:34.2494953-05:00",
+    "ReleaseNotes":  "TASK-0099 repository-wide PowerShell 5.1 parser, load, negative-path, package, and regression gates."
 }

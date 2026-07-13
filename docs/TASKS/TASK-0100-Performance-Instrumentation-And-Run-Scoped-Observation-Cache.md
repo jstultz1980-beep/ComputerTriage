@@ -1,7 +1,7 @@
 # TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

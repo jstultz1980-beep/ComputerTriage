@@ -19,6 +19,15 @@ function Add-SmokeFailure {
     [void]$failures.Add($Message)
 }
 
+$importFailures = @(Get-NTKImportFailures)
+foreach($failure in $importFailures){
+    Add-SmokeFailure ("Import failure [{0}] {1}: {2}" -f $failure.Stage,$failure.Name,$failure.Error)
+}
+
+if($Global:NTKDegradedMode){
+    Add-SmokeFailure 'Toolkit entered degraded mode while loading the tracked repository image.'
+}
+
 $catalog = @(Get-NTKToolCatalog)
 
 if($catalog.Count -lt 1){

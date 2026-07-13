@@ -9,20 +9,18 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 Status: Active
 
 Current Active task:
-- `TASK-0099-Repository-Wide-Validation-Foundation`
+- `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache`
 
 Current objective:
-- Establish repository-wide parser and load gates.
-- Automate critical negative-path and package-integrity fixtures.
-- Consolidate regression coverage for collection, analysis, ARGUS, reporting, and GUI contracts.
+- Measure startup, first-render, repeated-query, lifecycle, and package hashing costs.
+- Add run-scoped observation caching where evidence freshness remains explicit.
+- Define and validate cold/warm performance budgets without weakening correctness contracts.
 
 ## Remaining Sequence
 
-1. **TASK-0099 - Repository-Wide Validation Foundation**
-   - Add parser, load, negative-path, package, and regression gates after contracts stabilize.
-2. **TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache**
+1. **TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache**
    - Measure and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs.
-3. **TASK-0080 - Release-Candidate Validation and Documentation**
+2. **TASK-0080 - Release-Candidate Validation and Documentation**
    - Execute final validation, operational documentation, and release-readiness review.
 
 ## Release-Candidate Entry Criteria

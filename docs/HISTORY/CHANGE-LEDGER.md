@@ -9,22 +9,28 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
-| Architecture | 17 / 25 | TASK-0098 shared report metadata and immutable run-index contract. |
-| Documentation | 20 / 25 | TASK-0098 reporting/run-index contract and validation record. |
-| Task System | 2 / 25 | TASK-0098 completion and TASK-0099 activation. |
+| Architecture | 18 / 25 | TASK-0099 manifest-driven repository validation foundation. |
+| Documentation | 21 / 25 | TASK-0099 validation contract and evidence record. |
+| Task System | 3 / 25 | TASK-0099 completion and TASK-0100 activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
 | UI | 3 / 25 | TASK-0096 Analyze and Triage lifecycle migration. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 4 / 25 | TASK-0098 build metadata. |
-| Validation/Test Framework | 10 / 25 | TASK-0098 report snapshot, ordering, immutability, stale, and missing fixtures. |
-| Roadmap/Backlog | 5 / 25 | Advanced architecture stabilization to TASK-0099. |
+| Build System | 5 / 25 | TASK-0099 build metadata and production-package contract gate. |
+| Validation/Test Framework | 11 / 25 | TASK-0099 tracked parser, load, negative-path, package, and regression gate. |
+| Roadmap/Backlog | 6 / 25 | Advanced architecture stabilization to TASK-0100. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0099-01 | 2026-07-13 | TASK-0099 | Architecture | +1 | Established one manifest-driven repository validation entry point with coverage and fixture-completeness enforcement. |
+| CHG-0099-02 | 2026-07-13 | TASK-0099 | Validation/Test Framework | +1 | Added all-tracked-file 5.1 parsing, isolated stages, timeouts, negative-path coverage, load completeness, and JSON results. |
+| CHG-0099-03 | 2026-07-13 | TASK-0099 | Build System | +1 | Added valid/tampered production-package verification and updated toolkit build metadata. |
+| CHG-0099-04 | 2026-07-13 | TASK-0099 | Documentation | +1 | Documented the canonical validation contract and recorded the 17-stage pass. |
+| CHG-0099-05 | 2026-07-13 | TASK-0099 / TASK-0100 | Task System | +1 | Completed repository validation work and activated performance instrumentation. |
+| CHG-0099-06 | 2026-07-13 | TASK-0099 / TASK-0100 | Roadmap/Backlog | +1 | Advanced architecture stabilization to performance instrumentation and observation caching. |
 | CHG-0098-01 | 2026-07-13 | TASK-0098 | Architecture | +1 | Defined shared report metadata, escaping, immutable run identity, artifact record, ordering, and state contracts. |
 | CHG-0098-02 | 2026-07-13 | TASK-0098 | Reporting | +1 | Integrated canonical metadata and escaping across identified report families with explicit available, stale, and missing resolution. |
 | CHG-0098-03 | 2026-07-13 | TASK-0098 | Validation/Test Framework | +1 | Added snapshot, escaping, multiple-run, immutable-conflict, stale, and deleted artifact fixtures. |

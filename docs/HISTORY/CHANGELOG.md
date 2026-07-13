@@ -4,6 +4,10 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Completed TASK-0099 repository-wide validation foundation and activated TASK-0100.
+- Added a manifest-driven Windows PowerShell 5.1 parser/load/negative-path/package/regression runner; all 17 gates pass and all 82 tracked PowerShell files parse with zero exclusions.
+- Added production-package positive/tamper fixtures and made toolkit smoke reject any import failure or degraded load.
+
 - Completed TASK-0098 shared reporting and run-index contracts and activated TASK-0099.
 - Centralized report escaping and metadata, indexed report artifacts by immutable run identity, replaced ambiguous latest ordering, and made stale/deleted artifact state explicit.
 - Passed all repository fixture suites plus parser, toolkit smoke, GUI smoke, and button-smoke validation.
