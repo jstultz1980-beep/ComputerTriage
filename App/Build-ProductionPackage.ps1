@@ -8,6 +8,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $sourceRoot = $PSScriptRoot
+. (Join-Path $sourceRoot 'DeploymentIntegrity.ps1')
 $launcherRoot = Split-Path -Parent $sourceRoot
 $DestinationRoot = if($DestinationRoot){$DestinationRoot}else{Join-Path $sourceRoot "Release"}
 if([string]::IsNullOrWhiteSpace($PackageName) -or $PackageName -match '[\\/:*?"<>|]'){
@@ -128,7 +129,9 @@ $launchers = @(
     }
 }
 
+$managedFiles = @(New-NTKManagedFileManifest -Root $packageRoot -ExcludeRelativePaths @('App\manifests\ProductionManifest.json'))
 $manifest = [ordered]@{
+    SchemaVersion = '2.0'
     PackageName = "Network Toolkit Portable"
     BuiltAt = (Get-Date).ToString("s")
     SourceRoot = $sourceRoot
@@ -147,6 +150,7 @@ $manifest = [ordered]@{
         "App\\manifests\\gui-settings.json"
     )
     Launchers = $launchers
+    ManagedFiles = $managedFiles
 }
 
 $manifestPath = Join-Path $packageAppRoot "manifests\ProductionManifest.json"
@@ -166,6 +170,12 @@ $readmePath = Join-Path $packageAppRoot "DEPLOYMENT-README.txt"
     ""
     "After a customer engagement, use Settings > Remove Client Data to clear collected diagnostic data."
 ) | Set-Content -LiteralPath $readmePath -Encoding UTF8
+
+# Recompute after every generated payload except the manifest itself exists so
+# the managed-file inventory covers the complete delivered image.
+$manifest.ManagedFiles = @(New-NTKManagedFileManifest -Root $packageRoot -ExcludeRelativePaths @('App\manifests\ProductionManifest.json'))
+$manifest.FileCount = @(Get-ChildItem -LiteralPath $packageRoot -Recurse -File -Force -ErrorAction SilentlyContinue).Count
+$manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
 
 if($Zip){
     $zipPath = Join-Path $DestinationRoot ("{0}.zip" -f $PackageName)

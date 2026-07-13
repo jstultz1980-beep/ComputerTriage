@@ -13,6 +13,7 @@ if(!(Test-Path -LiteralPath $exclusionHelper)){
     throw "Deployment exclusion helper was not found: $exclusionHelper"
 }
 . $exclusionHelper
+. (Join-Path $PSScriptRoot 'DeploymentIntegrity.ps1')
 
 function Resolve-DeploymentRoot {
     param([string]$Path)
@@ -43,11 +44,11 @@ try {
     if($source.Equals($destination,[System.StringComparison]::OrdinalIgnoreCase)){
         throw 'Source and destination must be different folders.'
     }
-    if(!(Test-Path -LiteralPath $destination)){ New-Item -ItemType Directory -Path $destination -Force | Out-Null }
-
-    # A deployment is a clean runtime image, not a clone of technician/client history.
-    Get-ChildItem -LiteralPath $destination -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction Stop
-    $appDestination = Join-Path $destination 'App'
+    $finalDestination=$destination
+    $staging="$finalDestination.ntk-stage"
+    if(Test-Path -LiteralPath $staging){throw "Incomplete staging folder already exists: $staging"}
+    New-Item -ItemType Directory -Path $staging -Force | Out-Null
+    $appDestination = Join-Path $staging 'App'
     New-Item -ItemType Directory -Path $appDestination -Force | Out-Null
     $appSource = Join-Path $source 'App'
     $exclusions = Get-NetworkToolkitDeploymentExclusions -SourceRoot $appSource -Mode Fresh -ExcludeSysinternals:$ExcludeSysinternals
@@ -70,12 +71,17 @@ try {
 
     $launcher = Join-Path $source 'NetworkToolkit.vbs'
     if(!(Test-Path -LiteralPath $launcher)){ throw "Launcher not found: $launcher" }
-    Copy-Item -LiteralPath $launcher -Destination (Join-Path $destination 'NetworkToolkit.vbs') -Force
+    Copy-Item -LiteralPath $launcher -Destination (Join-Path $staging 'NetworkToolkit.vbs') -Force
     foreach($required in @('NetworkToolkit.ps1','DeploymentExclusions.ps1','ToolKit-GUI\ToolKit-GUI.ps1','NetworkToolkit\NetworkToolkit-Core.ps1','manifests\toolkit-version.json')){
         if(!(Test-Path -LiteralPath (Join-Path $appDestination $required))){ throw "Deployment is missing required file: App\$required" }
     }
-    $result.FilesCopied = @(Get-ChildItem -LiteralPath $destination -File -Recurse -Force).Count
-    $result.SourceRoot = $source; $result.DestinationRoot = $destination; $result.Status = 'Completed'
+    $sourceManifest=New-NTKManagedFileManifest -Root $staging
+    $preflight=Test-NTKManagedFileManifest -Root $staging -Manifest $sourceManifest
+    if(!$preflight.passed){throw "Staged deployment verification failed: $($preflight.failures -join '; ')"}
+    $swap=Invoke-NTKStagedDirectorySwap -StagedPath $staging -DestinationPath $finalDestination -PostSwapVerify {param($installed)(Test-NTKManagedFileManifest -Root $installed -Manifest $sourceManifest).passed}
+    if($swap.state -ne 'Succeeded'){throw "Deployment swap failed: $($swap.error)"}
+    $result.FilesCopied = @(Get-ChildItem -LiteralPath $finalDestination -File -Recurse -Force).Count
+    $result.SourceRoot = $source; $result.DestinationRoot = $finalDestination; $result.Status = 'Completed'
 }
 catch {
     $result.Status = 'Failed'; $result.Error = $_.Exception.Message

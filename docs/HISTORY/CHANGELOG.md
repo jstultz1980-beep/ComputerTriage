@@ -4,6 +4,9 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Completed TASK-0092 transactional package, deployment, and update integrity; activated TASK-0093.
+- Added managed-file manifests, staging verification, destination identity, atomic swaps, interruption recovery, and rollback fixtures.
+
 - Completed TASK-0103 Project Custodian UI Engineering Audit.
 - Accepted the TASK-0102 UI audit evidence and reset only UI from `25 / 25` to `0 / 25`.
 - Retained TASK-0096 for GUI lifecycle/controller extraction and TASK-0099 for behavioral and negative-path UI validation; created no duplicate tasks.

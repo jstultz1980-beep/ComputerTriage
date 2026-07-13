@@ -1,7 +1,7 @@
 # TASK-0093 - External Tool Provenance and Lifecycle Policy
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

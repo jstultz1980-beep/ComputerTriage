@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712200831,
-    "SourceUpdatedAt":  "2026-07-12T20:08:31.6595261-05:00",
+    "Build":  20260712212326,
+    "SourceUpdatedAt":  "2026-07-12T21:23:26.9311673-05:00",
     "ReleaseNotes":  "Added transactional print and remote-management changes with pre-state capture, verification, spooler recovery, partial-change detection, cancellation, and rollback."
 }

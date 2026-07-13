@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'DeploymentIntegrity.ps1')
 $PackageRoot = if($PackageRoot){$PackageRoot}else{(Split-Path -Parent $PSScriptRoot)}
 $PackageRoot = (Resolve-Path -LiteralPath $PackageRoot).Path
 
@@ -49,6 +50,11 @@ if(Test-Path -LiteralPath $manifestPath){
         if($actualHash -ne $launcher.SHA256){
             [void]$failures.Add("Launcher hash mismatch: $($launcher.Path)")
         }
+    }
+    if(@($manifest.ManagedFiles).Count -eq 0){ [void]$failures.Add('Managed-file manifest is empty.') }
+    else {
+        $integrity=Test-NTKManagedFileManifest -Root $PackageRoot -Manifest @($manifest.ManagedFiles)
+        foreach($failure in @($integrity.failures)){[void]$failures.Add($failure)}
     }
 }
 else{

@@ -17,6 +17,7 @@ if(!(Test-Path -LiteralPath $exclusionHelper)){
     throw "Deployment exclusion helper was not found: $exclusionHelper"
 }
 . $exclusionHelper
+. (Join-Path $PSScriptRoot 'DeploymentIntegrity.ps1')
 
 function Resolve-NetworkToolkitFileSystemPath {
     param([Parameter(Mandatory=$true)][string]$Path)
@@ -258,6 +259,8 @@ try {
     $sourceLayout = Resolve-NetworkToolkitLayout -Path $SourceRoot
     if(!(Test-Path -LiteralPath $DestinationRoot)){ New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null }
     $destinationLayout = Resolve-NetworkToolkitLayout -Path $DestinationRoot
+    if(!(Test-NTKDeploymentIdentity -DeploymentRoot $sourceLayout.DeploymentRoot)){throw 'Source deployment identity validation failed.'}
+    if(!(Test-NTKDeploymentIdentity -DeploymentRoot $destinationLayout.DeploymentRoot)){throw 'Destination deployment identity validation failed.'}
     if($sourceLayout.DeploymentRoot.Equals($destinationLayout.DeploymentRoot,[System.StringComparison]::OrdinalIgnoreCase)){
         throw "Source and destination must be different folders."
     }
@@ -292,6 +295,12 @@ try {
         }
     }
 
+    $finalAppRoot=$DestinationRoot
+    $stagingApp="$finalAppRoot.ntk-stage"
+    if(Test-Path -LiteralPath $stagingApp){throw "Incomplete update staging folder already exists: $stagingApp"}
+    Copy-Item -LiteralPath $finalAppRoot -Destination $stagingApp -Recurse -Force -ErrorAction Stop
+    $DestinationRoot=$stagingApp
+
     $exclusions = Get-NetworkToolkitDeploymentExclusions -SourceRoot $SourceRoot -Mode Update
     $arguments = @($SourceRoot,$DestinationRoot,"/E","/COPY:DAT","/DCOPY:DAT","/R:1","/W:1","/NFL","/NDL","/NJH","/NJS","/NP","/XD") + $exclusions.Directories + @("/XF") + $exclusions.Files
     & robocopy @arguments | Out-String | Set-Content -LiteralPath ($ResultPath + ".log") -Encoding UTF8
@@ -304,6 +313,13 @@ try {
     $result.PrunedFiles = $pruneResult.Removed
     $result.PruneSkippedFiles = $pruneResult.Skipped
     $result.VerifiedFiles = @(Test-NetworkToolkitCopy -SourceRoot $SourceRoot -DestinationRoot $DestinationRoot)
+    $managedManifest=New-NTKManagedFileManifest -Root $SourceRoot -ExcludeRelativePaths @('manifests\gui-settings.json','manifests\custom-tools.json','manifests\custom-tools.json.bak')
+    $stagedIntegrity=Test-NTKManagedFileManifest -Root $DestinationRoot -Manifest $managedManifest
+    if(!$stagedIntegrity.passed){throw "Staged update is incomplete: $($stagedIntegrity.failures -join '; ')"}
+    $swap=Invoke-NTKStagedDirectorySwap -StagedPath $DestinationRoot -DestinationPath $finalAppRoot -PostSwapVerify {param($installed)(Test-NTKManagedFileManifest -Root $installed -Manifest $managedManifest).passed}
+    if($swap.state -ne 'Succeeded'){throw "Update swap failed: $($swap.error)"}
+    $DestinationRoot=$finalAppRoot
+    $result.DestinationRoot=$finalAppRoot
     Copy-Item -LiteralPath (Join-Path $sourceLayout.DeploymentRoot "NetworkToolkit.vbs") -Destination (Join-Path $destinationLayout.DeploymentRoot "NetworkToolkit.vbs") -Force
     Remove-NetworkToolkitRootArtifacts -DeploymentRoot $destinationLayout.DeploymentRoot
     $result.Status = "Completed"
