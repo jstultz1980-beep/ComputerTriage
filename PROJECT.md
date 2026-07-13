@@ -50,21 +50,40 @@ After an Engineering Audit, the Project Custodian activates exactly one dependen
 
 ## Completion Prompt Rule
 
-Every Codex stop-boundary summary must end with exactly one final operator instruction and no text after it.
+Every stop-boundary summary from Codex or the Project Custodian must include a handoff timestamp immediately before the final operator instruction.
 
-For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, the exact final line is:
+The timestamp format is:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+```
+
+Use current UTC time when the message is sent. Do not copy an older repository timestamp into a new chat response.
+
+When both the Debbie and Sampson chats are idle, the handoff with the newest timestamp identifies the current turn. If chat timestamps conflict with the repository, the repository remains authoritative.
+
+For a normal Codex-to-Project-Custodian handoff, the final two lines must be:
+
+```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to continue
 ```
 
-For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the exact final line is:
+For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the final two lines must be:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to address errors
 ```
 
-This closing instruction is mandatory and must not be paraphrased.
+For a normal Project-Custodian-to-Codex handoff, the final two lines must be:
+
+```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Resume Work
+```
+
+The operator instruction must remain the final line, with no text after it. These instructions are mandatory and must not be paraphrased.
 
 ## Address Errors Rule
 
