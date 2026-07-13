@@ -128,11 +128,6 @@ $script:ToolkitUpdateResultPath = $null
 $script:ToolkitDeploymentProcess = $null
 $script:ToolkitDeploymentTimer = $null
 $script:ToolkitDeploymentResultPath = $null
-$script:TriageProcess = $null
-$script:TriageTimer = $null
-$script:TriageResultPath = $null
-$script:TriageRunStartedAt = $null
-$script:TriageCompletionHandled = $false
 $script:TriageToolGrid = $null
 $script:TriageStatusLabel = $null
 $script:TriageProgressBar = $null
@@ -207,7 +202,7 @@ $script:GUIBusyProgress = $null
 $script:GUIBusyTimer = $null
 $script:GUIBusyFrame = 0
 $script:GUIBusyFrames = @("|","/","-","\")
-$script:SafeRunnerSessions = New-Object System.Collections.ArrayList
+$script:GUIBackgroundOperations = New-NTKBackgroundOperationController
 $script:RootLayout = $null
 $script:HeaderPanel = $null
 $script:HeaderSummaryPanel = $null
@@ -3103,32 +3098,9 @@ function Stop-GUISafeRunnerSession {
         return
     }
 
-    try {
-        if($State.Timer){
-            $State.Timer.Stop()
-            $State.Timer.Dispose()
-            $State.Timer = $null
-        }
+    if($State.OperationName){
+        Stop-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name $State.OperationName -Message 'Stopped by the technician.' | Out-Null
     }
-    catch {}
-
-    try {
-        if($State.Process){
-            if(!$State.Process.HasExited){
-                $State.Process.Kill()
-            }
-            $State.Process.Dispose()
-            $State.Process = $null
-        }
-    }
-    catch {}
-
-    try {
-        if($script:SafeRunnerSessions){
-            [void]$script:SafeRunnerSessions.Remove($State)
-        }
-    }
-    catch {}
 
     if($DisposeOverlay){
         try {
@@ -3141,18 +3113,19 @@ function Stop-GUISafeRunnerSession {
 }
 
 function Stop-GUISafeRunnerSessions {
-    foreach($state in @($script:SafeRunnerSessions)){
-        Stop-GUISafeRunnerSession -State $state -DisposeOverlay
+    foreach($operation in @($script:GUIBackgroundOperations.Operations.Values | Where-Object { $_.Metadata.Kind -eq 'SafeRunner' })){
+        Stop-GUISafeRunnerSession -State $operation.Metadata.State -DisposeOverlay
     }
 }
 
 function Stop-GUIAsyncWorkers {
     Stop-GUISafeRunnerSessions
+    Stop-NTKBackgroundOperations -Controller $script:GUIBackgroundOperations
 
     foreach($timerName in @(
         "QuickDiagnosisTimer","ToolkitSizeTimer","ToolkitUpdateTimer","ToolkitDeploymentTimer",
         "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer",
-        "ActivityRefreshTimer","ActivityInitialRefreshTimer","StartupTabBuildTimer","TriageTimer","TriageStatusRefreshTimer","GUIBusyTimer"
+        "ActivityRefreshTimer","ActivityInitialRefreshTimer","StartupTabBuildTimer","TriageStatusRefreshTimer","GUIBusyTimer"
     )){
         try {
             $timer = Get-Variable -Name $timerName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
@@ -3286,6 +3259,7 @@ exit ([int]`$metadata.ExitCode)
             Overlay = $overlay
             Tool = $ToolName
             ActivityId = $activityId
+            OperationName = "Analyze-$activityId"
             Session = $session.Path
             Timer = $null
             LastLengths = @{}
@@ -3293,7 +3267,6 @@ exit ([int]`$metadata.ExitCode)
             SendButton = $send
             Output = $output
         }
-        [void]$script:SafeRunnerSessions.Add($state)
         $close.Tag = $state
         $input.Tag = $state; $send.Tag = $state
         $send.Add_Click({
@@ -3358,20 +3331,36 @@ exit ([int]`$metadata.ExitCode)
                 }
                 catch { }
             }
-            if($process.HasExited){
-                $exitCode = $process.ExitCode
-                $timer.Stop(); $timer.Dispose()
-                $state.Timer = $null
-                try {
-                    $process.Dispose()
-                    $state.Process = $null
-                }
-                catch {}
-                try { [void]$script:SafeRunnerSessions.Remove($state) } catch {}
-                $title.Text = if($exitCode -eq 0){"Completed: $ToolName (exit 0)"}else{"Failed: $ToolName (exit $exitCode)"}
+            Update-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name $state.OperationName | Out-Null
+        }.GetNewClosure()
+        $timer.Add_Tick($tick)
+        $poll = {
+            param($operation)
+            if(!$process.HasExited){ return [pscustomobject]@{Completed=$false} }
+            $exitCode = $process.ExitCode
+            [pscustomobject]@{
+                Completed = $true
+                State = if($exitCode -eq 0){'Succeeded'}else{'Failed'}
+                CompletionKind = if($exitCode -eq 0){'Success'}else{'Failure'}
+                Message = "Process exited with code $exitCode."
+                Data = $exitCode
             }
         }.GetNewClosure()
-        $timer.Add_Tick($tick); $timer.Start()
+        $completed = {
+            param($operation)
+            $state.Process = $null
+            $state.Timer = $null
+            if($title -and !$title.IsDisposed){
+                $title.Text = switch($operation.CompletionKind){
+                    'Success' { "Completed: $ToolName (exit 0)" }
+                    'Timeout' { "Timed out: $ToolName" }
+                    'Cancellation' { "Canceled: $ToolName" }
+                    default { "Failed: $ToolName" }
+                }
+            }
+        }.GetNewClosure()
+        Start-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name $state.OperationName -Process $process -Timer $timer -TimeoutSeconds 3600 -OnPoll $poll -OnCompleted $completed -Metadata ([pscustomobject]@{Kind='SafeRunner';State=$state}) | Out-Null
+        $timer.Start()
         Write-GUIDiagnosticLog -Event 'SafeRunnerStarted' -Tool $ToolName -ActivityId $activityId -Detail "ChildProcessId=$($process.Id); Session=$($session.Path); Invocation=$Invocation"
         Add-GUILog "Launched safe session: $ToolName"
     }
@@ -13174,7 +13163,7 @@ function Set-GUITriageStatusText {
 }
 
 function Update-GUITriageRunControls {
-    $isRunning = ($script:TriageProcess -and !$script:TriageProcess.HasExited)
+    $isRunning = [bool](Get-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name 'Triage')
     if($script:TriageCancelButton -and !$script:TriageCancelButton.IsDisposed){
         $script:TriageCancelButton.Visible = [bool]$isRunning
     }
@@ -13355,7 +13344,7 @@ function Start-GUITriageRun {
         [ValidateSet("Quick","Full","Crash")][string]$Profile = "Quick",
         [string[]]$SelectedToolIds = @()
     )
-    if($script:TriageProcess -and !$script:TriageProcess.HasExited){
+    if(Get-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name 'Triage'){
         [System.Windows.Forms.MessageBox]::Show("A triage run is already running.","Triage",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
         return
     }
@@ -13376,12 +13365,6 @@ function Start-GUITriageRun {
     )
     if($privacy -ne [System.Windows.Forms.DialogResult]::Yes){ return }
 
-    if($script:TriageTimer){
-        try { $script:TriageTimer.Stop(); $script:TriageTimer.Dispose() } catch {}
-        $script:TriageTimer = $null
-    }
-    $script:TriageCompletionHandled = $false
-
     $paths = Initialize-NTKTriageStructure
     $resultPath = Join-Path $paths.Cache ("triage-result-{0}.json" -f [guid]::NewGuid().ToString("N"))
     $runner = Join-Path $paths.Cache ("run-triage-{0}.ps1" -f [guid]::NewGuid().ToString("N"))
@@ -13401,9 +13384,7 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
 "@
     $scriptText | Set-Content -LiteralPath $runner -Encoding UTF8
     $arguments = @("-NoProfile","-ExecutionPolicy","Bypass","-File","`"$runner`"")
-    $script:TriageResultPath = $resultPath
-    $script:TriageRunStartedAt = Get-Date
-    $script:TriageProcess = Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -PassThru
+    $process = Start-NTKToolProcess -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory $SharedToolkitRoot -WindowStyle Hidden -PassThru
     Set-GUITriageStatusText "$Profile triage running..."
     Update-GUITriageRunControls
     if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Marquee; $script:TriageProgressBar.MarqueeAnimationSpeed = 30 }
@@ -13415,50 +13396,60 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
     }
     Start-GUIBusyIndicator -Message "Triage"
 
+    $startedAt = Get-Date
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 1500
-    $timer.Add_Tick({
-        if($script:TriageCompletionHandled){
-            try { $timer.Stop(); $timer.Dispose() } catch {}
-            if($script:TriageTimer -eq $timer){
-                $script:TriageTimer = $null
-            }
-            return
-        }
-
-        $activeProcess = $script:TriageProcess
-        if($activeProcess -and !$activeProcess.HasExited){
-            $elapsed = [int]((Get-Date) - $script:TriageRunStartedAt).TotalSeconds
+    $poll = {
+        param($operation)
+        if(!$process.HasExited){
+            $elapsed = [int]((Get-Date) - $startedAt).TotalSeconds
             Set-GUITriageStatusText "Triage running... ${elapsed}s elapsed"
-            return
+            return [pscustomobject]@{Completed=$false}
         }
-
-        $script:TriageCompletionHandled = $true
-        $resultPath = $script:TriageResultPath
-        try { $timer.Stop(); $timer.Dispose() } catch {}
-        $script:TriageTimer = $null
-        $script:TriageProcess = $null
-        $script:TriageResultPath = $null
+        if(!(Test-Path -LiteralPath $resultPath)){
+            throw "The triage runner ended but did not write a result file: $resultPath"
+        }
+        $result = Get-Content -LiteralPath $resultPath -Raw -ErrorAction Stop | ConvertFrom-Json
+        if(!$result){ throw "The triage result file was empty or invalid: $resultPath" }
+        $state = switch([string]$result.status){
+            'Completed' { 'Succeeded' }
+            { $_ -in @('Partial','CompletedWithWarnings') } { 'Partial' }
+            default { 'Failed' }
+        }
+        [pscustomobject]@{
+            Completed = $true
+            State = $state
+            CompletionKind = if($state -eq 'Succeeded'){'Success'}elseif($state -eq 'Partial'){'Partial'}else{'Failure'}
+            Message = [string]$result.error
+            Data = $result
+        }
+    }.GetNewClosure()
+    $completed = {
+        param($operation)
         Stop-GUIBusyIndicator
         Update-GUITriageRunControls
         if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
+        if($operation.CompletionKind -eq 'Cancellation'){
+            Add-GUITriageLogLine "Triage process was cancelled by the technician."
+            Set-GUITriageStatusText "Triage cancelled."
+            return
+        }
+        if($operation.CompletionKind -eq 'Timeout'){
+            Add-GUITriageLogLine "Triage timed out: $($operation.Message)"
+            Set-GUITriageStatusText "Triage timed out. Open the latest run folder for details."
+            [System.Windows.Forms.MessageBox]::Show($operation.Message,"Triage Timeout",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
+            return
+        }
         try {
-            if([string]::IsNullOrWhiteSpace($resultPath)){
-                throw "The triage runner ended before a result path was registered."
-            }
-            if(!(Test-Path -LiteralPath $resultPath)){
-                throw "The triage runner ended but did not write a result file: $resultPath"
-            }
-            $result = Get-Content -LiteralPath $resultPath -Raw -ErrorAction Stop | ConvertFrom-Json
-            if(!$result){
-                throw "The triage result file was empty or invalid: $resultPath"
-            }
+            if(!$operation.Data){ throw $operation.Message }
+            $result = $operation.Data
             $script:TriageLatestRunPath = $result.runPath
             $script:TriageLatestBundlePath = $result.bundlePath
-            if($result.status -eq "Completed"){
+            if($operation.CompletionKind -in @('Success','Partial')){
                 $message = "Diagnostics collection completed.`r`n`r`nBundle:`r`n$($result.bundlePath)`r`n`r`nLocal analysis:`r`n$($result.summaryPath)`r`n`r`nUpload the ZIP bundle to ChatGPT for deeper analysis."
-                Add-GUITriageLogLine "Triage completed. Bundle: $($result.bundlePath)"
-                Set-GUITriageStatusText "Triage completed. Bundle ready."
+                $qualifier = if($operation.CompletionKind -eq 'Partial'){'partially completed'}else{'completed'}
+                Add-GUITriageLogLine "Triage $qualifier. Bundle: $($result.bundlePath)"
+                Set-GUITriageStatusText "Triage $qualifier. Bundle ready."
                 [System.Windows.Forms.MessageBox]::Show($message,"Triage Complete",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
                 Open-GUITriageBundleFolder
             }
@@ -13474,37 +13465,15 @@ Invoke-NTKTriageRun -Profile '$Profile' -ResultPath '$resultEscaped'$selectedSwi
             Set-GUITriageStatusText "Triage result could not be read. Open the latest run folder for details."
             [System.Windows.Forms.MessageBox]::Show("Triage ended, but the GUI could not read the result file.`r`n`r`n$readError","Triage Result Problem",[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning) | Out-Null
         }
-        finally {
-            $script:TriageProcess = $null
-            $script:TriageResultPath = $null
-        }
-    })
-    $script:TriageTimer = $timer
-    $script:TriageTimer.Start()
+    }.GetNewClosure()
+    $timer.Add_Tick({ Update-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name 'Triage' | Out-Null })
+    Start-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name 'Triage' -Process $process -Timer $timer -TimeoutSeconds 3600 -OnPoll $poll -OnCompleted $completed -Metadata ([pscustomobject]@{Kind='Triage';ResultPath=$resultPath;RunnerPath=$runner}) | Out-Null
+    Update-GUITriageRunControls
+    $timer.Start()
 }
 
 function Stop-GUITriageRun {
-    $script:TriageCompletionHandled = $true
-    if($script:TriageTimer){
-        try { $script:TriageTimer.Stop(); $script:TriageTimer.Dispose() } catch {}
-        $script:TriageTimer = $null
-    }
-
-    if($script:TriageProcess -and !$script:TriageProcess.HasExited){
-        try {
-            $script:TriageProcess.Kill()
-            Add-GUITriageLogLine "Triage process was cancelled by the technician."
-            Set-GUITriageStatusText "Triage cancelled."
-        }
-        catch {
-            Add-GUITriageLogLine "Triage cancel failed: $($_.Exception.Message)"
-        }
-    }
-    $script:TriageProcess = $null
-    $script:TriageResultPath = $null
-    Stop-GUIBusyIndicator
-    Update-GUITriageRunControls
-    if($script:TriageProgressBar){ $script:TriageProgressBar.Style = [System.Windows.Forms.ProgressBarStyle]::Blocks; $script:TriageProgressBar.Value = 0 }
+    Stop-NTKBackgroundOperation -Controller $script:GUIBackgroundOperations -Name 'Triage' -Message 'Canceled by the technician.' | Out-Null
 }
 
 function Start-GUITriageSelectedToolsRun {

@@ -17,7 +17,7 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0096-GUI-Background-Operation-Controller-Extraction`
+- `TASK-0097-Architecture-Terminology-And-Governance-Consolidation`
 
 Release-blocking remediation through TASK-0094 is complete. TASK-0095 established canonical analysis, tool-metadata, plugin, manifest, and operation-state contracts. TASK-0106/TASK-0107 completed the Roadmap/Backlog threshold audit and reset only that subsystem.
 
@@ -34,8 +34,8 @@ Required sequence:
 10. TASK-0094 Sensitive Artifact Handling and Runtime State Safety. Complete.
 11. TASK-0095 Canonical Analysis and Tool Metadata Architecture. Complete.
 12. TASK-0106 / TASK-0107 Roadmap/Backlog Audit Preparation and Engineering Audit. Complete.
-13. TASK-0096 GUI Background Operation Controller Extraction. Active.
-14. TASK-0097 Architecture, Terminology, and Governance Consolidation.
+13. TASK-0096 GUI Background Operation Controller Extraction. Complete.
+14. TASK-0097 Architecture, Terminology, and Governance Consolidation. Active Project Custodian boundary.
 15. TASK-0098 Shared Reporting and Run Index Contracts.
 16. TASK-0099 Repository-Wide Validation Foundation.
 17. TASK-0100 Performance Instrumentation and Run-Scoped Observation Cache.

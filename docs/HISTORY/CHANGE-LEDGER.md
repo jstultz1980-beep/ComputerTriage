@@ -9,22 +9,28 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 14 / 25 | TASK-0095 canonical analysis, tool metadata, plugin, and manifest contracts. |
+| Architecture | 15 / 25 | TASK-0096 shared background operation lifecycle controller. |
 | Documentation | 15 / 25 | TASK-0095 contracts and Roadmap/Backlog audit evidence. |
-| Task System | 22 / 25 | TASK-0095 closeout, TASK-0106 preparation, and TASK-0107 activation. |
+| Task System | 23 / 25 | TASK-0096 completion and TASK-0097 Project Custodian activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
-| UI | 2 / 25 | TASK-0095 canonical descriptor-backed tabs, search, and launch registry. |
+| UI | 3 / 25 | TASK-0096 Analyze and Triage lifecycle migration. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 2 / 25 | TASK-0095 canonical package/trust descriptor validation and build metadata. |
-| Validation/Test Framework | 8 / 25 | TASK-0095 duplicate, descriptor, plugin, state, GUI, and analysis fixtures. |
-| Roadmap/Backlog | 0 / 25 | TASK-0107 Engineering Audit accepted and reset only Roadmap/Backlog. |
+| Build System | 3 / 25 | TASK-0096 build metadata. |
+| Validation/Test Framework | 9 / 25 | TASK-0096 background lifecycle and leak fixtures. |
+| Roadmap/Backlog | 1 / 25 | Architecture stabilization advanced to TASK-0097. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0096-01 | 2026-07-13 | TASK-0096 | Architecture | +1 | Centralized process, job, timer, timeout, cancellation, completion, and cleanup ownership. |
+| CHG-0096-02 | 2026-07-13 | TASK-0096 | UI | +1 | Migrated Analyze and Triage to the shared lifecycle controller while preserving GUI behavior. |
+| CHG-0096-03 | 2026-07-13 | TASK-0096 | Validation/Test Framework | +1 | Added repeated replacement, cancel, close, timeout, failure, partial, success, process, job, and timer cleanup fixtures. |
+| CHG-0096-04 | 2026-07-13 | TASK-0096 | Build System | +1 | Updated toolkit build metadata for the accepted controller extraction. |
+| CHG-0096-05 | 2026-07-13 | TASK-0096 / TASK-0097 | Task System | +1 | Completed TASK-0096 and activated the TASK-0097 Project Custodian boundary. |
+| CHG-0096-06 | 2026-07-13 | TASK-0096 / TASK-0097 | Roadmap/Backlog | +1 | Advanced architecture stabilization to architecture, terminology, and governance consolidation. |
 | CHG-0107-01 | 2026-07-13 | TASK-0107 | Roadmap/Backlog | Reset to 0 | Accepted the TASK-0106 Roadmap/Backlog audit package, confirmed remaining sequence, clarified TASK-0097 ownership, and reset only Roadmap/Backlog. |
 | CHG-0107-02 | 2026-07-13 | TASK-0107 / TASK-0096 | Task System | 0 | Closed the Project Custodian audit boundary and activated TASK-0096 without incrementing the counter for routine audit bookkeeping. |
 | CHG-0095-01 | 2026-07-13 | TASK-0095 | Architecture | +1 | Established canonical analysis roles, normalized tool descriptors, plugin contracts, manifest roles, and operation states. |

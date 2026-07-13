@@ -12,13 +12,12 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Active | Centralize process, job, timer, cancellation, timeout, completion, and cleanup lifecycle behavior. |
+| `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT (Project Custodian) | Active | Decide intended-state architecture, terminology, roadmap, queue, and governance normalization before any focused Codex support. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 5 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT with Codex support | Queued | ChatGPT decides intended-state architecture, terminology, roadmap, queue, and governance normalization; Codex performs only focused implementation-reference updates authorized by that decision. |
 | 6 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
 | 7 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
 | 8 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, and lifecycle performance costs. |
@@ -34,6 +33,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Complete | Added a shared background lifecycle controller and migrated Analyze and Triage with leak and terminal-state validation. |
 | `TASK-0107-Project-Custodian-Roadmap-Backlog-Engineering-Audit` | Complete | Accepted the roadmap audit, confirmed remaining sequence, clarified TASK-0097 ownership, reset only Roadmap/Backlog, and activated TASK-0096. |
 | `TASK-0106-Roadmap-Backlog-Audit-Preparation` | Complete | Prepared deterministic Roadmap/Backlog threshold evidence without resetting the counter. |
 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Complete | Reconciled analysis roles, tool descriptors, plugin contracts, manifest roles, and operation states. |
@@ -48,8 +48,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 - TASK-0107 is complete and the Roadmap/Backlog evidence is accepted.
 - Only Roadmap/Backlog was reset from `25 / 25` to `0 / 25`.
-- The remaining order is TASK-0096, TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
-- TASK-0097 begins with a Project Custodian decision boundary; Codex support is limited to authorized implementation-reference updates.
-- TASK-0096 is the only Active task.
-- Codex implementation is authorized to resume.
+- TASK-0096 is complete with Analyze and Triage using the shared background lifecycle controller.
+- The remaining order is TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- TASK-0097 is the only Active task and is a Project Custodian decision boundary; Codex support is limited to authorized implementation-reference updates.
+- Codex implementation is not authorized until the Project Custodian records the TASK-0097 decision or activates a focused support task.
 - Net-new feature work remains deferred until release-blocking remediation is complete.

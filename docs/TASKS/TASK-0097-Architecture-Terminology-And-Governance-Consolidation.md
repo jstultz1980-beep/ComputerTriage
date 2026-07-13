@@ -1,10 +1,10 @@
 # TASK-0097 - Architecture, Terminology, and Governance Consolidation
 
 ## Status
-Queued
+Active
 
 ## Owner
-ChatGPT with Codex support where implementation references change.
+ChatGPT (Project Custodian)
 
 ## Depends On
 TASK-0096.

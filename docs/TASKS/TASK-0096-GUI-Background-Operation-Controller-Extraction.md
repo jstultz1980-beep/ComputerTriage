@@ -1,7 +1,7 @@
 # TASK-0096 - GUI Background Operation Controller Extraction
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -23,3 +23,10 @@ PLG-018, PLG-019, PERF-001, and PERF-002.
 
 ## Validation
 Repeated start/cancel/close, timeout, failure, success, smoke, and button-smoke tests.
+
+## Result
+- Added one reusable controller for process, job, timer, timeout, cancellation, terminal-state, callback, and cleanup ownership.
+- Migrated Analyze safe-runner sessions and Triage collection to the shared lifecycle controller.
+- Preserved distinct success, partial, failure, timeout, and cancellation outcomes.
+- Added repeated replacement/cancel/close leak fixtures covering processes, jobs, and timers.
+- Parser, focused controller fixtures, toolkit smoke, GUI smoke, and button-smoke validation passed.

@@ -4,6 +4,9 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Completed TASK-0096 shared GUI background operation lifecycle controller and activated the TASK-0097 Project Custodian architecture/governance boundary.
+- Migrated Analyze and Triage to centralized process, job, timer, timeout, cancellation, completion-state, and cleanup ownership with focused leak fixtures.
+
 - Completed TASK-0107 Project Custodian Roadmap/Backlog Engineering Audit.
 - Accepted the TASK-0106 evidence package and reset only Roadmap/Backlog from `25 / 25` to `0 / 25`.
 - Confirmed the remaining sequence: TASK-0096, TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.

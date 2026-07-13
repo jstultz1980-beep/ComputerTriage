@@ -1,19 +1,19 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0108
+HANDOFF-0109
 
 ## Current Task
-TASK-0096-GUI-Background-Operation-Controller-Extraction
+TASK-0097-Architecture-Terminology-And-Governance-Consolidation
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
-ChatGPT (Project Custodian) when TASK-0097 becomes active or an audit/blocker boundary is reached.
+Codex when the Project Custodian records the TASK-0097 decision and activates focused implementation support or TASK-0098.
 
 ## Objective
-Create one reusable controller for GUI background processes, jobs, timers, cancellation, timeout, completion, and cleanup; migrate Analyze and Triage first.
+Decide intended-state architecture, normalize terminology, simplify roadmap/queue roles, and reduce duplicated governance text without weakening controls.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -22,9 +22,11 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0107 completed the Roadmap/Backlog Engineering Audit.
 - The TASK-0106 evidence package was accepted.
 - Only Roadmap/Backlog was reset from `25 / 25` to `0 / 25`.
-- Remaining sequence confirmed: TASK-0096, TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- TASK-0096 completed the shared GUI background operation controller and migrated Analyze and Triage.
+- Repeated replacement, cancellation, shutdown, timeout, failure, partial, success, process, job, and timer cleanup checks passed.
+- Remaining sequence confirmed: TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
 - TASK-0097 begins with a Project Custodian architecture/governance decision; Codex support is limited to focused implementation-reference updates authorized by that decision.
-- TASK-0096 is the single Active Codex task.
+- TASK-0097 is the single Active Project Custodian task.
 - Release candidate remains blocked pending stabilization, validation, and performance gates.
 - `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks, but Codex must stop when TASK-0097 becomes active because it is a Project Custodian boundary.
 - `Governance Refresh` performs a lightweight safe-point governance reload and resumes the same Active task.
@@ -33,26 +35,26 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - Every genuine blocker summary must end exactly with `Tell Debbie to address errors`.
 
 ## Active Task Scope
-`TASK-0096-GUI-Background-Operation-Controller-Extraction`
+`TASK-0097-Architecture-Terminology-And-Governance-Consolidation`
 
-Codex must implement only the shared GUI background operation lifecycle controller and migrate Analyze and Triage within the task acceptance criteria. No unrelated architecture, governance, helper framework, native replacement, or feature expansion is authorized.
+The Project Custodian must make the architecture, terminology, roadmap, queue, and governance decisions first. Codex must not implement further changes unless the Project Custodian authorizes focused implementation-reference support or activates the next Codex task.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
 | Repository Governance | 13 / 25 | No |
-| Architecture | 14 / 25 | No |
+| Architecture | 15 / 25 | No |
 | Documentation | 15 / 25 | No |
-| Task System | 22 / 25 | No |
+| Task System | 23 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 4 / 25 | No |
-| UI | 2 / 25 | No |
+| UI | 3 / 25 | No |
 | Plugin Framework | 6 / 25 | No |
-| Build System | 2 / 25 | No |
-| Validation/Test Framework | 8 / 25 | No |
-| Roadmap/Backlog | 0 / 25 | No |
+| Build System | 3 / 25 | No |
+| Validation/Test Framework | 9 / 25 | No |
+| Roadmap/Backlog | 1 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -73,5 +75,5 @@ None.
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```
