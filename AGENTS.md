@@ -22,6 +22,14 @@ When the user enters `Resume Work`, Codex must:
 14. If no gate or stop condition exists, activate the next dependency-ready Codex-owned queued task and continue without another prompt.
 15. Repeat until an audit gate, Project Custodian boundary, genuine blocker, or user-only decision is reached.
 
+## Governance Refresh
+
+When the user enters `Governance Refresh`, follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`.
+
+This is a lightweight in-task rules reload. Pause at the next safe point, preserve current work and documented drift, fetch and safely synchronize, reread only the defined governance set, apply changed rules immediately, and resume the same Active task.
+
+Do not restart the task, perform a full project startup, change task ownership, activate another task, or reload architecture/roadmap/ADRs unless refreshed governance explicitly requires it.
+
 ## Audit Gate Behavior
 
 When any subsystem reaches `25 / 25` at a task boundary:
