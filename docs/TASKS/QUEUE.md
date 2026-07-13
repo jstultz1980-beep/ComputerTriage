@@ -12,22 +12,25 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Active | Add verification, recovery, and rollback to destructive repair operations. |
+| `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation` | Codex | Active | Establish one result envelope and eliminate false success. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 3 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Codex | Queued | Make package, deployment, and update operations complete and rollback-capable. |
-| 4 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, EDR policy, and tool-retention review. |
-| 5 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
-| 6 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate analysis/tool metadata sources and verify plugin modularity. |
-| 7 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
-| 8 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
-| 9 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
-| 10 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
-| 11 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, and lifecycle performance costs. |
-| 12 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
+| 1 | `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Codex | Queued | Make bundle identity, integrity, completeness, and collector outcomes trustworthy. |
+| 2 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Codex | Queued | Make ARGUS fail closed and correct citation, classification, confidence, and priority behavior. |
+| 3 | `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Queued | Add verification, recovery, and rollback to destructive repair operations. |
+| 4 | `TASK-0092-Transactional-Package-Deploy-And-Update-Integrity` | Codex | Queued | Make package, deployment, and update operations complete and rollback-capable. |
+| 5 | `TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy` | Codex | Queued | Enforce provenance, integrity, licensing, privilege, EDR policy, and tool-retention review. |
+| 6 | `TASK-0094-Sensitive-Artifact-Handling-And-Runtime-State-Safety` | Codex | Queued | Protect sensitive artifacts and make runtime state atomic and separable from defaults. |
+| 7 | `TASK-0095-Canonical-Analysis-And-Tool-Metadata-Architecture` | Codex | Queued | Consolidate analysis/tool metadata sources and verify plugin modularity. |
+| 8 | `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Codex | Queued | Centralize process, job, timer, cancellation, and cleanup lifecycle behavior. |
+| 9 | `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | ChatGPT / Codex support | Queued | Normalize intended-state architecture, terminology, roadmap, queue, and governance references. |
+| 10 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Codex | Queued | Create shared reporting metadata and immutable run indexing. |
+| 11 | `TASK-0099-Repository-Wide-Validation-Foundation` | Codex | Queued | Add repository-wide parser, load, negative-path, package, and regression gates. |
+| 12 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Codex | Queued | Instrument and reduce startup, first-render, repeated-query, and lifecycle performance costs. |
+| 13 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Queued | Execute the final release-candidate validation and documentation gate. |
 
 ## Superseded Tasks
 
@@ -39,8 +42,6 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
-| `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Complete | Added final sidecar hash verification, tamper detection, complete collector outcomes, and capability/status integrity. |
-| `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation` | Complete | Added canonical results, deterministic exits, startup failure classification, partial propagation, ARGUS suppression, and GUI/plugin outcome handling. |
 | `TASK-0101-Validation-Test-Framework-Counter-Audit` | Complete | Audited executable validation and reset only Validation/Test Framework. |
 | `TASK-0087-Parser-Backed-Evidence-Quality-And-Timeline` | Complete | Added parser-backed evidence quality and source-event-time semantics. |
 | `TASK-0086-Offline-Evidence-Isolation-And-Bundle-Identity` | Complete | Added immutable run identity and offline evidence isolation. |
@@ -49,7 +50,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0088 and TASK-0089 are complete; TASK-0090 is the only Active task.
+- TASK-0088 is the only Active task.
 - Codex is authorized to continue through ordered dependency-ready Codex tasks under one `Resume Work` cycle.
 - Audit Preparation occurs automatically at `25 / 25`.
 - Project Custodian review follows each Audit Preparation package.
