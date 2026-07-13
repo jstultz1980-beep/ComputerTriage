@@ -442,6 +442,10 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     [CmdletBinding()]
     param([string]$BundleRoot)
 
+    if(!(Get-Command New-NTKOperationResult -ErrorAction SilentlyContinue)){
+        . (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'App\NetworkToolkit\Utilities\OperationResult.ps1')
+    }
+
     if(!$BundleRoot){
         $BundleRoot = Get-ARGUSDefaultBundleRoot
     }
@@ -524,7 +528,15 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-ARGUSJsonFile -Path $validationPath -InputObject $validation
     Write-ARGUSJsonFile -Path $summaryPath -InputObject $summary
     Write-ARGUSJsonFile -Path $normalizedPath -InputObject $normalizedAnalysis
-    $grouping = Invoke-ARGUSGroupingAndRecommendations -BundleRoot $BundleRoot -NormalizedAnalysisPath $normalizedPath
+    if($validation.status -eq 'failed'){
+        $grouping = [pscustomobject]@{
+            DiagnosticGroups = [ordered]@{schemaVersion='1.0';status='failed';groups=@();errors=@($validation.errors)}
+            Recommendations = [ordered]@{schemaVersion='1.0';status='suppressed';recommendations=@();reason='ARGUS input contract failed.'}
+        }
+    }
+    else {
+        $grouping = Invoke-ARGUSGroupingAndRecommendations -BundleRoot $BundleRoot -NormalizedAnalysisPath $normalizedPath
+    }
     Write-ARGUSJsonFile -Path $diagnosticGroupsPath -InputObject $grouping.DiagnosticGroups
     Write-ARGUSJsonFile -Path $recommendationsPath -InputObject $grouping.Recommendations
     Write-ARGUSMarkdownReport -Path $reportPath -Validation $validation -Summary $summary
@@ -540,19 +552,12 @@ function Global:Invoke-ARGUSFoundationAnalysis {
     Write-Host "Technician report: $($finalReports.TechnicianReport)"
     Write-Host "Escalation report: $($finalReports.EscalationReport)"
 
-    return [pscustomobject]@{
-        Status = "Completed"
-        BundleRoot = $BundleRoot
-        ArgusRoot = $argusRoot
-        InputValidationStatus = $validation.status
-        InputValidationMode = $validation.mode
-        Findings = @($summary.prioritizedDeterministicFindings).Count
-        NormalizedAnalysis = $normalizedPath
-        DiagnosticGroups = $diagnosticGroupsPath
-        Recommendations = $recommendationsPath
-        TechnicianReport = $finalReports.TechnicianReport
-        EscalationReport = $finalReports.EscalationReport
-        RunId = $script:ARGUSBundleValidation.Identity.runId
+    $resultState = if($validation.status -eq 'failed'){'Failed'}elseif($validation.status -eq 'limited'){'SucceededWithWarnings'}else{'Succeeded'}
+    return New-NTKOperationResult -Operation 'ARGUS Foundation Analysis' -State $resultState -Message $(if($resultState -eq 'Failed'){'ARGUS input contract failed; recommendations were suppressed.'}else{'ARGUS analysis completed.'}) -Warnings @($validation.capabilityWarnings) -Errors @($validation.errors) -Data @{
+        Status=$(if($resultState -eq 'Failed'){'Failed'}else{'Completed'}); BundleRoot=$BundleRoot; ArgusRoot=$argusRoot
+        InputValidationStatus=$validation.status; InputValidationMode=$validation.mode; Findings=@($summary.prioritizedDeterministicFindings).Count
+        NormalizedAnalysis=$normalizedPath; DiagnosticGroups=$diagnosticGroupsPath; Recommendations=$recommendationsPath
+        TechnicianReport=$finalReports.TechnicianReport; EscalationReport=$finalReports.EscalationReport; RunId=$script:ARGUSBundleValidation.Identity.runId
         BundleId = $script:ARGUSBundleValidation.Identity.bundleId
         Report = $reportPath
     }

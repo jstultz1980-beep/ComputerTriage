@@ -17,7 +17,7 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation`
+- `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract`
 
 TASK-0087 and the required TASK-0101 threshold audit are complete. Release-blocking remediation has resumed with TASK-0088.
 

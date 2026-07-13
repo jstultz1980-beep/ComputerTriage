@@ -600,14 +600,21 @@ function Global:Invoke-NTKTriageRun {
         Compress-Archive -LiteralPath $items -DestinationPath $bundlePath -Force
         $post = Test-NTKTriagePostRun -RunPath $run.Path -BundlePath $bundlePath
         $post | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run.Path "Metadata\validation_postrun.json") -Encoding UTF8
-        "Preflight validation: $($preflight.passed)`r`nCollection: PASS`r`nLocal analysis: PASS`r`nBundle creation: PASS`r`nPost-run validation: $($post.passed)" | Set-Content -LiteralPath (Join-Path $run.Path "Reports\validation_summary.txt") -Encoding UTF8
-        $result = [pscustomobject]@{status="Completed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path "Analysis\summary.md");filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);toolsMissing=(Get-NTKTriageCount $missingTools);warnings=(Get-NTKTriageCount $warnings);findings=(Get-NTKTriageCount $findings);postValidationPassed=$post.passed}
+        $failedCommands = @($commandResults + $toolResults | Where-Object { $_.PSObject.Properties['succeeded'] -and !$_.succeeded })
+        $triageState = if(!$preflight.passed -or !$post.passed -or $failedCommands.Count -gt 0){'Partial'}elseif($warnings.Count -gt 0 -or $missingTools.Count -gt 0){'SucceededWithWarnings'}else{'Succeeded'}
+        "Preflight validation: $($preflight.passed)`r`nCollection state: $triageState`r`nFailed commands/tools: $($failedCommands.Count)`r`nBundle creation: $([bool](Test-Path -LiteralPath $bundlePath))`r`nPost-run validation: $($post.passed)" | Set-Content -LiteralPath (Join-Path $run.Path "Reports\validation_summary.txt") -Encoding UTF8
+        $result = New-NTKOperationResult -Operation 'Computer Triage' -State $triageState -Message "Triage completed with state $triageState." -Warnings @($warnings) -Errors @($failedCommands | ForEach-Object { "$( $_.name ): exit $( $_.exitCode )" }) -Stages @(
+            [pscustomobject]@{name='preflight';required=$true;succeeded=[bool]$preflight.passed},
+            [pscustomobject]@{name='collection';required=$true;succeeded=($failedCommands.Count -eq 0)},
+            [pscustomobject]@{name='bundle';required=$true;succeeded=[bool](Test-Path -LiteralPath $bundlePath)},
+            [pscustomobject]@{name='postValidation';required=$true;succeeded=[bool]$post.passed}
+        ) -Data @{status=$(if($triageState -in @('Succeeded','SucceededWithWarnings')){'Completed'}else{'Partial'});runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$bundlePath;summaryPath=(Join-Path $run.Path 'Analysis\summary.md');filesCollected=(Get-NTKTriageCount $fileRecords);commandsRun=(Get-NTKTriageCount $commandResults);toolsRun=(Get-NTKTriageCount $toolResults);toolsMissing=(Get-NTKTriageCount $missingTools);warningCount=(Get-NTKTriageCount $warnings);findings=(Get-NTKTriageCount $findings);postValidationPassed=$post.passed}
     }
     catch {
         Write-NTKTriageLog "Triage failed: $($_.Exception.Message)" $run.RunLog
         Write-NTKTriageLog "Triage failure type: $($_.Exception.GetType().FullName)" $run.RunLog
         Write-NTKTriageLog "Triage failure stack: $($_.ScriptStackTrace)" $run.RunLog
-        $result = [pscustomobject]@{status="Failed";runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message;errorType=$_.Exception.GetType().FullName;stack=$_.ScriptStackTrace}
+        $result = New-NTKOperationResult -Operation 'Computer Triage' -State Failed -Message 'Triage failed.' -Errors @($_.Exception.Message) -Data @{status='Failed';runId=$run.RunId;profile=$Profile;runPath=$run.Path;bundlePath=$null;summaryPath=$null;error=$_.Exception.Message;errorType=$_.Exception.GetType().FullName;stack=$_.ScriptStackTrace}
     }
     if($ResultPath){ $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ResultPath -Encoding UTF8 }
     return $result

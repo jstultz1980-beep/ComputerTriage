@@ -773,12 +773,16 @@ param(
     Add-Content -Path $logPath -Encoding UTF8 -Value "Finished: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
     Write-Host ""
-    Write-Host "Repair path completed. Log saved to:" -ForegroundColor Green
+    $failedSteps = @($results | Where-Object { $_.ExitCode -ne 0 })
+    $repairState = if($failedSteps.Count -gt 0){'Partial'}else{'Succeeded'}
+    Write-Host "Repair path finished with state $repairState. Log saved to:" -ForegroundColor $(if($repairState -eq 'Succeeded'){'Green'}else{'Yellow'})
     Write-Host $logPath -ForegroundColor Green
     Write-Host ""
     Write-Host "Recommended next step: reboot if DISM or SFC repaired anything, then rerun Quick Diagnosis."
 
     Start-NTKToolProcess -FilePath "notepad.exe" -ArgumentList @("`"$logPath`"") | Out-Null
+
+    return New-NTKOperationResult -Operation 'DISM and SFC Repair' -State $repairState -Message "Repair steps finished with state $repairState." -Errors @($failedSteps | ForEach-Object { "$($_.Step) exited $($_.ExitCode)." }) -Stages @($results | ForEach-Object { [pscustomobject]@{name=$_.Step;required=$true;succeeded=($_.ExitCode -eq 0);exitCode=$_.ExitCode} }) -Data @{Status=$(if($repairState -eq 'Succeeded'){'Completed'}else{'Partial'});LogPath=$logPath}
 
 }
 

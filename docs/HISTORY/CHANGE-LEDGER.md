@@ -9,17 +9,17 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 11 / 25 | Autonomous Resume Work and two-stage audit cycle. |
-| Architecture | 6 / 25 | TASK-0087 parser-backed evidence and event-time contracts. |
-| Documentation | 5 / 25 | Autonomous-cycle policy and audit preparation template. |
-| Task System | 11 / 25 | Codex continuous queue progression and automatic audit-task transition. |
-| Evidence Collection and Deterministic Analysis | 6 / 25 | TASK-0087 parser-backed quality and structured error artifacts. |
-| ARGUS | 8 / 25 | TASK-0087 parser-failure and timestamp confidence handling. |
+| Architecture | 7 / 25 | TASK-0088 canonical operation-result contract. |
+| Documentation | 6 / 25 | TASK-0088 implementation and validation evidence. |
+| Task System | 12 / 25 | TASK-0088 completion and TASK-0089 activation. |
+| Evidence Collection and Deterministic Analysis | 7 / 25 | TASK-0088 result propagation through triage and deterministic analysis. |
+| ARGUS | 9 / 25 | TASK-0088 failed-contract result and recommendation suppression. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
-| UI | 23 / 25 | TASK-0086 Analyze workflow bundle selection. |
-| Plugin Framework | 1 / 25 | No recent material change. |
-| Build System | 19 / 25 | TASK-0087 build metadata. |
-| Validation/Test Framework | 0 / 25 | TASK-0101 threshold audit completed. |
-| Roadmap/Backlog | 17 / 25 | Release-blocking remediation resumed with TASK-0088. |
+| UI | 24 / 25 | TASK-0088 GUI result-state and exit display. |
+| Plugin Framework | 2 / 25 | TASK-0088 per-step plugin outcome summary. |
+| Build System | 20 / 25 | TASK-0088 build metadata. |
+| Validation/Test Framework | 1 / 25 | TASK-0088 terminal-state and negative-path fixtures. |
+| Roadmap/Backlog | 18 / 25 | Remediation advanced to TASK-0089. |
 
 ## Current Ledger Entries
 
@@ -56,6 +56,16 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | CHG-0101-02 | 2026-07-12 | TASK-0101 | Documentation | +1 | Added audit evidence report. |
 | CHG-0101-03 | 2026-07-12 | TASK-0101 / TASK-0088 | Task System | +1 | Completed audit and activated TASK-0088. |
 | CHG-0101-04 | 2026-07-12 | TASK-0101 / TASK-0088 | Roadmap/Backlog | +1 | Cleared validation gate and resumed remediation. |
+| CHG-0088-01 | 2026-07-12 | TASK-0088 | Architecture | +1 | Added the canonical operation-result schema, terminal states, and exit-code mapping. |
+| CHG-0088-02 | 2026-07-12 | TASK-0088 | Evidence Collection and Deterministic Analysis | +1 | Propagated canonical states through triage and HEPHAESTUS. |
+| CHG-0088-03 | 2026-07-12 | TASK-0088 | ARGUS | +1 | Failed closed and suppressed recommendations after contract failure. |
+| CHG-0088-04 | 2026-07-12 | TASK-0088 | UI | +1 | Made safe-runner completion text depend on canonical exit state. |
+| CHG-0088-05 | 2026-07-12 | TASK-0088 | Plugin Framework | +1 | Added per-step repair outcome propagation. |
+| CHG-0088-06 | 2026-07-12 | TASK-0088 | Validation/Test Framework | +1 | Added terminal-state, CLI failure, and ARGUS suppression fixtures. |
+| CHG-0088-07 | 2026-07-12 | TASK-0088 | Build System | +1 | Updated accepted implementation build metadata. |
+| CHG-0088-08 | 2026-07-12 | TASK-0088 | Documentation | +1 | Recorded implementation and validation evidence. |
+| CHG-0088-09 | 2026-07-12 | TASK-0088 / TASK-0089 | Task System | +1 | Completed TASK-0088 and activated TASK-0089. |
+| CHG-0088-10 | 2026-07-12 | TASK-0088 / TASK-0089 | Roadmap/Backlog | +1 | Advanced dependency-ordered remediation to bundle integrity. |
 
 ## Audit Closeout
 

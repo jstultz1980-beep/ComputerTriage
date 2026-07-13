@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712190500,
-    "SourceUpdatedAt":  "2026-07-12T19:05:00-05:00",
-    "ReleaseNotes":  "Added parser-backed evidence quality, structured export errors, source-event-time timeline semantics, and downstream ARGUS confidence handling."
+    "Build":  20260712192933,
+    "SourceUpdatedAt":  "2026-07-12T19:29:33.5307941-05:00",
+    "ReleaseNotes":  "Established canonical operation results, deterministic CLI exit codes, required and optional startup failure handling, fail-closed ARGUS behavior, and propagated partial plugin and triage outcomes."
 }

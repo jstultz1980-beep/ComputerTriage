@@ -1,7 +1,7 @@
 # TASK-0089 - Diagnostic Bundle Integrity and Collection Contract
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

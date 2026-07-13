@@ -57,7 +57,8 @@ function Global:Add-NTKImportFailure {
         [string]$Stage,
         [string]$Name,
         [string]$Path,
-        [System.Exception]$Exception
+        [System.Exception]$Exception,
+        [bool]$Required = $false
     )
 
     $record = [pscustomobject]@{
@@ -66,6 +67,7 @@ function Global:Add-NTKImportFailure {
         Name = $Name
         Path = $Path
         Error = if($Exception){$Exception.Message}else{'Unknown load failure'}
+        Required = $Required
     }
     [void]$Global:NTKImportFailures.Add($record)
     Write-Host "[$Stage] $Name failed to load: $($record.Error)" -ForegroundColor Red
@@ -120,7 +122,7 @@ catch{
 
 function Import-NTKModules {
 
-param([string]$Directory)
+param([string]$Directory,[bool]$Required = $true)
 
 if(!(Test-Path $Directory)){
     Write-Host "Module directory missing: $Directory" -ForegroundColor Yellow
@@ -142,7 +144,7 @@ foreach($file in $files){
 
     }
     catch{
-        Add-NTKImportFailure -Stage 'Module' -Name $file.Name -Path $file.FullName -Exception $_.Exception
+        Add-NTKImportFailure -Stage 'Module' -Name $file.Name -Path $file.FullName -Exception $_.Exception -Required $Required
 
     }
 
@@ -190,7 +192,7 @@ foreach($plugin in $plugins){
 
         }
         catch{
-            Add-NTKImportFailure -Stage 'Plugin manifest' -Name $plugin.Name -Path $manifestFile -Exception $_.Exception
+            Add-NTKImportFailure -Stage 'Plugin manifest' -Name $plugin.Name -Path $manifestFile -Exception $_.Exception -Required $false
             continue
 
         }
@@ -224,13 +226,13 @@ foreach($plugin in $plugins){
         catch{
 
             Remove-Variable -Name NTKLoadingPlugin -Scope Global -ErrorAction SilentlyContinue
-            Add-NTKImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception $_.Exception
+            Add-NTKImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception $_.Exception -Required $false
 
         }
 
     }
     else{
-        Add-NTKImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception ([System.IO.FileNotFoundException]::new("Plugin script missing: $script"))
+        Add-NTKImportFailure -Stage 'Plugin' -Name $pluginName -Path $script -Exception ([System.IO.FileNotFoundException]::new("Plugin script missing: $script")) -Required $false
 
     }
 
@@ -242,7 +244,7 @@ foreach($plugin in $plugins){
 # Load Toolkit Modules
 # --------------------------------------------------
 
-Import-NTKModules $NTKPaths.Utilities
+Import-NTKModules $NTKPaths.Utilities $true
 
 if(Get-Command Clear-NTKOldTempOutputs -ErrorAction SilentlyContinue){
     Clear-NTKOldTempOutputs -KeepCount 12 -MaxAgeDays 7
@@ -252,12 +254,20 @@ if(Get-Command Clear-NTKReportAndLogQuota -ErrorAction SilentlyContinue){
     Clear-NTKReportAndLogQuota -ReportKeepCount 6 -LogKeepCount 10 -TempKeepCount 12 -MaxAgeDays 21
 }
 
-Import-NTKModules $NTKPaths.Core
-Import-NTKModules $NTKPaths.Discovery
+Import-NTKModules $NTKPaths.Core $true
+Import-NTKModules $NTKPaths.Discovery $false
 
 Import-NTKPlugins
 
-Import-NTKModules $NTKPaths.UI
+Import-NTKModules $NTKPaths.UI $true
+
+$requiredImportFailures = @(Get-NTKImportFailures | Where-Object { $_.Required })
+if($requiredImportFailures.Count -gt 0){
+    Write-Host "Required toolkit modules failed to load." -ForegroundColor Red
+    if($RunCommand){ exit 3 }
+    throw "Required toolkit modules failed to load: $($requiredImportFailures.Name -join ', ')"
+}
+$Global:NTKDegradedMode = (@(Get-NTKImportFailures | Where-Object { !$_.Required }).Count -gt 0)
 
 # --------------------------------------------------
 # Verify Console Exists
@@ -302,27 +312,21 @@ if($RunCommand){
     }
 
     try {
-
-        Invoke-NTKCommand $RunCommand
-
+        $rawResult = Invoke-NTKCommand $RunCommand
+        $operationResult = ConvertTo-NTKOperationResult -InputObject $rawResult -Operation $RunCommand
+        $operationResult | ConvertTo-Json -Depth 12 | Write-Output
+        exit ([int]$operationResult.exitCode)
     }
     catch [System.OperationCanceledException] {
-
-        Write-Host ""
-        Write-Host $_.Exception.Message -ForegroundColor Yellow
-
+        $operationResult = New-NTKOperationResult -Operation $RunCommand -State Canceled -Message $_.Exception.Message -Errors @($_.Exception.Message)
+        $operationResult | ConvertTo-Json -Depth 12 | Write-Output
+        exit ([int]$operationResult.exitCode)
     }
     catch {
-
-        Write-Host ""
-        Write-Host "Command failed." -ForegroundColor Red
-        Write-Host $_
-
+        $operationResult = New-NTKOperationResult -Operation $RunCommand -State Failed -Message 'Command failed.' -Errors @($_.Exception.Message)
+        $operationResult | ConvertTo-Json -Depth 12 | Write-Output
+        exit ([int]$operationResult.exitCode)
     }
-
-    Write-Host ""
-    [void](Read-Host "Press ENTER to close")
-    return
 
 }
 

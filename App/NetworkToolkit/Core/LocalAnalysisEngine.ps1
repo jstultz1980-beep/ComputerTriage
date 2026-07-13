@@ -500,6 +500,10 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
     [CmdletBinding()]
     param([string]$BundleRoot)
 
+    if(!(Get-Command New-NTKOperationResult -ErrorAction SilentlyContinue)){
+        . (Join-Path (Split-Path -Parent $PSScriptRoot) 'Utilities\OperationResult.ps1')
+    }
+
     if(!$BundleRoot){
         $BundleRoot = Get-HEPDefaultBundleRoot
     }
@@ -540,14 +544,9 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
         Write-Host "Bundle root: $BundleRoot"
         Write-Host "Analysis root: $analysisRoot"
 
-        return [pscustomobject]@{
-            Status = "Completed"
-            BundleRoot = $BundleRoot
-            AnalysisRoot = $analysisRoot
-            Findings = @($findings.findings).Count
-            EvidenceScore = $evidenceScore.overallScore
-            RunId = $script:HEPBundleValidation.Identity.runId
-            BundleId = $script:HEPBundleValidation.Identity.bundleId
+        return New-NTKOperationResult -Operation 'HEPHAESTUS Local Analysis' -State Succeeded -Message 'Local analysis completed.' -Data @{
+            Status='Completed'; BundleRoot=$BundleRoot; AnalysisRoot=$analysisRoot; Findings=@($findings.findings).Count
+            EvidenceScore=$evidenceScore.overallScore; RunId=$script:HEPBundleValidation.Identity.runId; BundleId=$script:HEPBundleValidation.Identity.bundleId
         }
     }
     catch {
@@ -567,11 +566,8 @@ function Global:Invoke-HEPHAESTUSLocalAnalysis {
         Write-HEPJsonFile -Path (Join-Path $analysisRoot "evidence-score.json") -InputObject $failure
 
         Write-Warning "HEPHAESTUS Local Analysis failed but collection should continue: $($_.Exception.Message)"
-        return [pscustomobject]@{
-            Status = "FailedNonFatal"
-            BundleRoot = $BundleRoot
-            AnalysisRoot = $analysisRoot
-            Error = $_.Exception.Message
+        return New-NTKOperationResult -Operation 'HEPHAESTUS Local Analysis' -State Partial -Message 'Local analysis failed; collection may continue.' -Errors @($_.Exception.Message) -Data @{
+            Status='FailedNonFatal'; BundleRoot=$BundleRoot; AnalysisRoot=$analysisRoot; Error=$_.Exception.Message
         }
     }
 }

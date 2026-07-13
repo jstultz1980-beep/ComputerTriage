@@ -3209,8 +3209,13 @@ try {
     . '$($ToolkitLauncher)' -NoConsole
     Start-Transcript -Path '$transcriptPath' -Force | Out-Null
     Write-Host "Running: $($ToolName.Replace('"','\"'))"
-    & { $Invocation }
-    `$metadata.Status = 'Completed'
+    `$operationResults = @(& { $Invocation })
+    `$terminalResults = @(`$operationResults | Where-Object { `$_.PSObject.Properties['state'] -and `$_.PSObject.Properties['exitCode'] })
+    `$worstExit = 0
+    foreach(`$operationResult in `$terminalResults){ if([int]`$operationResult.exitCode -gt `$worstExit){ `$worstExit = [int]`$operationResult.exitCode } }
+    `$metadata.OperationResults = `$terminalResults
+    `$metadata.Status = if(`$worstExit -eq 0){ 'Completed' }else{ 'Failed' }
+    `$metadata.ExitCode = `$worstExit
 }
 catch {
     Write-Host ''
@@ -3218,6 +3223,7 @@ catch {
     Write-Host `$_.Exception.Message -ForegroundColor Red
     `$metadata.Status = 'Error'
     `$metadata.Error = `$_.Exception.Message
+    `$metadata.ExitCode = 1
 }
 finally {
     `$metadata.CompletedAt = (Get-Date).ToString('s')
@@ -3232,6 +3238,7 @@ finally {
         Write-Host "Could not save tool output to computer state: `$(`$_.Exception.Message)" -ForegroundColor Yellow
     }
 }
+exit ([int]`$metadata.ExitCode)
 "@
 
     try {
@@ -3361,7 +3368,7 @@ finally {
                 }
                 catch {}
                 try { [void]$script:SafeRunnerSessions.Remove($state) } catch {}
-                $title.Text = "Completed: $ToolName (exit $exitCode)"
+                $title.Text = if($exitCode -eq 0){"Completed: $ToolName (exit 0)"}else{"Failed: $ToolName (exit $exitCode)"}
             }
         }.GetNewClosure()
         $timer.Add_Tick($tick); $timer.Start()
@@ -11468,7 +11475,7 @@ function Start-GUICompleteAnalysis {
         return
     }
     $safeBundle = $bundle.Replace("'","''")
-    Start-GUISafeScriptRunner -ToolName "Complete Local And ARGUS Analysis" -Invocation "Invoke-HEPHAESTUSLocalAnalysis -BundleRoot '$safeBundle'; Invoke-ARGUSFoundationAnalysis -BundleRoot '$safeBundle'"
+    Start-GUISafeScriptRunner -ToolName "Complete Local And ARGUS Analysis" -Invocation "`$hep = Invoke-HEPHAESTUSLocalAnalysis -BundleRoot '$safeBundle'; `$hep; if(`$hep.state -notin @('Succeeded','SucceededWithWarnings')){ return }; Invoke-ARGUSFoundationAnalysis -BundleRoot '$safeBundle'"
 }
 
 function Build-WindowsToolsPage {

@@ -4,6 +4,11 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Completed TASK-0088 canonical operation results and failure propagation.
+- Added deterministic terminal states/exit codes, required/optional startup handling, partial triage and plugin summaries, failed-contract ARGUS suppression, and GUI result-state display.
+- Added negative-path operation-result and CLI/ARGUS fixtures; full existing regression suite passed.
+- Activated TASK-0089 diagnostic bundle integrity and collection contract.
+
 - Established the autonomous `Resume Work` cycle: Codex now continues through dependency-ready Codex-owned tasks without another prompt until an audit gate, Project Custodian boundary, genuine blocker, or user-only decision.
 - Required Codex to automatically create and complete Audit Preparation when any subsystem reaches `25 / 25`, then push the evidence package and activate a Project Custodian Engineering Audit task.
 - Added `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md` and `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`.
