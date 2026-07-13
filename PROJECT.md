@@ -1,177 +1,128 @@
 # Computer Triage Toolkit Project Control
 
 ## Source of Truth
-The repository is the source of truth. Chat history is not the source of truth.
+The repository is the source of truth. Chat history is not authoritative.
+
+## Roles
+
+ChatGPT is the Project Custodian and owns architecture, governance, audit decisions, roadmap and task sequencing, blocker resolution, release readiness, and acceptance boundaries.
+
+Codex is the implementation and audit-preparation agent. Codex owns implementation, validation, focused corrections, task closeout records, local commits, and deterministic audit evidence gathering.
+
+The user owns product direction and decisions that cannot safely be made from established repository evidence or prior product direction.
 
 ## Handoff Prompt Rule
-`docs/HANDOFF.md` is the single source of truth for the prompt that should be
-given to another bot. Do not create or rely on a separate ChatGPT task packet as
-a source of truth.
+`docs/HANDOFF.md` is the single source of truth for the next-bot prompt. Every completed task must update it.
 
-Every completed task must update `docs/HANDOFF.md` with a `Next Bot Prompt`
-section. That prompt must tell the next bot to read repository files in the
-required startup order, follow the active task listed in `docs/HANDOFF.md`, and
-ignore chat history unless the same information exists in the repository.
+## Resume Work Rule
 
-## Prompt Shortcut Rule
-When the user prompts exactly or substantially with `Next 25`, treat it as this reusable instruction:
+When the user prompts `Resume Work`, Codex must follow `AGENTS.md`, `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`, and `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`.
 
-```text
-Read the project source-of-truth files first. Check punch_list.txt for new additions, merge any additions into the existing task list or create focused tasks if needed, reorder the task queue into the most logical implementation sequence, then proceed through tasks until the next 25-change audit gate is reached. Do not stop for user testing between tasks. Hold the full "Test This" list until stopped at the audit gate. Commit each completed task locally, but do not push unless explicitly asked.
-```
+The instruction authorizes one continuous execution cycle:
 
-## Codex CLI Resume Work Rule
-When the user prompts exactly or substantially with `Resume Work`, Codex CLI must treat it as this reusable instruction:
+1. Synchronize the local checkout with the authoritative remote without overwriting preserved drift.
+2. Execute the single Active Codex-owned task.
+3. Validate, correct in-scope defects, update required records, and commit locally.
+4. Reconcile punch-list additions.
+5. If no gate or stop condition exists, activate the next dependency-ready Codex-owned task already ordered in `docs/TASKS/QUEUE.md`.
+6. Continue without another user prompt.
+7. When a subsystem reaches `25 / 25`, automatically create and complete an Audit Preparation task before any further implementation.
+8. Push the completed audit package and activate a Project Custodian Engineering Audit task.
+9. Stop for the Project Custodian, a genuine blocker, or a user-only decision.
 
-```text
-Read AGENTS.md and docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md, then follow the full repository startup sequence. Verify the handoff and queue agree on exactly one Active task, preserve all documented unrelated working-tree drift, read the Active task and every referenced design/ADR/file, execute only that task, validate it, update all required governance/history/build records, commit locally, and report the result. A 25/25 audit threshold blocks the next implementation task but does not interrupt an Active task already underway. Do not push unless explicitly requested, except for a required blocker report under the Error Handoff Rule.
-```
+`Resume Work` does not authorize unrelated work, architecture invention, dependency bypass, destructive cleanup, stale-checkout implementation, or activation of ChatGPT-owned work.
 
-`Resume Work` is not permission to choose unrelated work, bypass audit gates, clean unrelated drift, or expand task scope.
+## Project Custodian Continue Rule
+
+When the user tells ChatGPT `Continue`, the Project Custodian must read the current cloud handoff, queue, error handoff, active task, and any audit package.
+
+The Project Custodian should act autonomously on architecture, governance, remediation sequencing, task consolidation, counter resets, and implementation readiness whenever repository evidence is sufficient. It should stop for the user only when a product, licensing, credential, physical-access, destructive, release, or subjective acceptance decision genuinely requires the user.
+
+After an Engineering Audit, the Project Custodian activates exactly one dependency-ready Codex task, commits and pushes the decision, and returns `Resume Work` as the next instruction.
 
 ## Address Errors Rule
-When the user prompts exactly or substantially with `Address Errors`, ChatGPT must treat it as this reusable instruction:
 
-```text
-Read PROJECT.md, docs/HANDOFF.md, docs/TASKS/QUEUE.md, and docs/ERROR-HANDOFF.md from the cloud repository. Verify the blocker is current and tied to the Active task. Inspect all tracked files needed to understand it. Resolve governance, architecture, scope, sequencing, documentation, or repository-state conflicts directly when possible. Preserve Codex implementation work and unrelated drift. If code work is required, create or amend the smallest appropriate tracked task without discarding current work. Update docs/ERROR-HANDOFF.md with the resolution, update handoff/queue/task records when state changes, commit and push the remediation, then instruct the user to tell Codex: Resume Work.
-```
-
-`Address Errors` is a Project Custodian workflow. It is not permission to perform unrelated feature work.
+When the user prompts `Address Errors`, ChatGPT reads the cloud source-of-truth files and `docs/ERROR-HANDOFF.md`, resolves governance/architecture/scope/sequencing conflicts where possible, preserves Codex work and unrelated drift, commits and pushes the resolution, and returns control through `Resume Work`.
 
 ## Error Handoff Rule
-`docs/ERROR-HANDOFF.md` is the canonical cloud blocker handoff from Codex to the Project Custodian.
 
-When Codex reaches a genuine blocker or required stop condition, it must:
-1. Preserve current implementation work and unrelated working-tree drift.
-2. Record the complete blocker in `docs/ERROR-HANDOFF.md`.
-3. Include the Active task, exact error, evidence, affected files, attempted actions, why continuation is unsafe, and the required Project Custodian decision.
-4. Commit the blocker report.
-5. Push the blocker-report commit to the cloud repository. This limited push is explicitly authorized even when normal task commits are local-only.
-6. Tell the user the error handoff is available, then wait for `Address Errors`.
+A blocker must never exist only in terminal output or chat. Codex must record a complete blocker in `docs/ERROR-HANDOFF.md`, commit it, and push the minimum blocker handoff so the Project Custodian can act.
 
-A blocker must never exist only in terminal output, chat, or an unpushed local commit.
+## Non-Interruption Rule
 
-## Active Task Non-Interruption Rule
-Read `docs/GOVERNANCE/NON-INTERRUPTION-GUARDRAIL.md`.
+Once Codex begins an Active task, that task remains locked until normal completion or a genuine blocker boundary. New requests are recorded for later reconciliation and do not interrupt active implementation.
 
-Once Codex begins an Active task, the task remains locked until its normal completion or blocker boundary.
-
-While Codex is executing that task, ChatGPT may record new user requests for future work, but must not:
-- Replace or deactivate the current Active task.
-- Change its owner or rewrite its scope.
-- Insert a design review, audit, or other gate into the middle of the task.
-- Require Codex to abandon, restart, or restructure work solely because a new request was submitted through ChatGPT.
-
-New requests are reconciled at the next task boundary.
-
-If a subsystem reaches `25 / 25` while an Active task is underway, the current task may finish, validate, and commit. The required audit becomes the next Active task before another implementation task begins.
-
-Immediate interruption is permitted only when:
-- The user explicitly cancels or pauses the task.
-- Continuing creates a material data-loss, credential, destructive-operation, or security risk.
-- Repository corruption or an irreconcilable source-of-truth conflict prevents safe continuation.
-- The Active task encounters a genuine blocker outside its authorized correction scope.
-
-A new ChatGPT request is not by itself an immediate-stop condition.
+If a counter reaches `25 / 25` during an Active task, Codex finishes and validates that task. The Audit Preparation task becomes next before more implementation.
 
 ## Required Startup Sequence
+
 1. Read `AGENTS.md` when operating through Codex CLI.
-2. Read this file.
-3. Read `docs/PROJECT-CHARTER.md`.
-4. Read `docs/ARCHITECTURE.md`.
-5. Read `docs/ROADMAP.md`.
-6. Read `docs/HANDOFF.md`.
-7. Read `docs/TASKS/QUEUE.md` and verify it agrees with the handoff.
-8. Read the active task document listed in `docs/HANDOFF.md`.
-9. Read every ADR, design, plan, review, manifest, and code file referenced by the active task.
-10. Read `docs/ERROR-HANDOFF.md`. If its status is `Blocked`, do not begin implementation; report that the Project Custodian must run `Address Errors`.
-11. Read `punch_list.txt` if it exists and reconcile any new change requests into existing tasks or create correctly ordered new tasks without duplicating existing work.
-12. Perform only the work assigned in the active task.
-13. Validate the work.
-14. Re-read `punch_list.txt` before completion and mark completed punch-list items with Markdown-style strike-through.
-15. Update the active task document.
-16. Update `docs/HANDOFF.md`, including the `Next Bot Prompt` for the next task or for creating the next task from the user's next request.
-17. Commit all related changes.
+2. Synchronize and verify local/remote repository state.
+3. Read this file.
+4. Read `docs/PROJECT-CHARTER.md`.
+5. Read `docs/ARCHITECTURE.md`.
+6. Read `docs/ROADMAP.md`.
+7. Read `docs/HANDOFF.md`.
+8. Read `docs/TASKS/QUEUE.md` and verify agreement.
+9. Read `docs/ERROR-HANDOFF.md`.
+10. Read the Active task and every referenced ADR, design, review, plan, manifest, and code file.
+11. Read `punch_list.txt` when present.
+12. Follow the autonomous cycle or the active Project Custodian boundary.
 
-## Core Rule
-No implementation work may begin unless there is an active task document under `docs/TASKS`.
+## Task System
 
-## Task Queue Rule
-`docs/TASKS/QUEUE.md` is the official task queue.
+`docs/TASKS/QUEUE.md` is the operational queue. Exactly one task may be Active.
 
-The official task lifecycle is:
+Lifecycle:
 
 ```text
-Backlog
-↓
-Queued
-↓
-Assigned
-↓
-Active
-↓
-Validation
-↓
-Complete
-↓
-Archived
+Backlog -> Queued -> Assigned -> Active -> Validation -> Complete -> Archived
 ```
 
-Only one task may be `Active` at a time.
+Implementation requires an Active task file under `docs/TASKS`.
 
-`docs/HANDOFF.md` must identify the active task and must agree with
-`docs/TASKS/QUEUE.md`.
+## Audit State Tracking
+
+Each subsystem has a material-change counter in `docs/HANDOFF.md` and `docs/HISTORY/CHANGE-LEDGER.md`.
+
+When a counter reaches `25 / 25` at a task boundary:
+
+1. Codex automatically creates and executes an Audit Preparation task.
+2. Codex uses `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`.
+3. Codex gathers deterministic evidence and recommendations.
+4. Codex does not reset counters or resume implementation.
+5. Codex activates a Project Custodian Engineering Audit task and pushes the audit package.
+6. The Project Custodian reviews evidence, makes final decisions, resets only audited counters, and activates the next implementation task.
+
+Routine bookkeeping does not increment counters unless it materially changes subsystem behavior, structure, responsibility, interface, documentation, or validation.
 
 ## No Patch Stacking Rule
-If a script or implementation develops structural errors, stop patching it. Roll back to the last known-good state and rebuild cleanly from the current repository layout.
 
-## Audit State Tracking Rule
-Each subsystem has its own audit change counter in `docs/HANDOFF.md`.
-
-A subsystem change is an accepted engineering change that materially affects that subsystem's behavior, structure, responsibility, interface, documentation, or validation model.
-
-When any subsystem counter reaches `25 / 25`, no new implementation work may begin until a new audit task is completed.
-
-The threshold applies at a task boundary. It does not interrupt an Active task already underway. The current task may finish, validate, and commit; the audit must become the next Active task before another implementation task starts.
-
-After the audit is completed:
-1. The audited subsystem counter resets to `0 / 25`.
-2. `docs/HANDOFF.md` is updated.
-3. `docs/HISTORY/CHANGE-LEDGER.md` records the audit completion.
-4. Normal task work may resume.
-
-Every completed task must update:
-- `docs/HANDOFF.md`
-- `docs/HISTORY/CHANGE-LEDGER.md` when it records a subsystem change
+If a script or implementation develops structural errors, stop patching it. Return to the last known-good state and rebuild cleanly within task scope.
 
 ## Build Metadata Rule
-Every accepted implementation change must update `App/manifests/toolkit-version.json` before commit.
 
-Use `App/Update-ToolkitVersion.ps1` unless a task explicitly changes versioning behavior.
-
-The semantic `Version` may remain unchanged for normal task work, but the `Build`,
-`SourceUpdatedAt`, and `ReleaseNotes` fields must reflect the committed change.
+Every accepted implementation change must update `App/manifests/toolkit-version.json`, normally through `App/Update-ToolkitVersion.ps1`.
 
 ## GitHub Sync Rule
-Normal implementation tasks may be committed locally, but should not be pushed to GitHub unless explicitly requested.
 
-Repository GitHub sync should happen during the 25-change audit/refactor checkpoint, or sooner only when the user asks for a push.
+Normal implementation commits remain local unless the user explicitly requests a push or repository rules require it.
 
-Exception: a blocker report in `docs/ERROR-HANDOFF.md` and its minimum required supporting governance changes must be pushed immediately so the Project Custodian can address it.
+Required cloud pushes:
+
+- blocker handoffs;
+- completed Audit Preparation packages and transition to Project Custodian Engineering Audit;
+- Project Custodian governance, audit, and blocker resolutions;
+- explicit user-requested synchronization.
 
 ## Product
-Computer Triage Toolkit.
 
-Primary goal: rapid, portable, single-computer Windows diagnostics, analysis, explanation, and reporting.
-
-## Components
-- Evidence Collection and Deterministic Analysis
-- ARGUS: cited evidence analysis, explanation, grouping, and technician guidance
-- Reporting: technician and executive outputs
+Computer Triage Toolkit provides rapid, portable, single-computer Windows diagnostics, deterministic analysis, ARGUS explanation and guidance, and technician/executive reporting.
 
 ## Non-Goals
+
 - Whole-network discovery
 - SIEM replacement
 - RMM replacement
 - Asset inventory platform
-- General AI Builder framework
+- General AI-builder framework
