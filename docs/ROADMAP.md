@@ -17,17 +17,17 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation`
+- `TASK-0091-Print-And-Remote-Change-Transaction-Safety`
 
-TASK-0087 and the required TASK-0101 threshold audit are complete. Release-blocking remediation has resumed with TASK-0088.
+TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
 
 Required sequence:
-1. TASK-0086 Offline Evidence Isolation and Bundle Identity.
-2. TASK-0087 Parser-Backed Evidence Quality and Timeline Semantics.
-3. TASK-0088 Canonical Operation Result and Failure Propagation.
-4. TASK-0089 Diagnostic Bundle Integrity and Collection Contract.
-5. TASK-0090 ARGUS Contract, Citation, and Priority Correctness.
-6. TASK-0091 Print and Remote Change Transaction Safety.
+1. TASK-0086 Offline Evidence Isolation and Bundle Identity. Complete.
+2. TASK-0087 Parser-Backed Evidence Quality and Timeline Semantics. Complete.
+3. TASK-0088 Canonical Operation Result and Failure Propagation. Complete.
+4. TASK-0089 Diagnostic Bundle Integrity and Collection Contract. Complete.
+5. TASK-0090 ARGUS Contract, Citation, and Priority Correctness. Complete.
+6. TASK-0091 Print and Remote Change Transaction Safety. Active.
 7. TASK-0092 Transactional Package, Deploy, and Update Integrity.
 8. TASK-0093 External Tool Provenance and Lifecycle Policy.
 9. TASK-0094 Sensitive Artifact Handling and Runtime State Safety.
