@@ -1,83 +1,55 @@
 # Active Error Handoff
 
-This tracked file is the cloud handoff from Codex to the Project Custodian when the Active task is blocked.
-
 ## Status
-Clear
+Blocked
 
 ## Reporting Agent
-None
+Codex
 
 ## Active Task
-None
+TASK-0091-Print-And-Remote-Change-Transaction-Safety
 
 ## Error ID
-None
+ERR-GIT-DIVERGENCE-20260712-001
 
 ## Severity
-None
+High
 
 ## Summary
-No active blocking error is recorded.
+Local and authoritative remote `master` diverged during the autonomous work cycle.
 
 ## Blocking Condition
-None.
+Local `master` contains three completed implementation commits for TASK-0088 through TASK-0090, while remote `master` independently gained seven Project Custodian governance commits. The mandatory synchronization rules prohibit implementation from a diverged checkout and prohibit silently rebasing governance conflicts.
 
 ## Evidence
-None.
+- Local HEAD: `f22868ac82ab63dfbd1d82c246cecc23778b6ab5`
+- Remote HEAD at detection: `dee00aff81600e4e8f583d2a5991139139527549`
+- Divergence: remote-only 7 commits; local-only 3 commits.
+- Local implementation commits: `945ed91`, `a8a15c4`, `f22868a`.
+- Cloud safety branch: `safety/codex-task0088-0090-divergence-20260712`.
 
 ## Files And State Involved
-None.
+The local commits include application, validation, build metadata, task, queue, handoff, ledger, changelog, and roadmap changes for TASK-0088 through TASK-0090. Remote commits modify governance and operator-closing instructions. Documented unrelated modified and untracked drift remains only in the original working tree.
 
 ## Actions Already Attempted
-None.
+Fetched `origin`, compared local/upstream histories, confirmed genuine divergence, created a local safety branch, and pushed the complete local implementation history to the identically named cloud safety branch. No rebase, reset, cleaning, or force push was performed.
 
 ## Why Codex Cannot Continue Safely
-Not applicable.
+Continuing TASK-0091 would use stale/diverged governance. Rebasing without Custodian review could incorrectly resolve handoff, queue, counter, and operator-instruction conflicts. Pushing local `master` would be non-fast-forward and unsafe.
 
 ## Requested Project Custodian Decision
-None.
+Reconcile the three TASK-0088 through TASK-0090 commits from the cloud safety branch onto current `master`, preserve the newer governance instructions, verify the final single Active task and counters, then clear this blocker and push the reconciled state.
 
 ## Recommended Remediation
-None.
+Cherry-pick or rebase the implementation commits in order (`945ed91`, `a8a15c4`, `f22868a`) onto current `master`, resolve governance files using current Project Custodian policy, confirm TASK-0091 activation, and set this handoff to Clear/Resolved.
 
 ## Working-Tree Drift Preserved
-None recorded by this handoff.
+- Modified `App/manifests/custom-tools.json`.
+- Modified `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`.
+- Untracked `App/NetworkToolkit/LatencyMon/`, `App/NetworkToolkit/Logs/`, `Custodian-Audit-20260711-000156.md`, `Project-Custodian-Bridge.ps1`, and `Set-CodexPermissions.ps1`.
 
 ## Last Updated
-Not set.
+2026-07-12T19:40:00-05:00
 
 ## Resolution
-Not applicable.
-
----
-
-## Codex Reporting Rules
-
-When Codex reaches a genuine blocker or stop condition, it must:
-
-1. Stop implementation without cleaning, discarding, or overwriting unrelated work.
-2. Replace this file with a complete blocker report.
-3. Set `Status` to `Blocked`.
-4. Record the Active task, exact error, evidence, affected files, actions attempted, preserved drift, and the decision required from the Project Custodian.
-5. Commit the blocker report with a message such as:
-   `BLOCKED <TASK-ID>: Record error handoff for Project Custodian`
-6. Push that blocker-report commit to the cloud repository even when normal task commits are local-only. This limited push is authorized because the Project Custodian must be able to read the report remotely.
-7. Tell the user only that the blocker has been recorded and pushed, then wait for `Address Errors`.
-
-Codex must not use this file for routine questions, low-risk implementation choices, or issues it can safely correct within the Active task.
-
-## Project Custodian Rules
-
-When the user prompts `Address Errors`, ChatGPT must:
-
-1. Read `PROJECT.md`, `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and this file from the cloud repository.
-2. Verify the error handoff is current and tied to the Active task.
-3. Inspect all repository files needed to understand the blocker.
-4. Resolve governance, architecture, task-scope, documentation, or sequencing conflicts directly in the repository when possible.
-5. If code implementation is required, create or amend the smallest appropriate tracked task without discarding Codex work.
-6. Preserve the Active task unless the blocker makes continuation impossible.
-7. Update this file with the resolution and set `Status` to `Resolved` or `Clear`.
-8. Update handoff/queue/task documents when the resolution changes project state.
-9. Commit and push the remediation so Codex can resume from the cloud source of truth.
-10. Give the user a concise instruction to tell Codex: `Resume Work`.
+Pending Project Custodian action.
