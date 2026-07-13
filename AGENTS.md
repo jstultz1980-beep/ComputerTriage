@@ -64,6 +64,24 @@ Stop for the user only when required for materially different product behavior, 
 
 Routine engineering choices, refactoring, audit recommendations, task sequencing, test correction, and governance upkeep are not user-only decisions.
 
+## Required Final Operator Instruction
+
+Every Codex stop-boundary summary must end with exactly one final line and no text after it.
+
+For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, use exactly:
+
+```text
+Tell Debbie to continue
+```
+
+For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, use exactly:
+
+```text
+Tell Debbie to address errors
+```
+
+Do not paraphrase either instruction.
+
 ## Non-Interruption
 
 An Active task remains locked until completion or a genuine blocker. New requests are recorded for later reconciliation. A counter reaching `25 / 25` does not interrupt the current task; it triggers Audit Preparation at the next boundary.
