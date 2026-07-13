@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0099
+HANDOFF-0100
 
 ## Current Task
 TASK-0091-Print-And-Remote-Change-Transaction-Safety
@@ -31,6 +31,7 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
 - `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks.
+- `Governance Refresh` performs a lightweight safe-point governance reload and resumes the same Active task.
 - At `25 / 25`, Codex automatically completes Audit Preparation, pushes the evidence package, and activates a Project Custodian Engineering Audit task.
 - Every non-blocked Codex stop-boundary summary must end exactly with `Tell Debbie to continue`.
 - Every genuine blocker summary must end exactly with `Tell Debbie to address errors`.
@@ -40,6 +41,7 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - `AGENTS.md`
 - `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md`
 - `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`
+- `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`
 - `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`
 
 ## Active Task Scope
@@ -55,9 +57,9 @@ After TASK-0091 completes, Codex must re-read the queue and counters. If no gate
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
-| Repository Governance | 12 / 25 | No |
+| Repository Governance | 13 / 25 | No |
 | Architecture | 9 / 25 | No |
-| Documentation | 9 / 25 | No |
+| Documentation | 10 / 25 | No |
 | Task System | 14 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | No |
 | ARGUS | 10 / 25 | No |
@@ -90,5 +92,5 @@ TASK-0091: Add print and remote transaction safety
 
 ## Next Bot Prompt
 ```text
-Resume Work. First perform mandatory repository synchronization and confirm local `master` matches authoritative upstream without overwriting preserved drift. The former local TASK-0088 through TASK-0090 commits were reconciled through PR #1; do not reuse or merge the old safety branch. Read the required governance files, handoff, queue, clear error handoff, TASK-0091, and all references. Execute TASK-0091 within scope using non-destructive mocks and fixtures for transaction verification, rollback, and recovery; run parser, smoke, and button-smoke validation; update required records and build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary. Every non-blocked stop-boundary summary must end with the exact final line `Tell Debbie to continue`. Every genuine blocker summary must end with the exact final line `Tell Debbie to address errors`.
+Resume Work. First perform mandatory repository synchronization and confirm local `master` matches authoritative upstream without overwriting preserved drift. The former local TASK-0088 through TASK-0090 commits were reconciled through PR #1; do not reuse or merge the old safety branch. Read the required governance files, handoff, queue, clear error handoff, TASK-0091, and all references. Execute TASK-0091 within scope using non-destructive mocks and fixtures for transaction verification, rollback, and recovery; run parser, smoke, and button-smoke validation; update required records and build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary. During active work, the user may issue `Governance Refresh`; pause at the next safe point, follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`, apply changed governance immediately, and resume TASK-0091 without restarting it. Every non-blocked stop-boundary summary must end with the exact final line `Tell Debbie to continue`. Every genuine blocker summary must end with the exact final line `Tell Debbie to address errors`.
 ```
