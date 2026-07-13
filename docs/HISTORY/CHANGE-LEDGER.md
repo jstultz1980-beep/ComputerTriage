@@ -8,9 +8,9 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 11 / 25 | Autonomous Resume Work and two-stage audit cycle. |
+| Repository Governance | 12 / 25 | Mandatory Codex operator closing instruction. |
 | Architecture | 6 / 25 | TASK-0087 parser-backed evidence and event-time contracts. |
-| Documentation | 5 / 25 | Autonomous-cycle policy and audit preparation template. |
+| Documentation | 6 / 25 | Completion-prompt governance documented across authoritative workflow files. |
 | Task System | 11 / 25 | Codex continuous queue progression and automatic audit-task transition. |
 | Evidence Collection and Deterministic Analysis | 6 / 25 | TASK-0087 parser-backed quality and structured error artifacts. |
 | ARGUS | 8 / 25 | TASK-0087 parser-failure and timestamp confidence handling. |
@@ -25,6 +25,8 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-GOV-0093 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Required every Codex stop-boundary summary to end with the exact operator instruction `Tell Debbie to continue`, or `Tell Debbie to address errors` for a genuine blocker, with no trailing text. |
+| CHG-DOC-0093 | 2026-07-12 | Governance maintenance | Documentation | +1 | Updated PROJECT.md, AGENTS.md, Codex operating instructions, autonomous-cycle policy, handoff, and changelog with the mandatory closing instruction. |
 | CHG-GOV-0092 | 2026-07-12 | Governance maintenance | Repository Governance | +1 | Authorized one `Resume Work` instruction to continue through dependency-ready Codex tasks until an audit, Project Custodian, blocker, or user-only boundary. |
 | CHG-DOC-0092 | 2026-07-12 | Governance maintenance | Documentation | +1 | Added the autonomous work/audit policy and reusable Audit Preparation template. |
 | CHG-TASK-0092 | 2026-07-12 | Governance maintenance | Task System | +1 | Authorized Codex to activate the next ordered Codex task and automatically create/complete Audit Preparation before transferring to Project Custodian Engineering Audit. |
