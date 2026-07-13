@@ -4,6 +4,10 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-13
 
+- Recorded the TASK-0097 Project Custodian intended-state architecture, canonical terminology, governance authority boundaries, and approved remaining sequence.
+- Expanded `docs/ARCHITECTURE.md` into the concise runtime authority and converted `docs/ROADMAP.md` to forward-looking work only.
+- Authorized Codex for focused terminology/reference reconciliation and governance simulations without application or feature changes.
+
 - Completed TASK-0096 shared GUI background operation lifecycle controller and activated the TASK-0097 Project Custodian architecture/governance boundary.
 - Migrated Analyze and Triage to centralized process, job, timer, timeout, cancellation, completion-state, and cleanup ownership with focused leak fixtures.
 
