@@ -49,21 +49,25 @@ Routine engineering choices, refactoring, audit recommendations, task sequencing
 
 ## Required Final Operator Instruction
 
-Every Codex stop-boundary summary must end with exactly one final line and no text after it.
+Follow the timestamped handoff protocol in `PROJECT.md`.
+
+Every Codex stop-boundary summary must end with a current UTC timestamp followed by exactly one final operator instruction, with no text after it.
 
 For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, use exactly:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to continue
 ```
 
 For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, use exactly:
 
 ```text
+Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either instruction.
+Do not paraphrase either instruction. The operator instruction remains the final line.
 
 ## Non-Interruption
 
