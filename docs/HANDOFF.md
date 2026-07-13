@@ -1,10 +1,10 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0097
+HANDOFF-0098
 
 ## Current Task
-TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness
+TASK-0091-Print-And-Remote-Change-Transaction-Safety
 
 ## Current Owner
 Codex
@@ -13,7 +13,7 @@ Codex
 ChatGPT at the next Project Custodian Engineering Audit, architecture/governance boundary, blocker, acceptance boundary, or user-only decision.
 
 ## Objective
-Continue dependency-ordered remediation with TASK-0090 under the autonomous `Resume Work` cycle.
+Continue dependency-ordered remediation with TASK-0091 under the autonomous `Resume Work` cycle.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -25,7 +25,8 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0101 completed the Validation/Test Framework threshold audit and reset it to `0 / 25`.
 - TASK-0088 completed canonical operation results and failure propagation.
 - TASK-0089 completed diagnostic bundle integrity and collection outcomes.
-- TASK-0090 is the single Active implementation task.
+- TASK-0090 completed ARGUS correctness remediation.
+- TASK-0091 is the single Active implementation task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
 - `Resume Work` now authorizes continuous Codex execution through dependency-ready Codex tasks.
@@ -40,11 +41,11 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`
 
 ## Active Task Scope
-`TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness`
+`TASK-0091-Print-And-Remote-Change-Transaction-Safety`
 
-Codex must make ARGUS contract, citation, confidence, classification, and priority behavior correct within TASK-0090 scope.
+Codex must add verification, recovery, and rollback to print and remote change operations within TASK-0091 scope.
 
-Codex must read TASK-0090 and its references before implementation and must not merge later transaction, package, or GUI-controller remediations into TASK-0090.
+Codex must read TASK-0091 and its references before implementation and must not merge later package, provenance, runtime-state, or GUI-controller remediations into TASK-0091.
 
 After TASK-0089 completes, Codex must re-read the queue and counters. If no gate or stop condition exists, it must activate the next dependency-ready Codex-owned task and continue without another prompt.
 
@@ -53,19 +54,19 @@ After TASK-0089 completes, Codex must re-read the queue and counters. If no gate
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
 | Repository Governance | 11 / 25 | No |
-| Architecture | 8 / 25 | No |
-| Documentation | 7 / 25 | No |
-| Task System | 13 / 25 | No |
+| Architecture | 9 / 25 | No |
+| Documentation | 8 / 25 | No |
+| Task System | 14 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | No |
-| ARGUS | 9 / 25 | No |
+| ARGUS | 10 / 25 | No |
 | Reporting | 3 / 25 | No |
 | UI | 24 / 25 | No |
 | Plugin Framework | 2 / 25 | No |
-| Build System | 21 / 25 | No |
-| Validation/Test Framework | 2 / 25 | No |
-| Roadmap/Backlog | 19 / 25 | No |
+| Build System | 22 / 25 | No |
+| Validation/Test Framework | 3 / 25 | No |
+| Roadmap/Backlog | 20 / 25 | No |
 
-No counter currently blocks TASK-0090. UI remains at `24 / 25`.
+No counter currently blocks TASK-0091. UI remains at `24 / 25`.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -82,10 +83,10 @@ None.
 
 ## Recommended Commit Message
 ```text
-TASK-0090: Correct ARGUS contract citations and priority
+TASK-0091: Add print and remote transaction safety
 ```
 
 ## Next Bot Prompt
 ```text
-Resume Work. First perform mandatory repository synchronization and preserve documented drift. Then read the required governance files, handoff, queue, error handoff, TASK-0090, and all references. Execute TASK-0090 within scope, validate failed contracts, citations, classification, confidence, priority, parser, smoke, and button-smoke behavior, update required records/build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary.
+Resume Work. First perform mandatory repository synchronization and preserve documented drift. Then read the required governance files, handoff, queue, error handoff, TASK-0091, and all references. Execute TASK-0091 within scope using non-destructive mocks/fixtures for transaction verification, rollback, and recovery; run parser, smoke, and button-smoke validation; update required records/build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary.
 ```

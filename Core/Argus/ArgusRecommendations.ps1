@@ -52,6 +52,13 @@ function Global:Get-ARGUSRecommendationPriority {
     }
 }
 
+function Global:Get-ARGUSRecommendationPriorityRank {
+    param([string]$Priority)
+    switch(([string]$Priority).ToLowerInvariant()){
+        'urgent' {1}; 'high' {2}; 'normal' {3}; 'low' {4}; 'evidence-needed' {5}; default {6}
+    }
+}
+
 function Global:Get-ARGUSRecommendationActionArea {
     param([string]$Domain)
 
@@ -267,7 +274,7 @@ function Global:New-ARGUSRecommendations {
     $recommendations = New-Object System.Collections.Generic.List[object]
     $counter = 0
 
-    foreach($group in @($DiagnosticGroups | Sort-Object @{ Expression = { Get-ARGUSRecommendationSeverityRank $_.priority } }, id)){
+    foreach($group in @($DiagnosticGroups | Sort-Object @{ Expression = { Get-ARGUSRecommendationPriorityRank $_.priority } }, id)){
         $counter++
         $blocked = @($group.blockedByMissingEvidence)
         $safeToAutomate = $false

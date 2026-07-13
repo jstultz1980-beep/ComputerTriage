@@ -9,17 +9,17 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 11 / 25 | Autonomous Resume Work and two-stage audit cycle. |
-| Architecture | 8 / 25 | TASK-0089 diagnostic bundle integrity contract. |
-| Documentation | 7 / 25 | TASK-0089 implementation and validation evidence. |
-| Task System | 13 / 25 | TASK-0089 completion and TASK-0090 activation. |
+| Architecture | 9 / 25 | TASK-0090 ARGUS citation and confidence contract. |
+| Documentation | 8 / 25 | TASK-0090 implementation and validation evidence. |
+| Task System | 14 / 25 | TASK-0090 completion and TASK-0091 activation. |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
-| ARGUS | 9 / 25 | TASK-0088 failed-contract result and recommendation suppression. |
+| ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
 | UI | 24 / 25 | TASK-0088 GUI result-state and exit display. |
 | Plugin Framework | 2 / 25 | TASK-0088 per-step plugin outcome summary. |
-| Build System | 21 / 25 | TASK-0089 build metadata. |
-| Validation/Test Framework | 2 / 25 | TASK-0089 integrity, tamper, and collector-failure fixtures. |
-| Roadmap/Backlog | 19 / 25 | Remediation advanced to TASK-0090. |
+| Build System | 22 / 25 | TASK-0090 build metadata. |
+| Validation/Test Framework | 3 / 25 | TASK-0090 domain, priority, citation, and mixed-gap fixtures. |
+| Roadmap/Backlog | 20 / 25 | Remediation advanced to TASK-0091. |
 
 ## Current Ledger Entries
 
@@ -73,6 +73,13 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | CHG-0089-05 | 2026-07-12 | TASK-0089 | Documentation | +1 | Recorded implementation and validation evidence. |
 | CHG-0089-06 | 2026-07-12 | TASK-0089 / TASK-0090 | Task System | +1 | Completed TASK-0089 and activated TASK-0090. |
 | CHG-0089-07 | 2026-07-12 | TASK-0089 / TASK-0090 | Roadmap/Backlog | +1 | Advanced remediation to ARGUS correctness. |
+| CHG-0090-01 | 2026-07-12 | TASK-0090 | Architecture | +1 | Tightened immutable citation and confidence-bound contracts. |
+| CHG-0090-02 | 2026-07-12 | TASK-0090 | ARGUS | +1 | Corrected domain matching, priority ordering, citation identity, gap isolation, and confidence bounds. |
+| CHG-0090-03 | 2026-07-12 | TASK-0090 | Validation/Test Framework | +1 | Added exact-domain, all-priority, citation, and mixed-gap fixtures. |
+| CHG-0090-04 | 2026-07-12 | TASK-0090 | Build System | +1 | Updated build metadata. |
+| CHG-0090-05 | 2026-07-12 | TASK-0090 | Documentation | +1 | Recorded implementation evidence. |
+| CHG-0090-06 | 2026-07-12 | TASK-0090 / TASK-0091 | Task System | +1 | Completed TASK-0090 and activated TASK-0091. |
+| CHG-0090-07 | 2026-07-12 | TASK-0090 / TASK-0091 | Roadmap/Backlog | +1 | Advanced remediation to transaction safety. |
 
 ## Audit Closeout
 

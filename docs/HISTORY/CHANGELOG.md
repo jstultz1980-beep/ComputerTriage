@@ -4,6 +4,9 @@ Detailed historical implementation chronology remains preserved in Git history a
 
 ## 2026-07-12
 
+- Completed TASK-0090 ARGUS contract, citation, and priority correctness; activated TASK-0091.
+- Added immutable citation identity, exact domain classification, correct priority ordering, evidence-gap isolation, and evidence-quality confidence bounds.
+
 - Completed TASK-0089 diagnostic bundle integrity and collection contract.
 - Added final sidecar SHA-256 verification, tamper detection, complete collector outcomes, capability completeness, and inner-operation section status propagation.
 - Activated TASK-0090 ARGUS contract, citation, and priority correctness.

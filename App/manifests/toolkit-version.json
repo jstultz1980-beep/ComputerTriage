@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712193332,
-    "SourceUpdatedAt":  "2026-07-12T19:33:32.2106420-05:00",
-    "ReleaseNotes":  "Added final diagnostic bundle sidecar SHA-256 integrity, tamper detection, complete command and collector outcomes, capability completeness, and inner-operation section status propagation."
+    "Build":  20260712193605,
+    "SourceUpdatedAt":  "2026-07-12T19:36:05.6157008-05:00",
+    "ReleaseNotes":  "Corrected ARGUS exact domain classification, immutable citation identity, priority ordering, evidence-gap isolation, and confidence bounds."
 }
