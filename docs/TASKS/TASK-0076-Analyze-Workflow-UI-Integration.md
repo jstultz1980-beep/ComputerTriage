@@ -1,7 +1,7 @@
 # TASK-0076 - Analyze Workflow UI Integration
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

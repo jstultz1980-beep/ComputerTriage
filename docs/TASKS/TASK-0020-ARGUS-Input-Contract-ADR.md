@@ -1,7 +1,7 @@
 # TASK-0020 - ARGUS Input Contract ADR
 
 ## Status
-Completed
+Complete
 
 ## Owner
 ChatGPT

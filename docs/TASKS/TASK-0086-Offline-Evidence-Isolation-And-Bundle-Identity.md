@@ -1,7 +1,7 @@
 # TASK-0086 - Offline Evidence Isolation and Bundle Identity
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

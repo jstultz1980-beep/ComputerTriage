@@ -1,7 +1,13 @@
 # TASK-0079 - Release Packaging And Update Hardening
 
 ## Status
-Queued
+Superseded
+
+## Superseded By
+
+`TASK-0092-Transactional-Package-Deploy-And-Update-Integrity`
+
+TASK-0092 completed managed manifests, staged verification, destination identity, atomic replacement, interruption recovery, and rollback. This historical task must not be activated separately.
 
 ## Owner
 Codex

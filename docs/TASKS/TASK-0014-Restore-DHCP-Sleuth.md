@@ -1,7 +1,7 @@
 # TASK-0014 - Restore DHCP Sleuth
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

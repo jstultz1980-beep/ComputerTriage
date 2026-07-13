@@ -1,7 +1,7 @@
 # TASK-0013 - Header Tool Search
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

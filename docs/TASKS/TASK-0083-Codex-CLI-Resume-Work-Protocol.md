@@ -1,7 +1,7 @@
 # TASK-0083 - Codex CLI Resume Work Protocol
 
 ## Status
-Completed
+Complete
 
 ## Owner
 ChatGPT

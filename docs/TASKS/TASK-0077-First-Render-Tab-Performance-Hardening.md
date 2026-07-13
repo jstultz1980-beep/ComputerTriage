@@ -1,7 +1,13 @@
 # TASK-0077 - First Render Tab Performance Hardening
 
 ## Status
-Queued
+Superseded
+
+## Superseded By
+
+`TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache`
+
+TASK-0100 owns first-render measurement and remediation together with the broader performance instrumentation and run-scoped cache work. This historical task must not be activated separately.
 
 ## Owner
 Codex

@@ -1,7 +1,7 @@
 # TASK-0002 - Fix Choco Status Controls
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

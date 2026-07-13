@@ -1,7 +1,7 @@
 # TASK-0005 - Connect GitHub Remote
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

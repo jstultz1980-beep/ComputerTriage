@@ -1,7 +1,7 @@
 # TASK-0063 - Add Ons Concept
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

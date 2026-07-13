@@ -1,7 +1,7 @@
 # TASK-0011 - Foundation Audit
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

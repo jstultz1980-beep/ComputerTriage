@@ -1,7 +1,7 @@
 # TASK-0003 - Remove Unsafe FRST Triage Tool
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

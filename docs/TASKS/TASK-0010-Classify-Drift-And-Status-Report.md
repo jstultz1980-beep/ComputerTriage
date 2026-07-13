@@ -1,7 +1,7 @@
 # TASK-0010 - Classify Drift And Status Report
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

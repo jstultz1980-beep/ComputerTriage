@@ -1,7 +1,7 @@
 # TASK-0071 - Finish Line Project Plan
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

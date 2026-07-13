@@ -1,7 +1,7 @@
 # TASK-0072 - ARGUS Product Definition And Evidence Map
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

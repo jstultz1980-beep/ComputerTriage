@@ -1,7 +1,7 @@
 # TASK-0027 - GUI Polish Quick Dx Header Choco Theme
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

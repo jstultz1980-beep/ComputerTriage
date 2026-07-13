@@ -1,7 +1,7 @@
 # TASK-0007 - Activity Resource Gauges
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

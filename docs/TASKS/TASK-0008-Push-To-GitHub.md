@@ -1,7 +1,7 @@
 # TASK-0008 - Push To GitHub
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

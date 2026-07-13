@@ -1,7 +1,7 @@
 # TASK-0021 - HEPHAESTUS Rule Catalog Expansion
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

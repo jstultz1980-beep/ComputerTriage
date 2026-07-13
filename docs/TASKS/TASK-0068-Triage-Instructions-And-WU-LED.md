@@ -1,7 +1,7 @@
 # TASK-0068 - Triage Instructions And WU LED
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

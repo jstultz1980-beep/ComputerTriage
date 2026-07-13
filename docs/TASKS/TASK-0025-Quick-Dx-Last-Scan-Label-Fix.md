@@ -1,7 +1,7 @@
 # TASK-0025 - Quick Dx Last Scan Label Fix
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

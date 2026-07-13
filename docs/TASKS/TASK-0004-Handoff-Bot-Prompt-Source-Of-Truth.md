@@ -1,7 +1,7 @@
 # TASK-0004 - Handoff Bot Prompt Source Of Truth
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

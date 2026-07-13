@@ -10,8 +10,8 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 16 / 25 | TASK-0097 intended-state runtime boundaries, contracts, flow, and failure behavior. |
-| Documentation | 18 / 25 | TASK-0108 Task System audit evidence package. |
-| Task System | 0 / 25 | TASK-0109 Engineering Audit accepted and reset only Task System. |
+| Documentation | 19 / 25 | TASK-0110 Task System consistency reconciliation and validation record. |
+| Task System | 1 / 25 | TASK-0110 completion and TASK-0098 activation. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 4 / 25 | TASK-0094 masked and classified sensitive reports. |
@@ -19,12 +19,15 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
 | Build System | 3 / 25 | TASK-0096 build metadata. |
 | Validation/Test Framework | 9 / 25 | TASK-0096 background lifecycle and leak fixtures. |
-| Roadmap/Backlog | 3 / 25 | Inserted the required Task System audit before TASK-0098. |
+| Roadmap/Backlog | 4 / 25 | Advanced architecture stabilization to TASK-0098. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0110-01 | 2026-07-13 | TASK-0110 | Documentation | +1 | Reconciled task aliases, terminal vocabulary, supersession, resolved Error Handoff history, and punch-list evidence. |
+| CHG-0110-02 | 2026-07-13 | TASK-0110 / TASK-0098 | Task System | +1 | Completed consistency cleanup and activated TASK-0098. |
+| CHG-0110-03 | 2026-07-13 | TASK-0110 / TASK-0098 | Roadmap/Backlog | +1 | Advanced the approved sequence to shared reporting and run-index contracts. |
 | CHG-0109-01 | 2026-07-13 | TASK-0109 | Task System | Reset to 0 | Accepted the TASK-0108 Task System audit package, recorded all debt dispositions, and reset only Task System. |
 | CHG-0109-02 | 2026-07-13 | TASK-0109 / TASK-0110 | Task System | 0 | Closed the Project Custodian audit boundary and activated focused consistency cleanup without incrementing the freshly reset counter. |
 | CHG-0108-01 | 2026-07-13 | TASK-0108 | Documentation | +1 | Recorded deterministic Task System threshold evidence, validation, debt candidates, and recommended dispositions. |

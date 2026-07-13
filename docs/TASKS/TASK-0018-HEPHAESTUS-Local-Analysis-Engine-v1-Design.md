@@ -1,7 +1,7 @@
 # TASK-0018 - HEPHAESTUS Local Analysis Engine v1 Design
 
 ## Status
-Completed
+Complete
 
 ## Owner
 ChatGPT

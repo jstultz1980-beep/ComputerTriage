@@ -1,7 +1,7 @@
 # TASK-0024 - Quick Dx Layout Adjustment
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

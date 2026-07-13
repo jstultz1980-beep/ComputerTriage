@@ -1,7 +1,7 @@
 # TASK-0006 - Document Handoff Process
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

@@ -1,7 +1,7 @@
 # TASK-0015 - Fix Header Search Tab Mapping
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

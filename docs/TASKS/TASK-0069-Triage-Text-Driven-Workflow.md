@@ -1,7 +1,7 @@
 # TASK-0069 - Triage Text Driven Workflow
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

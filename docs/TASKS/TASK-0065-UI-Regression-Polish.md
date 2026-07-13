@@ -1,7 +1,7 @@
 # TASK-0065 - UI Regression Polish
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

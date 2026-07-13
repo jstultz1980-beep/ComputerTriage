@@ -1,7 +1,7 @@
 ﻿# TASK-0074 - ARGUS Event Grouping And Recommendations
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

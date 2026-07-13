@@ -1,7 +1,7 @@
 # TASK-0081 - Task System Counter Audit
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

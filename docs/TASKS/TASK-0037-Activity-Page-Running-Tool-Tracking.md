@@ -1,7 +1,7 @@
 # TASK-0037 - Activity Page Running Tool Tracking
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

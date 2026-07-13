@@ -1,7 +1,7 @@
 # TASK-0062 - Computer Data Push Pull
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

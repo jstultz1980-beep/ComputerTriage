@@ -1,7 +1,7 @@
 # TASK-0028 - Quick Dx Compact Run Panel
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

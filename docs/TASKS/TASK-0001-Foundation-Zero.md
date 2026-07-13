@@ -1,7 +1,7 @@
 # TASK-0001 - Foundation Zero
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

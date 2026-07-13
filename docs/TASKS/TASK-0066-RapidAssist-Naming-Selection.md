@@ -1,7 +1,7 @@
 # TASK-0066 - RapidAssist Naming Selection
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

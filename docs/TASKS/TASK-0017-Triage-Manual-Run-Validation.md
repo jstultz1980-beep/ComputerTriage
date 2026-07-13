@@ -1,7 +1,7 @@
 # TASK-0017 - Triage Manual Run Validation
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

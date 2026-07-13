@@ -1,7 +1,13 @@
 # TASK-0078 - Embedded Tool Trust And EDR Safe Distribution
 
 ## Status
-Queued
+Superseded
+
+## Superseded By
+
+`TASK-0093-External-Tool-Provenance-And-Lifecycle-Policy`
+
+TASK-0093 completed the provenance, lifecycle, trust, licensing, EULA, privilege, EDR, and production-retention scope. This historical task must not be activated separately.
 
 ## Owner
 Codex

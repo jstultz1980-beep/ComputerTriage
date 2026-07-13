@@ -1,7 +1,7 @@
 ﻿# TASK-0073 - ARGUS Evidence Normalization Implementation
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

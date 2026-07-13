@@ -9,24 +9,22 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 Status: Active
 
 Current Active task:
-- `TASK-0110-Task-System-Consistency-Cleanup`
+- `TASK-0098-Shared-Reporting-And-Run-Index-Contracts`
 
 Current objective:
-- Resolve accepted Task System identity, status, Error Handoff, and punch-list consistency debt.
-- Preserve approved runtime architecture and governance behavior.
-- Activate TASK-0098 after focused cleanup and simulations pass.
+- Establish canonical report metadata and escaping behavior.
+- Add immutable run indexing for report and artifact resolution.
+- Make latest, stale, and deleted artifact state explicit.
 
 ## Remaining Sequence
 
-1. **TASK-0110 - Task System Consistency Cleanup**
-   - Resolve accepted Task System audit debt before more implementation.
-2. **TASK-0098 - Shared Reporting and Run Index Contracts**
+1. **TASK-0098 - Shared Reporting and Run Index Contracts**
    - Establish canonical report metadata, escaping, and immutable run identity resolution.
-3. **TASK-0099 - Repository-Wide Validation Foundation**
+2. **TASK-0099 - Repository-Wide Validation Foundation**
    - Add parser, load, negative-path, package, and regression gates after contracts stabilize.
-4. **TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache**
+3. **TASK-0100 - Performance Instrumentation and Run-Scoped Observation Cache**
    - Measure and reduce startup, first-render, repeated-query, lifecycle, and package hashing costs.
-5. **TASK-0080 - Release-Candidate Validation and Documentation**
+4. **TASK-0080 - Release-Candidate Validation and Documentation**
    - Execute final validation, operational documentation, and release-readiness review.
 
 ## Release-Candidate Entry Criteria

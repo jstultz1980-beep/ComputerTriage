@@ -1,7 +1,7 @@
 # TASK-0067 - UI Feedback Corrections
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

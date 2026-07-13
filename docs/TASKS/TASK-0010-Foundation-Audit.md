@@ -3,6 +3,15 @@
 ## Status
 Archived
 
+## Legacy Alias
+
+- Duplicate identifier: `TASK-0010` (noncanonical historical reference)
+- Canonical TASK-0010 record: `TASK-0010-Classify-Drift-And-Status-Report.md`
+- Actual Foundation Audit task: `TASK-0011-Foundation-Audit.md`
+- Audit record: `docs/REVIEWS/REVIEW-0001-Foundation-Audit.md`
+
+Automation must not treat this archived file as a second TASK-0010 identity or as active/queued work.
+
 ## Owner
 ChatGPT
 

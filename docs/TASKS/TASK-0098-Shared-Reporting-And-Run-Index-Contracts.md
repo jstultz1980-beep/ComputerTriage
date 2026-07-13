@@ -1,7 +1,7 @@
 # TASK-0098 - Shared Reporting and Run Index Contracts
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

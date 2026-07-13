@@ -1,7 +1,7 @@
 # TASK-0016 - Fix Tool Source Of Truth
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

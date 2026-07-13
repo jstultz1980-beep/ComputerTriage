@@ -1,7 +1,7 @@
 # TASK-0023 - ARGUS Foundation Implementation
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

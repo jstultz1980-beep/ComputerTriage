@@ -1,7 +1,7 @@
 # TASK-0075 - Reporting Finish Pass
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex

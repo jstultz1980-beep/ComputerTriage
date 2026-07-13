@@ -1,7 +1,7 @@
 # TASK-0026 - Quick Dx Fixed Internet Targets
 
 ## Status
-Completed
+Complete
 
 ## Owner
 Codex
