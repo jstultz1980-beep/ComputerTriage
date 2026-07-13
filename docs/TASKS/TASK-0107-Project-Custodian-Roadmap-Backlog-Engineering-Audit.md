@@ -1,7 +1,7 @@
 # TASK-0107 - Project Custodian Roadmap and Backlog Engineering Audit
 
 ## Status
-Active
+Complete
 
 ## Owner
 ChatGPT (Project Custodian)
@@ -15,7 +15,15 @@ Review TASK-0106 Roadmap/Backlog evidence, decide sequencing and remediation dis
 - `docs/TASKS/QUEUE.md`
 - TASK-0094 and TASK-0095 closeout records.
 
+## Decision
+- Accepted the TASK-0106 Roadmap/Backlog Audit Preparation evidence.
+- Confirmed the remaining sequence: TASK-0096, TASK-0097, TASK-0098, TASK-0099, TASK-0100, TASK-0080.
+- Accepted ROAD-AUD-01 as resolved through the reconciled outcome-focused roadmap and queue state.
+- Accepted ROAD-AUD-02 and clarified TASK-0097 ownership: ChatGPT performs the architecture, terminology, and governance decisions first; Codex support is limited to focused implementation-reference updates authorized by that decision.
+- Created no duplicate tasks.
+- Reset only Roadmap/Backlog from `25 / 25` to `0 / 25`.
+- Activated TASK-0096 as the next dependency-ready Codex task.
+
 ## Constraints
-- Do not reset counters before accepting the evidence.
-- Preserve documented unrelated drift.
-- No application implementation is authorized while this Project Custodian task is Active.
+- Documented unrelated drift remains preserved.
+- No application code was changed by this engineering audit.
