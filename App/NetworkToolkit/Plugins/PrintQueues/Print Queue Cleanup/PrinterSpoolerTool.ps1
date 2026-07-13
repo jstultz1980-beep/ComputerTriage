@@ -268,13 +268,28 @@ function Restart-Spooler {
 }
 
 function Clear-AllQueues {
-    Invoke-Target {
-        Stop-Service Spooler -Force -ErrorAction Stop
-        Start-Sleep -Seconds 2
-        Remove-Item -LiteralPath "$env:SystemRoot\System32\spool\PRINTERS\*" -Force -ErrorAction SilentlyContinue
-        Start-Service Spooler -ErrorAction Stop
+    $result = Invoke-Target {
+        $spooler=Get-Service Spooler -ErrorAction Stop; $wasRunning=($spooler.Status -eq 'Running')
+        $source=Join-Path $env:SystemRoot 'System32\spool\PRINTERS'; $backup=Join-Path $env:TEMP ('NTK-SpoolRollback-'+[guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $backup -Force | Out-Null; $moved=@()
+        try {
+            Stop-Service Spooler -Force -ErrorAction Stop
+            foreach($file in @(Get-ChildItem -LiteralPath $source -File -Force -ErrorAction Stop)){ Move-Item -LiteralPath $file.FullName -Destination $backup -ErrorAction Stop; $moved += $file.Name }
+            Start-Service Spooler -ErrorAction Stop
+            if((Get-Service Spooler).Status -ne 'Running'){throw 'Spooler recovery verification failed.'}
+            Remove-Item -LiteralPath $backup -Recurse -Force -ErrorAction SilentlyContinue
+            [pscustomobject]@{state='Succeeded';moved=$moved;rollback=$false}
+        }
+        catch {
+            $errorMessage=$_.Exception.Message
+            foreach($file in @(Get-ChildItem -LiteralPath $backup -File -Force -ErrorAction SilentlyContinue)){Move-Item -LiteralPath $file.FullName -Destination $source -Force -ErrorAction SilentlyContinue}
+            if($wasRunning){Start-Service Spooler -ErrorAction SilentlyContinue}else{Stop-Service Spooler -Force -ErrorAction SilentlyContinue}
+            [pscustomobject]@{state='Failed';moved=$moved;rollback=$true;spoolerRecovered=((Get-Service Spooler).Status -eq $(if($wasRunning){'Running'}else{'Stopped'}));error=$errorMessage}
+        }
     }
-    Set-Status 'All queues cleared and spooler restarted.' ([System.Drawing.Color]::ForestGreen)
+    if($result.state -ne 'Succeeded'){ Set-Status "Queue clear failed; rollback attempted: $($result.error)" ([System.Drawing.Color]::Firebrick); return $result }
+    Set-Status 'All queues cleared and spooler recovery verified.' ([System.Drawing.Color]::ForestGreen)
+    return $result
 }
 
 function Clear-PrinterQueue {

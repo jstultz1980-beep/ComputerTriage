@@ -9,17 +9,17 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
 | Repository Governance | 13 / 25 | Lightweight `Governance Refresh` command. |
-| Architecture | 9 / 25 | TASK-0090 ARGUS citation and confidence contract. |
-| Documentation | 10 / 25 | Governance Refresh policy and command documentation. |
-| Task System | 14 / 25 | TASK-0090 completion and TASK-0091 activation. |
+| Architecture | 10 / 25 | TASK-0091 change transaction contract. |
+| Documentation | 11 / 25 | TASK-0091 evidence and TASK-0102 audit package. |
+| Task System | 16 / 25 | TASK-0091 closeout and TASK-0102/TASK-0103 audit transition. |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | TASK-0089 final bundle integrity and collection outcomes. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
-| UI | 24 / 25 | TASK-0088 GUI result-state and exit display. |
-| Plugin Framework | 2 / 25 | TASK-0088 per-step plugin outcome summary. |
-| Build System | 22 / 25 | TASK-0090 build metadata. |
-| Validation/Test Framework | 3 / 25 | TASK-0090 domain, priority, citation, and mixed-gap fixtures. |
-| Roadmap/Backlog | 20 / 25 | Remediation advanced to TASK-0091. |
+| UI | 25 / 25 | TASK-0091 transaction-aware print status/recovery; Engineering Audit required. |
+| Plugin Framework | 3 / 25 | TASK-0091 print and remote transaction behavior. |
+| Build System | 23 / 25 | TASK-0091 build metadata. |
+| Validation/Test Framework | 4 / 25 | TASK-0091 rollback, partial-change, service failure, and cancellation fixtures. |
+| Roadmap/Backlog | 21 / 25 | UI audit inserted before TASK-0092. |
 
 ## Current Ledger Entries
 
@@ -84,6 +84,14 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | CHG-0090-05 | 2026-07-12 | TASK-0090 | Documentation | +1 | Recorded implementation evidence. |
 | CHG-0090-06 | 2026-07-12 | TASK-0090 / TASK-0091 | Task System | +1 | Completed TASK-0090 and activated TASK-0091. |
 | CHG-0090-07 | 2026-07-12 | TASK-0090 / TASK-0091 | Roadmap/Backlog | +1 | Advanced remediation to transaction safety. |
+| CHG-0091-01 | 2026-07-12 | TASK-0091 | Architecture | +1 | Added the capture/apply/verify/rollback transaction contract. |
+| CHG-0091-02 | 2026-07-12 | TASK-0091 | UI | +1 | Added transaction-aware print failure and recovery status, reaching 25 / 25. |
+| CHG-0091-03 | 2026-07-12 | TASK-0091 | Plugin Framework | +1 | Added print and remote service/firewall rollback behavior. |
+| CHG-0091-04 | 2026-07-12 | TASK-0091 | Validation/Test Framework | +1 | Added rollback, partial-change, locked-file, service-failure, and cancellation fixtures. |
+| CHG-0091-05 | 2026-07-12 | TASK-0091 | Build System | +1 | Updated build metadata. |
+| CHG-0091-06 | 2026-07-12 | TASK-0091 / TASK-0102 / TASK-0103 | Task System | +2 | Completed TASK-0091, prepared the UI audit, and activated Project Custodian review. |
+| CHG-0091-07 | 2026-07-12 | TASK-0091 / TASK-0102 | Documentation | +1 | Recorded implementation and UI audit evidence. |
+| CHG-0091-08 | 2026-07-12 | TASK-0102 / TASK-0103 | Roadmap/Backlog | +1 | Inserted required UI Engineering Audit before TASK-0092. |
 
 ## Audit Closeout
 

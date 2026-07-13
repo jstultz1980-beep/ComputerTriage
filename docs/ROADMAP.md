@@ -17,7 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0091-Print-And-Remote-Change-Transaction-Safety`
+- `TASK-0103-Project-Custodian-UI-Engineering-Audit`
+
+TASK-0091 is complete. UI reached `25 / 25`; implementation is paused for the Project Custodian audit prepared by TASK-0102.
 
 TASK-0088 through TASK-0090 are complete and reconciled onto authoritative `master`. Release-blocking remediation has advanced to transaction safety.
 

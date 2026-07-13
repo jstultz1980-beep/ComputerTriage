@@ -1,19 +1,19 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0100
+HANDOFF-0101
 
 ## Current Task
-TASK-0091-Print-And-Remote-Change-Transaction-Safety
+TASK-0103-Project-Custodian-UI-Engineering-Audit
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
 ChatGPT at the next Project Custodian Engineering Audit, architecture/governance boundary, blocker, acceptance boundary, or user-only decision.
 
 ## Objective
-Continue dependency-ordered remediation with TASK-0091 after reconciling the preserved TASK-0088 through TASK-0090 implementation history onto authoritative `master`.
+Review the completed UI Audit Preparation package, decide findings/counter reset, and activate the next Codex task.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -27,7 +27,9 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0089 completed diagnostic bundle integrity and collection outcomes.
 - TASK-0090 completed ARGUS contract, citation, confidence, classification, and priority correctness.
 - ERR-GIT-DIVERGENCE-20260712-001 is resolved through PR #1 without force-push or history rewriting.
-- TASK-0091 is the single Active implementation task.
+- TASK-0091 completed print and remote transaction safety.
+- TASK-0102 completed UI Audit Preparation without resetting counters.
+- TASK-0103 is the single Active Project Custodian Engineering Audit task.
 - Remaining remediation tasks stay queued in dependency order.
 - Release candidate remains blocked pending Critical/High remediation.
 - `Resume Work` authorizes continuous Codex execution through dependency-ready Codex tasks.
@@ -45,32 +47,28 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - `docs/REVIEWS/AUDIT-PREPARATION-TEMPLATE.md`
 
 ## Active Task Scope
-`TASK-0091-Print-And-Remote-Change-Transaction-Safety`
+`TASK-0103-Project-Custodian-UI-Engineering-Audit`
 
-Codex must add verification, recovery, and rollback to print and remote change operations within TASK-0091 scope.
-
-Codex must read TASK-0091 and its references before implementation and must not merge later package, provenance, runtime-state, or GUI-controller remediations into TASK-0091.
-
-After TASK-0091 completes, Codex must re-read the queue and counters. If no gate or stop condition exists, it must activate the next dependency-ready Codex-owned task and continue without another prompt.
+The Project Custodian must review `docs/REVIEWS/TASK-0102/UI-AUDIT-PREPARATION.md`, decide the UI reset and remediation disposition, and activate TASK-0092 or another tracked dependency-ready task. Codex must not resume implementation before that decision.
 
 ## Audit Counters
 
 | Subsystem | Changes Since Last Audit | Audit Required |
 |---|---:|---|
 | Repository Governance | 13 / 25 | No |
-| Architecture | 9 / 25 | No |
-| Documentation | 10 / 25 | No |
-| Task System | 14 / 25 | No |
+| Architecture | 10 / 25 | No |
+| Documentation | 11 / 25 | No |
+| Task System | 16 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 8 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 3 / 25 | No |
-| UI | 24 / 25 | No |
-| Plugin Framework | 2 / 25 | No |
-| Build System | 22 / 25 | No |
-| Validation/Test Framework | 3 / 25 | No |
-| Roadmap/Backlog | 20 / 25 | No |
+| UI | 25 / 25 | Yes - TASK-0103 Active |
+| Plugin Framework | 3 / 25 | No |
+| Build System | 23 / 25 | No |
+| Validation/Test Framework | 4 / 25 | No |
+| Roadmap/Backlog | 21 / 25 | No |
 
-No counter currently blocks TASK-0091. UI remains at `24 / 25`; if TASK-0091 increments UI, Codex must finish TASK-0091 and automatically perform the required UI Audit Preparation before further implementation.
+UI is at `25 / 25`. TASK-0102 preparation is complete; TASK-0103 Project Custodian review blocks further implementation.
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -87,10 +85,10 @@ None. ERR-GIT-DIVERGENCE-20260712-001 is resolved.
 
 ## Recommended Commit Message
 ```text
-TASK-0091: Add print and remote transaction safety
+TASK-0102: Prepare UI engineering audit
 ```
 
 ## Next Bot Prompt
 ```text
-Resume Work. First perform mandatory repository synchronization and confirm local `master` matches authoritative upstream without overwriting preserved drift. The former local TASK-0088 through TASK-0090 commits were reconciled through PR #1; do not reuse or merge the old safety branch. Read the required governance files, handoff, queue, clear error handoff, TASK-0091, and all references. Execute TASK-0091 within scope using non-destructive mocks and fixtures for transaction verification, rollback, and recovery; run parser, smoke, and button-smoke validation; update required records and build metadata, commit locally, and continue through the autonomous cycle until a gate or stop boundary. During active work, the user may issue `Governance Refresh`; pause at the next safe point, follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`, apply changed governance immediately, and resume TASK-0091 without restarting it. Every non-blocked stop-boundary summary must end with the exact final line `Tell Debbie to continue`. Every genuine blocker summary must end with the exact final line `Tell Debbie to address errors`.
+Continue. Read the cloud handoff, queue, clear error handoff, TASK-0103, and `docs/REVIEWS/TASK-0102/UI-AUDIT-PREPARATION.md`. Review the UI evidence, decide findings and remediation disposition, reset only UI if accepted, activate the next dependency-ready Codex task, commit and push the decision, then return `Resume Work`. Preserve documented drift. This is a Project Custodian boundary.
 ```

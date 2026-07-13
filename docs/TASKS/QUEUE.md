@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Codex | Active | Add verification, recovery, and rollback to destructive repair operations. |
+| `TASK-0103-Project-Custodian-UI-Engineering-Audit` | ChatGPT | Active | Review UI audit evidence, decide reset/disposition, and activate the next Codex task. |
 
 ## Ordered Queue
 
@@ -39,6 +39,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0102-UI-Audit-Preparation` | Complete | Prepared UI threshold evidence without resetting the counter. |
+| `TASK-0091-Print-And-Remote-Change-Transaction-Safety` | Complete | Added verified transactions, rollback, spooler recovery, and remote service/firewall restoration. |
 | `TASK-0090-ARGUS-Contract-Citation-And-Priority-Correctness` | Complete | Corrected ARGUS citation identity, classification, priority ordering, evidence-gap isolation, and confidence bounds. |
 | `TASK-0089-Diagnostic-Bundle-Integrity-And-Collection-Contract` | Complete | Added final bundle integrity, tamper detection, and complete collector outcomes. |
 | `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation` | Complete | Added canonical operation results, deterministic exits, startup classification, partial propagation, and failed-contract handling. |
@@ -48,8 +50,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0088 through TASK-0090 are complete and reconciled onto `master` through PR #1.
-- TASK-0091 is the only Active task.
+- TASK-0088 through TASK-0091 are complete.
+- UI reached `25 / 25`; TASK-0102 Audit Preparation is complete.
+- TASK-0103 Project Custodian UI Engineering Audit is the only Active task.
 - Codex is authorized to continue through ordered dependency-ready Codex tasks under one `Resume Work` cycle.
 - Audit Preparation occurs automatically at `25 / 25`.
 - Project Custodian review follows each Audit Preparation package.

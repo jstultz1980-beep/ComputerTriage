@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260712193605,
-    "SourceUpdatedAt":  "2026-07-12T19:36:05.6157008-05:00",
-    "ReleaseNotes":  "Corrected ARGUS exact domain classification, immutable citation identity, priority ordering, evidence-gap isolation, and confidence bounds."
+    "Build":  20260712200831,
+    "SourceUpdatedAt":  "2026-07-12T20:08:31.6595261-05:00",
+    "ReleaseNotes":  "Added transactional print and remote-management changes with pre-state capture, verification, spooler recovery, partial-change detection, cancellation, and rollback."
 }

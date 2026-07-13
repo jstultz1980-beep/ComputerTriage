@@ -2,6 +2,11 @@ function Global:Get-NTKRemoteManagementEnableBlock {
 
     return {
         $results = New-Object System.Collections.ArrayList
+        $servicePreState = @{}
+        foreach($serviceName in @('WinRM','RemoteRegistry')){
+            try { $svc=Get-CimInstance Win32_Service -Filter "Name='$serviceName'" -ErrorAction Stop; $servicePreState[$serviceName]=[pscustomobject]@{StartMode=$svc.StartMode;State=$svc.State} } catch {}
+        }
+        $firewallPreState = @{}
 
         function Add-Result {
             param(
@@ -48,6 +53,7 @@ function Global:Get-NTKRemoteManagementEnableBlock {
             try {
                 $rules = @(Get-NetFirewallRule -DisplayGroup $group -ErrorAction Stop)
                 if($rules.Count -gt 0){
+                    $firewallPreState[$group]=@($rules | Select-Object Name,Enabled)
                     $rules | Enable-NetFirewallRule -ErrorAction Stop
                     Add-Result "Firewall: $group" "OK" "Enabled $($rules.Count) rule(s)."
                 }
@@ -66,6 +72,23 @@ function Global:Get-NTKRemoteManagementEnableBlock {
         }
         catch {
             Add-Result "WinRM listener verification" "Warning" $_.Exception.Message
+        }
+
+        $failedSteps=@($results | Where-Object Status -in @('Warning','Error'))
+        if($failedSteps.Count -gt 0){
+            $rollbackErrors=@()
+            foreach($group in $firewallPreState.Keys){
+                foreach($rule in @($firewallPreState[$group])){ try { Set-NetFirewallRule -Name $rule.Name -Enabled $rule.Enabled -ErrorAction Stop } catch { $rollbackErrors += $_.Exception.Message } }
+            }
+            foreach($serviceName in $servicePreState.Keys){
+                $pre=$servicePreState[$serviceName]
+                try {
+                    $startup = switch($pre.StartMode){'Auto'{'Automatic'};'Manual'{'Manual'};'Disabled'{'Disabled'};default{'Manual'}}
+                    Set-Service -Name $serviceName -StartupType $startup -ErrorAction Stop
+                    if($pre.State -eq 'Running'){Start-Service $serviceName -ErrorAction Stop}else{Stop-Service $serviceName -Force -ErrorAction Stop}
+                } catch { $rollbackErrors += $_.Exception.Message }
+            }
+            Add-Result 'Transaction rollback' $(if($rollbackErrors.Count -eq 0){'OK'}else{'Error'}) $(if($rollbackErrors.Count -eq 0){'Original service/firewall state restored.'}else{($rollbackErrors -join '; ')})
         }
 
         return @($results)
