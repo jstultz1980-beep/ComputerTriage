@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260713133112,
-    "SourceUpdatedAt":  "2026-07-13T13:31:12.1858765-05:00",
-    "ReleaseNotes":  "TASK-0100 structured performance telemetry, explicit budgets, and run-scoped provider observation caching."
+    "Build":  20260713135718,
+    "SourceUpdatedAt":  "2026-07-13T13:57:18.6087673-05:00",
+    "ReleaseNotes":  "TASK-0080 release-candidate validation, operational documentation, and known limitation evidence."
 }

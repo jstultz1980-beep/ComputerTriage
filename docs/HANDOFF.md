@@ -1,19 +1,19 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0117
+HANDOFF-0118
 
 ## Current Task
 TASK-0080-Release-Candidate-Validation-And-Documentation
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
-Project Custodian after Codex completes TASK-0080 release-candidate evidence and reaches the release decision boundary.
+Codex only if the Project Custodian activates a focused remediation; otherwise the user for explicit release/publication authorization after readiness is accepted.
 
 ## Objective
-Execute the final validation and documentation gate, reconcile release readiness, and prepare evidence for the Project Custodian release decision.
+Decide whether the full-package LibreOffice cleanup failure requires focused remediation or written risk acceptance, then determine release readiness.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -27,14 +27,16 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0098 completed shared reporting/run-index contracts and passed focused and full regression validation.
 - TASK-0099 completed repository-wide parser, load, negative-path, package, and regression gates; all 17 stages pass.
 - TASK-0100 completed structured performance telemetry, budgets, run-scoped caching, and baselines; all 18 validation stages pass.
-- TASK-0080 is the sole Active Codex task and final queued release-candidate gate.
+- TASK-0080 canonical repository validation passed 18 of 18 stages.
+- The full production image built at 6.72 GB across 24,364 files, but independent verification rejected four long-path LibreOffice files under a mutable `Data` tree.
+- Codex completed the TASK-0080 evidence and documentation phase; TASK-0080 is the sole Active Project Custodian task at the release-decision boundary.
 - No implementation task remains queued behind TASK-0080.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
 `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
-Codex must execute only the release-candidate validation, operational documentation, known-limitations reconciliation, packaging evidence, and Project Custodian decision preparation defined by TASK-0080. No unrelated feature, architecture, performance, or drift cleanup is authorized.
+The Project Custodian must review the TASK-0080 evidence, decide focused packaging remediation versus written risk acceptance, and determine release readiness. Codex must not implement further work until a focused remediation task is activated.
 
 ## Audit Counters
 
@@ -42,16 +44,16 @@ Codex must execute only the release-candidate validation, operational documentat
 |---|---:|---|
 | Repository Governance | 15 / 25 | No |
 | Architecture | 19 / 25 | No |
-| Documentation | 22 / 25 | No |
-| Task System | 4 / 25 | No |
+| Documentation | 23 / 25 | No |
+| Task System | 5 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 5 / 25 | No |
 | UI | 4 / 25 | No |
 | Plugin Framework | 6 / 25 | No |
 | Build System | 6 / 25 | No |
-| Validation/Test Framework | 12 / 25 | No |
-| Roadmap/Backlog | 7 / 25 | No |
+| Validation/Test Framework | 13 / 25 | No |
+| Roadmap/Backlog | 8 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -66,14 +68,14 @@ Do not stage or clean unless a focused task explicitly owns it:
 - Untracked: `Project-Factory-Lessons-Learned-Handoff.txt`
 - Untracked: `Set-CodexPermissions.ps1`
 
-## Blockers
-None.
+## Release Decision Issue
+Full-image verification fails because four long-path LibreOffice configuration files survive mutable-data cleanup. This does not block evidence handoff, but it blocks a release-ready recommendation unless remediated or accepted in writing by the Project Custodian.
 
 ## Decision Reference
-- `docs/REVIEWS/TASK-0100/VALIDATION.md`
-- `docs/PERFORMANCE-AND-OBSERVATION-CACHE.md`
-- `App/manifests/performance-budgets.json`
-- `docs/TASKS/TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache.md`
+- `docs/REVIEWS/TASK-0080/RELEASE-CANDIDATE-VALIDATION.md`
+- `docs/KNOWN-LIMITATIONS.md`
+- `docs/REPOSITORY-VALIDATION.md`
+- `App/manifests/repository-validation.json`
 - `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
 - `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`
 - `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`
@@ -82,5 +84,5 @@ None.
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```

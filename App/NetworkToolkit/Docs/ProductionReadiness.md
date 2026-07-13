@@ -1,5 +1,11 @@
 # Production Readiness
 
+## Current Release Decision
+
+Version 1.0 is not yet approved for release. The 2026-07-13 canonical repository gate passed all 18 stages, but independent verification of the full 6.72 GB portable image failed because four long-path LibreOffice configuration files remained under `App\Custom\LibreOfficePortable\Data`. A successful package build is not sufficient; `Test-ProductionPackage.ps1` must pass against the generated image before distribution.
+
+See `docs\KNOWN-LIMITATIONS.md` and `docs\REVIEWS\TASK-0080\RELEASE-CANDIDATE-VALIDATION.md` in the source repository for the evidence and required Project Custodian decision.
+
 ## Current Portable Layout
 
 The production toolkit root should stay intentionally clean. The only file expected at the portable root is `NetworkToolkit.vbs`, which launches the toolkit without leaving a PowerShell console window behind.
@@ -24,7 +30,7 @@ NetworkToolkit\
 
 The production package is built with `Build-ProductionPackage.ps1`. It creates a clean `Release\NetworkToolkit-Portable` deployment folder suitable for copying directly to a thumb drive.
 
-Launch the toolkit with `NetworkToolkit.vbs`. After copying the folder to removable media, run `App\Test-ProductionPackage.ps1` from the copied folder to verify the primary launch-file hashes and confirm that no client reports, profiles, state, dumps, or Git metadata were included.
+Launch the toolkit with `NetworkToolkit.vbs`. Before copying the folder to removable media, run `App\Test-ProductionPackage.ps1 -PackageRoot <generated-package-folder>` from the source checkout to verify the complete managed-file manifest and confirm that no client reports, profiles, state, dumps, portable-application data, or Git metadata were included.
 
 The package builder excludes:
 

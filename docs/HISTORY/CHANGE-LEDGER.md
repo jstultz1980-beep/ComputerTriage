@@ -10,21 +10,25 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 19 / 25 | TASK-0100 structured timing and run-scoped observation/provider contract. |
-| Documentation | 22 / 25 | TASK-0100 performance contract, budgets, and baselines. |
-| Task System | 4 / 25 | TASK-0100 completion and TASK-0080 activation. |
+| Documentation | 23 / 25 | TASK-0080 release evidence, operational guidance, and known limitations. |
+| Task System | 5 / 25 | TASK-0080 evidence completion and transfer to the Project Custodian release decision. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
 | UI | 4 / 25 | TASK-0100 GUI shell, first-render, and tab-switch timing. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
 | Build System | 6 / 25 | TASK-0100 package manifest hashing telemetry and build metadata. |
-| Validation/Test Framework | 12 / 25 | TASK-0100 cache, provider, budget, cold/warm, and invalidation fixtures. |
-| Roadmap/Backlog | 7 / 25 | Advanced to final release-candidate validation. |
+| Validation/Test Framework | 13 / 25 | TASK-0080 canonical and full-production-image release evidence. |
+| Roadmap/Backlog | 8 / 25 | Advanced to the Project Custodian release-readiness decision. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0080-01 | 2026-07-13 | TASK-0080 | Validation/Test Framework | +1 | Ran the 18-stage canonical gate and independently built and verified the 6.72 GB production image. |
+| CHG-0080-02 | 2026-07-13 | TASK-0080 | Documentation | +1 | Recorded release evidence, quick-start guidance, readiness status, build duration, and the LibreOffice cleanup limitation. |
+| CHG-0080-03 | 2026-07-13 | TASK-0080 | Task System | +1 | Completed Codex release-gate execution and transferred the Active task to the Project Custodian decision boundary. |
+| CHG-0080-04 | 2026-07-13 | TASK-0080 | Roadmap/Backlog | +1 | Advanced the final gate to remediation/risk-acceptance and release-readiness disposition. |
 | CHG-0100-01 | 2026-07-13 | TASK-0100 | Architecture | +1 | Added nested performance-run, budget, observation freshness, provider-health, invalidation, and telemetry contracts. |
 | CHG-0100-02 | 2026-07-13 | TASK-0100 | UI | +1 | Emitted structured GUI shell, first-render, and every-tab-switch timing. |
 | CHG-0100-03 | 2026-07-13 | TASK-0100 | Build System | +1 | Instrumented managed-file hashing and updated build metadata. |

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-13 - Release-Candidate Gate
+
+- Completed the Codex evidence phase of TASK-0080: all 18 canonical repository validation stages passed.
+- Built the complete 6.72 GB production image with 24,364 files and independently exercised its managed-file and clean-data verifier.
+- Recorded a release-blocking package limitation: four long-path LibreOffice configuration files survive mutable-data cleanup, so Version 1.0 is not recommended for tagging or distribution yet.
+- Updated quick-start, production-readiness, known-limitations, release evidence, handoff, and build metadata for the Project Custodian decision.
+
 Detailed historical implementation chronology remains preserved in Git history and individual task records. This file records current milestone-level changes.
 
 ## 2026-07-13

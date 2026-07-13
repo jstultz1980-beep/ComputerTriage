@@ -34,6 +34,10 @@ Network Toolkit should be:
 
 ## Launching
 
+### Release-Candidate Notice
+
+The canonical 18-stage repository gate passes, but the latest full portable-image verification is not release-ready because four long-path LibreOffice files survive the clean-package step. See `docs\KNOWN-LIMITATIONS.md` and the TASK-0080 release-candidate evidence before building, tagging, or distributing Version 1.0.
+
 ### Normal GUI Launch
 
 From the portable root, run:
@@ -572,6 +576,8 @@ Verify a copied package:
 ```
 
 The production package should not include Git metadata, prior release output, old reports, old profiles, temp sessions, logs, minidumps, or client state.
+
+Treat a successful build as staged output, not release approval. Run `Test-ProductionPackage.ps1` against the generated folder and require a passing result before copying, tagging, or publishing it.
 
 ## Maintainer Rules
 

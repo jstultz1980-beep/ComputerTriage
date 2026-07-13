@@ -12,14 +12,14 @@ Current Active task:
 - `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
 Current objective:
-- Execute the canonical repository and production-package gates.
-- Reconcile operational, troubleshooting, limitation, and release-readiness documentation.
-- Produce the final Project Custodian release decision evidence package.
+- Project Custodian disposition of the full-package LibreOffice mutable-data cleanup failure.
+- Focused remediation and a new full-image verification, or explicit written risk acceptance.
+- Release-readiness decision before any tag, publication, or distribution.
 
 ## Remaining Sequence
 
 1. **TASK-0080 - Release-Candidate Validation and Documentation**
-   - Execute final validation, operational documentation, and release-readiness review.
+   - Codex evidence and documentation are complete; Project Custodian release decision is Active.
 
 ## Release-Candidate Entry Criteria
 

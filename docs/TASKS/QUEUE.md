@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0080-Release-Candidate-Validation-And-Documentation` | Codex | Active | Execute the final release-candidate validation and documentation gate. |
+| `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Active | Decide release readiness and focused remediation after Codex completed the final evidence gate. |
 
 ## Ordered Queue
 
@@ -35,8 +35,10 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0100 is complete and the canonical repository validation gate passes 18 stages with zero failures.
-- TASK-0080 is the sole Active task and final queued release-candidate gate.
+- TASK-0100 is complete and the TASK-0080 canonical repository validation gate passes 18 stages with zero failures.
+- Codex completed TASK-0080 execution and transferred the sole Active task to the Project Custodian for the release decision.
+- The full 6.72 GB package built, but independent verification rejected four surviving long-path LibreOffice files under a mutable `Data` tree.
+- No tag, publication, or distribution is recommended until focused remediation or written risk acceptance.
 - No implementation task remains queued behind TASK-0080.
 - TASK-0109 accepted the TASK-0108 evidence package.
 - Only Task System was reset from `25 / 25` to `0 / 25`.
