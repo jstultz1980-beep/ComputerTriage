@@ -1,7 +1,7 @@
 # TASK-0101 - Validation/Test Framework Counter Audit
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -20,12 +20,20 @@ Audit the validation and test framework before any further implementation task b
 - Update governance records and reset only Validation/Test Framework after audit completion.
 
 ## Acceptance Criteria
-- [ ] Current validation entry points and coverage are documented.
-- [ ] Recent validation evidence is reconciled with runnable checks.
-- [ ] Material gaps have focused follow-up tasks or an explicit disposition.
-- [ ] Validation/Test Framework is reset only after the audit is complete.
+- [x] Current validation entry points and coverage are documented.
+- [x] Recent validation evidence is reconciled with runnable checks.
+- [x] Material gaps have focused follow-up tasks or an explicit disposition.
+- [x] Validation/Test Framework is reset only after the audit is complete.
 
 ## Constraints
 - This is the required threshold audit and must precede TASK-0088.
 - Do not implement unrelated application features or remediation work.
 - Preserve all documented unrelated working-tree drift.
+
+## Audit Result
+- Audited 62 tracked PowerShell scripts with zero parser failures.
+- Re-ran four focused test scripts plus GUI smoke and button-smoke successfully.
+- Reconciled recent TASK-0086 and TASK-0087 validation claims with executable checks.
+- Confirmed remaining gaps are already owned by TASK-0088, TASK-0092, TASK-0094, TASK-0096, and TASK-0099.
+- Reset only Validation/Test Framework to `0 / 25` and activated TASK-0088.
+- Full findings: `docs/REVIEWS/TASK-0101/VALIDATION-TEST-FRAMEWORK-AUDIT.md`.

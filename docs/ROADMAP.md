@@ -17,9 +17,9 @@ Build a portable Windows toolkit that collects, analyzes, explains, and reports 
 Status: Active
 
 Current Active task:
-- `TASK-0101-Validation-Test-Framework-Counter-Audit`
+- `TASK-0088-Canonical-Operation-Results-And-Failure-Propagation`
 
-TASK-0087 is complete. TASK-0101 is the required threshold audit before remediation resumes with TASK-0088.
+TASK-0087 and the required TASK-0101 threshold audit are complete. Release-blocking remediation has resumed with TASK-0088.
 
 Required sequence:
 1. TASK-0086 Offline Evidence Isolation and Bundle Identity.

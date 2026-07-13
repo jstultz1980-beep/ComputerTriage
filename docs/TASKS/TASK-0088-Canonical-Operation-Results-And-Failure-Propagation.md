@@ -1,7 +1,7 @@
 # TASK-0088 - Canonical Operation Results and Failure Propagation
 
 ## Status
-Queued
+Active
 
 ## Owner
 Codex

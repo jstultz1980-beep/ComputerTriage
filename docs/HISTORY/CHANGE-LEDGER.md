@@ -10,16 +10,16 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 |---|---:|---|
 | Repository Governance | 10 / 25 | Mandatory remote synchronization verification added to `Resume Work`. |
 | Architecture | 6 / 25 | TASK-0087 parser-backed evidence and event-time contracts. |
-| Documentation | 3 / 25 | TASK-0087 implementation and validation evidence. |
-| Task System | 9 / 25 | TASK-0087 completion and TASK-0101 activation. |
+| Documentation | 4 / 25 | TASK-0101 validation/test audit report and evidence reconciliation. |
+| Task System | 10 / 25 | TASK-0101 completion and TASK-0088 activation. |
 | Evidence Collection and Deterministic Analysis | 6 / 25 | TASK-0087 parser-backed quality and structured error artifacts. |
 | ARGUS | 8 / 25 | TASK-0087 parser-failure and timestamp confidence handling. |
 | Reporting | 3 / 25 | TASK-0086 run/bundle identity reporting. |
 | UI | 23 / 25 | TASK-0086 Analyze workflow bundle selection. |
 | Plugin Framework | 1 / 25 | No audit-closeout implementation change. |
 | Build System | 19 / 25 | TASK-0087 build metadata. |
-| Validation/Test Framework | 25 / 25 | TASK-0087 fixtures; TASK-0101 audit required. |
-| Roadmap/Backlog | 16 / 25 | TASK-0101 audit inserted before TASK-0088. |
+| Validation/Test Framework | 0 / 25 | TASK-0101 threshold audit completed and reset only this subsystem. |
+| Roadmap/Backlog | 17 / 25 | Release-blocking remediation resumed with TASK-0088. |
 
 ## Current Ledger Entries
 
@@ -49,9 +49,13 @@ A subsystem counter reaching `25 / 25` requires a new audit before additional im
 | CHG-0087-06 | 2026-07-12 | TASK-0087 / TASK-0101 | Task System | +1 | Completed TASK-0087 and activated the required Validation/Test Framework threshold audit. |
 | CHG-0087-07 | 2026-07-12 | TASK-0087 | Build System | +1 | Updated build metadata for parser-backed evidence quality and event-time semantics. |
 | CHG-0087-08 | 2026-07-12 | TASK-0087 / TASK-0101 | Roadmap/Backlog | +1 | Inserted the required threshold audit before TASK-0088. |
+| CHG-0101-01 | 2026-07-12 | TASK-0101 | Validation/Test Framework | Reset to 0 | Audited executable validation, reconciled recent claims, mapped remaining gaps to focused tasks, and reset only the audited subsystem. |
+| CHG-0101-02 | 2026-07-12 | TASK-0101 | Documentation | +1 | Added the validation/test framework audit report and recorded executable evidence. |
+| CHG-0101-03 | 2026-07-12 | TASK-0101 / TASK-0088 | Task System | +1 | Completed the required audit and activated TASK-0088. |
+| CHG-0101-04 | 2026-07-12 | TASK-0101 / TASK-0088 | Roadmap/Backlog | +1 | Cleared the validation gate and resumed dependency-ordered remediation. |
 
 ## Audit Closeout
 
-TASK-0084 was a broad planned engineering audit, not a threshold-triggered subsystem reset. It did not reset subsystem counters. TASK-0085 had already reset Documentation to `0 / 25`; the TASK-0084 final documentation package incremented it to `1 / 25`.
+TASK-0084 was a broad planned engineering audit, not a threshold-triggered subsystem reset. It did not reset subsystem counters. TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only.
 
 Historical ledger entries before TASK-0084 remain available in Git history.
