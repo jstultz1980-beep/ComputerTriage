@@ -19,12 +19,14 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
 | Build System | 2 / 25 | TASK-0095 canonical package/trust descriptor validation and build metadata. |
 | Validation/Test Framework | 8 / 25 | TASK-0095 duplicate, descriptor, plugin, state, GUI, and analysis fixtures. |
-| Roadmap/Backlog | 25 / 25 | TASK-0095 completion triggered TASK-0106/TASK-0107 audit boundary. |
+| Roadmap/Backlog | 0 / 25 | TASK-0107 Engineering Audit accepted and reset only Roadmap/Backlog. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0107-01 | 2026-07-13 | TASK-0107 | Roadmap/Backlog | Reset to 0 | Accepted the TASK-0106 Roadmap/Backlog audit package, confirmed remaining sequence, clarified TASK-0097 ownership, and reset only Roadmap/Backlog. |
+| CHG-0107-02 | 2026-07-13 | TASK-0107 / TASK-0096 | Task System | 0 | Closed the Project Custodian audit boundary and activated TASK-0096 without incrementing the counter for routine audit bookkeeping. |
 | CHG-0095-01 | 2026-07-13 | TASK-0095 | Architecture | +1 | Established canonical analysis roles, normalized tool descriptors, plugin contracts, manifest roles, and operation states. |
 | CHG-0095-02 | 2026-07-13 | TASK-0095 | Evidence Collection and Deterministic Analysis | +1 | Removed duplicate HEPHAESTUS symbols and assigned authoritative deterministic analysis ownership. |
 | CHG-0095-03 | 2026-07-13 | TASK-0095 | UI | +1 | Drove GUI tabs, search, and launch registry from canonical tool descriptors. |
@@ -81,4 +83,4 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 ## Audit Closeout
 
-TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. Future threshold audits follow the autonomous two-stage cycle.
+TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. TASK-0107 reset Roadmap/Backlog only. Future threshold audits follow the autonomous two-stage cycle.
