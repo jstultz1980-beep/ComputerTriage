@@ -40,6 +40,24 @@ The Project Custodian should act autonomously on architecture, governance, remed
 
 After an Engineering Audit, the Project Custodian activates exactly one dependency-ready Codex task, commits and pushes the decision, and returns `Resume Work` as the next instruction.
 
+## Completion Prompt Rule
+
+Every Codex stop-boundary summary must end with exactly one final operator instruction and no text after it.
+
+For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, the exact final line is:
+
+```text
+Tell Debbie to continue
+```
+
+For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the exact final line is:
+
+```text
+Tell Debbie to address errors
+```
+
+This closing instruction is mandatory and must not be paraphrased.
+
 ## Address Errors Rule
 
 When the user prompts `Address Errors`, ChatGPT reads the cloud source-of-truth files and `docs/ERROR-HANDOFF.md`, resolves governance/architecture/scope/sequencing conflicts where possible, preserves Codex work and unrelated drift, commits and pushes the resolution, and returns control through `Resume Work`.
