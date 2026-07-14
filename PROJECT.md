@@ -50,38 +50,50 @@ After an Engineering Audit, the Project Custodian activates exactly one dependen
 
 ## Completion Prompt Rule
 
-Every stop-boundary summary from Codex or the Project Custodian must include a handoff timestamp immediately before the final operator instruction.
+Every stop-boundary summary from Codex or the Project Custodian must visibly print a handoff timestamp in the final chat response immediately before the final operator instruction. Updating a repository file without displaying the timestamp in chat does not satisfy this rule.
 
 The timestamp format is:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 ```
 
-Use current UTC time when the message is sent. Do not copy an older repository timestamp into a new chat response.
-
-When both the Debbie and Sampson chats are idle, the handoff with the newest timestamp identifies the current turn. If chat timestamps conflict with the repository, the repository remains authoritative.
-
-For a normal Codex-to-Project-Custodian handoff, the final two lines must be:
+or, when Central Standard Time is in effect:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CST
+```
+
+Use the current time in the `America/Chicago` time zone when the message is sent. Use the correct `CDT` or `CST` abbreviation for that date. Do not use UTC and do not copy an older repository timestamp into a new chat response.
+
+When both the Debbie and Sampson chats are idle, the handoff with the newest displayed timestamp identifies the current turn. If chat timestamps conflict with the repository, the repository remains authoritative.
+
+For a normal Codex-to-Project-Custodian handoff, the final two visible lines must be:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
 
-For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the final two lines must be:
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
+
+For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the final two visible lines must be:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-For a normal Project-Custodian-to-Codex handoff, the final two lines must be:
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
+
+For a normal Project-Custodian-to-Codex handoff, the final two visible lines must be:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Resume Work
 ```
+
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
 
 The operator instruction must remain the final line, with no text after it. These instructions are mandatory and must not be paraphrased.
 
