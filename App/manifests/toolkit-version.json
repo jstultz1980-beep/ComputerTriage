@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260714114813,
-    "SourceUpdatedAt":  "2026-07-14T11:48:13.5724551-05:00",
-    "ReleaseNotes":  "TASK-0080 release-candidate validation, operational documentation, and known limitation evidence."
+    "Build":  20260714133102,
+    "SourceUpdatedAt":  "2026-07-14T13:31:02.5670963-05:00",
+    "ReleaseNotes":  "TASK-0112 cold-tab initialization performance remediation and warm-up queue instrumentation."
 }

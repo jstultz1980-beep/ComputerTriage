@@ -4,16 +4,16 @@
 HANDOFF-0120
 
 ## Current Task
-TASK-0112-Cold-Tab-Initialization-Performance-Remediation
+TASK-0080-Release-Candidate-Validation-And-Documentation
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
-ChatGPT (Project Custodian) after TASK-0112 completes, its focused and canonical validation passes, and TASK-0080 is reactivated for the final release-readiness decision.
+The user for explicit release/publication authorization after the Project Custodian accepts or rejects release readiness.
 
 ## Objective
-Measure and remove repeatable first-open tab latency without shifting expensive work into synchronous application startup.
+Decide final release readiness for the clean full production image, then authorize or decline tagging, publication, or distribution.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -22,19 +22,18 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0097 through TASK-0100 are complete.
 - TASK-0110 resolved accepted Task System consistency debt.
 - TASK-0111 completed fail-closed long-path mutable-tree cleanup and independently verified the clean full production image.
-- TASK-0080 canonical repository validation passed 19 of 19 stages.
-- Direct technician use identified repeatable lag when selecting a tab that had not been opened since toolkit startup.
-- Already initialized tabs are materially faster, indicating cold-tab initialization rather than general sustained UI slowness.
-- The Project Custodian rejected broad release readiness until this normal-navigation latency is remediated.
-- TASK-0112 is the sole Active Codex task.
-- TASK-0080 is queued for the final Project Custodian release-readiness decision after TASK-0112.
+- TASK-0112 added queued warm-up, per-stage timing, and focused cold-tab validation.
+- TASK-0112 canonical repository validation passed 20 of 20 stages.
+- TASK-0112 is complete.
+- TASK-0080 is the sole Active Project Custodian task at the release-readiness boundary.
+- No implementation task remains queued behind TASK-0080.
 - No tag, publication, or distribution is authorized.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0112-Cold-Tab-Initialization-Performance-Remediation`
+`TASK-0080-Release-Candidate-Validation-And-Documentation`
 
-Codex must implement only the focused cold-tab performance remediation defined by TASK-0112. It must preserve unrelated drift, instrument first-open and warm navigation, warm lightweight tab UI only after the main window is responsive, keep live collection deferred, prevent duplicate initialization, and run focused plus canonical validation. Broad UI redesign and unrelated work are not authorized.
+The Project Custodian must review the TASK-0112 remediation evidence, decide final release readiness, and either accept the clean package or activate a new focused remediation. Codex must not implement further work until a new focused task is activated.
 
 ## Audit Counters
 
@@ -42,16 +41,16 @@ Codex must implement only the focused cold-tab performance remediation defined b
 |---|---:|---|
 | Repository Governance | 15 / 25 | No |
 | Architecture | 19 / 25 | No |
-| Documentation | 23 / 25 | No |
-| Task System | 6 / 25 | No |
+| Documentation | 24 / 25 | No |
+| Task System | 7 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 5 / 25 | No |
 | UI | 5 / 25 | No |
 | Plugin Framework | 6 / 25 | No |
-| Build System | 6 / 25 | No |
-| Validation/Test Framework | 13 / 25 | No |
-| Roadmap/Backlog | 9 / 25 | No |
+| Build System | 8 / 25 | No |
+| Validation/Test Framework | 15 / 25 | No |
+| Roadmap/Backlog | 10 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -77,5 +76,5 @@ None.
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```

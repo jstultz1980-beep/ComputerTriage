@@ -106,6 +106,8 @@ $script:TabBuilders = @{}
 $script:BuiltTabs = @{}
 $script:StaticTabStrip = $null
 $script:StartupTabBuildTimer = $null
+$script:GUITabWarmupController = $null
+$script:GUITabWarmupTimer = $null
 $script:SlowTabSwitchThresholdMs = 250
 $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
@@ -3127,7 +3129,7 @@ function Stop-GUIAsyncWorkers {
     foreach($timerName in @(
         "QuickDiagnosisTimer","ToolkitSizeTimer","ToolkitUpdateTimer","ToolkitDeploymentTimer",
         "QuickOutputTimer","PublicIPTimer","ChocoActionTimer","WUActionTimer","PsExecTimer",
-        "ActivityRefreshTimer","ActivityInitialRefreshTimer","StartupTabBuildTimer","TriageStatusRefreshTimer","GUIBusyTimer"
+        "ActivityRefreshTimer","ActivityInitialRefreshTimer","StartupTabBuildTimer","GUITabWarmupTimer","TriageStatusRefreshTimer","GUIBusyTimer"
     )){
         try {
             $timer = Get-Variable -Name $timerName -Scope Script -ValueOnly -ErrorAction SilentlyContinue
@@ -9340,8 +9342,143 @@ function Register-GUITabBuilder {
     }
 }
 
+function Write-GUITabPerformanceTiming {
+    param(
+        [string]$Name,
+        [System.Windows.Forms.TabPage]$Page,
+        [string]$Source,
+        [string]$Stage,
+        [long]$DurationMs,
+        [hashtable]$ExtraTags = @{}
+    )
+
+    if(![string]::IsNullOrWhiteSpace($Name) -and (Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue)){
+        $tags = @{ Tab = $(if($Page){ $Page.Text }else{ 'Unknown' }); Source = $Source; Stage = $Stage }
+        foreach($key in @($ExtraTags.Keys)){
+            $tags[$key] = $ExtraTags[$key]
+        }
+        [void](Add-NTKPerformanceTiming -Name $Name -DurationMs $DurationMs -Tags $tags)
+    }
+}
+
+function Get-GUITabWarmupItems {
+    param([System.Windows.Forms.TabControl]$Tabs)
+
+    if(!$Tabs){
+        return @()
+    }
+
+    $items = New-Object System.Collections.ArrayList
+    $order = 0
+    foreach($page in @($Tabs.TabPages)){
+        if(!$page -or $page.IsDisposed){
+            continue
+        }
+
+        $currentPage = $page
+        $currentOrder = $order
+        $buildAction = { param($TabPage) Build-GUITabIfNeeded -Page $TabPage -Source 'Warmup' }.GetNewClosure()
+        $isBuilt = { param($TabPage) $script:BuiltTabs.ContainsKey($TabPage.Text) }.GetNewClosure()
+        $isDisposed = { param($TabPage) $TabPage.IsDisposed }.GetNewClosure()
+        [void]$items.Add([pscustomobject]@{
+            Name = [string]$currentPage.Text
+            Order = $currentOrder
+            Page = $currentPage
+            BuildAction = $buildAction
+            IsBuilt = $isBuilt
+            IsDisposed = $isDisposed
+        })
+        $order++
+    }
+
+    return @($items)
+}
+
+function Stop-GUITabWarmupQueue {
+    if($script:GUITabWarmupTimer){
+        try { $script:GUITabWarmupTimer.Stop() } catch {}
+        try { $script:GUITabWarmupTimer.Dispose() } catch {}
+        $script:GUITabWarmupTimer = $null
+    }
+    $script:GUITabWarmupController = $null
+}
+
+function Invoke-GUITabWarmupQueueStep {
+    if(!$script:GUITabWarmupController){
+        return $null
+    }
+
+    if($script:MainTabs -and $script:MainTabs.SelectedTab){
+        [void](Request-NTKTabWarmupPriority -Controller $script:GUITabWarmupController -Name $script:MainTabs.SelectedTab.Text)
+    }
+
+    $result = Invoke-NTKTabWarmupStep -Controller $script:GUITabWarmupController
+    if(!$result -or $result.Result -eq 'Empty'){
+        Stop-GUITabWarmupQueue
+        return $result
+    }
+
+    if($result.Item){
+        $pageName = [string]$result.Item.Name
+        Write-GUITabPerformanceTiming -Name 'gui.tab.warmup' -Page $result.Item.Page -Source 'Warmup' -Stage $result.Result -DurationMs $result.DurationMs -ExtraTags @{Result=$result.Result}
+        if($result.Result -eq 'Built'){
+            Write-GUIDiagnosticLog -Event 'TabWarmupBuilt' -Tool $pageName -Detail ("DurationMs={0}; Remaining={1}" -f $result.DurationMs,$script:GUITabWarmupController.Queue.Count)
+        }
+        elseif($result.Result -eq 'Skipped'){
+            Write-GUIDiagnosticLog -Event 'TabWarmupSkipped' -Tool $pageName -Detail ("Remaining={0}" -f $script:GUITabWarmupController.Queue.Count)
+        }
+        elseif($result.Result -eq 'Failed'){
+            Write-GUIDiagnosticLog -Event 'TabWarmupFailed' -Tool $pageName -Level 'ERROR' -Detail $result.Error
+        }
+    }
+
+    if($script:GUITabWarmupController.Queue.Count -le 0){
+        Stop-GUITabWarmupQueue
+    }
+
+    return $result
+}
+
+function Start-GUITabWarmupQueue {
+    param([System.Windows.Forms.TabControl]$Tabs)
+
+    if(!$Tabs){
+        return
+    }
+
+    Stop-GUITabWarmupQueue
+    $controller = New-NTKTabWarmupController -Name 'GUI Tab Warmup' -IntervalMs 100
+    $items = @(Get-GUITabWarmupItems -Tabs $Tabs | Where-Object {
+        $_ -and $_.Page -and !$_.Page.IsDisposed -and !$script:BuiltTabs.ContainsKey($_.Name)
+    })
+
+    if($items.Count -eq 0){
+        return
+    }
+
+    [void](Set-NTKTabWarmupQueue -Controller $controller -Items $items)
+    $script:GUITabWarmupController = $controller
+    $script:GUITabWarmupTimer = New-Object System.Windows.Forms.Timer
+    $script:GUITabWarmupTimer.Interval = $controller.IntervalMs
+    $script:GUITabWarmupTimer.Add_Tick({
+        try {
+            [void](Invoke-GUITabWarmupQueueStep)
+        }
+        catch {
+            Add-GUILog "Tab warm-up queue failed: $($_.Exception.Message)"
+            Write-GUIDiagnosticLog -Event 'TabWarmupQueueFailed' -Tool 'GUI' -Level 'ERROR' -Detail $_.ScriptStackTrace -Exception $_.Exception
+            Stop-GUITabWarmupQueue
+        }
+    })
+    $script:GUITabWarmupTimer.Start()
+    Write-GUILog ("Queued {0} tab warm-up(s)." -f $items.Count)
+}
+
 function Build-GUITabIfNeeded {
-    param([System.Windows.Forms.TabPage]$Page)
+    param(
+        [System.Windows.Forms.TabPage]$Page,
+        [string]$Source = 'Manual'
+    )
 
     if(!$Page){
         return
@@ -9359,19 +9496,34 @@ function Build-GUITabIfNeeded {
     $entry = $script:TabBuilders[$Page.Text]
     $buildTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $buildSucceeded = $false
+    $stageTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $Page.SuspendLayout()
 
     try {
+        $stageTimer.Restart()
         $Page.BackColor = $script:GUITheme.Page
         Enable-GUISubtleSurfaceTexture -Control $Page
         $Page.Controls.Clear()
+        Write-GUITabPerformanceTiming -Name 'gui.tab.stage' -Page $Page -Source $Source -Stage 'Surface' -DurationMs $stageTimer.ElapsedMilliseconds
+
+        $stageTimer.Restart()
         & $entry.Builder $Page
+        Write-GUITabPerformanceTiming -Name 'gui.tab.stage' -Page $Page -Source $Source -Stage 'Builder' -DurationMs $stageTimer.ElapsedMilliseconds
+
+        $stageTimer.Restart()
         Apply-GUIThemeToControl -Control $Page
+        Write-GUITabPerformanceTiming -Name 'gui.tab.stage' -Page $Page -Source $Source -Stage 'Theme' -DurationMs $stageTimer.ElapsedMilliseconds
+
         $script:BuiltTabs[$Page.Text] = $true
         $buildSucceeded = $true
+
+        $stageTimer.Restart()
         Set-GUIFallbackButtonToolTips
+        Write-GUITabPerformanceTiming -Name 'gui.tab.stage' -Page $Page -Source $Source -Stage 'ToolTips' -DurationMs $stageTimer.ElapsedMilliseconds
+
         $buildTimer.Stop()
-        Write-GUIDiagnosticLog -Event 'TabBuilt' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count)
+        Write-GUITabPerformanceTiming -Name 'gui.tab.first-render' -Page $Page -Source $Source -Stage 'Complete' -DurationMs $buildTimer.ElapsedMilliseconds -ExtraTags @{Result='Built'}
+        Write-GUIDiagnosticLog -Event 'TabBuilt' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}; Source={2}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count,$Source)
         if($buildTimer.ElapsedMilliseconds -ge $script:SlowTabSwitchThresholdMs){
             Write-GUIDiagnosticLog -Event 'SlowTabBuild' -Tool $Page.Text -Detail ("ElapsedMs={0}; Controls={1}; ThresholdMs={2}" -f $buildTimer.ElapsedMilliseconds,$Page.Controls.Count,$script:SlowTabSwitchThresholdMs)
             if($script:StatusLabel -and !$script:StatusLabel.IsDisposed){
@@ -9390,12 +9542,10 @@ function Build-GUITabIfNeeded {
         $Page.Controls.Clear()
         $Page.Controls.Add($label)
         $script:BuiltTabs[$Page.Text] = $true
+        Write-GUITabPerformanceTiming -Name 'gui.tab.first-render' -Page $Page -Source $Source -Stage 'Complete' -DurationMs $buildTimer.ElapsedMilliseconds -ExtraTags @{Result='Failed';Error=$_.Exception.Message}
     }
     finally {
         if($buildTimer.IsRunning){ $buildTimer.Stop() }
-        if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
-            [void](Add-NTKPerformanceTiming -Name 'gui.tab.first-render' -DurationMs $buildTimer.ElapsedMilliseconds -Tags @{Tab=$Page.Text;Success=$buildSucceeded;Controls=$Page.Controls.Count})
-        }
         $Page.ResumeLayout()
     }
 }
@@ -9452,11 +9602,15 @@ function Select-GUITabPage {
             try { $control.SuspendLayout() } catch {}
         }
 
+        if($script:GUITabWarmupController){
+            [void](Request-NTKTabWarmupPriority -Controller $script:GUITabWarmupController -Name $Page.Text)
+        }
+
         if($script:MainTabs.SelectedTab -ne $Page){
             $script:MainTabs.SelectedTab = $Page
         }
 
-        Build-GUITabIfNeeded -Page $Page
+        Build-GUITabIfNeeded -Page $Page -Source 'Manual'
         Update-GUITabRuntimeState -SelectedPage $Page
         Update-GUIStaticTabStripSelection
     }
@@ -16741,6 +16895,7 @@ function Build-Form {
                     if($script:MainTabs -and $script:MainTabs.SelectedTab){
                         Select-GUITabPage -Page $script:MainTabs.SelectedTab
                     }
+                    Start-GUITabWarmupQueue -Tabs $script:MainTabs
                     Update-GUIWifiIndicators
                 }
                 catch {

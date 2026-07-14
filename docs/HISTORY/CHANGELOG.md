@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-14 - Cold-Tab Initialization Remediation
+
+- Completed TASK-0112 cold-tab initialization performance remediation with queued warm-up and per-stage timing instrumentation.
+- Canonical repository validation now passes 20 stages with zero failures.
+- Focused warm-up controller validation and performance/cache probes passed.
+- Returned TASK-0080 to the Project Custodian release-readiness boundary.
+
 ## 2026-07-14 - Release-Candidate Remediation
 
 - Completed TASK-0111 long-path mutable-tree cleanup remediation and rebuilt the release candidate with fail-closed cleanup.

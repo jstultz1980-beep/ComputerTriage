@@ -15,7 +15,7 @@ function Invoke-GuiPerformanceProbe {
     $timer.Stop()
     Assert-True ($LASTEXITCODE -eq 0) 'GUI performance probe failed.'
     $result = Get-Content -LiteralPath $ResultPath -Raw | ConvertFrom-Json
-    foreach($required in @('gui.startup.shell','gui.tab.first-render','gui.tab.switch')){
+    foreach($required in @('gui.startup.shell','gui.tab.stage','gui.tab.first-render','gui.tab.switch')){
         Assert-True (@($result.timings | Where-Object name -eq $required).Count -gt 0) "GUI timing '$required' was not emitted."
     }
     Assert-True (@($result.timings | Where-Object { $_.budgetState -eq 'Exceeded' }).Count -eq 0) 'An internal GUI performance budget was exceeded.'

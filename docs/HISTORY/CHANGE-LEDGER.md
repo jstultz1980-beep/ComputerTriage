@@ -11,20 +11,25 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 19 / 25 | TASK-0100 structured timing and run-scoped observation/provider contract. |
 | Documentation | 24 / 25 | TASK-0111 remediation evidence, release-candidate guidance, and resolved known limitations. |
-| Task System | 6 / 25 | TASK-0111 evidence completion and transfer back to the Project Custodian release decision. |
+| Task System | 7 / 25 | TASK-0112 evidence completion and transfer back to the Project Custodian release decision. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
-| UI | 4 / 25 | TASK-0100 GUI shell, first-render, and tab-switch timing. |
+| UI | 5 / 25 | TASK-0112 queued warm-up, per-stage timing, and navigation responsiveness. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 7 / 25 | TASK-0111 fail-closed long-path mutable-tree cleanup and build metadata. |
-| Validation/Test Framework | 14 / 25 | TASK-0111 canonical and full-production-image remediation verification. |
-| Roadmap/Backlog | 9 / 25 | Advanced to the Project Custodian final release-readiness decision. |
+| Build System | 8 / 25 | TASK-0112 GUI warm-up helper integration and build metadata refresh. |
+| Validation/Test Framework | 15 / 25 | TASK-0112 warm-up controller and performance/cache validation. |
+| Roadmap/Backlog | 10 / 25 | Advanced back to the Project Custodian final release-readiness decision. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0112-01 | 2026-07-14 | TASK-0112 | UI | +1 | Added queued tab warm-up, per-stage first-open timing, and safe user-priority handling for cold navigation. |
+| CHG-0112-02 | 2026-07-14 | TASK-0112 | Build System | +1 | Added the GUI warm-up helper and refreshed toolkit build metadata for the accepted performance remediation. |
+| CHG-0112-03 | 2026-07-14 | TASK-0112 | Validation/Test Framework | +1 | Added the focused warm-up controller fixture and updated performance/cache validation to require stage timings. |
+| CHG-0112-04 | 2026-07-14 | TASK-0112 | Task System | +1 | Completed TASK-0112 and returned the release boundary to the Project Custodian decision. |
+| CHG-0112-05 | 2026-07-14 | TASK-0112 | Roadmap/Backlog | +1 | Advanced the sequence back to the final release-readiness review. |
 | CHG-0111-01 | 2026-07-14 | TASK-0111 | Build System | +1 | Added fail-closed long-path cleanup helpers to the production-package builder and preserved the package metadata update. |
 | CHG-0111-02 | 2026-07-14 | TASK-0111 | Validation/Test Framework | +1 | Added a focused mutable-tree cleanup fixture and verified the clean full production image. |
 | CHG-0111-03 | 2026-07-14 | TASK-0111 | Documentation | +1 | Recorded the remediation outcome, resolved the known limitation, and updated release guidance. |

@@ -4,23 +4,21 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Release-Candidate Performance Remediation
+## Current Phase - Release-Candidate Validation
 
 Status: Active
 
 Current Active task:
-- `TASK-0112-Cold-Tab-Initialization-Performance-Remediation`
+- `TASK-0080-Release-Candidate-Validation-And-Documentation`
 
 Current objective:
-- Measure first-open latency for every primary tab.
-- Warm lightweight tab UI after the main window becomes responsive.
-- Keep expensive live data collection deferred until required.
-- Prove responsive first selection, one-time initialization, and no lifecycle regressions.
+- Review the TASK-0112 remediation evidence and decide final release readiness.
+- Authorize or decline tagging, publication, or distribution for the verified package.
 
 ## Remaining Sequence
 
 1. **TASK-0112 - Cold Tab Initialization Performance Remediation**
-   - Focused release-blocking usability remediation for repeatable first-open tab lag.
+   - Completed. The release-blocking cold-tab initialization latency was remediated and validated.
 2. **TASK-0080 - Release-Candidate Validation and Documentation**
    - Project Custodian final release-readiness decision after TASK-0112 evidence passes.
 

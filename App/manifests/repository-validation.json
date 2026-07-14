@@ -45,6 +45,7 @@
     { "id": "operation-result", "path": "App/NetworkToolkit/Tests/Test-OperationResultContract.ps1", "coverage": ["cli-exit", "analysis", "argus"], "negativePath": true },
     { "id": "parser-backed-evidence", "path": "App/NetworkToolkit/Tests/Test-ParserBackedEvidenceQuality.ps1", "coverage": ["collection", "analysis", "argus"], "negativePath": true },
     { "id": "production-package-mutable-tree-cleanup", "path": "App/NetworkToolkit/Tests/Test-ProductionPackageMutableTreeCleanup.ps1", "coverage": ["package", "managed-manifest"], "negativePath": true },
+    { "id": "gui-tab-warmup-controller", "path": "App/NetworkToolkit/Tests/Test-GUITabWarmupQueue.ps1", "coverage": ["gui", "lifecycle", "performance"], "negativePath": true },
     { "id": "performance-observation-cache", "path": "App/NetworkToolkit/Tests/Test-PerformanceAndObservationCache.ps1", "coverage": ["performance", "lifecycle", "gui"], "negativePath": true },
     { "id": "reporting-run-index", "path": "App/NetworkToolkit/Tests/Test-ReportingAndRunIndex.ps1", "coverage": ["reporting", "artifact"], "negativePath": true },
     { "id": "sensitive-artifact-safety", "path": "App/NetworkToolkit/Tests/Test-SensitiveArtifactSafety.ps1", "coverage": ["sensitive-state", "artifact"], "negativePath": true },

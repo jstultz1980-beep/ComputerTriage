@@ -12,18 +12,19 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0112-Cold-Tab-Initialization-Performance-Remediation` | Codex | Active | Measure and remove first-open tab latency without shifting expensive work into synchronous startup. |
+| `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Active | Make the final release-readiness decision after the TASK-0112 remediation passes full-image verification. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 1 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Queued | Make the final release-readiness decision after TASK-0112 performance evidence passes. |
+| _None_ | _None_ | _None_ | _None_ | No queued task remains behind the active Project Custodian decision. |
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0112-Cold-Tab-Initialization-Performance-Remediation` | Complete | Added queued warm-up, per-stage timing, and focused cold-tab validation. |
 | `TASK-0111-Long-Path-Mutable-Tree-Cleanup` | Complete | Added fail-closed long-path cleanup and independently verified the clean full production image. |
 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Complete | Added structured timings, explicit budgets, run-scoped observations/provider health, and cold/warm baselines. |
 | `TASK-0099-Repository-Wide-Validation-Foundation` | Complete | Added the canonical parser, load, negative-path, package, and regression gate. |
@@ -32,9 +33,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0111 completed packaging remediation and the clean full image verifies successfully.
-- Direct technician use identified repeatable first-open lag on tabs not previously opened during the current session.
-- TASK-0112 is the sole Active Codex task and is release-blocking usability remediation.
-- TASK-0080 remains queued for the final Project Custodian release-readiness decision after TASK-0112.
+- TASK-0112 completed the cold-tab initialization performance remediation and the clean full image still verifies successfully.
+- TASK-0080 is the sole Active Project Custodian task.
+- The Project Custodian must decide final release readiness from the verified evidence set.
 - No tag, publication, or distribution is authorized.
 - Net-new feature work remains deferred.

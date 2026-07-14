@@ -1,7 +1,7 @@
 # TASK-0080 - Release Candidate Validation And Documentation
 
 ## Status
-Queued
+Active
 
 ## Owner
 ChatGPT (Project Custodian)
@@ -26,19 +26,18 @@ Run the final release-candidate validation gate and produce release-ready docume
 - [x] Triage, local analysis, ARGUS, reporting, deployment, update, and package validations pass or have documented limitations.
 - [x] Release notes and known limitations are complete.
 - [x] Independent full production image verification passes with no mutable application data.
-- [ ] Technician-visible cold-tab navigation performance is accepted after TASK-0112.
+- [x] Technician-visible cold-tab navigation performance is accepted after TASK-0112.
 - [ ] Project Custodian declares the candidate release-ready.
 
 ## Codex Validation Result
 
-- TASK-0111 remediated the long-path mutable-tree cleanup defect by using fail-closed cleanup helpers for the declared mutable trees.
-- The canonical repository gate passed all 19 stages with zero failures.
-- A full 6.73 GB production image built successfully with 24,362 files.
-- Independent full-image verification passed with no mutable application data remaining.
+- TASK-0112 remediated the cold-tab initialization performance defect by adding queued warm-up and per-stage instrumentation.
+- The canonical repository gate passed all 20 stages with zero failures.
+- The GUI smoke, button smoke, focused warm-up controller test, and performance/cache probe all passed.
 - Quick-start, production readiness, known limitations, release evidence, changelog, handoff, and build metadata were reconciled.
 
 ## Project Custodian Decision
 
-TASK-0111 completed the focused packaging remediation and returned the release package to a clean verified state.
+TASK-0112 completed the focused cold-tab initialization performance remediation and returned the release workflow to the final Project Custodian review boundary.
 
-Direct technician use then identified repeatable first-open lag when selecting a tab that had not been opened since toolkit startup. The Project Custodian does not accept broad release readiness while this normal-navigation latency remains. TASK-0112 is Active for focused cold-tab initialization performance remediation. TASK-0080 returns to the Project Custodian after TASK-0112 completes and its performance evidence passes.
+TASK-0080 remains Active as the final Project Custodian release-readiness boundary. The Project Custodian must now decide whether the verified candidate is release-ready and whether tagging, publication, or distribution should proceed.

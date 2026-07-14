@@ -2,6 +2,10 @@
 
 ## Release-Candidate Status
 
+TASK-0112 resolved the previously repeatable first-open tab latency issue. The canonical repository validation now passes 20 stages, and focused warm-up validation shows queued tabs initialize once, in order, and without blocking the default tab.
+
+## Historical Release-Candidate Status
+
 TASK-0111 resolved the previously blocking full-package cleanup defect. The canonical repository validation now passes 19 stages, and independent verification of the full 6.73 GB portable image passes with no mutable application data remaining.
 
 ## Resolved - Full-Package LibreOffice Data Cleanup
