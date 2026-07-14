@@ -95,6 +95,19 @@ function Global:Complete-NTKBackgroundOperation {
         CallbackError = $Operation.CallbackError
     })
     while($Controller.History.Count -gt 50){ $Controller.History.RemoveAt(0) }
+    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+        $durationMs = 0
+        try { $durationMs = [long](($Operation.CompletedAtUtc - $Operation.StartedAtUtc).TotalMilliseconds) } catch {}
+        $outcome = switch($CompletionKind){
+            'Success' { 'Success' }
+            'Partial' { 'Skipped' }
+            'Failure' { 'Failure' }
+            'Timeout' { 'Timeout' }
+            'Cancellation' { 'Cancelled' }
+            default { if($State -eq 'Canceled'){'Cancelled'}elseif($State -eq 'Failed'){'Failure'}else{'Success'} }
+        }
+        [void](Add-NTKPerformanceTiming -Name 'operation.lifecycle' -DurationMs ([Math]::Max(0,$durationMs)) -Tags @{Operation=$Operation.Name;State=$Operation.State;CompletionKind=$Operation.CompletionKind;Message=$Operation.Message} -Outcome $outcome)
+    }
     return $Operation
 }
 
@@ -157,6 +170,9 @@ function Global:Start-NTKBackgroundOperation {
         CallbackError = $null
     }
     $Controller.Operations[$Name] = $operation
+    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+        [void](Add-NTKPerformanceTiming -Name 'operation.lifecycle' -DurationMs 0 -Tags @{Operation=$Name;State='Started';MetadataKind=if($Metadata -and $Metadata.PSObject.Properties['Kind']){[string]$Metadata.Kind}else{''}} -Outcome 'Success')
+    }
     return $operation
 }
 

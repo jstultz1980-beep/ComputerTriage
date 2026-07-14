@@ -15,6 +15,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$Global:NTKCoreStartupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+$Global:NTKCoreStartupStageStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 # --------------------------------------------------
 # Resolve Toolkit Root
@@ -35,6 +37,15 @@ if(!(Test-Path $pathFile)){
 
 . "$pathFile"
 
+. (Join-Path $ToolkitRoot "Utilities\Performance.ps1")
+if($NoConsole -and -not $Global:NTKPerformanceRunHandle -and (Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue)){
+    $Global:NTKPerformanceRunHandle = Start-NTKPerformanceRun -Name 'gui'
+}
+if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+    [void](Add-NTKPerformanceTiming -Name 'core.startup.config-load' -DurationMs $Global:NTKCoreStartupStageStopwatch.ElapsedMilliseconds -Tags @{Stage='PathResolver';Required=$true} -Context $Global:NTKPerformanceRunContext)
+}
+$Global:NTKCoreStartupStageStopwatch.Restart()
+
 # --------------------------------------------------
 # Load Command Registry
 # --------------------------------------------------
@@ -49,6 +60,10 @@ if(!(Test-Path $NTKFiles.Registry)){
 if($NTKFiles.ToolCatalog -and (Test-Path $NTKFiles.ToolCatalog)){
     . "$($NTKFiles.ToolCatalog)"
 }
+if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+    [void](Add-NTKPerformanceTiming -Name 'core.startup.manifest-load' -DurationMs $Global:NTKCoreStartupStageStopwatch.ElapsedMilliseconds -Tags @{Stage='CommandRegistry';ToolCatalog=[bool]($NTKFiles.ToolCatalog -and (Test-Path $NTKFiles.ToolCatalog))} -Context $Global:NTKPerformanceRunContext)
+}
+$Global:NTKCoreStartupStageStopwatch.Restart()
 
 $Global:NTKImportFailures = New-Object System.Collections.Generic.List[object]
 
@@ -125,6 +140,8 @@ function Import-NTKModules {
 
 param([string]$Directory,[bool]$Required = $true)
 
+$moduleStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
 if(!(Test-Path $Directory)){
     Write-Host "Module directory missing: $Directory" -ForegroundColor Yellow
     return
@@ -151,6 +168,10 @@ foreach($file in $files){
 
 }
 
+if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+    [void](Add-NTKPerformanceTiming -Name 'core.startup.module-load' -DurationMs $moduleStopwatch.ElapsedMilliseconds -Tags @{Directory=$Directory;Required=$Required;Files=$files.Count} -Context $Global:NTKPerformanceRunContext)
+}
+
 }
 
 # --------------------------------------------------
@@ -158,6 +179,8 @@ foreach($file in $files){
 # --------------------------------------------------
 
 function Import-NTKPlugins {
+
+$pluginStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 if(!(Test-Path $NTKPaths.Plugins)){
     return
@@ -209,6 +232,10 @@ foreach($plugin in $plugins){
 
     }
 
+}
+
+if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+    [void](Add-NTKPerformanceTiming -Name 'core.startup.plugin-discovery' -DurationMs $pluginStopwatch.ElapsedMilliseconds -Tags @{PluginRoot=$NTKPaths.Plugins;Count=$plugins.Count} -Context $Global:NTKPerformanceRunContext)
 }
 
 }

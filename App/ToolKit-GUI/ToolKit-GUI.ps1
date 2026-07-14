@@ -81,7 +81,7 @@ catch {
     exit 1
 }
 
-$script:GUIPerformanceHandle = if(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue){ Start-NTKPerformanceRun -Name 'gui' }else{$null}
+$script:GUIPerformanceHandle = if($Global:NTKPerformanceRunHandle){ $Global:NTKPerformanceRunHandle }elseif(Get-Command Start-NTKPerformanceRun -ErrorAction SilentlyContinue){ $Global:NTKPerformanceRunHandle = Start-NTKPerformanceRun -Name 'gui' }else{$null}
 $script:Commands = @(Get-NTKCommands | Where-Object {$_.Name -notin @("File Utilities","Software Utilities")})
 $script:ToolkitLoadFailures = if(Get-Command Get-NTKImportFailures -ErrorAction SilentlyContinue){ @(Get-NTKImportFailures) }else{ @() }
 $script:Fingerprints = @()
@@ -108,6 +108,9 @@ $script:StaticTabStrip = $null
 $script:StartupTabBuildTimer = $null
 $script:GUITabWarmupController = $null
 $script:GUITabWarmupTimer = $null
+$script:GUITabWarmupStartRecorded = $false
+$script:GUITabWarmupCompletionRecorded = $false
+$script:GUIReadyForUserRecorded = $false
 $script:SlowTabSwitchThresholdMs = 250
 $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
@@ -5038,6 +5041,255 @@ function Open-GUISettingsPage {
     }
 }
 
+function Format-GUIPerformanceDashboardSummaryText {
+    param([object]$Model)
+
+    $lines = New-Object System.Collections.ArrayList
+    [void]$lines.Add('Performance QA Dashboard')
+    [void]$lines.Add(("Overall state: {0}" -f $Model.overallState))
+    [void]$lines.Add(("Telemetry file: {0}" -f $Model.telemetryPath))
+    if($Model.telemetryLastModifiedUtc){ [void]$lines.Add(("Telemetry last modified UTC: {0}" -f $Model.telemetryLastModifiedUtc)) }
+    if($Model.currentRun){
+        [void]$lines.Add(("Current run: {0} / {1} ms" -f $Model.currentRun.name,$Model.currentRun.elapsedMs))
+    }
+    [void]$lines.Add(("Recent runs: {0}" -f @($Model.recentRuns).Count))
+    [void]$lines.Add(("Metric groups: {0}" -f @($Model.metricSummaries).Count))
+    if($Model.dataQuality.sampleSizeWarning){
+        [void]$lines.Add(("Data quality warning: {0}" -f $Model.dataQuality.sampleSizeWarning))
+    }
+    if($Model.dataQuality.corruptTail){
+        [void]$lines.Add(("Telemetry warning: corrupt tail detected ({0} invalid line(s))." -f $Model.dataQuality.corruptLineCount))
+    }
+    if(@($Model.metricSummaries).Count -gt 0){
+        [void]$lines.Add('')
+        [void]$lines.Add('Top metrics:')
+        foreach($metric in @($Model.metricSummaries | Select-Object -First 10)){
+            $budgetState = if($metric.budgetState){ $metric.budgetState }else{ 'Unbudgeted' }
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; budget={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$budgetState))
+        }
+    }
+    return ($lines -join "`r`n")
+}
+
+function Update-GUIPerformanceDashboardView {
+    param(
+        [System.Windows.Forms.DataGridView]$Grid,
+        [System.Windows.Forms.Label]$SummaryLabel,
+        [System.Windows.Forms.RichTextBox]$ReportBox,
+        [System.Windows.Forms.Label]$StatusLabel
+    )
+
+    if(!$Grid -or !$SummaryLabel -or !$ReportBox){
+        return
+    }
+
+    try {
+        $model = Get-NTKPerformanceDashboardModel -KeepRecent 20
+        $SummaryLabel.Text = "State: $($model.overallState) | Recent runs: $(@($model.recentRuns).Count) | Metric groups: $(@($model.metricSummaries).Count)"
+        $Grid.Rows.Clear()
+        foreach($metric in @($model.metricSummaries)){
+            [void]$Grid.Rows.Add(
+                $metric.name,
+                $metric.sampleCount,
+                $metric.averageMs,
+                $metric.bestMs,
+                $metric.worstMs,
+                $metric.lastMs,
+                $metric.regressionMs,
+                $(if($metric.budgetMs -ne $null){$metric.budgetMs}else{'-' }),
+                $(if($metric.budgetState){$metric.budgetState}else{'Unbudgeted'})
+            )
+        }
+        $ReportBox.Text = Format-GUIPerformanceDashboardSummaryText -Model $model
+        if($StatusLabel){
+            $StatusLabel.Text = "Telemetry: $($model.telemetryPath)"
+        }
+    }
+    catch {
+        $SummaryLabel.Text = "Performance dashboard unavailable."
+        $ReportBox.Text = "Performance dashboard refresh failed:`r`n$($_.Exception.Message)"
+        if($StatusLabel){ $StatusLabel.Text = "Refresh failed." }
+    }
+}
+
+function Show-GUIPerformanceDashboardWindow {
+    $window = New-Object System.Windows.Forms.Form
+    $window.Text = "Network Toolkit Performance QA"
+    $window.StartPosition = "CenterParent"
+    $window.Size = New-Object System.Drawing.Size(1180,760)
+    $window.MinimumSize = New-Object System.Drawing.Size(1120,700)
+    $window.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
+    $window.BackColor = $script:GUITheme.Page
+
+    $root = New-Object System.Windows.Forms.TableLayoutPanel
+    $root.Dock = "Fill"
+    $root.Padding = New-Object System.Windows.Forms.Padding(12)
+    $root.RowCount = 5
+    $root.ColumnCount = 1
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,64))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,86))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,100))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,136))) | Out-Null
+    $root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,46))) | Out-Null
+    $window.Controls.Add($root)
+
+    $summaryPanel = New-Object System.Windows.Forms.TableLayoutPanel
+    $summaryPanel.Dock = "Fill"
+    $summaryPanel.ColumnCount = 4
+    $summaryPanel.RowCount = 2
+    $summaryPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    $summaryPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    $summaryPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    $summaryPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,25))) | Out-Null
+    $summaryPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $summaryPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $root.Controls.Add($summaryPanel,0,0)
+
+    $summaryLabel = New-Object System.Windows.Forms.Label
+    $summaryLabel.Dock = "Fill"
+    $summaryLabel.TextAlign = "MiddleLeft"
+    $summaryLabel.Font = New-Object System.Drawing.Font("Segoe UI Semibold",11,[System.Drawing.FontStyle]::Bold)
+    $summaryLabel.Text = "Loading performance telemetry..."
+    $summaryPanel.Controls.Add($summaryLabel,0,0)
+    $summaryPanel.SetColumnSpan($summaryLabel,4)
+
+    $statusLabel = New-Object System.Windows.Forms.Label
+    $statusLabel.Dock = "Fill"
+    $statusLabel.TextAlign = "MiddleLeft"
+    $statusLabel.ForeColor = $script:GUITheme.MutedText
+    $summaryPanel.Controls.Add($statusLabel,0,1)
+    $summaryPanel.SetColumnSpan($statusLabel,4)
+
+    $grid = New-Object System.Windows.Forms.DataGridView
+    $grid.Dock = "Fill"
+    $grid.ReadOnly = $true
+    $grid.AllowUserToAddRows = $false
+    $grid.AllowUserToDeleteRows = $false
+    $grid.RowHeadersVisible = $false
+    $grid.AutoSizeColumnsMode = "Fill"
+    $grid.SelectionMode = "FullRowSelect"
+    $grid.MultiSelect = $false
+    $grid.BackgroundColor = $script:GUITheme.Page
+    $grid.ColumnHeadersHeightSizeMode = "AutoSize"
+    [void]$grid.Columns.Add("Metric","Metric")
+    [void]$grid.Columns.Add("Samples","Samples")
+    [void]$grid.Columns.Add("AverageMs","Average (ms)")
+    [void]$grid.Columns.Add("BestMs","Best (ms)")
+    [void]$grid.Columns.Add("WorstMs","Worst (ms)")
+    [void]$grid.Columns.Add("LastMs","Last (ms)")
+    [void]$grid.Columns.Add("RegressionMs","Regression (ms)")
+    [void]$grid.Columns.Add("BudgetMs","Budget")
+    [void]$grid.Columns.Add("State","State")
+    $root.Controls.Add($grid,0,2)
+
+    $details = New-Object System.Windows.Forms.TextBox
+    $details.Dock = "Fill"
+    $details.Multiline = $true
+    $details.ScrollBars = "Vertical"
+    $details.ReadOnly = $true
+    $details.Font = New-Object System.Drawing.Font("Consolas",9)
+    $details.BackColor = $script:GUITheme.ConsoleBack
+    $details.ForeColor = $script:GUITheme.ConsoleText
+    $root.Controls.Add($details,0,3)
+
+    $buttonRow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $buttonRow.Dock = "Fill"
+    $buttonRow.FlowDirection = "LeftToRight"
+    $buttonRow.WrapContents = $false
+    $buttonRow.Padding = New-Object System.Windows.Forms.Padding(0,2,0,0)
+
+    $refreshButton = New-GUIButton "Refresh" { Update-GUIPerformanceDashboardView -Grid $grid -SummaryLabel $summaryLabel -ReportBox $details -StatusLabel $statusLabel }
+    $refreshButton.Width = 110
+    [void]$buttonRow.Controls.Add($refreshButton)
+
+    $exportButton = New-GUIButton "Export QA Bundle" {
+        try {
+            $bundle = Export-NTKPerformanceQABundle -IncludeTelemetry
+            Add-GUILog "Performance QA bundle exported: $($bundle.BundlePath)"
+            [System.Windows.Forms.MessageBox]::Show(
+                "Performance QA bundle exported.`r`n`r`n$($bundle.BundlePath)",
+                "Performance QA Export",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Information
+            ) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show(
+                "Export failed:`r`n$($_.Exception.Message)",
+                "Performance QA Export",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Error
+            ) | Out-Null
+        }
+    }
+    $exportButton.Width = 140
+    [void]$buttonRow.Controls.Add($exportButton)
+
+    $trimButton = New-GUIButton "Trim Telemetry" {
+        if([System.Windows.Forms.MessageBox]::Show(
+            "Trim performance telemetry to the most recent runs?`r`n`r`nOlder records outside the retention window will be removed.",
+            "Trim Performance Telemetry",
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Question
+        ) -ne [System.Windows.Forms.DialogResult]::Yes){
+            return
+        }
+        try {
+            $result = Invoke-NTKPerformanceTelemetryRetention
+            Add-GUILog "Performance telemetry trimmed: kept $($result.Kept), removed $($result.Removed)."
+            Update-GUIPerformanceDashboardView -Grid $grid -SummaryLabel $summaryLabel -ReportBox $details -StatusLabel $statusLabel
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show(
+                "Trim failed:`r`n$($_.Exception.Message)",
+                "Trim Performance Telemetry",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Error
+            ) | Out-Null
+        }
+    }
+    $trimButton.Width = 130
+    [void]$buttonRow.Controls.Add($trimButton)
+
+    $resetButton = New-GUIButton "Reset Telemetry" {
+        if([System.Windows.Forms.MessageBox]::Show(
+            "Reset performance telemetry?`r`n`r`nThis archives the current log and starts a new empty telemetry file.",
+            "Reset Performance Telemetry",
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Warning
+        ) -ne [System.Windows.Forms.DialogResult]::Yes){
+            return
+        }
+        try {
+            $result = Reset-NTKPerformanceTelemetry
+            Add-GUILog "Performance telemetry reset. Backup: $($result.BackupPath)"
+            Update-GUIPerformanceDashboardView -Grid $grid -SummaryLabel $summaryLabel -ReportBox $details -StatusLabel $statusLabel
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show(
+                "Reset failed:`r`n$($_.Exception.Message)",
+                "Reset Performance Telemetry",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Error
+            ) | Out-Null
+        }
+    }
+    $resetButton.Width = 130
+    [void]$buttonRow.Controls.Add($resetButton)
+
+    $closeButton = New-GUIButton "Close" { $window.Close() }
+    $closeButton.Width = 90
+    [void]$buttonRow.Controls.Add($closeButton)
+    $root.Controls.Add($buttonRow,0,4)
+
+    $window.Add_Shown({
+        Update-GUIPerformanceDashboardView -Grid $grid -SummaryLabel $summaryLabel -ReportBox $details -StatusLabel $statusLabel
+    })
+
+    [void]$window.ShowDialog($script:Form)
+    $window.Dispose()
+}
+
 function Resolve-GUIToolkitPath {
     param([string]$Path)
 
@@ -9400,6 +9652,10 @@ function Stop-GUITabWarmupQueue {
         try { $script:GUITabWarmupTimer.Dispose() } catch {}
         $script:GUITabWarmupTimer = $null
     }
+    if(!$script:GUITabWarmupCompletionRecorded -and (Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue) -and $script:GUIStartupStopwatch){
+        $script:GUITabWarmupCompletionRecorded = $true
+        [void](Add-NTKPerformanceTiming -Name 'gui.startup.warmup-complete' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{Queue='GUI Tab Warmup'} -Context $Global:NTKPerformanceRunContext)
+    }
     $script:GUITabWarmupController = $null
 }
 
@@ -9447,6 +9703,8 @@ function Start-GUITabWarmupQueue {
     }
 
     Stop-GUITabWarmupQueue
+    $script:GUITabWarmupStartRecorded = $false
+    $script:GUITabWarmupCompletionRecorded = $false
     $controller = New-NTKTabWarmupController -Name 'GUI Tab Warmup' -IntervalMs 100
     $items = @(Get-GUITabWarmupItems -Tabs $Tabs | Where-Object {
         $_ -and $_.Page -and !$_.Page.IsDisposed -and !$script:BuiltTabs.ContainsKey($_.Name)
@@ -9458,6 +9716,10 @@ function Start-GUITabWarmupQueue {
 
     [void](Set-NTKTabWarmupQueue -Controller $controller -Items $items)
     $script:GUITabWarmupController = $controller
+    if(!$script:GUITabWarmupStartRecorded -and (Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue) -and $script:GUIStartupStopwatch){
+        $script:GUITabWarmupStartRecorded = $true
+        [void](Add-NTKPerformanceTiming -Name 'gui.startup.warmup-start' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{Queue='GUI Tab Warmup';Count=$items.Count} -Context $Global:NTKPerformanceRunContext)
+    }
     $script:GUITabWarmupTimer = New-Object System.Windows.Forms.Timer
     $script:GUITabWarmupTimer.Interval = $controller.IntervalMs
     $script:GUITabWarmupTimer.Add_Tick({
@@ -16276,11 +16538,12 @@ function Build-SettingsPage {
 
     $maintenanceLayout = New-Object System.Windows.Forms.TableLayoutPanel
     $maintenanceLayout.Dock = "Fill"
-    $maintenanceLayout.RowCount = 7
+    $maintenanceLayout.RowCount = 8
     $maintenanceLayout.ColumnCount = 2
     $maintenanceLayout.Padding = New-Object System.Windows.Forms.Padding(12)
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $maintenanceLayout.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
+    $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
     $maintenanceLayout.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Absolute,42))) | Out-Null
@@ -16344,10 +16607,17 @@ function Build-SettingsPage {
     $maintenanceLayout.Controls.Add($transferButton,0,3)
     $maintenanceLayout.SetColumnSpan($transferButton,2)
 
+    $performanceButton = New-GUIButton "Performance & QA" { Show-GUIPerformanceDashboardWindow }
+    $performanceButton.Dock = "Fill"
+    $performanceButton.Width = 0
+    $performanceButton.Name = "SettingsPerformanceDashboardButton"
+    $maintenanceLayout.Controls.Add($performanceButton,0,4)
+    $maintenanceLayout.SetColumnSpan($performanceButton,2)
+
     $foldersLabel = New-GUILabel "Toolkit folders"
     $foldersLabel.Dock = "Fill"
     $foldersLabel.TextAlign = "MiddleLeft"
-    $maintenanceLayout.Controls.Add($foldersLabel,0,5)
+    $maintenanceLayout.Controls.Add($foldersLabel,0,6)
     $maintenanceLayout.SetColumnSpan($foldersLabel,2)
 
     $folderPanel = New-Object System.Windows.Forms.TableLayoutPanel
@@ -16359,7 +16629,7 @@ function Build-SettingsPage {
     $folderPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
     $folderPanel.RowStyles.Add((New-Object System.Windows.Forms.RowStyle([System.Windows.Forms.SizeType]::Percent,50))) | Out-Null
-    $maintenanceLayout.Controls.Add($folderPanel,0,6)
+    $maintenanceLayout.Controls.Add($folderPanel,0,7)
     $maintenanceLayout.SetColumnSpan($folderPanel,2)
 
     $logsButton = New-GUIButton "View Live Log" { Show-GUILiveLogWindow }
@@ -16426,6 +16696,7 @@ function Set-GUIFallbackButtonToolTips {
         "Key Report" = "Open the latest confidential Software Key Finder HTML report."
         "Update Toolkit" = "Select a current working toolkit and destination folder, then update the destination while preserving its client data by default."
         "Deploy Fresh Toolkit" = "Create a clean portable deployment on a USB drive or new folder, including toolkit apps but excluding client data and logs."
+        "Performance & QA" = "Open the performance dashboard from Settings without adding it to primary navigation."
         "Open Logs" = "Open the toolkit log folder for troubleshooting GUI and tool launch issues."
         "Open Reports" = "Open exported technician reports."
         "Open Temp Outputs" = "Open temporary tool output sessions."
@@ -16859,6 +17130,7 @@ function Build-Form {
     if(!$startupPage){
         $startupPage = $quickPage
     }
+    $script:GUIStartupPageName = [string]$startupPage.Text
 
     if($SmokeTest -or $ButtonSmokeTest){
         Select-GUITabPage -Page $startupPage
@@ -16875,6 +17147,9 @@ function Build-Form {
             $script:GuiTabSwitchInProgress = $false
         }
         Add-GUITabLoadingPlaceholder -Page $startupPage -Text "Loading $($startupPage.Text)..."
+        if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue -and $script:GUIStartupStopwatch){
+            [void](Add-NTKPerformanceTiming -Name 'gui.startup.default-tab-ready' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{StartupTab=$startupPage.Text} -Context $Global:NTKPerformanceRunContext)
+        }
         Update-GUIStaticTabStripSelection
         $Form.Add_Shown({
             if($script:StartupTabBuildTimer){
@@ -16897,6 +17172,10 @@ function Build-Form {
                     }
                     Start-GUITabWarmupQueue -Tabs $script:MainTabs
                     Update-GUIWifiIndicators
+                    if(!$script:GUIReadyForUserRecorded -and (Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue) -and $script:GUIStartupStopwatch){
+                        $script:GUIReadyForUserRecorded = $true
+                        [void](Add-NTKPerformanceTiming -Name 'gui.startup.ready-for-user' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{StartupTab=$(if($script:MainTabs -and $script:MainTabs.SelectedTab){$script:MainTabs.SelectedTab.Text}else{$script:GUIStartupPageName})} -Context $Global:NTKPerformanceRunContext)
+                    }
                 }
                 catch {
                     Add-GUILog "Deferred startup tab build failed: $($_.Exception.Message)"
@@ -16908,6 +17187,9 @@ function Build-Form {
         })
     }
     Enable-GUIDoubleBuffering -Control $Form
+    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue -and $script:GUIStartupStopwatch){
+        [void](Add-NTKPerformanceTiming -Name 'gui.startup.static-ui' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{Stage='FormAndTabs'} -Context $Global:NTKPerformanceRunContext)
+    }
 }
 
 Register-GUIExceptionHandlers
@@ -17047,6 +17329,20 @@ if($ButtonSmokeTest){
             exit 1
         }
 
+    }
+
+    if($script:MainTabs.TabPages | Where-Object { $_.Text -eq "Performance & QA" }){
+        Write-Host "Performance dashboard was added to the primary tab strip."
+        exit 1
+    }
+
+    $settingsTab = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Settings" } | Select-Object -First 1
+    if($script:BuiltTabs.ContainsKey("Settings")){ [void]$script:BuiltTabs.Remove("Settings") }
+    $settingsTab.Controls.Clear()
+    Build-GUITabIfNeeded -Page $settingsTab
+    if(@($settingsTab.Controls.Find("SettingsPerformanceDashboardButton",$true)).Count -ne 1){
+        Write-Host "Settings performance dashboard button missing."
+        exit 1
     }
 
     $analyzeTab = $script:MainTabs.TabPages | Where-Object { $_.Text -eq "Analyze" } | Select-Object -First 1

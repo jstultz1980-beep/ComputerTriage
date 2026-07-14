@@ -10,7 +10,8 @@ param(
     [string]$WindowStyle = "Normal",
     [switch]$Elevated,
     [switch]$Wait,
-    [switch]$PassThru
+    [switch]$PassThru,
+    [int]$RetryCount = 0
 )
 
     if(!$FilePath){
@@ -44,7 +45,34 @@ param(
         $startInfo.PassThru = $true
     }
 
-    Start-Process @startInfo
+    $trackLaunchTiming = Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue
+    if($trackLaunchTiming -and (!$PassThru -or $Wait)){
+        $startInfo.PassThru = $true
+    }
+
+    $watch = [System.Diagnostics.Stopwatch]::StartNew()
+    $process = Start-Process @startInfo
+    $watch.Stop()
+
+    if($trackLaunchTiming){
+        $exitCode = $null
+        $executionMs = $null
+        $outcome = 'Success'
+        if($process -and $process.PSObject.Properties['HasExited'] -and $process.HasExited){
+            try { $exitCode = [int]$process.ExitCode } catch {}
+            $executionMs = $watch.ElapsedMilliseconds
+            if($exitCode -ne $null -and $exitCode -ne 0){
+                $outcome = 'Failure'
+            }
+            [void](Add-NTKPerformanceTiming -Name 'external-tool.execution' -DurationMs ([long]$executionMs) -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;ExitCode=$exitCode;RetryCount=$RetryCount;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated} -Outcome $outcome)
+        }
+
+        [void](Add-NTKPerformanceTiming -Name 'external-tool.launch' -DurationMs ([long]$watch.ElapsedMilliseconds) -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated;RetryCount=$RetryCount;ExitCode=$exitCode;ExecutionMs=$executionMs} -Outcome $outcome)
+    }
+
+    if($PassThru){
+        return $process
+    }
 
 }
 

@@ -58,6 +58,51 @@ try {
     Assert-True ($retry.State -eq 'Available' -and $script:failures -eq 2) 'Provider failure leaked across run scope.'
     [void](Complete-NTKPerformanceRun -Handle $retryHandle -ResultPath (Join-Path $root 'retry-result.json'))
 
+    $qaHandle = Start-NTKPerformanceRun -Name 'qa-dashboard-fixture'
+    [void](Add-NTKPerformanceTiming -Name 'gui.startup.shell' -DurationMs 12 -Tags @{SmokeTest=$true})
+    [void](Add-NTKPerformanceTiming -Name 'gui.startup.ready-for-user' -DurationMs 18 -Tags @{StartupTab='Quick Diagnosis'})
+    [void](Add-NTKPerformanceTiming -Name 'external-tool.launch' -DurationMs 7 -Tags @{FilePath='tool.exe';RetryCount=0;ExitCode=0})
+    [void](Complete-NTKPerformanceRun -Handle $qaHandle -ResultPath (Join-Path $root 'qa-result.json'))
+
+    $telemetryPath = Get-NTKPerformanceTelemetryPath
+    if(!(Test-Path -LiteralPath (Split-Path -Parent $telemetryPath))){
+        New-Item -ItemType Directory -Path (Split-Path -Parent $telemetryPath) -Force | Out-Null
+    }
+    $qaSummary = [pscustomobject]@{
+        schemaVersion = '1.0'
+        runId = 'qa-fixture'
+        name = 'qa-dashboard-fixture'
+        startedAtUtc = [datetimeoffset]::UtcNow.AddMinutes(-1).ToString('o')
+        completedAtUtc = [datetimeoffset]::UtcNow.ToString('o')
+        durationMs = 30
+        timings = @(
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.shell'; eventCategory='gui'; operationName='startup'; stageName='shell'; outcome='Success'; durationMs=12; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='WithinBudget'; tags=[pscustomobject]@{SmokeTest=$true} },
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.ready-for-user'; eventCategory='gui'; operationName='startup'; stageName='ready-for-user'; outcome='Success'; durationMs=18; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='WithinBudget'; tags=[pscustomobject]@{StartupTab='Quick Diagnosis'} }
+        )
+        providerHealth = @()
+        observationCount = 0
+        toolkitVersion = [pscustomobject]@{ Version = '1.0.0'; Build = 20260714133102 }
+        sourceCommit = 'deadbeef'
+        environmentFingerprint = [pscustomobject]@{ fingerprintId = 'fixture'; computerName = $env:COMPUTERNAME }
+    }
+    Set-Content -LiteralPath $telemetryPath -Value ($qaSummary | ConvertTo-Json -Depth 20 -Compress) -Encoding UTF8
+    Add-Content -LiteralPath $telemetryPath -Value '{' -Encoding UTF8
+
+    $telemetry = Read-NTKPerformanceTelemetry -Path $telemetryPath
+    Assert-True ($telemetry.Records.Count -eq 1 -and $telemetry.CorruptTail) 'Telemetry reader did not tolerate a corrupt tail record.'
+
+    $history = Get-NTKPerformanceRunHistory -Path $telemetryPath -KeepRecent 5
+    Assert-True ($history.Runs.Count -eq 1 -and $history.Runs[0].timings.Count -eq 2) 'Performance history did not parse the preserved run.'
+
+    $model = Get-NTKPerformanceDashboardModel -KeepRecent 5
+    Assert-True ($model.metricSummaries.Count -ge 2) 'Dashboard model did not summarize telemetry.'
+
+    $retention = Invoke-NTKPerformanceTelemetryRetention -Path $telemetryPath -KeepRecentRuns 1 -MaxAgeDays 30
+    Assert-True ($retention.Changed -and $retention.Kept -eq 1) 'Telemetry retention did not preserve the most recent run.'
+
+    $bundle = Export-NTKPerformanceQABundle -OutputRoot (Join-Path $root 'Exports') -IncludeTelemetry
+    Assert-True ((Test-Path -LiteralPath $bundle.BundlePath) -and (Test-Path -LiteralPath $bundle.SummaryPath) -and (Test-Path -LiteralPath $bundle.ReportPath)) 'Performance QA bundle export failed.'
+
     $cold = Invoke-GuiPerformanceProbe -ResultPath (Join-Path $root 'gui-cold.json')
     $warm = Invoke-GuiPerformanceProbe -ResultPath (Join-Path $root 'gui-warm.json')
     Assert-True ($cold.ElapsedMs -le (Get-NTKPerformanceBudgetMs -Name 'gui.process.cold')) "Cold GUI process exceeded budget: $($cold.ElapsedMs) ms."
