@@ -1,39 +1,36 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0120
+HANDOFF-0121
 
 ## Current Task
-TASK-0080-Release-Candidate-Validation-And-Documentation
+None - engineering work complete
 
 ## Current Owner
-ChatGPT (Project Custodian)
+User
 
 ## Next Owner
-The user for explicit release/publication authorization after the Project Custodian accepts or rejects release readiness.
+ChatGPT (Project Custodian) only when the user authorizes release execution, requests a new planning cycle, or records another decision requiring repository work.
 
 ## Objective
-Decide final release readiness for the clean full production image, then authorize or decline tagging, publication, or distribution.
+Await explicit user authorization for Version 1.0 tagging, GitHub Release publication, or distribution.
 
 ## Source Of Truth
-The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
+The repository is authoritative. No engineering task is Active or queued at this user-only release boundary.
 
 ## Current Project State
 - TASK-0097 through TASK-0100 are complete.
 - TASK-0110 resolved accepted Task System consistency debt.
 - TASK-0111 completed fail-closed long-path mutable-tree cleanup and independently verified the clean full production image.
-- TASK-0112 added queued warm-up, per-stage timing, and focused cold-tab validation.
+- TASK-0112 completed cold-tab initialization performance remediation.
 - TASK-0112 canonical repository validation passed 20 of 20 stages.
-- TASK-0112 is complete.
-- TASK-0080 is the sole Active Project Custodian task at the release-readiness boundary.
-- No implementation task remains queued behind TASK-0080.
-- No tag, publication, or distribution is authorized.
-- Net-new features, helper frameworks, and native replacements remain deferred.
+- TASK-0080 accepted the verified release candidate as release-ready and is complete.
+- No implementation task remains Active or queued.
+- Tagging, GitHub Release publication, and distribution remain explicit user-authorized external actions.
+- Net-new features, helper frameworks, and native replacements remain deferred until a new approved planning cycle.
 
-## Active Task Scope
-`TASK-0080-Release-Candidate-Validation-And-Documentation`
-
-The Project Custodian must review the TASK-0112 remediation evidence, decide final release readiness, and either accept the clean package or activate a new focused remediation. Codex must not implement further work until a new focused task is activated.
+## Release Readiness Decision
+Version 1.0 is accepted as engineering-ready and repository-ready. The Project Custodian has completed the final readiness decision. No release action has been executed automatically.
 
 ## Audit Counters
 
@@ -69,12 +66,12 @@ Do not stage or clean unless a focused task explicitly owns it:
 None.
 
 ## Decision Reference
-- `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
 - `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
+- `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
 - `docs/REVIEWS/TASK-0080/RELEASE-CANDIDATE-VALIDATION.md`
 - `docs/TASKS/TASK-0111-Long-Path-Mutable-Tree-Cleanup.md`
 
 ## Next Bot Prompt
 ```text
-Continue
+Await User Decision
 ```
