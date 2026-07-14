@@ -1,38 +1,39 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0124
+HANDOFF-0125
 
 ## Current Task
-None - Version 1.0 release closed
+TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard
 
 ## Current Owner
-User
+Codex
 
 ## Next Owner
-ChatGPT (Project Custodian) when the user authorizes a new planning cycle, requests review of the feature-request list, or reports a release defect requiring triage.
+ChatGPT (Project Custodian) after TASK-0114 completes focused and canonical validation and provides objective real-world performance QA evidence.
 
 ## Objective
-Preserve the published Version 1.0 release state and await explicit direction for the next approved planning cycle.
+Add unbiased, persistent performance instrumentation and automated QA reporting for real-world testing, with the Performance Dashboard accessible only from the Settings page.
 
 ## Source Of Truth
-The repository is authoritative. No engineering task is Active or queued at this closeout boundary.
+The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0097 through TASK-0100 are complete.
-- TASK-0110 resolved accepted Task System consistency debt.
-- TASK-0111 completed fail-closed long-path mutable-tree cleanup and independently verified the clean full production image.
-- TASK-0112 completed cold-tab initialization performance remediation and canonical validation passed 20 of 20 stages.
-- TASK-0080 accepted the verified release candidate as release-ready and is complete.
-- TASK-0113 published Version 1.0 as `v1.0.0` and recorded the release metadata.
-- The published tag points to accepted commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
-- The GitHub Release includes the verified production manifest asset.
-- Project Custodian release closeout is confirmed.
-- No implementation task remains Active or queued.
-- New feature work, helper frameworks, native replacements, and Version 1.1 planning remain deferred until a new approved planning cycle.
+- Version 1.0 is published as `v1.0.0` from accepted commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
+- Release publication and Project Custodian closeout are complete.
+- The user authorized a focused performance QA instrumentation cycle before formal real-world QA review.
+- TASK-0100 already provides performance telemetry and run-scoped observations.
+- TASK-0112 already provides cold-tab warm-up and per-stage tab timing.
+- TASK-0114 must extend those contracts rather than create a competing framework.
+- TASK-0114 is the sole Active Codex task.
+- The Performance Dashboard must be accessible only from Settings and must not appear in primary navigation.
+- The published Version 1.0 tag and release artifacts must remain unchanged.
+- Unrelated features, helper frameworks, native replacements, and broad UI redesign remain deferred.
 
-## Release Closeout Decision
-Version 1.0 publication is accepted as complete. The tag, release URL, accepted commit, attached manifest, checksum, and publication timestamp are recorded in `docs/REVIEWS/TASK-0113/RELEASE-PUBLICATION-RECORD.md` and `docs/TASKS/TASK-0113-Version-1.0-Release-Publication.md`.
+## Active Task Scope
+`TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard`
+
+Codex must add launch-through-`ReadyForUser` timing, normalized cold/warm tab and operation timing, toolkit-controlled external-tool timing, bounded resource telemetry, automated QA analysis, export, and a Settings-only Performance Dashboard. Timing must use a monotonic duration source; telemetry must be bounded, append-safe, privacy-conscious, and low overhead. Codex must preserve PowerShell 5.1 behavior, current lifecycle/cancellation semantics, the published release, and unrelated drift.
 
 ## Audit Counters
 
@@ -41,15 +42,15 @@ Version 1.0 publication is accepted as complete. The tag, release URL, accepted 
 | Repository Governance | 15 / 25 | No |
 | Architecture | 19 / 25 | No |
 | Documentation | 24 / 25 | No |
-| Task System | 8 / 25 | No |
+| Task System | 9 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 5 / 25 | No |
-| UI | 5 / 25 | No |
+| UI | 6 / 25 | No |
 | Plugin Framework | 6 / 25 | No |
 | Build System | 8 / 25 | No |
-| Validation/Test Framework | 15 / 25 | No |
-| Roadmap/Backlog | 11 / 25 | No |
+| Validation/Test Framework | 16 / 25 | No |
+| Roadmap/Backlog | 12 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -68,12 +69,12 @@ Do not stage or clean unless a focused task explicitly owns it:
 None.
 
 ## Decision Reference
-- `docs/TASKS/TASK-0113-Version-1.0-Release-Publication.md`
-- `docs/REVIEWS/TASK-0113/RELEASE-PUBLICATION-RECORD.md`
-- `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
+- `docs/TASKS/TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard.md`
+- `docs/TASKS/TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache.md`
 - `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
+- `docs/GOVERNANCE/HANDOFF-STATE-AND-FINGERPRINT-PROTOCOL.md`
 
 ## Next Bot Prompt
 ```text
-Await User Direction
+Resume Work
 ```
