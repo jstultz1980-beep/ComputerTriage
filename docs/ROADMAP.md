@@ -4,23 +4,24 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Release-Candidate Validation
+## Current Phase - Version 1.0 Release Authorization
 
-Status: Active
+Status: Engineering complete; awaiting explicit user authorization for tagging, publication, or distribution.
 
 Current Active task:
-- `TASK-0080-Release-Candidate-Validation-And-Documentation`
+- None.
 
 Current objective:
-- Review the TASK-0112 remediation evidence and decide final release readiness.
-- Authorize or decline tagging, publication, or distribution for the verified package.
+- Preserve the verified Version 1.0 candidate.
+- Await explicit user authorization for release execution.
+- Begin no new implementation until a new planning cycle is approved.
 
-## Remaining Sequence
+## Completed Release Sequence
 
 1. **TASK-0112 - Cold Tab Initialization Performance Remediation**
    - Completed. The release-blocking cold-tab initialization latency was remediated and validated.
 2. **TASK-0080 - Release-Candidate Validation and Documentation**
-   - Project Custodian final release-readiness decision after TASK-0112 evidence passes.
+   - Completed. The Project Custodian accepted the verified candidate as release-ready.
 
 ## Release-Candidate Entry Criteria
 
@@ -34,9 +35,11 @@ Current objective:
 - Technician-visible normal navigation is responsive on representative hardware.
 - Known limitations and operational guidance are documented.
 
+All entry criteria are accepted for Version 1.0 engineering readiness.
+
 ## Deferred Work
 
-Net-new features, external-tool helper frameworks, native replacements, and other expansion remain deferred until Version 1.0 reaches the original project goal or an active roadmap task explicitly authorizes them.
+Net-new features, external-tool helper frameworks, native replacements, and other expansion remain deferred until a new approved planning cycle begins.
 
 ## Historical Record
 
