@@ -12,13 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| _None_ | _None_ | _None_ | Engineering work is complete; release publication requires explicit user authorization. |
+| `TASK-0113-Version-1.0-Release-Publication` | Codex | Active | Execute the explicitly authorized Version 1.0 tag, GitHub Release publication, artifact verification, and release record closeout. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| _None_ | _None_ | _None_ | No implementation task is queued. |
+| _None_ | _None_ | _None_ | No implementation task is queued behind release publication. |
 
 ## Recently Completed
 
@@ -34,8 +34,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- TASK-0112 completed the cold-tab initialization performance remediation.
-- TASK-0080 accepted the verified candidate as release-ready and is complete.
-- No engineering task is Active or queued.
-- Tagging, GitHub Release publication, and distribution require explicit user authorization.
-- Net-new feature work remains deferred until the next approved planning cycle.
+- The user explicitly authorized Version 1.0 release execution.
+- TASK-0113 is the sole Active Codex task.
+- Codex must synchronize with the authoritative cloud branch before release execution.
+- Tagging, GitHub Release publication, and verified artifact attachment are authorized within TASK-0113.
+- New feature work and Version 1.1 planning remain deferred until release publication is closed out.
