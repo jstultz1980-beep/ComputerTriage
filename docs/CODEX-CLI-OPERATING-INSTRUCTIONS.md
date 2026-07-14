@@ -102,6 +102,8 @@ When any subsystem reaches `25 / 25` at a task boundary:
 
 Codex stops when the sole Active task is owned by ChatGPT/Project Custodian. The user then tells ChatGPT `Continue`. After the Project Custodian pushes the decision and activates a Codex task, the user tells Codex `Resume Work`.
 
+The timestamped handoff block is mandatory in the final visible Codex chat response before stopping at every Project Custodian boundary. A repository update or terminal-only timestamp does not satisfy the handoff protocol.
+
 Use the timestamped handoff protocol in `PROJECT.md` to determine which idle chat contains the newest handoff. If chat messages conflict with repository task ownership, the repository remains authoritative.
 
 ## User-Only Decisions
@@ -128,20 +130,24 @@ Commit and push the blocker report, then stop at the Project Custodian boundary.
 
 At a stop boundary report synchronized starting commit, tasks completed, resulting commits, files changed, validation, current/next owner, counters, preserved drift, and the reason for stopping.
 
-The summary must end with a current UTC handoff timestamp followed by exactly one final operator instruction, with no text after it.
+The summary must visibly end in the Codex chat display with a current Central Time handoff timestamp followed by exactly one final operator instruction, with no text after it. Use the `America/Chicago` time zone and the correct `CDT` or `CST` abbreviation. Do not use UTC.
 
 For a non-blocked stop boundary:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
+
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
 
 For a genuine blocker recorded and pushed through `docs/ERROR-HANDOFF.md`:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either final instruction. The operator instruction remains the final line.
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
+
+Do not paraphrase either final instruction. The timestamp and operator instruction must both be visible in the final Codex response, and the operator instruction remains the final line.
