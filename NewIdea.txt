@@ -1,0 +1,287 @@
+You are working inside an existing administrative toolbox project. Review the repository, current roadmap, architecture, task queue, feature requests, scripts, documentation, and governance files before proposing or implementing changes.
+
+I want you to evaluate and incorporate the following administrative utilities into the toolbox:
+
+1. Secure Channel Repair
+2. Disk Health Audit
+3. Windows Update Health
+4. Event Log Summarizer
+5. Microsoft 365 administration utilities
+6. Hyper-V administration utilities
+7. Network administration utilities, including a firewall rule tester
+
+Do not assume these are all new ideas. The project may already contain complete, partial, planned, renamed, or overlapping implementations.
+
+For every requested utility:
+
+* Search the entire repository for existing scripts, modules, feature requests, roadmap entries, task records, documentation, tests, and related functionality.
+* Identify exact overlaps, partial overlaps, dependencies, and conflicting approaches.
+* Compare the existing project approach with the proposed evaluator-driven approach below.
+* Preserve the stronger design where the existing implementation is better.
+* Adopt the proposed approach where it improves safety, consistency, diagnostics, usability, or maintainability.
+* Merge redundant ideas rather than creating duplicate tools.
+* Do not delete or replace existing working functionality without documenting why and preserving a rollback path.
+* Record newly accepted work as properly scoped feature requests or tasks in the correct roadmap phase.
+* Follow the repository’s existing governance, naming, ownership, audit, handoff, testing, and documentation standards.
+* Keep PowerShell compatibility aligned with the project’s established requirements, especially PowerShell 5.1 if that is the current baseline.
+
+Use this common workflow where appropriate:
+
+Evaluator
+→ Audit
+→ Repair or guided remediation
+→ Verification
+→ Report
+
+The evaluator must determine whether the tool can safely continue before making changes. It should inspect prerequisites, permissions, platform role, required services, dependencies, connectivity, configuration, and environmental constraints.
+
+The audit must be read-only and should clearly distinguish:
+
+* Healthy
+* Warning
+* Repair required
+* Unable to determine
+* Blocked
+
+Repairs must be optional, narrowly scoped, logged, reversible where practical, and followed by verification.
+
+Reports should use a consistent output structure and include:
+
+* Computer or tenant context
+* Evaluation result
+* Audit findings
+* Actions performed
+* Verification result
+* Remaining warnings
+* Recommended next action
+* Exit code
+* Log or export location
+
+Evaluate the following feature areas.
+
+## Secure Channel Repair
+
+Potential capabilities:
+
+* Detect domain membership
+* Test the machine trust relationship
+* Identify the current domain and preferred domain controller
+* Validate DNS before attempting repair
+* Check time synchronization and Kerberos prerequisites
+* Test connectivity to required domain services
+* Detect whether the local machine password or secure channel is broken
+* Attempt safe repair using supported Windows methods
+* Support alternate credentials without exposing them
+* Re-test the secure channel after repair
+* Distinguish DNS, firewall, time, replication, credential, and trust failures
+* Avoid removing and rejoining the domain unless explicitly approved and no safer repair works
+
+## Disk Health Audit
+
+Potential capabilities:
+
+* Local disk inventory
+* Volume capacity and low-space thresholds
+* Physical disk health
+* SMART or reliability data where supported
+* Storage Spaces status
+* RAID or vendor data where available
+* NTFS dirty-bit status
+* File-system errors
+* BitLocker status
+* Pending reboot indicators related to disk repair
+* Relevant disk, NTFS, StorPort, controller, and bad-block events
+* Checkpoint, VHDX, or dynamically expanding disk concerns where relevant
+* Read-only audit by default
+* Safe remediation recommendations rather than automatically running destructive disk repairs
+
+## Windows Update Health
+
+Potential capabilities:
+
+* Windows Update service status and startup configuration
+* BITS, Cryptographic Services, and related dependencies
+* Pending reboot detection
+* Installed update history
+* Recent failed updates
+* WSUS, Microsoft Update, Intune, or policy source detection
+* Windows Update policy conflicts
+* Update cache health
+* Delivery Optimization state
+* Component store health indicators
+* Reset or repair actions only when justified
+* Post-repair scan verification
+* Clear distinction between scan failure, download failure, installation failure, policy restriction, and reboot pending
+
+## Event Log Summarizer
+
+Potential capabilities:
+
+* Configurable time range
+* Local or remote computer support
+* Relevant administrative logs
+* Group repeated events by provider, event ID, message pattern, and likely root cause
+* Suppress known noise without hiding important failures
+* Correlate events across System, Application, security-related, servicing, update, Hyper-V, DNS, DHCP, Active Directory, storage, and networking logs
+* Rank issues by severity, frequency, recency, and probable operational impact
+* Produce both a concise summary and detailed evidence
+* Preserve timestamps, event IDs, providers, and source logs
+* Avoid pretending that correlation proves causation
+* Export machine-readable and human-readable reports
+
+## Microsoft 365 Utilities
+
+Evaluate the project for existing Microsoft 365, Entra ID, Exchange Online, Teams, SharePoint, OneDrive, licensing, security, and compliance tools.
+
+Potential utilities include:
+
+* Tenant connection and prerequisite evaluator
+* Required module and permission validation
+* Tenant summary
+* License inventory and utilization
+* Unlicensed or incorrectly licensed users
+* MFA and authentication-method reporting
+* Conditional Access summary
+* Legacy authentication exposure
+* Privileged role membership
+* Stale users and guests
+* Shared mailbox audit
+* Mailbox forwarding and inbox-rule audit
+* Distribution groups and Microsoft 365 groups
+* External sharing review
+* OneDrive and SharePoint storage usage
+* Teams configuration and licensing review
+* Domain and DNS configuration checks
+* Entra Connect or cloud sync health
+* Service health and message-center summaries
+* Application registrations and credential-expiration audit
+* Secure export with redaction
+* GDAP and delegated administration awareness where applicable
+
+Do not create one monolithic Microsoft 365 script. Organize capabilities into focused modules or utilities with a shared connection, logging, permission, and reporting framework.
+
+## Hyper-V Utilities
+
+Potential utilities include:
+
+* Host health evaluator
+* Hyper-V role, service, and management-tool checks
+* VM inventory
+* VM state and resource summary
+* Checkpoint age and checkpoint sprawl audit
+* VHD/VHDX inventory and orphan detection
+* Dynamically expanding disk growth risk
+* Storage capacity and path validation
+* Virtual switch and VLAN configuration audit
+* VM network-adapter consistency
+* Integration services status
+* Guest time synchronization configuration
+* Replication health
+* Cluster awareness where applicable
+* Automatic start and stop action audit
+* Memory and CPU allocation review
+* VM configuration-version review
+* Backup and checkpoint conflict detection
+* Safe remediation recommendations
+* No automatic checkpoint deletion, disk merge, VM shutdown, or storage modification without explicit approval
+
+## Network Utilities
+
+Evaluate existing tools before adding anything new.
+
+Potential utilities include:
+
+* NIC configuration validator
+* Duplicate IP and subnet conflict checks
+* DNS resolution tester
+* Default gateway tester
+* Route-table analyzer
+* Port connectivity tester
+* SMB readiness tester
+* RDP readiness tester
+* WinRM health checker
+* VPN client health
+* Printer connectivity audit
+* MTU and fragmentation tester
+* DHCP lease and option validator
+* VLAN consistency checks
+* Public IP and egress path detection
+* Proxy and WinHTTP configuration audit
+* Network profile and Windows Firewall state
+* Packet-loss and latency sampling
+* Name-resolution path comparison
+* Multi-interface routing and metric audit
+
+## Firewall Rule Tester
+
+Treat this as a focused feature, not merely a port scanner.
+
+Potential capabilities:
+
+* Accept source, destination, protocol, port, and direction
+* Test local Windows Firewall rules
+* Identify matching allow and block rules
+* Evaluate profile applicability: Domain, Private, and Public
+* Evaluate enabled state, direction, protocol, port, program, service, interface type, remote address, and local address
+* Detect explicit block rules that override expected access
+* Show whether the failure appears local, remote, routing-related, DNS-related, service-related, or upstream
+* Check whether the target service is actually listening
+* Test TCP and UDP appropriately without claiming UDP success from the absence of an error
+* Support remote Windows hosts where permissions allow
+* Compare configured rules with observed connectivity
+* Explain which rule likely allowed or blocked traffic
+* Include Windows Firewall logging status and relevant dropped-packet evidence
+* Support read-only testing by default
+* Require explicit approval before creating, changing, enabling, or deleting firewall rules
+* Log before-and-after state for any approved rule modification
+* Never create broad “Any/Any” rules as an automatic fix
+
+## Required comparison output
+
+Before implementation, produce a repository-grounded comparison matrix with these columns:
+
+* Requested capability
+* Existing project component
+* Existing status
+* Existing approach
+* Proposed evaluator-driven approach
+* Overlap level
+* Recommended disposition
+* Required changes
+* Risk
+* Dependencies
+* Proposed roadmap phase or task
+
+Use these disposition values:
+
+* Keep existing
+* Enhance existing
+* Merge
+* Rename or re-scope
+* Replace with migration plan
+* Add as new
+* Defer
+* Reject
+
+After the comparison, update the project documentation and task system according to existing governance. Do not create duplicate feature requests for capabilities already represented.
+
+Prioritize architecture, shared framework work, and reusable components before creating many standalone scripts. Likely shared components include:
+
+* Administrative privilege checks
+* Prerequisite evaluation
+* Local and remote execution
+* Common logging
+* Structured findings
+* Exit codes
+* Safe repair confirmation
+* Redaction
+* HTML, JSON, CSV, and text reporting
+* Event-log collection
+* Connectivity testing
+* Credential handling
+* Post-repair verification
+* PowerShell 5.1 compatibility tests
+
+Complete as much repository analysis and planning as possible without asking me routine design questions. Make reasonable decisions using the existing project standards. Escalate only decisions that are destructive, security-sensitive, architecturally irreversible, or genuinely ambiguous.
+
+Do not begin broad implementation until the redundancy comparison, architecture impact, roadmap placement, and task decomposition are documented.
