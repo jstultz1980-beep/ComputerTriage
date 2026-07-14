@@ -12,34 +12,29 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Active | Decide release readiness and focused remediation after Codex completed the final evidence gate. |
+| `TASK-0111-Long-Path-Mutable-Tree-Cleanup` | Codex | Active | Implement fail-closed, long-path-capable mutable-tree cleanup and reverify the full production image. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| - | None | - | No task remains queued behind the Active release-candidate gate. |
+| 1 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Queued | Make the final release-readiness decision after TASK-0111 passes full-image verification. |
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
 | `TASK-0100-Performance-Instrumentation-And-Run-Scoped-Observation-Cache` | Complete | Added structured timings, explicit budgets, run-scoped observations/provider health, and cold/warm baselines. |
-| `TASK-0099-Repository-Wide-Validation-Foundation` | Complete | Added the canonical 5.1 parser, load, negative-path, package, artifact, and regression gate; 17 stages pass. |
+| `TASK-0099-Repository-Wide-Validation-Foundation` | Complete | Added the canonical 5.1 parser, load, negative-path, package, and regression gate; 17 stages pass. |
 | `TASK-0098-Shared-Reporting-And-Run-Index-Contracts` | Complete | Added canonical report metadata and escaping plus immutable run/artifact indexing with explicit stale and missing state. |
 | `TASK-0110-Task-System-Consistency-Cleanup` | Complete | Resolved accepted identity, status, Error Handoff, supersession, and punch-list consistency debt. |
 | `TASK-0109-Project-Custodian-Task-System-Engineering-Audit` | Complete | Accepted the Task System audit, reset only Task System, recorded six debt dispositions, and activated TASK-0110. |
-| `TASK-0108-Task-System-Audit-Preparation` | Complete | Prepared Task System threshold evidence, preserved the `25 / 25` counter, and transferred review to TASK-0109. |
-| `TASK-0097-Architecture-Terminology-And-Governance-Consolidation` | Complete | Reconciled canonical references, removed stale competing sequence text, and passed all required governance simulations. |
-| `TASK-0096-GUI-Background-Operation-Controller-Extraction` | Complete | Added a shared background lifecycle controller and migrated Analyze and Triage with leak and terminal-state validation. |
 
 ## Current Decision
 
-- TASK-0100 is complete and the TASK-0080 canonical repository validation gate passes 18 stages with zero failures.
-- Codex completed TASK-0080 execution and transferred the sole Active task to the Project Custodian for the release decision.
-- The full 6.72 GB package built, but independent verification rejected four surviving long-path LibreOffice files under a mutable `Data` tree.
-- No tag, publication, or distribution is recommended until focused remediation or written risk acceptance.
-- No implementation task remains queued behind TASK-0080.
-- TASK-0109 accepted the TASK-0108 evidence package.
-- Only Task System was reset from `25 / 25` to `0 / 25`.
+- The Project Custodian rejected risk acceptance for the four surviving long-path LibreOffice files.
+- TASK-0111 is the sole Active Codex task.
+- TASK-0111 must make mutable-tree cleanup long-path capable and fail closed, add focused validation, rebuild the full image, and pass independent verification.
+- TASK-0080 remains queued as the final Project Custodian release-readiness boundary.
+- No tag, publication, or distribution is authorized until TASK-0080 is accepted.
 - Net-new feature work remains deferred.
