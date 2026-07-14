@@ -4,22 +4,24 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Release-Candidate Validation
+## Current Phase - Release-Candidate Remediation
 
 Status: Active
 
 Current Active task:
-- `TASK-0080-Release-Candidate-Validation-And-Documentation`
+- `TASK-0111-Long-Path-Mutable-Tree-Cleanup`
 
 Current objective:
-- Project Custodian disposition of the full-package LibreOffice mutable-data cleanup failure.
-- Focused remediation and a new full-image verification, or explicit written risk acceptance.
-- Release-readiness decision before any tag, publication, or distribution.
+- Make declared mutable-tree cleanup long-path capable and fail closed.
+- Add focused regression coverage for the LibreOffice long-path condition.
+- Build and independently verify a clean full production image.
 
 ## Remaining Sequence
 
-1. **TASK-0080 - Release-Candidate Validation and Documentation**
-   - Codex evidence and documentation are complete; Project Custodian release decision is Active.
+1. **TASK-0111 - Long-Path Mutable Tree Cleanup**
+   - Resolve the release-blocking package-cleanup defect and produce passing full-image verification evidence.
+2. **TASK-0080 - Release-Candidate Validation and Documentation**
+   - Project Custodian final release-readiness decision after remediation.
 
 ## Release-Candidate Entry Criteria
 
@@ -27,6 +29,7 @@ Current objective:
 - Every High finding is resolved or explicitly accepted in writing.
 - Evidence, result, collection, ARGUS, operation, deployment, tool-trust, sensitive-data, reporting, and run-identity contracts are validated.
 - Repository-wide validation gates pass.
+- Full production image verification passes with no mutable application data.
 - Package/update rollback and external-tool provenance are validated.
 - Performance budgets are measured and accepted.
 - Known limitations and operational guidance are documented.
