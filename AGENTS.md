@@ -51,23 +51,27 @@ Routine engineering choices, refactoring, audit recommendations, task sequencing
 
 Follow the timestamped handoff protocol in `PROJECT.md`.
 
-Every Codex stop-boundary summary must end with a current UTC timestamp followed by exactly one final operator instruction, with no text after it.
+Every Codex stop-boundary summary must visibly print the current Central Time timestamp in the chat display immediately before exactly one final operator instruction. A timestamp written only to a repository file does not satisfy this rule.
 
-For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, use exactly:
+Use the `America/Chicago` time zone and the correct daylight abbreviation:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
+
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
 
 For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, use exactly:
 
 ```text
-Handoff Timestamp: YYYY-MM-DDTHH:mm:ssZ
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either instruction. The operator instruction remains the final line.
+Use `CST` instead of `CDT` when Central Standard Time is in effect.
+
+Do not use UTC. Do not paraphrase either instruction. The timestamp and operator instruction must both be visible in the final Codex response, and the operator instruction remains the final line.
 
 ## Non-Interruption
 
