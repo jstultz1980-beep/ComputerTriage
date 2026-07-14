@@ -9,6 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 $sourceRoot = $PSScriptRoot
 . (Join-Path $sourceRoot 'DeploymentIntegrity.ps1')
+. (Join-Path $sourceRoot 'PackageCleanup.ps1')
 $launcherRoot = Split-Path -Parent $sourceRoot
 $DestinationRoot = if($DestinationRoot){$DestinationRoot}else{Join-Path $sourceRoot "Release"}
 if([string]::IsNullOrWhiteSpace($PackageName) -or $PackageName -match '[\\/:*?"<>|]'){
@@ -110,8 +111,7 @@ foreach($relativePath in @('Data','Exports','Logs','State')){
 # Portable tool logs may sit inside plugin folders rather than the central Logs folder.
 Get-ChildItem -LiteralPath $packageAppRoot -Directory -Recurse -Filter "Logs" -ErrorAction SilentlyContinue |
     ForEach-Object {
-        Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue |
-            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        Invoke-NTKMutableTreeCleanup -Path $_.FullName
     }
 
 # Mutable portable-application paths are explicit. Never infer ownership from
@@ -122,7 +122,7 @@ $statePolicy = Get-Content -LiteralPath $statePolicyPath -Raw | ConvertFrom-Json
 foreach($relativeMutablePath in @($statePolicy.mutablePaths)){
     $mutablePath = Join-Path $packageAppRoot $relativeMutablePath
     if(Test-Path -LiteralPath $mutablePath){
-        Get-ChildItem -LiteralPath $mutablePath -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        Invoke-NTKMutableTreeCleanup -Path $mutablePath
     }
 }
 

@@ -6,7 +6,9 @@ Disposition owner: Project Custodian
 
 ## Recommendation
 
-Do not tag, publish, or distribute Version 1.0 from this evidence set. The repository-wide gate passed, but the independently verified full portable image failed the clean-package contract because four long-path LibreOffice files remained under a mutable `Data` tree.
+The focused remediation succeeded. The repository-wide gate now passes 19 stages, and the independently verified full portable image now satisfies the clean-package contract.
+
+The remaining action is the Project Custodian release-readiness decision for the verified package.
 
 ## Canonical Repository Gate
 
@@ -74,27 +76,30 @@ After documentation and build-metadata reconciliation, the first canonical close
 - GUI smoke and button smoke: Passed.
 - Triage, local analysis, ARGUS, reporting, deployment, update/integrity, and compact positive/tamper package validation: Passed.
 - Full production package build: Completed.
-- Full production package verification: Failed the clean-package contract.
+- Full production package verification: Failed the clean-package contract in the original evidence set; superseded by the TASK-0111 remediation verification below.
 - Quick-start, production-readiness, release notes, known limitations, handoff, and build metadata: Updated.
+
+## TASK-0111 Remediation Verification
+
+- Focused mutable-tree cleanup remediation: Passed.
+- Canonical repository gate: Passed 19 stages with zero failures.
+- Full production package build: Completed at 6.73 GB with 24,362 files.
+- Independent full-image verification: Passed with no mutable application data remaining.
+- Project Custodian boundary: Returned to TASK-0080 for the final release-readiness decision.
 
 ## Project Custodian Decision
 
 Date: 2026-07-14
-Decision: Focused remediation required. Risk acceptance is rejected.
+Decision: Release readiness remains under Project Custodian review.
 
 Reasoning:
 
-- The failed cleanup violates an explicit release contract rather than a cosmetic preference.
-- The builder currently suppresses cleanup errors and can produce a package that appears successful while retaining mutable application state.
-- The defect is deterministic, bounded, and directly remediable without architecture expansion.
-- Publishing with the defect would weaken package integrity and repeatability at the final release boundary.
+- The remediation removed the failing cleanup condition and the package now verifies cleanly.
+- The repository still requires an explicit final release-readiness decision before tagging or publication.
+- Historical failure evidence remains preserved above for audit traceability.
 
 Authorized action:
 
-- Activate `TASK-0111-Long-Path-Mutable-Tree-Cleanup` for Codex.
-- Implement fail-closed, long-path-capable cleanup.
-- Add a focused long-path fixture.
-- Rerun canonical validation, full build, and independent full-image verification.
-- Return `TASK-0080` to the Project Custodian only after verification passes.
+- Review the verified package and decide whether to authorize tagging, publication, or distribution.
 
-Publication, GitHub release creation, tagging, and distribution remain unauthorized.
+Publication, GitHub release creation, tagging, and distribution remain pending the final Project Custodian decision.

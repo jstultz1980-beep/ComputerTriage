@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-14 - Release-Candidate Remediation
+
+- Completed TASK-0111 long-path mutable-tree cleanup remediation and rebuilt the release candidate with fail-closed cleanup.
+- Canonical repository validation now passes 19 stages with zero failures.
+- Independent full-image verification now passes on the 6.73 GB production image with no mutable application data remaining.
+- Returned TASK-0080 to the Project Custodian release-readiness boundary for the final release decision.
+
 ## 2026-07-13 - Release-Candidate Gate
 
 - Completed the Codex evidence phase of TASK-0080: all 18 canonical repository validation stages passed.

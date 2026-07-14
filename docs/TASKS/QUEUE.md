@@ -12,13 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0111-Long-Path-Mutable-Tree-Cleanup` | Codex | Active | Implement fail-closed, long-path-capable mutable-tree cleanup and reverify the full production image. |
+| `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Active | Make the final release-readiness decision after the TASK-0111 remediation passes full-image verification. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| 1 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | ChatGPT (Project Custodian) | Queued | Make the final release-readiness decision after TASK-0111 passes full-image verification. |
+| _None_ | _None_ | _None_ | _None_ | No queued task remains behind the active Project Custodian decision. |
 
 ## Recently Completed
 
@@ -32,9 +32,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- The Project Custodian rejected risk acceptance for the four surviving long-path LibreOffice files.
-- TASK-0111 is the sole Active Codex task.
-- TASK-0111 must make mutable-tree cleanup long-path capable and fail closed, add focused validation, rebuild the full image, and pass independent verification.
-- TASK-0080 remains queued as the final Project Custodian release-readiness boundary.
+- TASK-0111 completed the long-path mutable-tree cleanup remediation and verified the clean full production image.
+- TASK-0080 is the sole Active Project Custodian task.
+- The Project Custodian must decide final release readiness from the verified evidence set.
 - No tag, publication, or distribution is authorized until TASK-0080 is accepted.
 - Net-new feature work remains deferred.

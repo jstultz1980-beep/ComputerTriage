@@ -10,21 +10,26 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 |---|---:|---|
 | Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
 | Architecture | 19 / 25 | TASK-0100 structured timing and run-scoped observation/provider contract. |
-| Documentation | 23 / 25 | TASK-0080 release evidence, operational guidance, and known limitations. |
-| Task System | 5 / 25 | TASK-0080 evidence completion and transfer to the Project Custodian release decision. |
+| Documentation | 24 / 25 | TASK-0111 remediation evidence, release-candidate guidance, and resolved known limitations. |
+| Task System | 6 / 25 | TASK-0111 evidence completion and transfer back to the Project Custodian release decision. |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
 | UI | 4 / 25 | TASK-0100 GUI shell, first-render, and tab-switch timing. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 6 / 25 | TASK-0100 package manifest hashing telemetry and build metadata. |
-| Validation/Test Framework | 13 / 25 | TASK-0080 canonical and full-production-image release evidence. |
-| Roadmap/Backlog | 8 / 25 | Advanced to the Project Custodian release-readiness decision. |
+| Build System | 7 / 25 | TASK-0111 fail-closed long-path mutable-tree cleanup and build metadata. |
+| Validation/Test Framework | 14 / 25 | TASK-0111 canonical and full-production-image remediation verification. |
+| Roadmap/Backlog | 9 / 25 | Advanced to the Project Custodian final release-readiness decision. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0111-01 | 2026-07-14 | TASK-0111 | Build System | +1 | Added fail-closed long-path cleanup helpers to the production-package builder and preserved the package metadata update. |
+| CHG-0111-02 | 2026-07-14 | TASK-0111 | Validation/Test Framework | +1 | Added a focused mutable-tree cleanup fixture and verified the clean full production image. |
+| CHG-0111-03 | 2026-07-14 | TASK-0111 | Documentation | +1 | Recorded the remediation outcome, resolved the known limitation, and updated release guidance. |
+| CHG-0111-04 | 2026-07-14 | TASK-0111 | Task System | +1 | Returned the Active task boundary to the Project Custodian release-readiness decision. |
+| CHG-0111-05 | 2026-07-14 | TASK-0111 | Roadmap/Backlog | +1 | Advanced the remaining sequence from remediation to final release readiness review. |
 | CHG-0080-01 | 2026-07-13 | TASK-0080 | Validation/Test Framework | +1 | Ran the 18-stage canonical gate and independently built and verified the 6.72 GB production image. |
 | CHG-0080-02 | 2026-07-13 | TASK-0080 | Documentation | +1 | Recorded release evidence, quick-start guidance, readiness status, build duration, and the LibreOffice cleanup limitation. |
 | CHG-0080-03 | 2026-07-13 | TASK-0080 | Task System | +1 | Completed Codex release-gate execution and transferred the Active task to the Project Custodian decision boundary. |

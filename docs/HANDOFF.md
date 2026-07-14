@@ -4,35 +4,40 @@
 HANDOFF-0119
 
 ## Current Task
-TASK-0111-Long-Path-Mutable-Tree-Cleanup
+TASK-0080-Release-Candidate-Validation-And-Documentation
 
 ## Current Owner
-Codex
+ChatGPT (Project Custodian)
 
 ## Next Owner
-ChatGPT (Project Custodian) after TASK-0111 completes, full-image verification passes, and TASK-0080 is reactivated for the final release-readiness decision.
+The user for explicit release/publication authorization after the Project Custodian accepts or rejects release readiness.
 
 ## Objective
-Implement fail-closed, long-path-capable mutable-tree cleanup, add focused validation, rebuild the full production image, and pass independent verification.
+Decide final release readiness for the clean full production image, then authorize or decline tagging, publication, or distribution.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0110 through TASK-0100 are complete.
-- TASK-0080 canonical repository validation passed 18 of 18 stages.
-- The first full production image built at 6.72 GB across 24,364 files.
-- Independent verification rejected four long-path LibreOffice files that survived cleanup under `App\Custom\LibreOfficePortable\Data`.
-- The Project Custodian rejected written risk acceptance.
-- TASK-0111 is the sole Active Codex remediation task.
-- TASK-0080 is queued for the final Project Custodian release-readiness decision after remediation.
-- No tag, publication, or distribution is authorized.
+- TASK-0097 architecture, terminology, roadmap, queue, and governance consolidation is complete.
+- TASK-0108 completed Task System Audit Preparation.
+- TASK-0109 accepted the evidence package and reset only Task System from `25 / 25` to `0 / 25`.
+- The authoritative audit decision is `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`.
+- TASK-0110 resolved the accepted Task System debt and passed all required simulations.
+- TASK-0111 implemented fail-closed long-path mutable-tree cleanup, passed the focused fixture, and independently verified the clean full production image.
+- TASK-0098 completed shared reporting/run-index contracts and passed focused and full regression validation.
+- TASK-0099 completed repository-wide parser, load, negative-path, package, and regression gates; all 17 stages pass.
+- TASK-0100 completed structured performance telemetry, budgets, run-scoped caching, and baselines; all 18 validation stages pass.
+- TASK-0080 canonical repository validation passed 19 of 19 stages.
+- The full production image now builds at 6.73 GB across 24,362 files, and independent verification reports no mutable application data.
+- TASK-0080 is the sole Active Project Custodian task at the release-readiness boundary.
+- No implementation task remains queued behind TASK-0080.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0111-Long-Path-Mutable-Tree-Cleanup`
+`TASK-0080-Release-Candidate-Validation-And-Documentation`
 
-Codex must implement only the focused package-cleanup remediation defined by TASK-0111. It must preserve unrelated drift, add a long-path fixture, run canonical validation, build a new full image, and run independent verification. Broad packaging redesign and unrelated work are not authorized.
+The Project Custodian must review the TASK-0111 remediation evidence, decide final release readiness, and either accept the clean package or activate a new focused remediation. Codex must not implement further work until a new focused task is activated.
 
 ## Audit Counters
 
@@ -76,5 +81,5 @@ None.
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```

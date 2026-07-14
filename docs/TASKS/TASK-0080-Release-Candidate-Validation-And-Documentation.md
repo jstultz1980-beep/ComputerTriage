@@ -1,7 +1,7 @@
 # TASK-0080 - Release Candidate Validation And Documentation
 
 ## Status
-Queued
+Active
 
 ## Owner
 ChatGPT (Project Custodian)
@@ -25,19 +25,20 @@ Run the final release-candidate validation gate and produce release-ready docume
 - [x] GUI smoke and button-smoke pass.
 - [x] Triage, local analysis, ARGUS, reporting, deployment, update, and package validations pass or have documented limitations.
 - [x] Release notes and known limitations are complete.
-- [ ] Independent full production image verification passes with no mutable application data.
+- [x] Independent full production image verification passes with no mutable application data.
 - [ ] Project Custodian declares the candidate release-ready.
 
 ## Codex Validation Result
 
-- The canonical repository gate passed all 18 stages with zero failures.
-- A full 6.72 GB production image built successfully with 24,364 files and 24,343 managed entries.
-- Independent full-image verification found one release-blocking limitation: four long-path LibreOffice configuration files survived mutable-data cleanup.
+- TASK-0111 remediated the long-path mutable-tree cleanup defect by using fail-closed cleanup helpers for the declared mutable trees.
+- The canonical repository gate passed all 19 stages with zero failures.
+- A full 6.73 GB production image built successfully with 24,362 files.
+- Independent full-image verification passed with no mutable application data remaining.
 - Quick-start, production readiness, known limitations, release evidence, changelog, handoff, and build metadata were reconciled.
-- Codex recommended no tag, publication, or distribution until focused remediation or explicit risk acceptance.
+- TASK-0080 is now the Project Custodian release-readiness boundary again.
 
 ## Project Custodian Decision
 
-Risk acceptance is rejected. TASK-0111 is Active to implement fail-closed, long-path-capable mutable-tree cleanup, add a focused fixture, rebuild the full package, and rerun independent verification.
+TASK-0111 completed the focused remediation and returned the release package to a clean verified state.
 
-TASK-0080 remains queued as the final Project Custodian release-readiness boundary after TASK-0111 completes. No tagging, publication, or distribution is authorized before that decision.
+TASK-0080 remains Active as the final Project Custodian release-readiness boundary. The Project Custodian must now decide whether the verified candidate is release-ready and whether tagging, publication, or distribution should proceed.
