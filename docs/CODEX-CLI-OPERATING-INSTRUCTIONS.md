@@ -27,9 +27,23 @@ git fetch --prune origin
 git rev-parse HEAD
 git rev-parse @{u}
 git rev-list --left-right --count HEAD...@{u}
+git merge --ff-only @{u}
+git rev-parse HEAD
+git rev-parse @{u}
+git rev-list --left-right --count HEAD...@{u}
 ```
 
-Safely fast-forward when local is behind and preserved drift is not threatened. Stop through Error Handoff when local is ahead, diverged, lacks an upstream, fetch fails, or synchronization cannot be completed safely. Confirm local and remote commit hashes match before trusting governance files.
+A fetch alone is not synchronization. Codex must safely fast-forward when local is behind and preserved drift is not threatened.
+
+Before trusting governance, confirm:
+
+- local `HEAD` equals `@{u}`;
+- the final comparison is `0 0`;
+- local `HEAD` equals the `Current HEAD` in the newest Project Custodian handoff;
+- the checked-out branch equals the handoff `Current Branch`;
+- preserved drift remains intact.
+
+Codex may read cloud-hosted governance directly only when the connector returns that exact branch and commit. Stop through Error Handoff when local is ahead, diverged, lacks an upstream, fetch fails, fast-forward is unsafe, or the handoff commit cannot be matched.
 
 ### 2. Read source-of-truth files
 
@@ -49,7 +63,7 @@ Read in order:
 
 ### 3. Verify governance
 
-Confirm exactly one Active task, handoff/queue agreement, an existing Active task file, permitted ownership, no unresolved blocker, documented drift, in-scope work, and counters below gate unless the Active task is Audit Preparation.
+Confirm exactly one Active task, handoff/queue agreement, an existing Active task file, permitted ownership, no unresolved blocker, documented drift, in-scope work, counters below gate unless the Active task is Audit Preparation, and synchronized repository state.
 
 ### 4. Execute and validate
 
@@ -65,7 +79,7 @@ Update applicable task, queue, handoff, ledger, changelog, roadmap/backlog, punc
 
 After task completion, reread counters, queue, handoff, error handoff, and punch list. If a subsystem reached `25 / 25`, follow Audit Preparation. Otherwise activate the next dependency-ready Codex-owned queued task and continue without another prompt.
 
-Codex may not skip dependencies, invent product direction, reorder ChatGPT-owned architecture work, or activate a ChatGPT-owned implementation/design task.
+Codex may not skip dependencies, invent product direction, reorder ChatGPT-owned architecture work, activate a ChatGPT-owned implementation/design task, or proceed from stale governance.
 
 ## Governance Refresh Workflow
 
@@ -73,15 +87,14 @@ When the user enters `Governance Refresh`, Codex must follow `docs/GOVERNANCE/GO
 
 1. Pause at the next safe interruption point.
 2. Preserve current task work and documented drift.
-3. Fetch and compare local/upstream state.
-4. Safely fast-forward when possible.
+3. Fetch, safely fast-forward, and verify `HEAD == @{u}` with comparison `0 0`.
+4. Confirm the resulting commit equals the newest Project Custodian handoff commit.
 5. Reread only the governance set defined in the policy.
 6. Apply changed governance immediately.
-7. Resume the same Active task from the interruption point.
+7. Recheck handoff, queue, Active task, and ownership.
+8. Resume the same Active task from the interruption point only after verification passes.
 
-Do not restart the task, repeat completed work, perform a full architecture/roadmap/ADR reload, change task state by itself, or clean unrelated drift. Report only if refreshed rules materially change execution, ownership, task state, validation, summary format, or create a stop condition.
-
-Unsafe synchronization or irreconcilable governance conflict uses Error Handoff.
+Do not restart the task, repeat completed work, perform a full architecture/roadmap/ADR reload, change task state by itself, or clean unrelated drift. Unsafe synchronization or irreconcilable governance conflict uses Error Handoff.
 
 ## Audit Preparation Procedure
 
@@ -101,6 +114,8 @@ When any subsystem reaches `25 / 25` at a task boundary:
 ## Project Custodian Boundary
 
 Codex stops when the sole Active task is owned by ChatGPT/Project Custodian. The user then tells ChatGPT `Continue`. After the Project Custodian pushes the decision and activates a Codex task, the user tells Codex `Resume Work`.
+
+Codex must synchronize to the exact branch and `Current HEAD` reported by the Project Custodian before reading the new task state or resuming work.
 
 ## User-Only Decisions
 
@@ -124,20 +139,40 @@ Commit and push the blocker report, then stop at the Project Custodian boundary.
 
 ## Completion Reporting
 
-At a stop boundary report synchronized starting commit, tasks completed, resulting commits, files changed, validation, current/next owner, counters, preserved drift, and the reason for stopping.
+At every stop boundary, report synchronized starting commit, tasks completed, resulting commits, files changed, validation, current/next owner, counters, preserved drift, reason for stopping, and this visible footer:
 
-The summary must end with exactly one final operator instruction and no text after it.
+```text
+Repository State
+----------------
+Current Branch: <branch>
+Current HEAD: <full commit SHA>
+Current Upstream: <origin/branch>
+Upstream Comparison: <ahead> <behind>
+
+Current Task: <task>
+Current Owner: <owner>
+Next Owner: <owner>
+
+Repository State Verified: YES|NO
+Preserved Drift: Unchanged|Changed as documented
+```
+
+`Repository State Verified: YES` is allowed only when local `HEAD` equals upstream, the comparison is `0 0`, and local `HEAD` equals the newest Project Custodian handoff commit. If verification is `NO`, state the reason and do not claim implementation authority.
+
+The visible chat response must end with a current `America/Chicago` timestamp followed by exactly one final operator instruction, with no text after it.
 
 For a non-blocked stop boundary:
 
 ```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
 
 For a genuine blocker recorded and pushed through `docs/ERROR-HANDOFF.md`:
 
 ```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either final line.
+Use CST instead of CDT when appropriate. Do not paraphrase either final instruction.

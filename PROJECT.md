@@ -32,6 +32,30 @@ The instruction authorizes one continuous execution cycle:
 
 `Resume Work` does not authorize unrelated work, architecture invention, dependency bypass, destructive cleanup, stale-checkout implementation, or activation of ChatGPT-owned work.
 
+## Mandatory Cloud Synchronization Rule
+
+Before Codex trusts any governance or task document, it must synchronize the checked-out branch with its configured remote upstream:
+
+```powershell
+git fetch --prune origin
+git rev-list --left-right --count HEAD...@{u}
+git merge --ff-only @{u}
+git rev-parse HEAD
+git rev-parse @{u}
+git rev-list --left-right --count HEAD...@{u}
+```
+
+Codex may read directly from cloud-hosted authoritative documents only when the connector returns the exact branch and commit identified in the newest Project Custodian handoff. Otherwise it must perform the safe fast-forward synchronization above.
+
+Codex must not implement, validate, close, or transition a task until:
+
+- local `HEAD` equals `@{u}`;
+- the final upstream comparison is `0 0`;
+- local `HEAD` equals the `Current HEAD` reported in the newest Project Custodian handoff;
+- `docs/HANDOFF.md`, `docs/TASKS/QUEUE.md`, and the Active task file agree.
+
+If any condition cannot be satisfied without threatening preserved drift, Codex must use the Error Handoff procedure. A fetch alone is not synchronization.
+
 ## Governance Refresh Rule
 
 When the user prompts `Governance Refresh`, Codex must follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`.
@@ -48,23 +72,72 @@ The Project Custodian should act autonomously on architecture, governance, remed
 
 After an Engineering Audit, the Project Custodian activates exactly one dependency-ready Codex task, commits and pushes the decision, and returns `Resume Work` as the next instruction.
 
-## Completion Prompt Rule
+## Symmetric Handoff Integrity Rule
 
-Every Codex stop-boundary summary must end with exactly one final operator instruction and no text after it.
+Every stop-boundary summary from Codex or the Project Custodian must contain a visible repository-state footer. The footer must report the exact repository state used for the decision and must appear in the chat response, not only in terminal output or repository files.
 
-For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, the exact final line is:
+Required fields:
 
 ```text
+Repository State
+----------------
+Current Branch: <branch>
+Current HEAD: <full commit SHA>
+Current Upstream: <origin/branch or authoritative cloud branch>
+Upstream Comparison: <ahead> <behind>
+
+Current Task: <task>
+Current Owner: <owner>
+Next Owner: <owner>
+
+Repository State Verified: YES|NO
+Preserved Drift: Unchanged|Changed as documented
+```
+
+For Codex, `Repository State Verified: YES` is permitted only when local `HEAD` equals upstream, the comparison is `0 0`, and local `HEAD` equals the newest Project Custodian handoff commit.
+
+For the Project Custodian, the footer reports the authoritative cloud branch and the commit produced or verified during the handoff. The cloud branch is its own authoritative upstream, so the comparison is `0 0` after the write is confirmed.
+
+If verification is `NO`, the response must state the reason and no implementation authority may be claimed.
+
+## Completion Prompt Rule
+
+Every stop-boundary summary must end with a current Central Time handoff timestamp immediately before exactly one final operator instruction, with no text after it.
+
+Use `America/Chicago` and the correct daylight-saving abbreviation:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
+```
+
+or:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CST
+```
+
+For a normal Codex-to-Project-Custodian handoff, the final two lines are:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
 
-For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, the exact final line is:
+For a Codex blocker:
 
 ```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-This closing instruction is mandatory and must not be paraphrased.
+For a normal Project-Custodian-to-Codex handoff:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
+Resume Work
+```
+
+The timestamp and operator instruction are mandatory and must not be paraphrased.
 
 ## Address Errors Rule
 
