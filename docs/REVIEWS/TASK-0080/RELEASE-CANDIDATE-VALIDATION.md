@@ -74,9 +74,27 @@ After documentation and build-metadata reconciliation, the first canonical close
 - GUI smoke and button smoke: Passed.
 - Triage, local analysis, ARGUS, reporting, deployment, update/integrity, and compact positive/tamper package validation: Passed.
 - Full production package build: Completed.
-- Full production package verification: Limitation documented; clean-package contract failed.
+- Full production package verification: Failed the clean-package contract.
 - Quick-start, production-readiness, release notes, known limitations, handoff, and build metadata: Updated.
 
-## Project Custodian Decision Required
+## Project Custodian Decision
 
-The Project Custodian should activate a focused packaging remediation before release unless it explicitly accepts the cleanup risk in writing. The recommended correction is a fail-closed, long-path-capable mutable-tree cleanup with a focused long-path fixture, followed by a new full build and independent verification. Publication, GitHub release creation, and tagging remain user-authorized external actions after the Project Custodian declares the candidate ready.
+Date: 2026-07-14
+Decision: Focused remediation required. Risk acceptance is rejected.
+
+Reasoning:
+
+- The failed cleanup violates an explicit release contract rather than a cosmetic preference.
+- The builder currently suppresses cleanup errors and can produce a package that appears successful while retaining mutable application state.
+- The defect is deterministic, bounded, and directly remediable without architecture expansion.
+- Publishing with the defect would weaken package integrity and repeatability at the final release boundary.
+
+Authorized action:
+
+- Activate `TASK-0111-Long-Path-Mutable-Tree-Cleanup` for Codex.
+- Implement fail-closed, long-path-capable cleanup.
+- Add a focused long-path fixture.
+- Rerun canonical validation, full build, and independent full-image verification.
+- Return `TASK-0080` to the Project Custodian only after verification passes.
+
+Publication, GitHub release creation, tagging, and distribution remain unauthorized.
