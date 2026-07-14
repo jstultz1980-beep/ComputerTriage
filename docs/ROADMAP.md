@@ -4,17 +4,17 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Version 1.0 Release Authorization
+## Current Phase - Version 1.0 Release Closeout
 
-Status: Engineering complete; awaiting explicit user authorization for tagging, publication, or distribution.
+Status: Version 1.0 is published; awaiting Project Custodian closeout confirmation.
 
 Current Active task:
 - None.
 
 Current objective:
-- Preserve the verified Version 1.0 candidate.
-- Await explicit user authorization for release execution.
-- Begin no new implementation until a new planning cycle is approved.
+- Preserve the published Version 1.0 release record.
+- Await Project Custodian closeout confirmation.
+- Begin no new implementation until closeout and any required audit work are complete.
 
 ## Completed Release Sequence
 

@@ -1,7 +1,7 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0122
+HANDOFF-0123
 
 ## Current Task
 TASK-0113-Version-1.0-Release-Publication
@@ -10,10 +10,10 @@ TASK-0113-Version-1.0-Release-Publication
 Codex
 
 ## Next Owner
-ChatGPT (Project Custodian) after TASK-0113 completes release publication and records the final tag, release URL, commit, artifact verification, and publication timestamp.
+ChatGPT (Project Custodian) for release closeout confirmation after TASK-0113 completed publication and recorded the final tag, release URL, commit, artifact verification, and publication timestamp.
 
 ## Objective
-Execute the explicitly authorized Version 1.0 release from the accepted release state without changing product behavior or disturbing preserved drift.
+Complete the explicitly authorized Version 1.0 release closeout from the accepted release state without changing product behavior or disturbing preserved drift.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
@@ -25,13 +25,13 @@ The repository is authoritative. Exactly one task may be Active, and handoff, qu
 - TASK-0112 completed cold-tab initialization performance remediation and canonical validation passed 20 of 20 stages.
 - TASK-0080 accepted the verified release candidate as release-ready and is complete.
 - The user explicitly authorized Version 1.0 release execution.
-- TASK-0113 is the sole Active Codex release-publication task.
+- TASK-0113 release publication is complete and `v1.0.0` is published.
 - New feature work, helper frameworks, native replacements, and Version 1.1 planning remain deferred until release closeout.
 
 ## Active Task Scope
 `TASK-0113-Version-1.0-Release-Publication`
 
-Codex must synchronize to this exact cloud handoff state before release execution. It may create the Version 1.0 tag, publish the GitHub Release, attach only verified approved artifacts, and record final release metadata. It must not modify product behavior, rebuild without cause, publish unverified artifacts, or disturb unrelated drift.
+Codex synchronized to this exact cloud handoff state before release execution. It created the Version 1.0 tag, published the GitHub Release, attached the verified `ProductionManifest.json` asset, and recorded final release metadata. It did not modify product behavior, rebuild without cause, publish unverified artifacts, or disturb unrelated drift.
 
 ## Audit Counters
 
@@ -48,7 +48,7 @@ Codex must synchronize to this exact cloud handoff state before release executio
 | Plugin Framework | 6 / 25 | No |
 | Build System | 8 / 25 | No |
 | Validation/Test Framework | 15 / 25 | No |
-| Roadmap/Backlog | 10 / 25 | No |
+| Roadmap/Backlog | 11 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -71,8 +71,9 @@ None.
 - `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
 - `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
 - `docs/REVIEWS/TASK-0080/RELEASE-CANDIDATE-VALIDATION.md`
+- `docs/REVIEWS/TASK-0113/RELEASE-PUBLICATION-RECORD.md`
 
 ## Next Bot Prompt
 ```text
-Resume Work
+Continue
 ```

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-14 - Version 1.0 Release Publication
+
+- Published the Version 1.0.0 GitHub Release from the accepted release decision at commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
+- Attached the verified `NetworkToolkit-Portable-RC-ProductionManifest.json` publication asset and recorded its SHA-256 checksum.
+- Returned control to the Project Custodian for release closeout confirmation.
+
 ## 2026-07-14 - Cold-Tab Initialization Remediation
 
 - Completed TASK-0112 cold-tab initialization performance remediation with queued warm-up and per-stage timing instrumentation.

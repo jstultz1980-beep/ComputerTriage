@@ -12,7 +12,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0113-Version-1.0-Release-Publication` | Codex | Active | Execute the explicitly authorized Version 1.0 tag, GitHub Release publication, artifact verification, and release record closeout. |
+| _None_ | _None_ | _None_ | Version 1.0 release publication is complete; control returns to the Project Custodian for closeout confirmation. |
 
 ## Ordered Queue
 
@@ -24,6 +24,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0113-Version-1.0-Release-Publication` | Complete | Published `v1.0.0` from the accepted release commit and recorded the release metadata. |
 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Complete | Project Custodian accepted the verified candidate as release-ready after TASK-0112. |
 | `TASK-0112-Cold-Tab-Initialization-Performance-Remediation` | Complete | Added queued warm-up, per-stage timing, and focused cold-tab validation. |
 | `TASK-0111-Long-Path-Mutable-Tree-Cleanup` | Complete | Added fail-closed long-path cleanup and independently verified the clean full production image. |
@@ -35,7 +36,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 ## Current Decision
 
 - The user explicitly authorized Version 1.0 release execution.
-- TASK-0113 is the sole Active Codex task.
-- Codex must synchronize with the authoritative cloud branch before release execution.
-- Tagging, GitHub Release publication, and verified artifact attachment are authorized within TASK-0113.
-- New feature work and Version 1.1 planning remain deferred until release publication is closed out.
+- TASK-0113 release publication is complete and no implementation task is active.
+- The published release is `v1.0.0` at commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
+- The GitHub Release is published with the verified manifest asset attached.
+- New feature work and Version 1.1 planning remain deferred until Project Custodian closeout confirmation.

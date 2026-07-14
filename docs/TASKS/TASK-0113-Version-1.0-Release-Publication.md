@@ -1,7 +1,7 @@
 # TASK-0113 - Version 1.0 Release Publication
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -30,14 +30,23 @@ Publish the accepted Version 1.0 release from the authoritative release branch w
 - Beginning Version 1.1 planning.
 
 ## Acceptance Criteria
-- [ ] Local and upstream release branch are synchronized before release execution.
-- [ ] The release commit matches the accepted Project Custodian decision.
-- [ ] Version 1.0 tag is created and points to the accepted commit.
-- [ ] GitHub Release is published with approved release notes.
-- [ ] Any attached artifacts pass existing integrity verification and checksums are recorded.
-- [ ] Repository records identify the final tag, release URL, commit, and publication timestamp.
-- [ ] Preserved drift remains untouched.
-- [ ] Control returns to the Project Custodian for release closeout confirmation.
+- [x] Local and upstream release branch are synchronized before release execution.
+- [x] The release commit matches the accepted Project Custodian decision.
+- [x] Version 1.0 tag is created and points to the accepted commit.
+- [x] GitHub Release is published with approved release notes.
+- [x] Any attached artifacts pass existing integrity verification and checksums are recorded.
+- [x] Repository records identify the final tag, release URL, commit, and publication timestamp.
+- [x] Preserved drift remains untouched.
+- [x] Control returns to the Project Custodian for release closeout confirmation.
+
+## Publication Record
+
+- Tag: `v1.0.0`
+- Release URL: `https://github.com/jstultz1980-beep/ComputerTriage/releases/tag/v1.0.0`
+- Accepted commit: `38de0b626fe3cadc6848a12b9e40fadfc7006151`
+- Verified attached asset: `NetworkToolkit-Portable-RC-ProductionManifest.json`
+- Attached asset SHA-256: `AB77AF24EDDE71D417341095A342B050A5D00C5CD951F749B290D6187B4BF94D`
+- Publication timestamp: `2026-07-14 16:17:01 CDT`
 
 ## Blocker Rule
 If tagging, release creation, artifact verification, permissions, branch synchronization, or publication fails, record the complete blocker in `docs/ERROR-HANDOFF.md`, push the minimum blocker handoff, and stop without partial or guessed remediation.
