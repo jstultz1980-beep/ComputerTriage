@@ -1,42 +1,38 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0118
+HANDOFF-0119
 
 ## Current Task
-TASK-0080-Release-Candidate-Validation-And-Documentation
+TASK-0111-Long-Path-Mutable-Tree-Cleanup
 
 ## Current Owner
-ChatGPT (Project Custodian)
+Codex
 
 ## Next Owner
-Codex only if the Project Custodian activates a focused remediation; otherwise the user for explicit release/publication authorization after readiness is accepted.
+ChatGPT (Project Custodian) after TASK-0111 completes, full-image verification passes, and TASK-0080 is reactivated for the final release-readiness decision.
 
 ## Objective
-Decide whether the full-package LibreOffice cleanup failure requires focused remediation or written risk acceptance, then determine release readiness.
+Implement fail-closed, long-path-capable mutable-tree cleanup, add focused validation, rebuild the full production image, and pass independent verification.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
-- TASK-0097 architecture, terminology, roadmap, queue, and governance consolidation is complete.
-- TASK-0108 completed Task System Audit Preparation.
-- TASK-0109 accepted the evidence package and reset only Task System from `25 / 25` to `0 / 25`.
-- The authoritative audit decision is `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`.
-- TASK-0110 resolved the accepted Task System debt and passed all required simulations.
-- TASK-0098 completed shared reporting/run-index contracts and passed focused and full regression validation.
-- TASK-0099 completed repository-wide parser, load, negative-path, package, and regression gates; all 17 stages pass.
-- TASK-0100 completed structured performance telemetry, budgets, run-scoped caching, and baselines; all 18 validation stages pass.
+- TASK-0110 through TASK-0100 are complete.
 - TASK-0080 canonical repository validation passed 18 of 18 stages.
-- The full production image built at 6.72 GB across 24,364 files, but independent verification rejected four long-path LibreOffice files under a mutable `Data` tree.
-- Codex completed the TASK-0080 evidence and documentation phase; TASK-0080 is the sole Active Project Custodian task at the release-decision boundary.
-- No implementation task remains queued behind TASK-0080.
+- The first full production image built at 6.72 GB across 24,364 files.
+- Independent verification rejected four long-path LibreOffice files that survived cleanup under `App\Custom\LibreOfficePortable\Data`.
+- The Project Custodian rejected written risk acceptance.
+- TASK-0111 is the sole Active Codex remediation task.
+- TASK-0080 is queued for the final Project Custodian release-readiness decision after remediation.
+- No tag, publication, or distribution is authorized.
 - Net-new features, helper frameworks, and native replacements remain deferred.
 
 ## Active Task Scope
-`TASK-0080-Release-Candidate-Validation-And-Documentation`
+`TASK-0111-Long-Path-Mutable-Tree-Cleanup`
 
-The Project Custodian must review the TASK-0080 evidence, decide focused packaging remediation versus written risk acceptance, and determine release readiness. Codex must not implement further work until a focused remediation task is activated.
+Codex must implement only the focused package-cleanup remediation defined by TASK-0111. It must preserve unrelated drift, add a long-path fixture, run canonical validation, build a new full image, and run independent verification. Broad packaging redesign and unrelated work are not authorized.
 
 ## Audit Counters
 
@@ -68,21 +64,17 @@ Do not stage or clean unless a focused task explicitly owns it:
 - Untracked: `Project-Factory-Lessons-Learned-Handoff.txt`
 - Untracked: `Set-CodexPermissions.ps1`
 
-## Release Decision Issue
-Full-image verification fails because four long-path LibreOffice configuration files survive mutable-data cleanup. This does not block evidence handoff, but it blocks a release-ready recommendation unless remediated or accepted in writing by the Project Custodian.
+## Blockers
+None.
 
 ## Decision Reference
 - `docs/REVIEWS/TASK-0080/RELEASE-CANDIDATE-VALIDATION.md`
+- `docs/TASKS/TASK-0111-Long-Path-Mutable-Tree-Cleanup.md`
+- `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
 - `docs/KNOWN-LIMITATIONS.md`
 - `docs/REPOSITORY-VALIDATION.md`
-- `App/manifests/repository-validation.json`
-- `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
-- `docs/REVIEWS/TASK-0108/TASK-SYSTEM-AUDIT-PREPARATION.md`
-- `docs/REVIEWS/TASK-0109/PROJECT-CUSTODIAN-DECISION.md`
-- `docs/TASKS/TASK-0109-Project-Custodian-Task-System-Engineering-Audit.md`
-- `docs/TASKS/TASK-0110-Task-System-Consistency-Cleanup.md`
 
 ## Next Bot Prompt
 ```text
-Continue
+Resume Work
 ```
