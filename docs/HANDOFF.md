@@ -1,36 +1,37 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0121
+HANDOFF-0122
 
 ## Current Task
-None - engineering work complete
+TASK-0113-Version-1.0-Release-Publication
 
 ## Current Owner
-User
+Codex
 
 ## Next Owner
-ChatGPT (Project Custodian) only when the user authorizes release execution, requests a new planning cycle, or records another decision requiring repository work.
+ChatGPT (Project Custodian) after TASK-0113 completes release publication and records the final tag, release URL, commit, artifact verification, and publication timestamp.
 
 ## Objective
-Await explicit user authorization for Version 1.0 tagging, GitHub Release publication, or distribution.
+Execute the explicitly authorized Version 1.0 release from the accepted release state without changing product behavior or disturbing preserved drift.
 
 ## Source Of Truth
-The repository is authoritative. No engineering task is Active or queued at this user-only release boundary.
+The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
 - TASK-0097 through TASK-0100 are complete.
 - TASK-0110 resolved accepted Task System consistency debt.
 - TASK-0111 completed fail-closed long-path mutable-tree cleanup and independently verified the clean full production image.
-- TASK-0112 completed cold-tab initialization performance remediation.
-- TASK-0112 canonical repository validation passed 20 of 20 stages.
+- TASK-0112 completed cold-tab initialization performance remediation and canonical validation passed 20 of 20 stages.
 - TASK-0080 accepted the verified release candidate as release-ready and is complete.
-- No implementation task remains Active or queued.
-- Tagging, GitHub Release publication, and distribution remain explicit user-authorized external actions.
-- Net-new features, helper frameworks, and native replacements remain deferred until a new approved planning cycle.
+- The user explicitly authorized Version 1.0 release execution.
+- TASK-0113 is the sole Active Codex release-publication task.
+- New feature work, helper frameworks, native replacements, and Version 1.1 planning remain deferred until release closeout.
 
-## Release Readiness Decision
-Version 1.0 is accepted as engineering-ready and repository-ready. The Project Custodian has completed the final readiness decision. No release action has been executed automatically.
+## Active Task Scope
+`TASK-0113-Version-1.0-Release-Publication`
+
+Codex must synchronize to this exact cloud handoff state before release execution. It may create the Version 1.0 tag, publish the GitHub Release, attach only verified approved artifacts, and record final release metadata. It must not modify product behavior, rebuild without cause, publish unverified artifacts, or disturb unrelated drift.
 
 ## Audit Counters
 
@@ -39,7 +40,7 @@ Version 1.0 is accepted as engineering-ready and repository-ready. The Project C
 | Repository Governance | 15 / 25 | No |
 | Architecture | 19 / 25 | No |
 | Documentation | 24 / 25 | No |
-| Task System | 7 / 25 | No |
+| Task System | 8 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 10 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 5 / 25 | No |
@@ -66,12 +67,12 @@ Do not stage or clean unless a focused task explicitly owns it:
 None.
 
 ## Decision Reference
+- `docs/TASKS/TASK-0113-Version-1.0-Release-Publication.md`
 - `docs/TASKS/TASK-0080-Release-Candidate-Validation-And-Documentation.md`
 - `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
 - `docs/REVIEWS/TASK-0080/RELEASE-CANDIDATE-VALIDATION.md`
-- `docs/TASKS/TASK-0111-Long-Path-Mutable-Tree-Cleanup.md`
 
 ## Next Bot Prompt
 ```text
-Await User Decision
+Resume Work
 ```
