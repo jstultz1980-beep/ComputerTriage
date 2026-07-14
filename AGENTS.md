@@ -6,13 +6,23 @@ ChatGPT is the Project Custodian. Codex is the implementation and audit-preparat
 
 When the user enters `Resume Work`, follow the complete executable startup and implementation procedure in `docs/CODEX-CLI-OPERATING-INSTRUCTIONS.md` and the continuation/audit rules in `docs/GOVERNANCE/AUTONOMOUS-WORK-AND-AUDIT-CYCLE.md`.
 
-The non-negotiable entry conditions are: synchronize before trusting governance, preserve documented drift, verify exactly one Active task, execute only authorized Codex-owned scope, and stop at a Project Custodian, audit, blocker, or user-only boundary.
+The non-negotiable entry conditions are:
+
+- preserve documented drift;
+- fetch and safely fast-forward the checked-out branch to its upstream;
+- verify local `HEAD` equals upstream and the newest Project Custodian handoff commit;
+- verify the final upstream comparison is `0 0`;
+- verify exactly one Active task and handoff/queue/task agreement;
+- execute only authorized Codex-owned scope;
+- stop at a Project Custodian, audit, blocker, or user-only boundary.
+
+A fetch by itself is not synchronization. Codex must not trust local governance or begin implementation while local `HEAD` is behind the authoritative cloud branch.
 
 ## Governance Refresh
 
 When the user enters `Governance Refresh`, follow `docs/GOVERNANCE/GOVERNANCE-REFRESH.md`.
 
-This is a lightweight in-task rules reload. Pause at the next safe point, preserve current work and documented drift, fetch and safely synchronize, reread only the defined governance set, apply changed rules immediately, and resume the same Active task.
+This is a lightweight in-task rules reload. Pause at the next safe point, preserve current work and documented drift, fetch and safely fast-forward, verify `HEAD == @{u}` and comparison `0 0`, reread only the defined governance set, apply changed rules immediately, and resume the same Active task.
 
 Do not restart the task, perform a full project startup, change task ownership, activate another task, or reload architecture/roadmap/ADRs unless refreshed governance explicitly requires it.
 
@@ -39,7 +49,8 @@ Codex may not:
 - bypass dependencies or audit gates;
 - activate ChatGPT-owned work other than the required Engineering Audit transition;
 - clean unrelated drift;
-- push normal implementation work unless explicitly authorized.
+- push normal implementation work unless explicitly authorized;
+- work from stale local governance.
 
 ## User-Only Decisions
 
@@ -47,23 +58,45 @@ Stop for the user only when required for materially different product behavior, 
 
 Routine engineering choices, refactoring, audit recommendations, task sequencing, test correction, and governance upkeep are not user-only decisions.
 
-## Required Final Operator Instruction
+## Required Handoff Footer
 
-Every Codex stop-boundary summary must end with exactly one final line and no text after it.
-
-For successful completion, Audit Preparation completion, a Project Custodian boundary, or a user-only decision boundary, use exactly:
+Every Codex stop-boundary summary must visibly include:
 
 ```text
+Repository State
+----------------
+Current Branch: <branch>
+Current HEAD: <full commit SHA>
+Current Upstream: <origin/branch>
+Upstream Comparison: <ahead> <behind>
+
+Current Task: <task>
+Current Owner: <owner>
+Next Owner: <owner>
+
+Repository State Verified: YES|NO
+Preserved Drift: Unchanged|Changed as documented
+```
+
+`Repository State Verified: YES` is allowed only when local `HEAD` equals upstream, the comparison is `0 0`, and local `HEAD` equals the newest Project Custodian handoff commit.
+
+The response must then end with a current Central Time timestamp followed by exactly one final operator instruction, with no text after it.
+
+Normal boundary:
+
+```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to continue
 ```
 
-For a genuine blocker recorded through `docs/ERROR-HANDOFF.md`, use exactly:
+Blocker:
 
 ```text
+Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT
 Tell Debbie to address errors
 ```
 
-Do not paraphrase either instruction.
+Use CST instead of CDT when appropriate. Do not paraphrase either instruction.
 
 ## Non-Interruption
 
