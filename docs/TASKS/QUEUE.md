@@ -12,13 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| _None_ | _None_ | _None_ | Version 1.0 release publication is complete; control returns to the Project Custodian for closeout confirmation. |
+| `TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard` | Codex | Active | Add objective launch, navigation, operation, external-tool, and resource timing; automate performance QA; expose the dashboard only from Settings. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| _None_ | _None_ | _None_ | No implementation task is queued behind release publication. |
+| _None_ | _None_ | _None_ | _None_ | No additional implementation task is queued behind TASK-0114. |
 
 ## Recently Completed
 
@@ -35,8 +35,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- The user explicitly authorized Version 1.0 release execution.
-- TASK-0113 release publication is complete and no implementation task is active.
-- The published release is `v1.0.0` at commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
-- The GitHub Release is published with the verified manifest asset attached.
-- New feature work and Version 1.1 planning remain deferred until Project Custodian closeout confirmation.
+- Version 1.0 remains published and unchanged.
+- The user authorized a focused real-world performance QA instrumentation cycle.
+- TASK-0114 is the sole Active Codex task.
+- The Performance Dashboard must be accessible only from the Settings page.
+- No unrelated feature work, helper framework work, native replacement work, or broad UI redesign is authorized.
