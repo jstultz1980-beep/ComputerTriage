@@ -1,7 +1,7 @@
 # TASK-0080 - Release Candidate Validation And Documentation
 
 ## Status
-Active
+Complete
 
 ## Owner
 ChatGPT (Project Custodian)
@@ -27,7 +27,7 @@ Run the final release-candidate validation gate and produce release-ready docume
 - [x] Release notes and known limitations are complete.
 - [x] Independent full production image verification passes with no mutable application data.
 - [x] Technician-visible cold-tab navigation performance is accepted after TASK-0112.
-- [ ] Project Custodian declares the candidate release-ready.
+- [x] Project Custodian declares the candidate release-ready.
 
 ## Codex Validation Result
 
@@ -38,6 +38,6 @@ Run the final release-candidate validation gate and produce release-ready docume
 
 ## Project Custodian Decision
 
-TASK-0112 completed the focused cold-tab initialization performance remediation and returned the release workflow to the final Project Custodian review boundary.
+The Project Custodian accepts the TASK-0112 remediation and the verified release-candidate evidence.
 
-TASK-0080 remains Active as the final Project Custodian release-readiness boundary. The Project Custodian must now decide whether the verified candidate is release-ready and whether tagging, publication, or distribution should proceed.
+Version 1.0 is release-ready from an engineering and repository-readiness standpoint. TASK-0080 is complete. Tagging, GitHub Release publication, and distribution remain explicit user-authorized external actions and are not performed automatically.
