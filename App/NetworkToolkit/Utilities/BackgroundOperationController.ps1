@@ -107,6 +107,9 @@ function Global:Complete-NTKBackgroundOperation {
             default { if($State -eq 'Canceled'){'Cancelled'}elseif($State -eq 'Failed'){'Failure'}else{'Success'} }
         }
         [void](Add-NTKPerformanceTiming -Name 'operation.lifecycle' -DurationMs ([Math]::Max(0,$durationMs)) -Tags @{Operation=$Operation.Name;State=$Operation.State;CompletionKind=$Operation.CompletionKind;Message=$Operation.Message} -Outcome $outcome)
+        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'operation.lifecycle' -Tags @{Operation=$Operation.Name;State=$Operation.State;CompletionKind=$Operation.CompletionKind} -Context $Controller.Context)
+        }
     }
     return $Operation
 }
@@ -172,6 +175,9 @@ function Global:Start-NTKBackgroundOperation {
     $Controller.Operations[$Name] = $operation
     if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
         [void](Add-NTKPerformanceTiming -Name 'operation.lifecycle' -DurationMs 0 -Tags @{Operation=$Name;State='Started';MetadataKind=if($Metadata -and $Metadata.PSObject.Properties['Kind']){[string]$Metadata.Kind}else{''}} -Outcome 'Success')
+        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'operation.lifecycle' -Tags @{Operation=$Name;State='Started';MetadataKind=if($Metadata -and $Metadata.PSObject.Properties['Kind']){[string]$Metadata.Kind}else{''}} -Context $Controller.Context)
+        }
     }
     return $operation
 }

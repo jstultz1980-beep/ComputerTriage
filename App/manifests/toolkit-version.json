@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260714171734,
-    "SourceUpdatedAt":  "2026-07-14T17:17:34.0000000-05:00",
-    "ReleaseNotes":  "TASK-0114 performance QA instrumentation, ReadyForUser timing, Settings-only dashboard, and telemetry retention/export."
+    "Build":  20260715100130,
+    "SourceUpdatedAt":  "2026-07-15T10:01:30.0892845-05:00",
+    "ReleaseNotes":  "TASK-0114 resource snapshot QA telemetry, settings dashboard, and report coverage."
 }

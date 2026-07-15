@@ -17149,6 +17149,9 @@ function Build-Form {
         Add-GUITabLoadingPlaceholder -Page $startupPage -Text "Loading $($startupPage.Text)..."
         if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue -and $script:GUIStartupStopwatch){
             [void](Add-NTKPerformanceTiming -Name 'gui.startup.default-tab-ready' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{StartupTab=$startupPage.Text} -Context $Global:NTKPerformanceRunContext)
+            if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+                [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.startup.default-tab-ready' -Tags @{StartupTab=$startupPage.Text} -Context $Global:NTKPerformanceRunContext)
+            }
         }
         Update-GUIStaticTabStripSelection
         $Form.Add_Shown({
@@ -17175,6 +17178,9 @@ function Build-Form {
                     if(!$script:GUIReadyForUserRecorded -and (Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue) -and $script:GUIStartupStopwatch){
                         $script:GUIReadyForUserRecorded = $true
                         [void](Add-NTKPerformanceTiming -Name 'gui.startup.ready-for-user' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{StartupTab=$(if($script:MainTabs -and $script:MainTabs.SelectedTab){$script:MainTabs.SelectedTab.Text}else{$script:GUIStartupPageName})} -Context $Global:NTKPerformanceRunContext)
+                        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+                            [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.startup.ready-for-user' -Tags @{StartupTab=$(if($script:MainTabs -and $script:MainTabs.SelectedTab){$script:MainTabs.SelectedTab.Text}else{$script:GUIStartupPageName})} -Context $Global:NTKPerformanceRunContext)
+                        }
                     }
                 }
                 catch {
@@ -17189,6 +17195,9 @@ function Build-Form {
     Enable-GUIDoubleBuffering -Control $Form
     if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue -and $script:GUIStartupStopwatch){
         [void](Add-NTKPerformanceTiming -Name 'gui.startup.static-ui' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{Stage='FormAndTabs'} -Context $Global:NTKPerformanceRunContext)
+        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.startup.static-ui' -Tags @{Stage='FormAndTabs'} -Context $Global:NTKPerformanceRunContext)
+        }
     }
 }
 
@@ -17196,14 +17205,17 @@ Register-GUIExceptionHandlers
 Build-Form
 Add-GUILog "Loaded GUI launcher from $GuiRoot"
 Add-GUILog "Using shared toolkit from $SharedToolkitRoot"
-if($script:GUIStartupStopwatch){
-    $script:GUIStartupStopwatch.Stop()
-    Add-GUILog ("GUI shell initialized in {0} ms" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
-    Write-GUIDiagnosticLog -Event 'GUIStartupShellReady' -Tool 'GUI' -Detail ("ElapsedMs={0}; DeferredStartupTab=True" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
-    if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
-        [void](Add-NTKPerformanceTiming -Name 'gui.startup.shell' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{SmokeTest=[bool]$SmokeTest;ButtonSmokeTest=[bool]$ButtonSmokeTest})
+    if($script:GUIStartupStopwatch){
+        $script:GUIStartupStopwatch.Stop()
+        Add-GUILog ("GUI shell initialized in {0} ms" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
+        Write-GUIDiagnosticLog -Event 'GUIStartupShellReady' -Tool 'GUI' -Detail ("ElapsedMs={0}; DeferredStartupTab=True" -f $script:GUIStartupStopwatch.ElapsedMilliseconds)
+        if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceTiming -Name 'gui.startup.shell' -DurationMs $script:GUIStartupStopwatch.ElapsedMilliseconds -Tags @{SmokeTest=[bool]$SmokeTest;ButtonSmokeTest=[bool]$ButtonSmokeTest})
+            if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+                [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.startup.shell' -Tags @{SmokeTest=[bool]$SmokeTest;ButtonSmokeTest=[bool]$ButtonSmokeTest} -Context $Global:NTKPerformanceRunContext)
+            }
+        }
     }
-}
 if($script:ToolkitLoadFailures.Count -gt 0){
     foreach($failure in $script:ToolkitLoadFailures){
         Add-GUILog ("Toolkit load failure [{0}] {1}: {2}" -f $failure.Stage,$failure.Name,$failure.Error)

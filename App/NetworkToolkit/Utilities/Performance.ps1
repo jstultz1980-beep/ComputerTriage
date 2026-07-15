@@ -86,9 +86,92 @@ function Global:Get-NTKPerformanceEnvironmentFingerprint {
     }
 }
 
+function Global:Get-NTKPerformanceResourceSnapshot {
+    param(
+        [string]$Name = 'current',
+        [object]$Process = $null
+    )
+
+    if(!$Process){
+        $Process = [System.Diagnostics.Process]::GetCurrentProcess()
+    }
+
+    try { $Process.Refresh() } catch {}
+
+    $workingSetMb = $null
+    $privateMemoryMb = $null
+    $handleCount = $null
+    $threadCount = $null
+    $cpuTimeMs = $null
+
+    try { if($null -ne $Process.WorkingSet64){ $workingSetMb = [Math]::Round(([double]$Process.WorkingSet64 / 1MB),2) } } catch {}
+    try { if($null -ne $Process.PrivateMemorySize64){ $privateMemoryMb = [Math]::Round(([double]$Process.PrivateMemorySize64 / 1MB),2) } } catch {}
+    try { if($null -ne $Process.HandleCount){ $handleCount = [long]$Process.HandleCount } } catch {}
+    try { if($Process.Threads){ $threadCount = [long]$Process.Threads.Count } } catch {}
+    try {
+        if($null -ne $Process.TotalProcessorTime){
+            $cpuTimeMs = [Math]::Round($Process.TotalProcessorTime.TotalMilliseconds,2)
+        }
+    }
+    catch {}
+
+    return [pscustomobject]@{
+        schemaVersion = '1.0'
+        capturedAtUtc = [datetimeoffset]::UtcNow.ToString('o')
+        capturedAtOffset = [datetimeoffset]::Now.Offset.ToString()
+        name = $Name
+        processId = if($Process -and $Process.Id){ [int]$Process.Id }else{ $null }
+        processName = if($Process -and $Process.ProcessName){ [string]$Process.ProcessName }else{ $null }
+        workingSetMb = $workingSetMb
+        privateMemoryMb = $privateMemoryMb
+        handleCount = $handleCount
+        threadCount = $threadCount
+        cpuTimeMs = $cpuTimeMs
+    }
+}
+
 function Global:Get-NTKPerformanceTelemetryPath {
     $logRoot = if($Global:NTKPaths -and $Global:NTKPaths.Logs){$Global:NTKPaths.Logs}else{$Global:NTKPerformanceDefaultLogRoot}
     return Join-Path $logRoot 'Performance\performance.jsonl'
+}
+
+function Global:Add-NTKPerformanceResourceSnapshot {
+    param(
+        [Parameter(Mandatory=$true)][string]$Name,
+        [hashtable]$Tags = @{},
+        [object]$Process = $null,
+        [object]$Context = $Global:NTKPerformanceRunContext
+    )
+
+    if(!$Context){ return $null }
+    if(!$Process){
+        $Process = [System.Diagnostics.Process]::GetCurrentProcess()
+    }
+
+    $snapshot = Get-NTKPerformanceResourceSnapshot -Name $Name -Process $Process
+    $record = [pscustomobject][ordered]@{
+        schemaVersion = $snapshot.schemaVersion
+        runId = [string]$Context.RunId
+        name = $snapshot.name
+        capturedAtUtc = $snapshot.capturedAtUtc
+        capturedAtOffset = $snapshot.capturedAtOffset
+        processId = $snapshot.processId
+        processName = $snapshot.processName
+        workingSetMb = $snapshot.workingSetMb
+        privateMemoryMb = $snapshot.privateMemoryMb
+        handleCount = $snapshot.handleCount
+        threadCount = $snapshot.threadCount
+        cpuTimeMs = $snapshot.cpuTimeMs
+        toolkitVersion = if($Context.ToolkitVersionInfo){ [string]$Context.ToolkitVersionInfo.Version }else{ $null }
+        sourceCommit = if($Context.SourceCommit){ [string]$Context.SourceCommit }else{ $null }
+        environmentFingerprint = if($Context.EnvironmentFingerprint){ $Context.EnvironmentFingerprint }else{ $null }
+        tags = [pscustomobject]$Tags
+    }
+    if(-not $Context.ResourceSnapshots){
+        $Context.ResourceSnapshots = New-Object System.Collections.ArrayList
+    }
+    [void]$Context.ResourceSnapshots.Add($record)
+    return $record
 }
 
 function Global:Resolve-NTKPerformanceEventParts {
@@ -160,6 +243,10 @@ function Global:Get-NTKPerformanceRunHistory {
         if($record.timings){
             $timings = @($record.timings)
         }
+        $resourceSnapshots = @()
+        if($record.resourceSnapshots){
+            $resourceSnapshots = @($record.resourceSnapshots)
+        }
 
         $durations = @($timings | Where-Object { $null -ne $_.durationMs } | Select-Object -ExpandProperty durationMs)
         $lastTiming = if($timings.Count -gt 0){ $timings | Select-Object -Last 1 }else{ $null }
@@ -180,6 +267,7 @@ function Global:Get-NTKPerformanceRunHistory {
             sourceCommit = if($record.sourceCommit){ $record.sourceCommit }else{ $null }
             environmentFingerprint = if($record.environmentFingerprint){ $record.environmentFingerprint }else{ $null }
             timings = @($timings)
+            resourceSnapshots = @($resourceSnapshots)
         }
         [void]$runs.Add($currentRun)
     }
@@ -245,12 +333,79 @@ function Global:Get-NTKPerformanceMetricSummary {
     return @($summary)
 }
 
+function Global:Get-NTKPerformanceResourceSummary {
+    param([object[]]$Runs)
+
+    $snapshots = @()
+    foreach($run in @($Runs)){
+        foreach($snapshot in @($run.resourceSnapshots)){
+            $snapshots += [pscustomobject]@{
+                runId = [string]$run.runId
+                runStartedAtUtc = [string]$run.startedAtUtc
+                name = [string]$snapshot.name
+                workingSetMb = if($null -ne $snapshot.workingSetMb){ [double]$snapshot.workingSetMb }else{ $null }
+                privateMemoryMb = if($null -ne $snapshot.privateMemoryMb){ [double]$snapshot.privateMemoryMb }else{ $null }
+                handleCount = if($null -ne $snapshot.handleCount){ [double]$snapshot.handleCount }else{ $null }
+                threadCount = if($null -ne $snapshot.threadCount){ [double]$snapshot.threadCount }else{ $null }
+                cpuTimeMs = if($null -ne $snapshot.cpuTimeMs){ [double]$snapshot.cpuTimeMs }else{ $null }
+                capturedAtUtc = if($snapshot.capturedAtUtc){ [string]$snapshot.capturedAtUtc }else{ '' }
+            }
+        }
+    }
+
+    $summary = New-Object System.Collections.ArrayList
+    foreach($group in @($snapshots | Group-Object name | Sort-Object Name)){
+        $ordered = @($group.Group | Sort-Object runStartedAtUtc)
+        $last = if($ordered.Count -gt 0){ $ordered[-1] }else{ $null }
+        $previous = if($ordered.Count -gt 1){ $ordered[-2] }else{ $null }
+        $workingSetValues = @($ordered | Where-Object { $null -ne $_.workingSetMb } | Select-Object -ExpandProperty workingSetMb)
+        $privateMemoryValues = @($ordered | Where-Object { $null -ne $_.privateMemoryMb } | Select-Object -ExpandProperty privateMemoryMb)
+        $handleValues = @($ordered | Where-Object { $null -ne $_.handleCount } | Select-Object -ExpandProperty handleCount)
+        $threadValues = @($ordered | Where-Object { $null -ne $_.threadCount } | Select-Object -ExpandProperty threadCount)
+        $cpuValues = @($ordered | Where-Object { $null -ne $_.cpuTimeMs } | Select-Object -ExpandProperty cpuTimeMs)
+
+        [void]$summary.Add([pscustomobject]@{
+            name = [string]$group.Name
+            sampleCount = $ordered.Count
+            workingSetAverageMb = if($workingSetValues.Count -gt 0){ [Math]::Round((($workingSetValues | Measure-Object -Average).Average),2) }else{ $null }
+            workingSetBestMb = if($workingSetValues.Count -gt 0){ [Math]::Round((($workingSetValues | Measure-Object -Minimum).Minimum),2) }else{ $null }
+            workingSetWorstMb = if($workingSetValues.Count -gt 0){ [Math]::Round((($workingSetValues | Measure-Object -Maximum).Maximum),2) }else{ $null }
+            privateMemoryAverageMb = if($privateMemoryValues.Count -gt 0){ [Math]::Round((($privateMemoryValues | Measure-Object -Average).Average),2) }else{ $null }
+            privateMemoryBestMb = if($privateMemoryValues.Count -gt 0){ [Math]::Round((($privateMemoryValues | Measure-Object -Minimum).Minimum),2) }else{ $null }
+            privateMemoryWorstMb = if($privateMemoryValues.Count -gt 0){ [Math]::Round((($privateMemoryValues | Measure-Object -Maximum).Maximum),2) }else{ $null }
+            handleAverage = if($handleValues.Count -gt 0){ [Math]::Round((($handleValues | Measure-Object -Average).Average),2) }else{ $null }
+            handleBest = if($handleValues.Count -gt 0){ [Math]::Round((($handleValues | Measure-Object -Minimum).Minimum),2) }else{ $null }
+            handleWorst = if($handleValues.Count -gt 0){ [Math]::Round((($handleValues | Measure-Object -Maximum).Maximum),2) }else{ $null }
+            threadAverage = if($threadValues.Count -gt 0){ [Math]::Round((($threadValues | Measure-Object -Average).Average),2) }else{ $null }
+            threadBest = if($threadValues.Count -gt 0){ [Math]::Round((($threadValues | Measure-Object -Minimum).Minimum),2) }else{ $null }
+            threadWorst = if($threadValues.Count -gt 0){ [Math]::Round((($threadValues | Measure-Object -Maximum).Maximum),2) }else{ $null }
+            cpuAverageMs = if($cpuValues.Count -gt 0){ [Math]::Round((($cpuValues | Measure-Object -Average).Average),2) }else{ $null }
+            cpuBestMs = if($cpuValues.Count -gt 0){ [Math]::Round((($cpuValues | Measure-Object -Minimum).Minimum),2) }else{ $null }
+            cpuWorstMs = if($cpuValues.Count -gt 0){ [Math]::Round((($cpuValues | Measure-Object -Maximum).Maximum),2) }else{ $null }
+            lastWorkingSetMb = if($last){ $last.workingSetMb }else{ $null }
+            lastPrivateMemoryMb = if($last){ $last.privateMemoryMb }else{ $null }
+            lastHandleCount = if($last){ $last.handleCount }else{ $null }
+            lastThreadCount = if($last){ $last.threadCount }else{ $null }
+            lastCpuTimeMs = if($last){ $last.cpuTimeMs }else{ $null }
+            regressionWorkingSetMb = if($last -and $previous -and $null -ne $last.workingSetMb -and $null -ne $previous.workingSetMb){ [Math]::Round(([double]$last.workingSetMb - [double]$previous.workingSetMb),2) }else{ $null }
+            regressionPrivateMemoryMb = if($last -and $previous -and $null -ne $last.privateMemoryMb -and $null -ne $previous.privateMemoryMb){ [Math]::Round(([double]$last.privateMemoryMb - [double]$previous.privateMemoryMb),2) }else{ $null }
+            regressionHandleCount = if($last -and $previous -and $null -ne $last.handleCount -and $null -ne $previous.handleCount){ [Math]::Round(([double]$last.handleCount - [double]$previous.handleCount),2) }else{ $null }
+            regressionThreadCount = if($last -and $previous -and $null -ne $last.threadCount -and $null -ne $previous.threadCount){ [Math]::Round(([double]$last.threadCount - [double]$previous.threadCount),2) }else{ $null }
+            regressionCpuTimeMs = if($last -and $previous -and $null -ne $last.cpuTimeMs -and $null -ne $previous.cpuTimeMs){ [Math]::Round(([double]$last.cpuTimeMs - [double]$previous.cpuTimeMs),2) }else{ $null }
+            lastRunId = if($last){ [string]$last.runId }else{ '' }
+        })
+    }
+
+    return @($summary)
+}
+
 function Global:Get-NTKPerformanceDashboardModel {
     param([int]$KeepRecent = 12)
 
     $history = Get-NTKPerformanceRunHistory -KeepRecent $KeepRecent
     $runs = @($history.Runs)
     $metrics = @(Get-NTKPerformanceMetricSummary -Runs $runs)
+    $resourceSummaries = @(Get-NTKPerformanceResourceSummary -Runs $runs)
     $current = if($Global:NTKPerformanceRunContext){
         [pscustomobject]@{
             runId = [string]$Global:NTKPerformanceRunContext.RunId
@@ -258,10 +413,12 @@ function Global:Get-NTKPerformanceDashboardModel {
             startedAtUtc = [string]$Global:NTKPerformanceRunContext.StartedAtUtc.ToString('o')
             elapsedMs = [long]$Global:NTKPerformanceRunContext.Stopwatch.ElapsedMilliseconds
             timingCount = @($Global:NTKPerformanceRunContext.Timings).Count
+            resourceSnapshotCount = @($Global:NTKPerformanceRunContext.ResourceSnapshots).Count
             observationCount = $Global:NTKPerformanceRunContext.Observations.Count
             toolkitVersion = if($Global:NTKPerformanceRunContext.ToolkitVersionInfo){ $Global:NTKPerformanceRunContext.ToolkitVersionInfo.Version }else{ $null }
             sourceCommit = $Global:NTKPerformanceRunContext.SourceCommit
             environmentFingerprint = $Global:NTKPerformanceRunContext.EnvironmentFingerprint
+            resourceSnapshots = @($Global:NTKPerformanceRunContext.ResourceSnapshots)
         }
     }else{
         $null
@@ -270,12 +427,13 @@ function Global:Get-NTKPerformanceDashboardModel {
     $dataQuality = [pscustomobject]@{
         totalRuns = $runs.Count
         totalTimings = @($runs | ForEach-Object { @($_.timings).Count } | Measure-Object -Sum).Sum
+        totalResourceSnapshots = @($runs | ForEach-Object { @($_.resourceSnapshots).Count } | Measure-Object -Sum).Sum
         corruptTail = [bool]$history.Telemetry.CorruptTail
         corruptLineCount = [int]$history.Telemetry.CorruptLineCount
         sampleSizeWarning = if($runs.Count -lt 5){ 'Fewer than 5 recent runs are available.' }else{ $null }
     }
 
-    $qualityState = if($runs.Count -eq 0){ 'InsufficientData' }elseif($runs.Count -lt 5 -or $history.Telemetry.CorruptTail){ 'Warning' }else{ 'Pass' }
+    $qualityState = if($runs.Count -eq 0){ 'InsufficientData' }elseif($runs.Count -lt 5 -or $history.Telemetry.CorruptTail -or $dataQuality.totalResourceSnapshots -eq 0){ 'Warning' }else{ 'Pass' }
 
     return [pscustomobject]@{
         schemaVersion = '1.0'
@@ -284,6 +442,7 @@ function Global:Get-NTKPerformanceDashboardModel {
         currentRun = $current
         recentRuns = $runs
         metricSummaries = $metrics
+        resourceSummaries = $resourceSummaries
         dataQuality = $dataQuality
         overallState = $qualityState
     }
@@ -355,8 +514,9 @@ function Global:Export-NTKPerformanceQABundle {
         telemetryLastModifiedUtc = if($model.telemetryLastModifiedUtc){ [string]$model.telemetryLastModifiedUtc }else{ $null }
         currentRun = $model.currentRun
         dataQuality = $model.dataQuality
-        recentRuns = @($model.recentRuns | Select-Object runId,name,startedAtUtc,completedAtUtc,durationMs,timingCount,averageTimingMs,bestTimingMs,worstTimingMs,lastTimingName,lastTimingMs,toolkitVersion,sourceCommit)
+        recentRuns = @($model.recentRuns | Select-Object runId,name,startedAtUtc,completedAtUtc,durationMs,timingCount,resourceSnapshotCount,averageTimingMs,bestTimingMs,worstTimingMs,lastTimingName,lastTimingMs,toolkitVersion,sourceCommit)
         metricSummaries = @($model.metricSummaries)
+        resourceSummaries = @($model.resourceSummaries)
     }
 
     $summaryPath = Join-Path $bundleRoot 'qa-performance-summary.json'
@@ -369,12 +529,34 @@ function Global:Export-NTKPerformanceQABundle {
     [void]$lines.Add(("Overall state: {0}" -f $summary.overallState))
     [void]$lines.Add(("Recent runs: {0}" -f $summary.recentRuns.Count))
     [void]$lines.Add(("Metric groups: {0}" -f $summary.metricSummaries.Count))
+    [void]$lines.Add(("Resource groups: {0}" -f $summary.resourceSummaries.Count))
     if($summary.dataQuality.sampleSizeWarning){ [void]$lines.Add(("Warning: {0}" -f $summary.dataQuality.sampleSizeWarning)) }
     if($summary.dataQuality.corruptTail){ [void]$lines.Add(("Warning: telemetry log has a corrupt tail record. Corrupt lines: {0}" -f $summary.dataQuality.corruptLineCount)) }
+    if($summary.currentRun -and $summary.currentRun.resourceSnapshotCount -ne $null){ [void]$lines.Add(("Current resource snapshots: {0}" -f $summary.currentRun.resourceSnapshotCount)) }
     if($summary.currentRun){ [void]$lines.Add(("Current run: {0} ({1} ms)" -f $summary.currentRun.name,$summary.currentRun.elapsedMs)) }
     if($summary.metricSummaries.Count -gt 0){
         [void]$lines.Add('')
-        [void]$lines.Add('Top metrics:')
+        [void]$lines.Add('Startup metrics:')
+        foreach($metric in @($summary.metricSummaries | Where-Object { $_.name -like 'gui.startup.*' } | Select-Object -First 8)){
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; state={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$metric.budgetState))
+        }
+        [void]$lines.Add('')
+        [void]$lines.Add('Navigation metrics:')
+        foreach($metric in @($summary.metricSummaries | Where-Object { $_.name -like 'gui.tab.*' -or $_.name -like 'navigation.*' } | Select-Object -First 8)){
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; state={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$metric.budgetState))
+        }
+        [void]$lines.Add('')
+        [void]$lines.Add('Operation metrics:')
+        foreach($metric in @($summary.metricSummaries | Where-Object { $_.name -like 'operation.*' -or $_.name -like 'provider.*' -or $_.name -like 'external-tool.*' } | Select-Object -First 8)){
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; state={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$metric.budgetState))
+        }
+        [void]$lines.Add('')
+        [void]$lines.Add('Resource trends:')
+        foreach($resource in @($summary.resourceSummaries | Select-Object -First 8)){
+            [void]$lines.Add((" - {0}: count={1}; ws={2}/{3}/{4} MB; private={5}/{6}/{7} MB; handles={8}/{9}/{10}; threads={11}/{12}/{13}; cpu={14}/{15}/{16} ms; regression(ws/private/handles/threads/cpu)={17}/{18}/{19}/{20}/{21}" -f $resource.name,$resource.sampleCount,$resource.workingSetAverageMb,$resource.workingSetBestMb,$resource.workingSetWorstMb,$resource.privateMemoryAverageMb,$resource.privateMemoryBestMb,$resource.privateMemoryWorstMb,$resource.handleAverage,$resource.handleBest,$resource.handleWorst,$resource.threadAverage,$resource.threadBest,$resource.threadWorst,$resource.cpuAverageMs,$resource.cpuBestMs,$resource.cpuWorstMs,$resource.regressionWorkingSetMb,$resource.regressionPrivateMemoryMb,$resource.regressionHandleCount,$resource.regressionThreadCount,$resource.regressionCpuTimeMs))
+        }
+        [void]$lines.Add('')
+        [void]$lines.Add('Regression-oriented metrics:')
         foreach($metric in @($summary.metricSummaries | Select-Object -First 12)){
             [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; state={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$metric.budgetState))
         }
@@ -440,6 +622,7 @@ function Global:Start-NTKPerformanceRun {
         Stopwatch = [Diagnostics.Stopwatch]::StartNew()
         Budgets = Get-NTKPerformanceBudgets
         Timings = New-Object Collections.ArrayList
+        ResourceSnapshots = New-Object Collections.ArrayList
         Observations = @{}
         ProviderHealth = @{}
         ParentContext = $parentContext
@@ -448,6 +631,7 @@ function Global:Start-NTKPerformanceRun {
         EnvironmentFingerprint = $environmentFingerprint
     }
     $Global:NTKPerformanceRunContext = $context
+    [void](Add-NTKPerformanceResourceSnapshot -Name 'run.start' -Tags @{Point='Start-NTKPerformanceRun'} -Context $context)
     return [pscustomobject]@{ Context=$context; OwnsContext=$true; Name=$Name }
 }
 
@@ -586,6 +770,7 @@ function Global:Complete-NTKPerformanceRun {
     param([Parameter(Mandatory=$true)][object]$Handle,[string]$ResultPath)
     if(!$Handle.OwnsContext){ return $Handle.Context }
     $context = $Handle.Context
+    [void](Add-NTKPerformanceResourceSnapshot -Name 'run.complete' -Tags @{Point='Complete-NTKPerformanceRun'} -Context $context)
     if($context.Stopwatch.IsRunning){ $context.Stopwatch.Stop() }
     $summary = [pscustomobject][ordered]@{
         schemaVersion = '1.0'
@@ -595,6 +780,7 @@ function Global:Complete-NTKPerformanceRun {
         completedAtUtc = [datetimeoffset]::UtcNow.ToString('o')
         durationMs = $context.Stopwatch.ElapsedMilliseconds
         timings = @($context.Timings.ToArray())
+        resourceSnapshots = @($context.ResourceSnapshots.ToArray())
         providerHealth = @($context.ProviderHealth.GetEnumerator() | ForEach-Object { [pscustomobject]@{provider=$_.Key;state=$_.Value.State;error=$_.Value.Error;capturedAtUtc=$_.Value.CapturedAtUtc} })
         observationCount = $context.Observations.Count
         toolkitVersion = $context.ToolkitVersionInfo

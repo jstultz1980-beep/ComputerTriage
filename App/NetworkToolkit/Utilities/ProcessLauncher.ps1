@@ -65,9 +65,15 @@ param(
                 $outcome = 'Failure'
             }
             [void](Add-NTKPerformanceTiming -Name 'external-tool.execution' -DurationMs ([long]$executionMs) -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;ExitCode=$exitCode;RetryCount=$RetryCount;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated} -Outcome $outcome)
+            if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+                [void](Add-NTKPerformanceResourceSnapshot -Name 'external-tool.execution' -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;ExitCode=$exitCode;RetryCount=$RetryCount;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated} -Context $Global:NTKPerformanceRunContext)
+            }
         }
 
         [void](Add-NTKPerformanceTiming -Name 'external-tool.launch' -DurationMs ([long]$watch.ElapsedMilliseconds) -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated;RetryCount=$RetryCount;ExitCode=$exitCode;ExecutionMs=$executionMs} -Outcome $outcome)
+        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'external-tool.launch' -Tags @{FilePath=$FilePath;ArgumentCount=$cleanArguments.Count;Wait=[bool]$Wait;PassThru=[bool]$PassThru;Elevated=[bool]$Elevated;RetryCount=$RetryCount;ExitCode=$exitCode;ExecutionMs=$executionMs} -Context $Global:NTKPerformanceRunContext)
+        }
     }
 
     if($PassThru){
