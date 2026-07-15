@@ -8,23 +8,30 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 16 / 25 | TASK-0114 handoff and roadmap boundary reconciliation. |
+| Repository Governance | 17 / 25 | TASK-0117 handoff, queue, and roadmap completion reconciliation. |
 | Architecture | 20 / 25 | TASK-0114 resource snapshots, shutdown telemetry, and QA model extension. |
-| Documentation | 25 / 25 | TASK-0114 performance QA evidence and closeout records. |
-| Task System | 10 / 25 | TASK-0114 release of the active implementation boundary to Project Custodian review. |
+| Documentation | 1 / 25 | TASK-0117 layout-remediation closeout evidence and validation record. |
+| Task System | 12 / 25 | TASK-0117 completion record and active-task boundary closeout. |
 | Evidence Collection and Deterministic Analysis | 11 / 25 | TASK-0114 QA evidence packet and structured performance sample capture. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
 | Reporting | 6 / 25 | TASK-0114 QA dashboard/report summaries and evidence export. |
-| UI | 7 / 25 | TASK-0114 Settings-only performance dashboard and shutdown telemetry. |
+| UI | 9 / 25 | TASK-0117 responsive initial layout and DPI remediation. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 9 / 25 | TASK-0114 build metadata refresh for the performance QA closeout. |
-| Validation/Test Framework | 17 / 25 | TASK-0114 performance/cache, shutdown, and evidence validation coverage. |
-| Roadmap/Backlog | 13 / 25 | TASK-0114 closeout and Project Custodian performance QA review boundary. |
+| Build System | 10 / 25 | TASK-0117 build metadata refresh for the layout-remediation closeout. |
+| Validation/Test Framework | 18 / 25 | TASK-0117 focused layout-boundary validation and repository gate coverage. |
+| Roadmap/Backlog | 15 / 25 | TASK-0117 completion and Project Custodian review boundary. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0117-01 | 2026-07-15 | TASK-0117 | Repository Governance | +1 | Reconciled the TASK-0117 completion handoff, queue, and roadmap boundaries for Project Custodian review. |
+| CHG-0117-02 | 2026-07-15 | TASK-0117 | UI | +1 | Reworked the default-launch client sizing and header-summary layout to prevent right-side clipping. |
+| CHG-0117-03 | 2026-07-15 | TASK-0117 | Documentation | +1 | Recorded the TASK-0117 completion evidence, validation record, and layout root-cause summary. |
+| CHG-0117-04 | 2026-07-15 | TASK-0117 | Task System | +1 | Closed TASK-0117 and removed the active implementation boundary. |
+| CHG-0117-05 | 2026-07-15 | TASK-0117 | Validation/Test Framework | +1 | Added focused layout-boundary validation and verified the repository gates after remediation. |
+| CHG-0117-06 | 2026-07-15 | TASK-0117 | Build System | +1 | Refreshed the toolkit build metadata for the layout-remediation closeout. |
+| CHG-0117-07 | 2026-07-15 | TASK-0117 | Roadmap/Backlog | +1 | Advanced the field-test maintenance roadmap to the Project Custodian review boundary. |
 | CHG-0114-01 | 2026-07-15 | TASK-0114 | Repository Governance | +1 | Reconciled TASK-0114 closeout handoff, queue, and roadmap boundaries for Project Custodian review. |
 | CHG-0114-02 | 2026-07-15 | TASK-0114 | Architecture | +1 | Extended the performance telemetry model with resource snapshots, shutdown timing, and orphan-process checks. |
 | CHG-0114-03 | 2026-07-15 | TASK-0114 | Documentation | +1 | Captured the TASK-0114 evidence packet, validation record, and task closeout notes. |

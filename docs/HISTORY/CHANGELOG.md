@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-15 - Responsive Layout And DPI Remediation Closeout
+
+- Completed TASK-0117 with client-size-based launch sizing, header-summary width clamping, and deterministic layout-boundary validation.
+- Validated parser, GUI smoke, button smoke, and canonical repository gates after the focused remediation.
+- Recorded the TASK-0117 completion evidence and updated the task-state, roadmap, handoff, queue, and build metadata records for Project Custodian review.
+
 ## 2026-07-15 - Documentation Audit Closeout And Field-Test Layout Remediation
 
 - Accepted TASK-0115 documentation-audit evidence and completed TASK-0116.

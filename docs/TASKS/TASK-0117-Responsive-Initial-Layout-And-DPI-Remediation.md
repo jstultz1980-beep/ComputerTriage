@@ -1,7 +1,7 @@
 # TASK-0117 - Responsive Initial Layout And DPI Remediation
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -46,16 +46,24 @@ A separate status-bar error reports that `Write-GUILog` is unavailable during de
 6. The fix must not introduce synchronous startup work or regress TASK-0112/TASK-0114 performance behavior.
 
 ## Acceptance Criteria
-- [ ] Default launch shows the complete right side of the interface without clipping.
-- [ ] Header, navigation rows, main content, right-side panels, and status bar remain inside the client area.
-- [ ] Supported window resizing does not create overlap or inaccessible controls.
-- [ ] Focused layout-boundary validation passes.
-- [ ] GUI smoke and button-smoke pass.
-- [ ] Cold-tab warm-up and performance QA validation remain passing.
-- [ ] PowerShell 5.1 parser validation passes.
-- [ ] Canonical repository validation passes or all applicable focused regression suites pass with documented justification.
-- [ ] The `Write-GUILog` startup defect is recorded separately and not silently folded into this task.
-- [ ] Preserved drift remains untouched.
+- [x] Default launch shows the complete right side of the interface without clipping.
+- [x] Header, navigation rows, main content, right-side panels, and status bar remain inside the client area.
+- [x] Supported window resizing does not create overlap or inaccessible controls.
+- [x] Focused layout-boundary validation passes.
+- [x] GUI smoke and button-smoke pass.
+- [x] Cold-tab warm-up and performance QA validation remain passing.
+- [x] PowerShell 5.1 parser validation passes.
+- [x] Canonical repository validation passes or all applicable focused regression suites pass with documented justification.
+- [x] The `Write-GUILog` startup defect is recorded separately and not silently folded into this task.
+- [x] Preserved drift remains untouched.
+
+## Completion Record
+
+- Validation evidence: `docs/REVIEWS/TASK-0117/VALIDATION.md`
+- Root cause: the main window sized itself with a fixed outer `Size` and a fixed header-summary minimum width, so the usable client area was smaller than the layout assumptions on launch and under scaling.
+- Captured layout dimensions: default client size `1280x720`; documented minimum client size `1200x680`.
+- Validation: PowerShell parser, GUI smoke, button smoke, focused layout-boundary validation, and canonical repository validation all passed.
+- Result: TASK-0117 responsive initial layout and DPI remediation is complete. The deferred-startup `Write-GUILog` failure remains separately tracked.
 
 ## Required Evidence
 - Before/after screenshots or captured layout dimensions for the default launch.

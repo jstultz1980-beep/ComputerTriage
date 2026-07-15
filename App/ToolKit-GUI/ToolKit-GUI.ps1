@@ -9623,11 +9623,70 @@ function Update-GUIHeaderLayout {
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
         $summaryLeft = 370
         $summaryRight = if($searchLeft){ $searchLeft - 16 }else{ $script:HeaderToolsPanel.Left - 16 }
-        $summaryWidth = [Math]::Max(430, $summaryRight - $summaryLeft)
-        $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
-        $script:HeaderSummaryPanel.Location = New-Object System.Drawing.Point($summaryLeft,10)
-        $script:HeaderSummaryPanel.Size = New-Object System.Drawing.Size($summaryWidth,58)
+        $summaryWidth = $summaryRight - $summaryLeft
+        if($summaryWidth -gt 0){
+            $script:HeaderSummaryPanel.Visible = $true
+            $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+            $script:HeaderSummaryPanel.Location = New-Object System.Drawing.Point($summaryLeft,10)
+            $script:HeaderSummaryPanel.Size = New-Object System.Drawing.Size($summaryWidth,58)
+        }
+        else{
+            $script:HeaderSummaryPanel.Visible = $false
+        }
     }
+}
+
+function Get-GUIInitialClientSize {
+    $minClientWidth = 1200
+    $minClientHeight = 680
+    $preferredClientWidth = 1280
+    $preferredClientHeight = 720
+
+    $screen = [System.Windows.Forms.Screen]::FromPoint([System.Windows.Forms.Cursor]::Position)
+    if(!$screen){
+        $screen = [System.Windows.Forms.Screen]::PrimaryScreen
+    }
+
+    $workingArea = if($screen){ $screen.WorkingArea }else{ [System.Drawing.Rectangle]::new(0,0,$preferredClientWidth,$preferredClientHeight) }
+    $clientWidth = [Math]::Min($preferredClientWidth, [Math]::Max($minClientWidth, $workingArea.Width - 24))
+    $clientHeight = [Math]::Min($preferredClientHeight, [Math]::Max($minClientHeight, $workingArea.Height - 48))
+
+    return New-Object System.Drawing.Size($clientWidth, $clientHeight)
+}
+
+function Test-GUILayoutBounds {
+    param(
+        [System.Windows.Forms.Control]$Control,
+        [string]$Path = $null
+    )
+
+    if(!$Control -or $Control.IsDisposed){
+        return @()
+    }
+
+    if([string]::IsNullOrWhiteSpace($Path)){
+        $Path = if([string]::IsNullOrWhiteSpace($Control.Name)){ $Control.GetType().Name }else{ $Control.Name }
+    }
+
+    $issues = New-Object System.Collections.Generic.List[string]
+    $containerRect = [System.Drawing.Rectangle]::new(0,0,$Control.ClientSize.Width,$Control.ClientSize.Height)
+
+    foreach($child in @($Control.Controls)){
+        if(!$child -or $child.IsDisposed -or -not $child.Visible){
+            continue
+        }
+
+        $childName = if([string]::IsNullOrWhiteSpace($child.Name)){ $child.GetType().Name }else{ $child.Name }
+        if($child.Right -gt $containerRect.Width -or $child.Bottom -gt $containerRect.Height -or $child.Left -lt 0 -or $child.Top -lt 0){
+            [void]$issues.Add(("{0} > {1}: child={2} bounds={3} parentClient={4}x{5}" -f $Path,$Control.GetType().Name,$childName,$child.Bounds,$containerRect.Width,$containerRect.Height))
+        }
+
+        foreach($issue in @(Test-GUILayoutBounds -Control $child -Path ($Path + "/" + $childName))){
+            [void]$issues.Add($issue)
+        }
+    }
+
+    return @($issues)
 }
 
 function Update-GUIStaticTabStripSelection {
@@ -16808,13 +16867,20 @@ function Build-Form {
     $Form.Text = "Network Toolkit"
     $Form.StartPosition = "CenterScreen"
     $Form.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::None
-    $Form.MinimumSize = New-Object System.Drawing.Size(1280,720)
-    $Form.Size = $Form.MinimumSize
     $Form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::Sizable
     $Form.MaximizeBox = $true
     $Form.ShowIcon = $true
     $Form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $Form.BackColor = $script:GUITheme.Shell
+
+    $initialClientSize = Get-GUIInitialClientSize
+    $Form.ClientSize = $initialClientSize
+    $nonClientWidth = [int]([Math]::Max(0, $Form.Size.Width - $Form.ClientSize.Width))
+    $nonClientHeight = [int]([Math]::Max(0, $Form.Size.Height - $Form.ClientSize.Height))
+    $minimumClientSize = New-Object System.Drawing.Size(1200,680)
+    $minimumWindowWidth = [int]$minimumClientSize.Width + [int]$nonClientWidth
+    $minimumWindowHeight = [int]$minimumClientSize.Height + [int]$nonClientHeight
+    $Form.MinimumSize = New-Object System.Drawing.Size($minimumWindowWidth,$minimumWindowHeight)
 
     if(Test-Path $GuiIconPath){
         $Form.Icon = New-Object System.Drawing.Icon($GuiIconPath)
@@ -17220,6 +17286,7 @@ function Build-Form {
         }
         Update-GUIStaticTabStripSelection
         $Form.Add_Shown({
+            Update-GUIHeaderLayout
             if($script:StartupTabBuildTimer){
                 try { $script:StartupTabBuildTimer.Stop(); $script:StartupTabBuildTimer.Dispose() } catch {}
                 $script:StartupTabBuildTimer = $null
@@ -17268,6 +17335,16 @@ function Build-Form {
 
 Register-GUIExceptionHandlers
 Build-Form
+if($SmokeTest -or $ButtonSmokeTest){
+    $layoutIssues = @(Test-GUILayoutBounds -Control $script:Form)
+    if($layoutIssues.Count -gt 0){
+        Write-Host "Focused layout-boundary validation failed:"
+        foreach($issue in $layoutIssues){
+            Write-Host $issue
+        }
+        exit 1
+    }
+}
 Add-GUILog "Loaded GUI launcher from $GuiRoot"
 Add-GUILog "Using shared toolkit from $SharedToolkitRoot"
     if($script:GUIStartupStopwatch){

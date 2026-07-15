@@ -6,21 +6,19 @@ Build a portable Windows toolkit that collects, validates, analyzes, explains, a
 
 ## Current Phase - Version 1.0 Field-Test Maintenance
 
-Status: Active.
+Status: Awaiting Project Custodian review.
 
 Current Active task:
-- `TASK-0117-Responsive-Initial-Layout-And-DPI-Remediation`
+- _None_
 
 Current objective:
-- Correct the default-launch right-side clipping found during real-world testing.
-- Add deterministic layout-boundary validation and verify supported resolution/scaling behavior.
+- Confirm TASK-0117 completion evidence and disposition the deferred-startup `Write-GUILog` defect separately.
 - Preserve the published `v1.0.0` tag and release artifacts unchanged.
 
 ## Current Sequence
 
-1. **TASK-0117 - Responsive Initial Layout And DPI Remediation**
-   - Correct horizontal overflow without broad UI redesign.
-   - Validate default launch, resizing, representative resolution, and DPI scaling.
+1. **Project Custodian review of TASK-0117**
+   - Confirm the validation evidence and close out the responsive-layout remediation.
 2. **Separate deferred-startup defect triage**
    - The `Write-GUILog` deferred-startup failure is not part of TASK-0117 and requires its own tracked disposition.
 3. **Continue structured field testing**
