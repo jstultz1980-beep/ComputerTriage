@@ -12,18 +12,19 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0116-Project-Custodian-Documentation-Engineering-Audit` | ChatGPT (Project Custodian) | Active | Review the TASK-0115 documentation-audit evidence, decide the Documentation gate, and activate the next boundary. |
+| `TASK-0117-Responsive-Initial-Layout-And-DPI-Remediation` | Codex | Active | Correct the real-world default-launch right-side clipping and add focused responsive-layout validation. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| _None_ | _None_ | _None_ | _None_ | No additional implementation task is queued behind TASK-0116. |
+| _None_ | _None_ | _None_ | _None_ | No additional task is queued behind TASK-0117. The deferred-startup `Write-GUILog` defect requires separate tracked disposition. |
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0116-Project-Custodian-Documentation-Engineering-Audit` | Complete | Accepted the documentation evidence, reset only Documentation, and activated the focused field-test layout remediation. |
 | `TASK-0115-Documentation-Audit-Preparation` | Complete | Prepared deterministic documentation-audit evidence for the TASK-0114 closeout and preserved the Documentation gate at `25 / 25`. |
 | `TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard` | Complete | Added launch-through-ReadyForUser telemetry, resource snapshots, shutdown/orphan checks, Settings-only dashboard reporting, and QA evidence. |
 | `TASK-0113-Version-1.0-Release-Publication` | Complete | Published `v1.0.0` from the accepted release commit and recorded the release metadata. |
@@ -37,7 +38,9 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
+- TASK-0116 accepted the Documentation audit and reset only Documentation to `0 / 25`.
+- Real-world field testing found the default toolkit view clipping the right side of the interface.
+- TASK-0117 is the sole Active task and is limited to responsive initial layout and DPI behavior.
+- The deferred-startup `Write-GUILog` failure is a separate defect and is out of TASK-0117 scope.
 - Version 1.0 remains published and unchanged.
-- Documentation reached `25 / 25`; TASK-0116 is now the sole Active task.
-- The Performance Dashboard remains accessible only from the Settings page.
 - No unrelated feature work, helper framework work, native replacement work, or broad UI redesign is authorized.
