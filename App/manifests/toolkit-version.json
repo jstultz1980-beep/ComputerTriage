@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260715100130,
-    "SourceUpdatedAt":  "2026-07-15T10:01:30.0892845-05:00",
-    "ReleaseNotes":  "TASK-0114 resource snapshot QA telemetry, settings dashboard, and report coverage."
+    "Build":  20260715111038,
+    "SourceUpdatedAt":  "2026-07-15T11:10:38.9437308-05:00",
+    "ReleaseNotes":  "TASK-0114 resource snapshots, shutdown telemetry, and QA dashboard/report coverage."
 }

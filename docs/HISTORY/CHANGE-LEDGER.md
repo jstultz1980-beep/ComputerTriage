@@ -8,23 +8,33 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 | Subsystem | Current Counter | Last Material Change |
 |---|---:|---|
-| Repository Governance | 15 / 25 | TASK-0097 focused procedure-reference consolidation. |
-| Architecture | 19 / 25 | TASK-0100 structured timing and run-scoped observation/provider contract. |
-| Documentation | 24 / 25 | TASK-0111 remediation evidence, release-candidate guidance, and resolved known limitations. |
-| Task System | 8 / 25 | TASK-0113 release closeout and queue handoff to the Project Custodian. |
-| Evidence Collection and Deterministic Analysis | 10 / 25 | TASK-0095 canonical HEPHAESTUS analysis ownership. |
+| Repository Governance | 16 / 25 | TASK-0114 handoff and roadmap boundary reconciliation. |
+| Architecture | 20 / 25 | TASK-0114 resource snapshots, shutdown telemetry, and QA model extension. |
+| Documentation | 25 / 25 | TASK-0114 performance QA evidence and closeout records. |
+| Task System | 10 / 25 | TASK-0114 release of the active implementation boundary to Project Custodian review. |
+| Evidence Collection and Deterministic Analysis | 11 / 25 | TASK-0114 QA evidence packet and structured performance sample capture. |
 | ARGUS | 10 / 25 | TASK-0090 citation, classification, priority, and confidence correctness. |
-| Reporting | 5 / 25 | TASK-0098 canonical metadata, escaping, and run-linked artifact state. |
-| UI | 5 / 25 | TASK-0112 queued warm-up, per-stage timing, and navigation responsiveness. |
+| Reporting | 6 / 25 | TASK-0114 QA dashboard/report summaries and evidence export. |
+| UI | 7 / 25 | TASK-0114 Settings-only performance dashboard and shutdown telemetry. |
 | Plugin Framework | 6 / 25 | TASK-0095 plugin discovery, compatibility, lifecycle, and isolation contract. |
-| Build System | 8 / 25 | TASK-0112 GUI warm-up helper integration and build metadata refresh. |
-| Validation/Test Framework | 15 / 25 | TASK-0112 warm-up controller and performance/cache validation. |
-| Roadmap/Backlog | 11 / 25 | Advanced to Version 1.0 release closeout and Project Custodian confirmation. |
+| Build System | 9 / 25 | TASK-0114 build metadata refresh for the performance QA closeout. |
+| Validation/Test Framework | 17 / 25 | TASK-0114 performance/cache, shutdown, and evidence validation coverage. |
+| Roadmap/Backlog | 13 / 25 | TASK-0114 closeout and Project Custodian performance QA review boundary. |
 
 ## Current Ledger Entries
 
 | Change ID | Date | Task | Subsystem | Counter Change | Description |
 |---|---|---|---|---:|---|
+| CHG-0114-01 | 2026-07-15 | TASK-0114 | Repository Governance | +1 | Reconciled TASK-0114 closeout handoff, queue, and roadmap boundaries for Project Custodian review. |
+| CHG-0114-02 | 2026-07-15 | TASK-0114 | Architecture | +1 | Extended the performance telemetry model with resource snapshots, shutdown timing, and orphan-process checks. |
+| CHG-0114-03 | 2026-07-15 | TASK-0114 | Documentation | +1 | Captured the TASK-0114 evidence packet, validation record, and task closeout notes. |
+| CHG-0114-04 | 2026-07-15 | TASK-0114 | Task System | +1 | Closed TASK-0114 and transferred the boundary to Project Custodian review. |
+| CHG-0114-05 | 2026-07-15 | TASK-0114 | Evidence Collection and Deterministic Analysis | +1 | Added structured cold-launch evidence and resource/shutdown sample capture for QA review. |
+| CHG-0114-06 | 2026-07-15 | TASK-0114 | Reporting | +1 | Extended the QA dashboard and evidence report summaries to include resource and shutdown analysis. |
+| CHG-0114-07 | 2026-07-15 | TASK-0114 | UI | +1 | Added the Settings-only performance dashboard updates and shutdown telemetry surfacing. |
+| CHG-0114-08 | 2026-07-15 | TASK-0114 | Build System | +1 | Refreshed the toolkit version manifest for the TASK-0114 closeout build. |
+| CHG-0114-09 | 2026-07-15 | TASK-0114 | Validation/Test Framework | +1 | Expanded the performance/cache fixture to cover resource and shutdown evidence. |
+| CHG-0114-10 | 2026-07-15 | TASK-0114 | Roadmap/Backlog | +1 | Advanced the roadmap from implementation to Project Custodian performance QA review. |
 | CHG-0113-01 | 2026-07-14 | TASK-0113 | Task System | +1 | Closed the Codex release-publication task and handed control back to the Project Custodian. |
 | CHG-0113-02 | 2026-07-14 | TASK-0113 | Roadmap/Backlog | +1 | Advanced the roadmap from release authorization to published release closeout. |
 | CHG-0112-01 | 2026-07-14 | TASK-0112 | UI | +1 | Added queued tab warm-up, per-stage first-open timing, and safe user-priority handling for cold navigation. |
@@ -141,4 +151,4 @@ A subsystem counter reaching `25 / 25` triggers automatic Codex Audit Preparatio
 
 ## Audit Closeout
 
-TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. TASK-0107 reset Roadmap/Backlog only. TASK-0109 reset Task System only. Future threshold audits follow the autonomous two-stage cycle.
+TASK-0085 reset Documentation only. TASK-0101 reset Validation/Test Framework only. TASK-0103 reset UI only. TASK-0105 reset Build System only. TASK-0107 reset Roadmap/Backlog only. TASK-0109 reset Task System only. TASK-0114 advanced Documentation to `25 / 25`, so the next step is an Audit Preparation task before any further implementation. Future threshold audits follow the autonomous two-stage cycle.

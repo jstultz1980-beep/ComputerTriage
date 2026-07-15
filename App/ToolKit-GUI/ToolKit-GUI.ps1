@@ -111,6 +111,8 @@ $script:GUITabWarmupTimer = $null
 $script:GUITabWarmupStartRecorded = $false
 $script:GUITabWarmupCompletionRecorded = $false
 $script:GUIReadyForUserRecorded = $false
+$script:GUIShutdownStopwatch = $null
+$script:GUIShutdownTelemetryRecorded = $false
 $script:SlowTabSwitchThresholdMs = 250
 $script:GuiSettings = $null
 $script:SettingsTabOrderList = $null
@@ -5054,6 +5056,7 @@ function Format-GUIPerformanceDashboardSummaryText {
     }
     [void]$lines.Add(("Recent runs: {0}" -f @($Model.recentRuns).Count))
     [void]$lines.Add(("Metric groups: {0}" -f @($Model.metricSummaries).Count))
+    [void]$lines.Add(("Resource groups: {0}" -f @($Model.resourceSummaries).Count))
     if($Model.dataQuality.sampleSizeWarning){
         [void]$lines.Add(("Data quality warning: {0}" -f $Model.dataQuality.sampleSizeWarning))
     }
@@ -5062,11 +5065,36 @@ function Format-GUIPerformanceDashboardSummaryText {
     }
     if(@($Model.metricSummaries).Count -gt 0){
         [void]$lines.Add('')
-        [void]$lines.Add('Top metrics:')
-        foreach($metric in @($Model.metricSummaries | Select-Object -First 10)){
+        [void]$lines.Add('Startup metrics:')
+        foreach($metric in @($Model.metricSummaries | Where-Object { $_.name -like 'gui.startup.*' } | Select-Object -First 6)){
             $budgetState = if($metric.budgetState){ $metric.budgetState }else{ 'Unbudgeted' }
             [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; budget={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$budgetState))
         }
+        [void]$lines.Add('')
+        [void]$lines.Add('Navigation metrics:')
+        foreach($metric in @($Model.metricSummaries | Where-Object { $_.name -like 'gui.tab.*' -or $_.name -like 'navigation.*' } | Select-Object -First 6)){
+            $budgetState = if($metric.budgetState){ $metric.budgetState }else{ 'Unbudgeted' }
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; budget={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$budgetState))
+        }
+        [void]$lines.Add('')
+        [void]$lines.Add('Operation and tool metrics:')
+        foreach($metric in @($Model.metricSummaries | Where-Object { $_.name -like 'operation.*' -or $_.name -like 'external-tool.*' } | Select-Object -First 6)){
+            $budgetState = if($metric.budgetState){ $metric.budgetState }else{ 'Unbudgeted' }
+            [void]$lines.Add((" - {0}: count={1}; avg={2} ms; best={3} ms; worst={4} ms; regression={5} ms; budget={6}" -f $metric.name,$metric.sampleCount,$metric.averageMs,$metric.bestMs,$metric.worstMs,$metric.regressionMs,$budgetState))
+        }
+    }
+    if(@($Model.resourceSummaries).Count -gt 0){
+        [void]$lines.Add('')
+        [void]$lines.Add('Resource trends:')
+        foreach($resource in @($Model.resourceSummaries | Select-Object -First 6)){
+            [void]$lines.Add((" - {0}: count={1}; ws={2}/{3}/{4} MB; private={5}/{6}/{7} MB; handles={8}/{9}/{10}; threads={11}/{12}/{13}; cpu={14}/{15}/{16} ms" -f $resource.name,$resource.sampleCount,$resource.workingSetAverageMb,$resource.workingSetBestMb,$resource.workingSetWorstMb,$resource.privateMemoryAverageMb,$resource.privateMemoryBestMb,$resource.privateMemoryWorstMb,$resource.handleAverage,$resource.handleBest,$resource.handleWorst,$resource.threadAverage,$resource.threadBest,$resource.threadWorst,$resource.cpuAverageMs,$resource.cpuBestMs,$resource.cpuWorstMs))
+        }
+    }
+    [void]$lines.Add('')
+    [void]$lines.Add('Regression and shutdown:')
+    foreach($metric in @($Model.metricSummaries | Where-Object { $_.name -like 'gui.shutdown.*' } | Select-Object -First 4)){
+        $budgetState = if($metric.budgetState){ $metric.budgetState }else{ 'Unbudgeted' }
+        [void]$lines.Add((" - {0}: count={1}; last={2} ms; regression={3} ms; budget={4}" -f $metric.name,$metric.sampleCount,$metric.lastMs,$metric.regressionMs,$budgetState))
     }
     return ($lines -join "`r`n")
 }
@@ -5085,7 +5113,7 @@ function Update-GUIPerformanceDashboardView {
 
     try {
         $model = Get-NTKPerformanceDashboardModel -KeepRecent 20
-        $SummaryLabel.Text = "State: $($model.overallState) | Recent runs: $(@($model.recentRuns).Count) | Metric groups: $(@($model.metricSummaries).Count)"
+        $SummaryLabel.Text = "State: $($model.overallState) | Recent runs: $(@($model.recentRuns).Count) | Metric groups: $(@($model.metricSummaries).Count) | Resource groups: $(@($model.resourceSummaries).Count)"
         $Grid.Rows.Clear()
         foreach($metric in @($model.metricSummaries)){
             [void]$Grid.Rows.Add(
@@ -5109,6 +5137,42 @@ function Update-GUIPerformanceDashboardView {
         $SummaryLabel.Text = "Performance dashboard unavailable."
         $ReportBox.Text = "Performance dashboard refresh failed:`r`n$($_.Exception.Message)"
         if($StatusLabel){ $StatusLabel.Text = "Refresh failed." }
+    }
+}
+
+function Invoke-GUIShutdownTelemetry {
+    param(
+        [string]$CloseReason = 'Unknown',
+        [bool]$Disposed = $false
+    )
+
+    if($script:GUIShutdownTelemetryRecorded){
+        return
+    }
+
+    $script:GUIShutdownTelemetryRecorded = $true
+    if(!$script:GUIShutdownStopwatch){
+        $script:GUIShutdownStopwatch = [Diagnostics.Stopwatch]::StartNew()
+    }
+
+    try {
+        $orphanProcesses = @(Get-GUIToolkitActivityProcesses)
+        if(Get-Command Add-NTKPerformanceTiming -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceTiming -Name 'gui.shutdown.start' -DurationMs ([long]$script:GUIShutdownStopwatch.ElapsedMilliseconds) -Tags @{CloseReason=$CloseReason;OrphanCount=$orphanProcesses.Count} -Context $Global:NTKPerformanceRunContext)
+            [void](Add-NTKPerformanceTiming -Name 'gui.shutdown.complete' -DurationMs ([long]$script:GUIShutdownStopwatch.ElapsedMilliseconds) -Tags @{CloseReason=$CloseReason;OrphanCount=$orphanProcesses.Count;Disposed=$Disposed} -Context $Global:NTKPerformanceRunContext)
+        }
+        if(Get-Command Add-NTKPerformanceResourceSnapshot -ErrorAction SilentlyContinue){
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.shutdown.orphan-check' -Tags @{CloseReason=$CloseReason;OrphanCount=$orphanProcesses.Count;Orphans=@($orphanProcesses | Select-Object -First 5 Name,PID,AgeSeconds,MemoryMB)} -Context $Global:NTKPerformanceRunContext)
+            [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.shutdown.complete' -Tags @{CloseReason=$CloseReason;Disposed=$Disposed} -Context $Global:NTKPerformanceRunContext)
+        }
+    }
+    catch {
+        Write-GUIDiagnosticLog -Event 'ShutdownTelemetryFailed' -Tool 'GUI' -Level 'WARN' -Detail $_.Exception.Message -Exception $_.Exception
+    }
+    finally {
+        if($script:GUIShutdownStopwatch -and $script:GUIShutdownStopwatch.IsRunning){
+            $script:GUIShutdownStopwatch.Stop()
+        }
     }
 }
 
@@ -16759,6 +16823,7 @@ function Build-Form {
     $Form.Add_FormClosing({
         param($sender,$eventArgs)
         Stop-GUIAsyncWorkers
+        Invoke-GUIShutdownTelemetry -CloseReason ([string]$eventArgs.CloseReason) -Disposed:$false
         Write-GUIDiagnosticLog -Event 'FormClosing' -Tool 'GUI' -Detail ("CloseReason={0}; Cancel={1}" -f $eventArgs.CloseReason,$eventArgs.Cancel)
     })
     $Form.Add_FormClosed({
@@ -17235,6 +17300,7 @@ if($script:ToolkitLoadFailures.Count -gt 0){
 if($SmokeTest){
     Write-Host "Network Toolkit GUI loaded successfully."
     Write-Host "Commands:" $script:Commands.Count
+    Invoke-GUIShutdownTelemetry -CloseReason 'SmokeTest' -Disposed:$true
     Stop-GUIAsyncWorkers
     if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
     if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
@@ -17375,6 +17441,7 @@ if($ButtonSmokeTest){
 
     Write-Host "Button smoke test completed."
     Write-Host "Quick tab: OK"
+    Invoke-GUIShutdownTelemetry -CloseReason 'ButtonSmokeTest' -Disposed:$true
     Stop-GUIAsyncWorkers
     if($script:Form -and !$script:Form.IsDisposed){ $script:Form.Dispose() }
     if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
@@ -17385,6 +17452,7 @@ try {
     [void]$Form.ShowDialog()
 }
 finally {
+    Invoke-GUIShutdownTelemetry -CloseReason 'ShowDialogFinally' -Disposed:[bool]($script:Form -and $script:Form.IsDisposed)
     if($script:GUIPerformanceHandle){ [void](Complete-NTKPerformanceRun -Handle $script:GUIPerformanceHandle -ResultPath $PerformanceResultPath) }
     if($script:OwnsGuiInstanceMutex -and $global:NetworkToolkitInstanceMutex){
         try { $global:NetworkToolkitInstanceMutex.ReleaseMutex() } catch {}

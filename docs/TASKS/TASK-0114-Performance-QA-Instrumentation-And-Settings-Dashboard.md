@@ -1,7 +1,7 @@
 # TASK-0114 - Performance QA Instrumentation And Settings Dashboard
 
 ## Status
-Active
+Complete
 
 ## Owner
 Codex
@@ -80,21 +80,28 @@ The automated report must cover:
 - Treating one unusually slow run as proof of a regression without sample context.
 
 ## Acceptance Criteria
-- [ ] Toolkit launch records a complete startup timeline through `ReadyForUser` using monotonic duration measurement.
-- [ ] Primary-tab first-open and warm-open timings are recorded without duplicate instrumentation or measurable UI regression.
-- [ ] Existing operation lifecycle timings are normalized into the performance QA dataset.
-- [ ] External-tool timing is recorded where toolkit-controlled launches occur.
-- [ ] Resource snapshots are captured at defined points with graceful fallback when a metric is unavailable.
-- [ ] Telemetry files are append-safe, bounded by retention policy, and recover from a corrupt final record without losing prior valid data.
-- [ ] No credentials, secrets, raw diagnostic evidence, or user document contents are stored in performance telemetry.
-- [ ] The Performance Dashboard is accessible only from Settings and nowhere in primary navigation.
-- [ ] The dashboard loads historical summaries without blocking the UI and supports reset/export with confirmation where destructive.
-- [ ] Automated QA output includes startup, navigation, operation, resource, regression, and data-quality results.
-- [ ] Budgets are documented, configurable where appropriate, and do not silently convert missing data into passes.
-- [ ] Focused telemetry, retention, corruption, dashboard-access, and report-generation tests pass.
-- [ ] PowerShell 5.1 parser, GUI smoke, button smoke, operation lifecycle, cold-tab, performance/cache, and canonical repository validation pass.
-- [ ] Technician-visible testing confirms the instrumentation itself does not create noticeable launch or navigation lag.
-- [ ] Required task, handoff, queue, roadmap, history, counter, and build-metadata records are reconciled.
+- [x] Toolkit launch records a complete startup timeline through `ReadyForUser` using monotonic duration measurement.
+- [x] Primary-tab first-open and warm-open timings are recorded without duplicate instrumentation or measurable UI regression.
+- [x] Existing operation lifecycle timings are normalized into the performance QA dataset.
+- [x] External-tool timing is recorded where toolkit-controlled launches occur.
+- [x] Resource snapshots are captured at defined points with graceful fallback when a metric is unavailable.
+- [x] Telemetry files are append-safe, bounded by retention policy, and recover from a corrupt final record without losing prior valid data.
+- [x] No credentials, secrets, raw diagnostic evidence, or user document contents are stored in performance telemetry.
+- [x] The Performance Dashboard is accessible only from Settings and nowhere in primary navigation.
+- [x] The dashboard loads historical summaries without blocking the UI and supports reset/export with confirmation where destructive.
+- [x] Automated QA output includes startup, navigation, operation, resource, regression, and data-quality results.
+- [x] Budgets are documented, configurable where appropriate, and do not silently convert missing data into passes.
+- [x] Focused telemetry, retention, corruption, dashboard-access, and report-generation tests pass.
+- [x] PowerShell 5.1 parser, GUI smoke, button smoke, operation lifecycle, cold-tab, performance/cache, and canonical repository validation pass.
+- [x] Technician-visible testing confirms the instrumentation itself does not create noticeable launch or navigation lag.
+- [x] Required task, handoff, queue, roadmap, history, counter, and build-metadata records are reconciled.
+
+## Completion Record
+
+- Validation evidence: `docs/REVIEWS/TASK-0114/VALIDATION.md`
+- Generated QA bundle: `App/NetworkToolkit/Utilities/Performance.ps1` `Export-NTKPerformanceQABundle`
+- Focused validation: parser, GUI smoke, button smoke, operation lifecycle, cold-tab, performance/cache, canonical architecture, and reporting/run-index checks
+- Result: TASK-0114 implementation complete; performance QA evidence and shutdown/orphan-process telemetry captured; ready for Project Custodian review
 
 ## Required Evidence
 - Startup stage timing table from at least five cold launches on the same representative machine.

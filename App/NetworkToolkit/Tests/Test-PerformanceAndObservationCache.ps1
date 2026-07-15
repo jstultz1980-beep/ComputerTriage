@@ -62,8 +62,11 @@ try {
     [void](Add-NTKPerformanceTiming -Name 'gui.startup.shell' -DurationMs 12 -Tags @{SmokeTest=$true})
     [void](Add-NTKPerformanceTiming -Name 'gui.startup.ready-for-user' -DurationMs 18 -Tags @{StartupTab='Quick Diagnosis'})
     [void](Add-NTKPerformanceTiming -Name 'external-tool.launch' -DurationMs 7 -Tags @{FilePath='tool.exe';RetryCount=0;ExitCode=0})
+    [void](Add-NTKPerformanceTiming -Name 'gui.shutdown.start' -DurationMs 4 -Tags @{CloseReason='UserClosing';OrphanCount=0})
+    [void](Add-NTKPerformanceTiming -Name 'gui.shutdown.complete' -DurationMs 6 -Tags @{Disposed=$true})
     [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.startup.ready-for-user' -Tags @{StartupTab='Quick Diagnosis'})
     [void](Add-NTKPerformanceResourceSnapshot -Name 'external-tool.launch' -Tags @{FilePath='tool.exe'})
+    [void](Add-NTKPerformanceResourceSnapshot -Name 'gui.shutdown.complete' -Tags @{Disposed=$true})
     [void](Complete-NTKPerformanceRun -Handle $qaHandle -ResultPath (Join-Path $root 'qa-result.json'))
 
     $telemetryPath = Get-NTKPerformanceTelemetryPath
@@ -79,11 +82,14 @@ try {
         durationMs = 30
         timings = @(
             [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.shell'; eventCategory='gui'; operationName='startup'; stageName='shell'; outcome='Success'; durationMs=12; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='WithinBudget'; tags=[pscustomobject]@{SmokeTest=$true} },
-            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.ready-for-user'; eventCategory='gui'; operationName='startup'; stageName='ready-for-user'; outcome='Success'; durationMs=18; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='WithinBudget'; tags=[pscustomobject]@{StartupTab='Quick Diagnosis'} }
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.ready-for-user'; eventCategory='gui'; operationName='startup'; stageName='ready-for-user'; outcome='Success'; durationMs=18; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='WithinBudget'; tags=[pscustomobject]@{StartupTab='Quick Diagnosis'} },
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.shutdown.start'; eventCategory='gui'; operationName='shutdown'; stageName='start'; outcome='Success'; durationMs=4; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='Unbudgeted'; tags=[pscustomobject]@{CloseReason='UserClosing';OrphanCount=0} },
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.shutdown.complete'; eventCategory='gui'; operationName='shutdown'; stageName='complete'; outcome='Success'; durationMs=6; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; budgetState='Unbudgeted'; tags=[pscustomobject]@{Disposed=$true} }
         )
         resourceSnapshots = @(
             [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.startup.ready-for-user'; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; processId=$PID; processName='pwsh'; workingSetMb=120.5; privateMemoryMb=140.5; handleCount=20; threadCount=8; cpuTimeMs=15.5; tags=[pscustomobject]@{StartupTab='Quick Diagnosis'} },
-            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='external-tool.launch'; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; processId=$PID; processName='pwsh'; workingSetMb=121.5; privateMemoryMb=141.5; handleCount=21; threadCount=8; cpuTimeMs=16.5; tags=[pscustomobject]@{FilePath='tool.exe'} }
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='external-tool.launch'; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; processId=$PID; processName='pwsh'; workingSetMb=121.5; privateMemoryMb=141.5; handleCount=21; threadCount=8; cpuTimeMs=16.5; tags=[pscustomobject]@{FilePath='tool.exe'} },
+            [pscustomobject]@{ schemaVersion='1.0'; runId='qa-fixture'; name='gui.shutdown.complete'; capturedAtUtc=[datetimeoffset]::UtcNow.ToString('o'); capturedAtOffset='+00:00'; processId=$PID; processName='pwsh'; workingSetMb=122.5; privateMemoryMb=142.5; handleCount=22; threadCount=8; cpuTimeMs=17.5; tags=[pscustomobject]@{Disposed=$true} }
         )
         providerHealth = @()
         observationCount = 0
@@ -98,10 +104,10 @@ try {
     Assert-True ($telemetry.Records.Count -eq 1 -and $telemetry.CorruptTail) 'Telemetry reader did not tolerate a corrupt tail record.'
 
     $history = Get-NTKPerformanceRunHistory -Path $telemetryPath -KeepRecent 5
-    Assert-True ($history.Runs.Count -eq 1 -and $history.Runs[0].timings.Count -eq 2 -and $history.Runs[0].resourceSnapshots.Count -eq 2) 'Performance history did not parse the preserved run.'
+    Assert-True ($history.Runs.Count -eq 1 -and $history.Runs[0].timings.Count -eq 4 -and $history.Runs[0].resourceSnapshots.Count -eq 3) 'Performance history did not parse the preserved run.'
 
     $model = Get-NTKPerformanceDashboardModel -KeepRecent 5
-    Assert-True ($model.metricSummaries.Count -ge 2 -and $model.resourceSummaries.Count -ge 2) 'Dashboard model did not summarize telemetry.'
+    Assert-True ($model.metricSummaries.Count -ge 4 -and $model.resourceSummaries.Count -ge 3) 'Dashboard model did not summarize telemetry.'
 
     $retention = Invoke-NTKPerformanceTelemetryRetention -Path $telemetryPath -KeepRecentRuns 1 -MaxAgeDays 30
     Assert-True ($retention.Changed -and $retention.Kept -eq 1) 'Telemetry retention did not preserve the most recent run.'

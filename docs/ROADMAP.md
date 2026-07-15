@@ -4,29 +4,25 @@
 
 Build a portable Windows toolkit that collects, validates, analyzes, explains, and reports the health of one computer at a time. Deterministic local processing comes first; ARGUS provides cited explanation and technician guidance.
 
-## Current Phase - Real-World Performance QA Instrumentation
+## Current Phase - Project Custodian Performance QA Review
 
 Status: Active.
 
 Current Active task:
-- `TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard`
+- `TASK-0116-Project-Custodian-Documentation-Engineering-Audit`
 
 Current objective:
-- Add objective launch, navigation, operation, external-tool, and resource timing for field QA.
-- Automate performance review from recorded telemetry rather than subjective impressions.
-- Add a Performance Dashboard accessible only from the Settings page.
+- Review the completed TASK-0114 implementation evidence and TASK-0115 documentation-audit evidence.
+- Decide the Documentation gate and confirm whether any follow-up is warranted.
 - Preserve the published `v1.0.0` tag and release artifacts unchanged.
 
 ## Current Sequence
 
-1. **TASK-0114 - Performance QA Instrumentation and Settings Dashboard**
-   - Extend the existing performance telemetry rather than create a competing framework.
-   - Record launch through `ReadyForUser`, cold/warm navigation, operation lifecycle, external-tool timing, and resource trends.
-   - Add bounded storage, automated QA reporting, export, and a Settings-only dashboard.
-   - Validate instrumentation overhead and PowerShell 5.1 compatibility.
-2. **Project Custodian Performance QA Review**
-   - Review implementation evidence and real-world sample data after TASK-0114 completes.
+1. **Project Custodian Performance QA Review**
+   - Review implementation evidence, documentation evidence, and sample data after TASK-0114 completion.
    - Approve the structured field-test checklist and determine whether a maintenance release is warranted.
+2. **Next Codex implementation task**
+   - No new Codex-owned implementation task is ordered until the review boundary is resolved.
 
 ## Version 1.0 Baseline
 

@@ -12,18 +12,20 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard` | Codex | Active | Add objective launch, navigation, operation, external-tool, and resource timing; automate performance QA; expose the dashboard only from Settings. |
+| `TASK-0116-Project-Custodian-Documentation-Engineering-Audit` | ChatGPT (Project Custodian) | Active | Review the TASK-0115 documentation-audit evidence, decide the Documentation gate, and activate the next boundary. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| _None_ | _None_ | _None_ | _None_ | No additional implementation task is queued behind TASK-0114. |
+| _None_ | _None_ | _None_ | _None_ | No additional implementation task is queued behind TASK-0116. |
 
 ## Recently Completed
 
 | Task | Status | Notes |
 |---|---|---|
+| `TASK-0115-Documentation-Audit-Preparation` | Complete | Prepared deterministic documentation-audit evidence for the TASK-0114 closeout and preserved the Documentation gate at `25 / 25`. |
+| `TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard` | Complete | Added launch-through-ReadyForUser telemetry, resource snapshots, shutdown/orphan checks, Settings-only dashboard reporting, and QA evidence. |
 | `TASK-0113-Version-1.0-Release-Publication` | Complete | Published `v1.0.0` from the accepted release commit and recorded the release metadata. |
 | `TASK-0080-Release-Candidate-Validation-And-Documentation` | Complete | Project Custodian accepted the verified candidate as release-ready after TASK-0112. |
 | `TASK-0112-Cold-Tab-Initialization-Performance-Remediation` | Complete | Added queued warm-up, per-stage timing, and focused cold-tab validation. |
@@ -36,7 +38,6 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 ## Current Decision
 
 - Version 1.0 remains published and unchanged.
-- The user authorized a focused real-world performance QA instrumentation cycle.
-- TASK-0114 is the sole Active Codex task.
-- The Performance Dashboard must be accessible only from the Settings page.
+- Documentation reached `25 / 25`; TASK-0116 is now the sole Active task.
+- The Performance Dashboard remains accessible only from the Settings page.
 - No unrelated feature work, helper framework work, native replacement work, or broad UI redesign is authorized.

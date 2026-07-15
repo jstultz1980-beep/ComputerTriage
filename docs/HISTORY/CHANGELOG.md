@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-15 - Performance QA Instrumentation Closeout
+
+- Completed TASK-0114 with launch-through-ReadyForUser timing, resource snapshots, shutdown/orphan checks, and Settings-only performance QA reporting.
+- Captured a five-launch cold-start evidence set and preserved a technician-readable QA validation record.
+- Reconciled the queue, handoff, roadmap, and build metadata for the Project Custodian review boundary.
+
 ## 2026-07-14 - Version 1.0 Release Publication
 
 - Published the Version 1.0.0 GitHub Release from the accepted release decision at commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
