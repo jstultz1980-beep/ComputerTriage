@@ -9862,13 +9862,18 @@ function Start-GUITabWarmupQueue {
             [void](Invoke-GUITabWarmupQueueStep)
         }
         catch {
-            Add-GUILog "Tab warm-up queue failed: $($_.Exception.Message)"
             Write-GUIDiagnosticLog -Event 'TabWarmupQueueFailed' -Tool 'GUI' -Level 'ERROR' -Detail $_.ScriptStackTrace -Exception $_.Exception
+            if($script:StatusLabel -and !$script:StatusLabel.IsDisposed){
+                $script:StatusLabel.Text = "Tab warm-up queue failed: $($_.Exception.Message)"
+            }
             Stop-GUITabWarmupQueue
         }
     })
     $script:GUITabWarmupTimer.Start()
-    Write-GUILog ("Queued {0} tab warm-up(s)." -f $items.Count)
+    Write-GUIDiagnosticLog -Event 'TabWarmupQueueStarted' -Tool 'GUI' -Detail ("Count={0}" -f $items.Count)
+    if($script:StatusLabel -and !$script:StatusLabel.IsDisposed){
+        $script:StatusLabel.Text = "Queued $($items.Count) tab warm-up(s)."
+    }
 }
 
 function Build-GUITabIfNeeded {
