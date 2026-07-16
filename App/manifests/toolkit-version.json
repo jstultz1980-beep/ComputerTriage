@@ -1,7 +1,7 @@
 ﻿{
     "Product":  "Network Toolkit",
     "Version":  "1.0.0",
-    "Build":  20260715151049,
-    "SourceUpdatedAt":  "2026-07-15T15:10:49.0000000-05:00",
-    "ReleaseNotes":  "TASK-0117 responsive layout and DPI remediation, boundary validation, and layout-closeout evidence."
+    "Build":  20260716084826,
+    "SourceUpdatedAt":  "2026-07-16T08:48:26.4148952-05:00",
+    "ReleaseNotes":  "TASK-0117 header-summary overflow clamp and launch-sizing refinement."
 }

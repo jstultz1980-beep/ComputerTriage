@@ -6,7 +6,7 @@ Generated local time: 2026-07-15 15:10:49 -05:00
 
 The default launcher assumed a fixed outer form size and a fixed header-summary minimum width. That left less usable client area than the layout code expected, so the right-side header content could clip on launch and under supported scaling.
 
-The remediation changes the launcher to size from usable client area, clamps the header summary to the actual available width, and adds deterministic boundary validation for the visible control tree.
+The remediation changes the launcher to size from usable client area, clamps the header summary to the actual available width, removes the premature minimum-width floor that could force the summary past the right edge, and adds deterministic boundary validation for the visible control tree.
 
 ## Captured layout dimensions
 
@@ -20,6 +20,7 @@ The remediation changes the launcher to size from usable client area, clamps the
 - Button smoke: Passed
 - Focused layout-boundary validation: Passed
 - Canonical repository validation: Passed, `20 passed, 0 failed`
+- Launch-sizing diagnostics now record the chosen screen, working area, and final client size at startup and after `Shown`.
 
 ## Evidence notes
 

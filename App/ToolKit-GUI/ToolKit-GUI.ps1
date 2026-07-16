@@ -9219,8 +9219,9 @@ function Add-GUIHeaderComputerSummary {
 
     $summary = New-Object System.Windows.Forms.TableLayoutPanel
     $summary.Location = New-Object System.Drawing.Point(370,10)
-    $summary.Size = New-Object System.Drawing.Size(710,58)
-    $summary.Anchor = "Top,Left,Right"
+    $summary.Size = New-Object System.Drawing.Size(1,58)
+    $summary.Anchor = "Top,Left"
+    $summary.Visible = $false
     $summary.ColumnCount = 4
     $summary.RowCount = 2
     $summary.BackColor = [System.Drawing.Color]::Transparent
@@ -9623,7 +9624,7 @@ function Update-GUIHeaderLayout {
     if($script:HeaderSummaryPanel -and !$script:HeaderSummaryPanel.IsDisposed -and $script:HeaderToolsPanel){
         $summaryLeft = 370
         $summaryRight = if($searchLeft){ $searchLeft - 16 }else{ $script:HeaderToolsPanel.Left - 16 }
-        $summaryWidth = $summaryRight - $summaryLeft
+        $summaryWidth = [Math]::Max(0, $summaryRight - $summaryLeft)
         if($summaryWidth -gt 0){
             $script:HeaderSummaryPanel.Visible = $true
             $script:HeaderSummaryPanel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
