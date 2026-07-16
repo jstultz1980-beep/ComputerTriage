@@ -9795,15 +9795,16 @@ function Stop-GUITabWarmupQueue {
 }
 
 function Invoke-GUITabWarmupQueueStep {
-    if(!$script:GUITabWarmupController){
+    $controller = $script:GUITabWarmupController
+    if(!$controller){
         return $null
     }
 
     if($script:MainTabs -and $script:MainTabs.SelectedTab){
-        [void](Request-NTKTabWarmupPriority -Controller $script:GUITabWarmupController -Name $script:MainTabs.SelectedTab.Text)
+        [void](Request-NTKTabWarmupPriority -Controller $controller -Name $script:MainTabs.SelectedTab.Text)
     }
 
-    $result = Invoke-NTKTabWarmupStep -Controller $script:GUITabWarmupController
+    $result = Invoke-NTKTabWarmupStep -Controller $controller
     if(!$result -or $result.Result -eq 'Empty'){
         Stop-GUITabWarmupQueue
         return $result
@@ -9813,17 +9814,17 @@ function Invoke-GUITabWarmupQueueStep {
         $pageName = [string]$result.Item.Name
         Write-GUITabPerformanceTiming -Name 'gui.tab.warmup' -Page $result.Item.Page -Source 'Warmup' -Stage $result.Result -DurationMs $result.DurationMs -ExtraTags @{Result=$result.Result}
         if($result.Result -eq 'Built'){
-            Write-GUIDiagnosticLog -Event 'TabWarmupBuilt' -Tool $pageName -Detail ("DurationMs={0}; Remaining={1}" -f $result.DurationMs,$script:GUITabWarmupController.Queue.Count)
+            Write-GUIDiagnosticLog -Event 'TabWarmupBuilt' -Tool $pageName -Detail ("DurationMs={0}; Remaining={1}" -f $result.DurationMs,$controller.Queue.Count)
         }
         elseif($result.Result -eq 'Skipped'){
-            Write-GUIDiagnosticLog -Event 'TabWarmupSkipped' -Tool $pageName -Detail ("Remaining={0}" -f $script:GUITabWarmupController.Queue.Count)
+            Write-GUIDiagnosticLog -Event 'TabWarmupSkipped' -Tool $pageName -Detail ("Remaining={0}" -f $controller.Queue.Count)
         }
         elseif($result.Result -eq 'Failed'){
             Write-GUIDiagnosticLog -Event 'TabWarmupFailed' -Tool $pageName -Level 'ERROR' -Detail $result.Error
         }
     }
 
-    if($script:GUITabWarmupController.Queue.Count -le 0){
+    if($controller.Queue.Count -le 0){
         Stop-GUITabWarmupQueue
     }
 
@@ -10004,8 +10005,9 @@ function Select-GUITabPage {
             try { $control.SuspendLayout() } catch {}
         }
 
-        if($script:GUITabWarmupController){
-            [void](Request-NTKTabWarmupPriority -Controller $script:GUITabWarmupController -Name $Page.Text)
+        $warmupController = $script:GUITabWarmupController
+        if($warmupController){
+            [void](Request-NTKTabWarmupPriority -Controller $warmupController -Name $Page.Text)
         }
 
         if($script:MainTabs.SelectedTab -ne $Page){
