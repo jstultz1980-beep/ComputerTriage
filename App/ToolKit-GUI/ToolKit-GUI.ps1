@@ -9637,19 +9637,30 @@ function Update-GUIHeaderLayout {
 }
 
 function Get-GUIInitialClientSize {
+    param(
+        [System.Windows.Forms.Screen]$Screen = $null
+    )
+
     $minClientWidth = 1200
     $minClientHeight = 680
     $preferredClientWidth = 1280
     $preferredClientHeight = 720
 
-    $screen = [System.Windows.Forms.Screen]::FromPoint([System.Windows.Forms.Cursor]::Position)
     if(!$screen){
         $screen = [System.Windows.Forms.Screen]::PrimaryScreen
     }
 
     $workingArea = if($screen){ $screen.WorkingArea }else{ [System.Drawing.Rectangle]::new(0,0,$preferredClientWidth,$preferredClientHeight) }
-    $clientWidth = [Math]::Min($preferredClientWidth, [Math]::Max($minClientWidth, $workingArea.Width - 24))
-    $clientHeight = [Math]::Min($preferredClientHeight, [Math]::Max($minClientHeight, $workingArea.Height - 48))
+    $fitWidth = [Math]::Max(1, $workingArea.Width - 24)
+    $fitHeight = [Math]::Max(1, $workingArea.Height - 48)
+    $clientWidth = [Math]::Min($preferredClientWidth, $fitWidth)
+    $clientHeight = [Math]::Min($preferredClientHeight, $fitHeight)
+    if($fitWidth -ge $minClientWidth){
+        $clientWidth = [Math]::Max($minClientWidth, $clientWidth)
+    }
+    if($fitHeight -ge $minClientHeight){
+        $clientHeight = [Math]::Max($minClientHeight, $clientHeight)
+    }
 
     return New-Object System.Drawing.Size($clientWidth, $clientHeight)
 }
@@ -16873,14 +16884,20 @@ function Build-Form {
     $Form.Font = New-Object System.Drawing.Font("Segoe UI Semilight",9.5)
     $Form.BackColor = $script:GUITheme.Shell
 
-    $initialClientSize = Get-GUIInitialClientSize
+    $initialScreen = [System.Windows.Forms.Screen]::PrimaryScreen
+    $initialClientSize = Get-GUIInitialClientSize -Screen $initialScreen
     $Form.ClientSize = $initialClientSize
     $nonClientWidth = [int]([Math]::Max(0, $Form.Size.Width - $Form.ClientSize.Width))
     $nonClientHeight = [int]([Math]::Max(0, $Form.Size.Height - $Form.ClientSize.Height))
     $minimumClientSize = New-Object System.Drawing.Size(1200,680)
-    $minimumWindowWidth = [int]$minimumClientSize.Width + [int]$nonClientWidth
-    $minimumWindowHeight = [int]$minimumClientSize.Height + [int]$nonClientHeight
+    $minimumFitWidth = [Math]::Max(1, $initialScreen.WorkingArea.Width - 24)
+    $minimumFitHeight = [Math]::Max(1, $initialScreen.WorkingArea.Height - 48)
+    $minimumClientWidth = if($minimumFitWidth -ge $minimumClientSize.Width){ $minimumClientSize.Width }else{ $minimumFitWidth }
+    $minimumClientHeight = if($minimumFitHeight -ge $minimumClientSize.Height){ $minimumClientSize.Height }else{ $minimumFitHeight }
+    $minimumWindowWidth = [int]$minimumClientWidth + [int]$nonClientWidth
+    $minimumWindowHeight = [int]$minimumClientHeight + [int]$nonClientHeight
     $Form.MinimumSize = New-Object System.Drawing.Size($minimumWindowWidth,$minimumWindowHeight)
+    Write-GUIDiagnosticLog -Event 'LaunchSizing' -Tool 'GUI' -Detail ("Screen={0}; WorkingArea={1}x{2}; ClientSize={3}x{4}; MinimumClientSize={5}x{6}" -f $initialScreen.DeviceName,$initialScreen.WorkingArea.Width,$initialScreen.WorkingArea.Height,$Form.ClientSize.Width,$Form.ClientSize.Height,$minimumClientWidth,$minimumClientHeight)
 
     if(Test-Path $GuiIconPath){
         $Form.Icon = New-Object System.Drawing.Icon($GuiIconPath)
@@ -17286,6 +17303,23 @@ function Build-Form {
         }
         Update-GUIStaticTabStripSelection
         $Form.Add_Shown({
+            $shownScreen = $null
+            try {
+                if($script:Form -and $script:Form.IsHandleCreated){
+                    $shownScreen = [System.Windows.Forms.Screen]::FromControl($script:Form)
+                }
+            }
+            catch {}
+
+            if(!$shownScreen){
+                $shownScreen = [System.Windows.Forms.Screen]::PrimaryScreen
+            }
+
+            $shownClientSize = Get-GUIInitialClientSize -Screen $shownScreen
+            if($script:Form -and !$script:Form.IsDisposed -and ($script:Form.ClientSize.Width -ne $shownClientSize.Width -or $script:Form.ClientSize.Height -ne $shownClientSize.Height)){
+                $script:Form.ClientSize = $shownClientSize
+            }
+            Write-GUIDiagnosticLog -Event 'LaunchSizingShown' -Tool 'GUI' -Detail ("Screen={0}; WorkingArea={1}x{2}; ClientSize={3}x{4}" -f $shownScreen.DeviceName,$shownScreen.WorkingArea.Width,$shownScreen.WorkingArea.Height,$script:Form.ClientSize.Width,$script:Form.ClientSize.Height)
             Update-GUIHeaderLayout
             if($script:StartupTabBuildTimer){
                 try { $script:StartupTabBuildTimer.Stop(); $script:StartupTabBuildTimer.Dispose() } catch {}
