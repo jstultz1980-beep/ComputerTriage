@@ -1,39 +1,40 @@
 # Current Handoff
 
 ## Handoff ID
-HANDOFF-0127
+HANDOFF-0128
 
 ## Current Task
-TASK-0117-Responsive-Initial-Layout-And-DPI-Remediation (Complete)
+TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral
 
 ## Current Owner
 Codex
 
 ## Next Owner
-ChatGPT (Project Custodian) for completion review and next task activation.
+ChatGPT (Project Custodian) after TASK-0118 completes measured validation and returns before/after launch and heavy-tab evidence.
 
 ## Objective
-Record the completed TASK-0117 layout remediation, preserve the validation evidence for Project Custodian review, and keep the deferred-startup `Write-GUILog` defect separate.
+Reduce the measured 4.5-4.9 second shell-to-usable-window time by replacing eager 27-tab launch warm-up with bounded idle/on-demand initialization and making the heaviest tabs truly deferred.
 
 ## Source Of Truth
 The repository is authoritative. Exactly one task may be Active, and handoff, queue, and Active task file must agree.
 
 ## Current Project State
 - Version 1.0 remains published as `v1.0.0` from accepted commit `38de0b626fe3cadc6848a12b9e40fadfc7006151`.
-- TASK-0114 performance QA instrumentation is complete.
-- TASK-0115 prepared the Documentation audit evidence.
-- TASK-0116 accepted the audit, reset only Documentation from `25 / 25` to `0 / 25`, and is complete.
-- TASK-0117 corrected the default-launch right-side clipping defect and completed focused validation.
-- There is currently no Active Codex implementation task.
-- The separate deferred-startup `Write-GUILog` failure is not authorized under TASK-0117 and must be tracked independently.
+- TASK-0114 performance QA instrumentation and the Settings-only dashboard are complete.
+- TASK-0116 accepted the Documentation audit and reset only Documentation to `0 / 25`.
+- TASK-0117 corrected default-launch clipping and completed validation.
+- The live performance audit measured shell-to-usable-window time at approximately 4.5-4.9 seconds.
+- Launch currently schedules 27 tabs for deferred warm-up, which is the primary measured bottleneck.
+- Print, Analyze, Directory, and Windows Update have the highest observed first-render costs.
+- TASK-0118 is the sole Active Codex task.
+- The separate deferred-startup `Write-GUILog` failure remains outside TASK-0118 and requires independent sequencing.
 - The Performance Dashboard remains accessible only from Settings.
-- The published Version 1.0 tag and release artifacts remain unchanged.
-- Broad UI redesign and unrelated feature expansion remain deferred.
+- The published Version 1.0 tag and release artifacts must remain unchanged.
 
 ## Active Task Scope
-_None_
+`TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral`
 
-No implementation task is currently active. The completed TASK-0117 layout remediation remains recorded for Project Custodian review, and the deferred-startup `Write-GUILog` failure must be tracked separately.
+Codex must capture the baseline, replace eager 27-tab launch warm-up with a bounded cost-aware idle/on-demand policy, defer expensive embedded-script/live-data work for the heaviest tabs, reduce avoidable startup UI churn, and validate measurable improvement using the existing TASK-0100/TASK-0112/TASK-0114 telemetry. It must preserve user-selection priority, one-time initialization, failure isolation, PowerShell 5.1 behavior, lifecycle semantics, unrelated drift, and the published release.
 
 ## Audit Counters
 
@@ -41,8 +42,8 @@ No implementation task is currently active. The completed TASK-0117 layout remed
 |---|---:|---|
 | Repository Governance | 17 / 25 | No |
 | Architecture | 20 / 25 | No |
-| Documentation | 1 / 25 | No |
-| Task System | 12 / 25 | No |
+| Documentation | 2 / 25 | No |
+| Task System | 13 / 25 | No |
 | Evidence Collection and Deterministic Analysis | 11 / 25 | No |
 | ARGUS | 10 / 25 | No |
 | Reporting | 6 / 25 | No |
@@ -50,7 +51,7 @@ No implementation task is currently active. The completed TASK-0117 layout remed
 | Plugin Framework | 6 / 25 | No |
 | Build System | 10 / 25 | No |
 | Validation/Test Framework | 18 / 25 | No |
-| Roadmap/Backlog | 15 / 25 | No |
+| Roadmap/Backlog | 16 / 25 | No |
 
 ## Known Working-Tree Drift
 Do not stage or clean unless a focused task explicitly owns it:
@@ -69,11 +70,11 @@ Do not stage or clean unless a focused task explicitly owns it:
 None.
 
 ## Decision Reference
+- `docs/TASKS/TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral.md`
+- `docs/REVIEWS/TASK-0117/PERFORMANCE-AUDIT-FINDINGS.md`
 - `docs/TASKS/TASK-0117-Responsive-Initial-Layout-And-DPI-Remediation.md`
-- `docs/REVIEWS/TASK-0117/VALIDATION.md`
-- `docs/TASKS/TASK-0116-Project-Custodian-Documentation-Engineering-Audit.md`
-- `docs/REVIEWS/TASK-0115/DOCUMENTATION-AUDIT-PREPARATION.md`
-- `docs/REVIEWS/TASK-0114/VALIDATION.md`
+- `docs/TASKS/TASK-0114-Performance-QA-Instrumentation-And-Settings-Dashboard.md`
+- `docs/TASKS/TASK-0112-Cold-Tab-Initialization-Performance-Remediation.md`
 - `docs/GOVERNANCE/HANDOFF-STATE-AND-FINGERPRINT-PROTOCOL.md`
 
 ## Next Bot Prompt
