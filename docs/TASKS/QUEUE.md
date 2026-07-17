@@ -12,13 +12,13 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 | Task | Owner | Status | Purpose |
 |---|---|---|---|
-| `TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral` | Codex | Active | Reduce measured launch latency by replacing eager 27-tab warm-up with bounded idle/on-demand initialization and deferring heavy tabs. |
+| `TASK-0119-Deferred-Startup-Logging-Initialization-Error` | Codex | Active | Correct the confirmed deferred-startup `Write-GUILog` initialization/scope failure and preserve actionable fallback diagnostics. |
 
 ## Ordered Queue
 
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
-| _None_ | _None_ | _None_ | _None_ | No additional implementation task is queued behind TASK-0118. |
+| 1 | `TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral` | Codex | Queued | Resume measured startup optimization after the confirmed startup error is corrected. |
 
 ## Recently Completed
 
@@ -34,9 +34,8 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 ## Current Decision
 
-- The live performance audit recorded shell-to-usable-window time of approximately 4.5-4.9 seconds.
-- Launch currently schedules 27 tabs for deferred warm-up; this is the primary measured startup bottleneck.
-- TASK-0118 is the sole Active task and must extend the existing performance/warm-up contracts.
-- Print, Analyze, Directory, and Windows Update are the priority heavy tabs for demand-driven or staged construction.
-- The separate deferred-startup `Write-GUILog` defect remains out of scope and requires independent sequencing.
+- A visible startup error takes priority over performance tuning.
+- TASK-0119 is the sole Active task and must identify the actual initialization, scope, or runspace failure rather than suppressing the message.
+- TASK-0118 remains authorized but queued unchanged behind TASK-0119.
+- Deferred startup failures must remain visible through a safe fallback path.
 - The published `v1.0.0` release and unrelated drift must remain untouched.
