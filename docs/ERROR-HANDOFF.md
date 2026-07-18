@@ -1,56 +1,50 @@
 # Active Error Handoff
 
 ## Status
-Resolved - Authorized Reconciliation
+Active - Project Custodian Action Required
 
 ## Reporting Agent
 Codex
 
 ## Active Task
-TASK-0112-Cold-Tab-Initialization-Performance-Remediation
+TASK-0119-Deferred-Startup-Logging-Initialization-Error
 
 ## Error ID
-ERR-GIT-DIVERGENCE-20260714-003
+ERR-GIT-REMOTE-REFLOG-ACL-20260717-001
 
 ## Severity
 High
 
 ## Summary
-The local safety branch contains one Codex-created commit that is not yet on the upstream branch, while the upstream branch contains four newer Project Custodian governance commits. Local state is therefore ahead 1 and behind 4. Codex correctly stopped instead of trusting stale local governance.
+The HANDOFF-0131 Governance Refresh fetched authoritative commit `b09b775a9ed398a8bb42a64d3b257c3bd57a8b40`, but Git could not update the checked-out branch's remote-tracking ref because Windows denied append access to `.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713`.
 
-## Project Custodian Decision
-The local commit must be preserved. The four upstream governance commits must also be preserved. Codex is authorized to perform one non-destructive merge of the current upstream branch into the checked-out local safety branch.
+Local `HEAD` and the local `@{u}` therefore remain at `f5a1d6b309feb81d9b2b2a3373cb5c69da25c12b`, while `git ls-remote` confirms the authoritative cloud branch is at `b09b775a9ed398a8bb42a64d3b257c3bd57a8b40`. The required `HEAD == @{u}`, `0 0`, and newest-handoff-commit checks cannot pass.
 
-This is a synchronization repair only. It does not authorize new scope, rebasing, resetting, force-pushing, cleaning, stashing, or modifying unrelated working-tree drift.
+## Exact Failure
 
-## Required Reconciliation Procedure
-From the checked-out `safety/codex-task0110-0080-divergence-20260713` branch, Codex must run:
-
-```powershell
-git status --short --branch
-git fetch --prune origin
-git branch safety/pre-sync-task0112-20260714 HEAD
-git merge --no-edit @{u}
+```text
+error: cannot update the ref 'refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713': unable to append to '.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713': Permission denied
 ```
 
-If the merge completes without conflicts, Codex must then run:
+The reflog file is owned by `BUILTIN\Administrators`. Its effective ACL grants the current Codex context read/execute through `BUILTIN\Users`, but no write/append permission.
 
-```powershell
-git rev-parse HEAD
-git rev-parse @{u}
-git rev-list --left-right --count HEAD...@{u}
-git status --short --branch
-```
+## Preserved State
 
-The expected post-merge relationship is that local is ahead by the new merge commit and behind by zero. Codex may then reread the cloud-synchronized governance set and continue TASK-0112.
+- No ACL was changed.
+- The separately authorized ADR ACL repair was not attempted because repository synchronization did not complete.
+- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` content and documented working-tree modification remain unchanged.
+- TASK-0119 implementation work and all other documented drift remain unchanged.
 
-If any merge conflict occurs, Codex must stop immediately, preserve the conflict state, list the conflicted files, and return through `Tell Debbie to address errors`. Codex must not guess at governance conflict resolution.
+## Required Project Custodian Decision
 
-## Repository Authority Rule
-Codex must not trust local governance until it has fetched and integrated the newest upstream commits. A fetch alone is insufficient. At every handoff, both agents must report branch, full HEAD, upstream, ahead/behind counts, task ownership, repository verification status, preserved-drift status, and a Central Time timestamp.
+Authorize a narrowly scoped ACL repair for the exact Git remote-tracking reflog path (and only any directly necessary parent Git metadata path discovered by verification), then reissue `Governance Refresh` from HANDOFF-0131 or a superseding handoff.
 
-## Preserved Working-Tree Drift
-Do not stage, clean, restore, reset, overwrite, or otherwise alter unrelated drift recorded in `docs/HANDOFF.md`.
+After access is repaired, Codex must repeat fetch and safe fast-forward verification before applying the already-authorized ADR ACL reset or continuing TASK-0119.
 
-## Resolution
-Project Custodian reconciliation authorization recorded. Codex may perform the one-time non-destructive upstream merge described above and continue TASK-0112 if the merge is conflict-free.
+## Prohibited Until Resolution
+
+- Do not claim repository verification.
+- Do not apply the ADR ACL repair.
+- Do not resume TASK-0119.
+- Do not normalize unrelated repository or Git ACLs.
+- Do not clean, stage, restore, reset, or overwrite preserved drift.
