@@ -1,7 +1,7 @@
 # Active Error Handoff
 
 ## Status
-Resolved by Project Custodian
+Active - Elevated Windows ACL Repair Required
 
 ## Reporting Agent
 Codex
@@ -10,41 +10,52 @@ Codex
 TASK-0119-Deferred-Startup-Logging-Initialization-Error
 
 ## Error ID
-ERR-GIT-REMOTE-REFLOG-ACL-20260717-001
+ERR-GIT-ACL-RESET-REQUIRES-ELEVATION-20260717-002
 
-## Resolution
-The Project Custodian authorizes a one-time, narrowly scoped ACL repair for the exact Git remote-tracking reflog path:
+## Severity
+High
 
-`.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713`
+## Summary
+HANDOFF-0132 authorized inherited-permission restoration for the failing Git remote-tracking reflog and directly necessary parent metadata paths. Codex captured the ACL evidence and attempted the authorized `icacls /reset` and `/inheritance:e` operations on exactly:
 
-Codex may also repair only the directly necessary parent metadata paths under:
+- `.git/logs/refs/remotes/origin/safety`
+- `.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713`
 
-- `.git/logs/refs/remotes/origin/`
-- `.git/refs/remotes/origin/`
+Windows rejected every operation with `Access is denied`. No ACL changed.
 
-This authorization exists solely to restore Git fetch, remote-tracking-ref update, safe fast-forward synchronization, and reflog append behavior for the current branch. It does not authorize repository-wide ACL normalization, changes to unrelated `.git` metadata, content changes, drift cleanup, reset, checkout, or deletion.
+## Root Cause Evidence
+The two paths are owned by `BUILTIN\Administrators`. The current process runs as `J4FARMS\josh.adm` at Medium integrity, with `BUILTIN\Administrators` and `J4FARMS\Domain Admins` marked `Group used for deny only`. The process therefore lacks an enabled elevated administrator token capable of changing these ACLs.
 
-## Authorized Procedure
-1. Capture and report the current ACL, owner, inheritance state, and SDDL for the failing reflog path and any directly necessary parent path.
-2. Restore inherited permissions from the nearest correct parent. `icacls <path> /reset` and `icacls <path> /inheritance:e` are authorized only for the exact path and directly necessary parent paths listed above.
-3. Do not alter Git object content, refs, index content, working-tree files, stashes, or preserved drift while repairing ACLs.
-4. Repeat:
-   - `git fetch --prune origin`
-   - `git merge --ff-only @{u}`
-   - `git rev-parse HEAD`
-   - `git rev-parse @{u}`
-   - `git rev-list --left-right --count HEAD...@{u}`
-5. Repository verification must show local `HEAD == @{u}` and comparison `0 0` before any further repair or TASK-0119 work.
-6. After synchronization, apply the separately authorized ACL-only repair to `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`, preserving its content and working-tree modification.
-7. Continue TASK-0119 only after both access checks succeed.
-8. Record all ACL changes and verification evidence in the task completion evidence or a new error handoff.
+The failing reflog remains inheritance-enabled but inherits only read/execute access for `BUILTIN\Users`; it has no effective write/append or ACL-change grant for the current process.
 
-## Preserved-State Requirements
-- Preserve all documented working-tree drift.
-- Preserve all stashes.
-- Do not stage or commit the ADR content.
-- Do not normalize unrelated Git or repository ACLs.
-- Do not modify published Version 1.0 artifacts or tags.
+## Exact Failure
 
-## Project Custodian Decision Time
-2026-07-17 23:41:25 CDT
+```text
+.git\logs\refs\remotes\origin\safety: Access is denied.
+.git\logs\refs\remotes\origin\safety\codex-task0110-0080-divergence-20260713: Access is denied.
+Successfully processed 0 files; Failed processing 1 files
+```
+
+## Repository State
+- Local `HEAD`: `f5a1d6b309feb81d9b2b2a3373cb5c69da25c12b`
+- Local stale `@{u}`: `f5a1d6b309feb81d9b2b2a3373cb5c69da25c12b`
+- Authoritative cloud branch before this blocker report: `fa3cb1d1cbf9ac97a448a0c34788db494125e30d`
+- Local repository verification cannot pass because the remote-tracking ref cannot be updated.
+
+## Preserved State
+- ACL owner, inheritance state, and SDDL were captured before the attempt.
+- The attempted ACL operations changed neither authorized path.
+- The ADR ACL repair was not attempted.
+- ADR SHA-256 remains `498E44ABEE2B1EC0C3577365C8E21667BB8EDD46BF370EB8AF17F64EC4BE05D2`; its Git blob remains `67ed160b3b6676c6e732b880094b483adb2b17fb`.
+- The pre-attempt index tree remains `a2a436bdcd52e0fad0fa20baf6391c291b17fb1c`.
+- Both existing stashes and all unrelated drift remain preserved.
+
+## Required Resolution
+Perform the already-authorized inherited ACL restoration from an elevated Windows process, or restart Codex in an elevated process that can perform it. Then issue `Governance Refresh` again so Codex can fetch, fast-forward to exact `0 0`, apply the separately authorized ADR ACL-only repair, and resume TASK-0119.
+
+## Prohibited Until Resolution
+- Do not claim repository verification.
+- Do not apply the ADR ACL repair.
+- Do not resume TASK-0119.
+- Do not normalize unrelated repository or Git ACLs.
+- Do not clean, stage, restore, reset, or overwrite preserved drift.
