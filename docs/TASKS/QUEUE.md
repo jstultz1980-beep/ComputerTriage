@@ -19,6 +19,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 | Order | Task | Owner | Status | Purpose |
 |---:|---|---|---|---|
 | 1 | `TASK-0118-Startup-Warmup-And-Heavy-Tab-Deferral` | Codex | Queued | Resume measured startup optimization after the confirmed startup error is corrected. |
+| 2 | `TASK-0120-Preserved-Drift-Inventory-And-Reconciliation` | Codex | Queued | Inventory and resolve every modified, untracked, generated, archived, or retained-stash item through an approved disposition and return the repository to a clean state. |
 
 ## Recently Completed
 
@@ -36,6 +37,7 @@ When any subsystem reaches `25 / 25`, Codex must automatically create and comple
 
 - A visible startup error takes priority over performance tuning.
 - TASK-0119 is the sole Active task and must identify the actual initialization, scope, or runspace failure rather than suppressing the message.
-- TASK-0118 remains authorized but queued unchanged behind TASK-0119.
+- TASK-0118 remains authorized and queued immediately behind TASK-0119.
+- TASK-0120 is mandatory after TASK-0118 and must eliminate the indefinite preserved-drift exception through item-by-item reconciliation.
 - Deferred startup failures must remain visible through a safe fallback path.
-- The published `v1.0.0` release and unrelated drift must remain untouched.
+- The published `v1.0.0` release must remain untouched.
