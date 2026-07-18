@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide a single, symmetric, copyable handoff format so the user, Project Custodian, and Codex can immediately detect branch, commit, task, ownership, or synchronization mismatches before work begins.
+Provide a single, symmetric, copyable handoff format so the user, Project Custodian, and Codex can immediately detect branch, commit, task, ownership, synchronization, or chronology mismatches before work begins.
 
 This policy applies to every stop-boundary message from both ChatGPT/Project Custodian and Codex. It supplements the existing synchronization, timestamp, and final-operator-instruction rules. Where an older handoff example omits a field required here, this protocol controls.
 
@@ -39,9 +39,9 @@ Repository State
 ----------------
 Handoff ID: <HANDOFF-NNNN>
 Current Branch: <branch>
-Current HEAD: <full commit SHA>
+Current HEAD: <full commit SHA or UNVERIFIED>
 Current Upstream: <origin/branch or authoritative cloud branch>
-Upstream Comparison: <ahead> <behind>
+Upstream Comparison: <ahead> <behind or UNVERIFIED>
 
 Current Task: <task or None>
 Current Owner: <owner>
@@ -50,13 +50,50 @@ Next Owner: <owner>
 Repository State Verified: YES|NO
 Verification Reason: <required when NO; use Verified when YES>
 Preserved Drift: Unchanged|Changed as documented
-Repository Fingerprint: Branch=<branch>;HEAD=<full commit SHA>;Task=<task or None>;Owner=<owner>;Handoff=<HANDOFF-NNNN>
+Repository Fingerprint: Branch=<branch>;HEAD=<full commit SHA or UNVERIFIED>;Task=<task or None>;Owner=<owner>;Handoff=<HANDOFF-NNNN>
 
-Handoff Timestamp: YYYY-MM-DD HH:mm:ss CDT|CST
+Repository Verification Time: YYYY-MM-DD HH:mm:ss CDT|CST | UNKNOWN (<reason>)
+Work Stop Time: YYYY-MM-DD HH:mm:ss CDT|CST | UNKNOWN (<reason>)
+Handoff Generated Time: YYYY-MM-DD HH:mm:ss CDT|CST
 Next Command: <command>
 ```
 
-The timestamp must use `America/Chicago` with the correct `CDT` or `CST` abbreviation.
+All times must use `America/Chicago` and the correct `CDT` or `CST` abbreviation.
+
+## Timestamp Integrity Standard
+
+No timestamp may be synthesized, rounded to a placeholder, copied from an unrelated event, or guessed.
+
+The following values are prohibited unless they are the actual captured times:
+
+- `00:00:00`
+- the current date with an invented time
+- a prior handoff time reused for a new handoff
+- a repository commit time presented as a handoff time
+
+The three required timestamps have distinct meanings:
+
+- `Repository Verification Time` is the exact time repository state was last successfully verified.
+- `Work Stop Time` is the exact time execution stopped, completed, or became blocked.
+- `Handoff Generated Time` is the exact time the visible handoff was produced.
+
+If repository verification or work-stop time cannot be captured, the field must use `UNKNOWN` and include a concise reason. `Handoff Generated Time` must always be captured at generation time.
+
+Examples:
+
+```text
+Repository Verification Time: 2026-07-17 19:41:03 CDT
+Work Stop Time: 2026-07-17 19:42:18 CDT
+Handoff Generated Time: 2026-07-17 19:42:31 CDT
+```
+
+```text
+Repository Verification Time: UNKNOWN (sandbox failure prevented command execution)
+Work Stop Time: 2026-07-17 19:42:18 CDT
+Handoff Generated Time: 2026-07-17 19:42:31 CDT
+```
+
+A handoff containing a fabricated or placeholder timestamp is invalid and must be corrected before it is accepted as authoritative.
 
 ## Verification Standard
 
@@ -76,13 +113,37 @@ If any required condition fails, verification must be `NO`. The response must id
 
 ## Repository Fingerprint
 
-The fingerprint is mandatory and must use the exact full commit SHA:
+The fingerprint is mandatory. When verified, it must use the exact full commit SHA:
 
 ```text
 Repository Fingerprint: Branch=<branch>;HEAD=<full SHA>;Task=<task or None>;Owner=<owner>;Handoff=<HANDOFF-NNNN>
 ```
 
+When the commit cannot be verified, the fingerprint must use the exact literal value `UNVERIFIED`:
+
+```text
+Repository Fingerprint: Branch=<branch>;HEAD=UNVERIFIED;Task=<task or None>;Owner=<owner>;Handoff=<HANDOFF-NNNN>
+```
+
+Values such as `Not inspected`, `Unavailable`, `Unknown SHA`, or partial commit hashes are prohibited in the fingerprint.
+
 A fingerprint mismatch between Debbie and Codex means repository state is not verified, even when the timestamps are close.
+
+## Blocker Evidence Standard
+
+A blocker handoff must separate established facts from inference and include:
+
+```text
+Root Cause: <established cause or best-supported diagnosis>
+Confidence: High|Medium|Low (<optional percentage>)
+Evidence:
+- <direct observation>
+- <direct observation>
+Remaining Unknowns:
+- <unverified detail or None>
+```
+
+A diagnosis must not be labeled a confirmed public product defect unless an authoritative source establishes that fact. When evidence supports only a local runtime or environment diagnosis, the handoff must say so.
 
 ## Final Operator Instruction
 
