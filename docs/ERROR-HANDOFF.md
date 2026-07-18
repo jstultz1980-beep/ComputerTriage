@@ -1,7 +1,7 @@
 # Active Error Handoff
 
 ## Status
-Active - Project Custodian Action Required
+Resolved by Project Custodian
 
 ## Reporting Agent
 Codex
@@ -12,39 +12,39 @@ TASK-0119-Deferred-Startup-Logging-Initialization-Error
 ## Error ID
 ERR-GIT-REMOTE-REFLOG-ACL-20260717-001
 
-## Severity
-High
+## Resolution
+The Project Custodian authorizes a one-time, narrowly scoped ACL repair for the exact Git remote-tracking reflog path:
 
-## Summary
-The HANDOFF-0131 Governance Refresh fetched authoritative commit `b09b775a9ed398a8bb42a64d3b257c3bd57a8b40`, but Git could not update the checked-out branch's remote-tracking ref because Windows denied append access to `.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713`.
+`.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713`
 
-Local `HEAD` and the local `@{u}` therefore remain at `f5a1d6b309feb81d9b2b2a3373cb5c69da25c12b`, while `git ls-remote` confirms the authoritative cloud branch is at `b09b775a9ed398a8bb42a64d3b257c3bd57a8b40`. The required `HEAD == @{u}`, `0 0`, and newest-handoff-commit checks cannot pass.
+Codex may also repair only the directly necessary parent metadata paths under:
 
-## Exact Failure
+- `.git/logs/refs/remotes/origin/`
+- `.git/refs/remotes/origin/`
 
-```text
-error: cannot update the ref 'refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713': unable to append to '.git/logs/refs/remotes/origin/safety/codex-task0110-0080-divergence-20260713': Permission denied
-```
+This authorization exists solely to restore Git fetch, remote-tracking-ref update, safe fast-forward synchronization, and reflog append behavior for the current branch. It does not authorize repository-wide ACL normalization, changes to unrelated `.git` metadata, content changes, drift cleanup, reset, checkout, or deletion.
 
-The reflog file is owned by `BUILTIN\Administrators`. Its effective ACL grants the current Codex context read/execute through `BUILTIN\Users`, but no write/append permission.
+## Authorized Procedure
+1. Capture and report the current ACL, owner, inheritance state, and SDDL for the failing reflog path and any directly necessary parent path.
+2. Restore inherited permissions from the nearest correct parent. `icacls <path> /reset` and `icacls <path> /inheritance:e` are authorized only for the exact path and directly necessary parent paths listed above.
+3. Do not alter Git object content, refs, index content, working-tree files, stashes, or preserved drift while repairing ACLs.
+4. Repeat:
+   - `git fetch --prune origin`
+   - `git merge --ff-only @{u}`
+   - `git rev-parse HEAD`
+   - `git rev-parse @{u}`
+   - `git rev-list --left-right --count HEAD...@{u}`
+5. Repository verification must show local `HEAD == @{u}` and comparison `0 0` before any further repair or TASK-0119 work.
+6. After synchronization, apply the separately authorized ACL-only repair to `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md`, preserving its content and working-tree modification.
+7. Continue TASK-0119 only after both access checks succeed.
+8. Record all ACL changes and verification evidence in the task completion evidence or a new error handoff.
 
-## Preserved State
+## Preserved-State Requirements
+- Preserve all documented working-tree drift.
+- Preserve all stashes.
+- Do not stage or commit the ADR content.
+- Do not normalize unrelated Git or repository ACLs.
+- Do not modify published Version 1.0 artifacts or tags.
 
-- No ACL was changed.
-- The separately authorized ADR ACL repair was not attempted because repository synchronization did not complete.
-- `docs/ADRS/ADR-0003-ARGUS-Input-Contract-And-Trust-Model.md` content and documented working-tree modification remain unchanged.
-- TASK-0119 implementation work and all other documented drift remain unchanged.
-
-## Required Project Custodian Decision
-
-Authorize a narrowly scoped ACL repair for the exact Git remote-tracking reflog path (and only any directly necessary parent Git metadata path discovered by verification), then reissue `Governance Refresh` from HANDOFF-0131 or a superseding handoff.
-
-After access is repaired, Codex must repeat fetch and safe fast-forward verification before applying the already-authorized ADR ACL reset or continuing TASK-0119.
-
-## Prohibited Until Resolution
-
-- Do not claim repository verification.
-- Do not apply the ADR ACL repair.
-- Do not resume TASK-0119.
-- Do not normalize unrelated repository or Git ACLs.
-- Do not clean, stage, restore, reset, or overwrite preserved drift.
+## Project Custodian Decision Time
+2026-07-17 23:41:25 CDT
